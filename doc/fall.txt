@@ -1,0 +1,23 @@
+*fall.txt*							Filter All
+
+Author:  Alisue <lambdalisue@gmail.com>
+License: MIT License (See LICENSE)
+
+
+=============================================================================
+CONTENTS					*fall-contents*
+
+INTRODUCTION			|fall-introduction|
+
+
+=============================================================================
+INTRODUCTION					*fall-introduction*
+
+Fall (*fall.vim*) is a yet another fuzzy finder for Vim/Neovim written
+in Denops.
+
+Denops: https://github.com/vim-denops/denops.vim
+
+
+=============================================================================
+vim:tw=78:fo=tcq2mM:ts=8:ft=help:norl
