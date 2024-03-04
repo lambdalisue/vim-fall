@@ -3,23 +3,10 @@ import type { SetupParams } from "./setup.ts";
 export const defaultParams: SetupParams = {
   picker: {
     items: {
-      "": {
-        defaultAction: "open",
-        actions: ["debug", "echo", "open", "open:*"],
-        filters: ["substring"],
-        sorters: ["lexical", "lexical:desc"],
-        presenters: [],
-        previewer: "path",
-      },
       "line": {
         sorters: [],
         presenters: [],
       },
-    },
-    action: {
-      filters: ["substring"],
-      sorters: ["lexical", "lexical:desc"],
-      presenters: [],
     },
   },
   sources: {

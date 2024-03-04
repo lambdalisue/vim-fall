@@ -47,11 +47,21 @@ export const isSetupParams = is.ObjectOf({
 
 export type SetupParams = PredicateType<typeof isSetupParams>;
 
-let itemsPickerDefaults: Record<string, ItemsPickerDefault> = {};
+let itemsPickerDefaults: Record<string, ItemsPickerDefault> = {
+  "": {
+    defaultAction: "open",
+    actions: ["debug", "echo", "open", "open:*"],
+    filters: ["substring"],
+    sorters: ["lexical", "lexical:desc"],
+    presenters: [],
+    previewer: "path",
+    params: {},
+  },
+};
 
 let actionPickerDefault: ActionPickerDefault = {
-  filters: [],
-  sorters: [],
+  filters: ["substring"],
+  sorters: ["lexical", "lexical:desc"],
   presenters: [],
   params: {},
 };
