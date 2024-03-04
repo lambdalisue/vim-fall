@@ -11,6 +11,7 @@ import type {
   Previewer,
   Processor,
   Source,
+  SourceItem,
 } from "../types.ts";
 import { AsyncScheduler } from "../util/async_scheduler.ts";
 import {
@@ -155,24 +156,44 @@ export class ItemsPicker {
     );
 
     // Read streams and collect items in background
-    let pickerItems: PickerItem[] = [];
+    const pickerItems: PickerItem[] = [];
     let items: PresentationItem[] = [];
+    let updateCounter = 0;
+    let stream: ReadableStream<SourceItem>;
     try {
-      (await this.#source(denops, ...args)).pipeTo(
-        new WritableStream({
-          write: (chunk) => {
-            pickerItems = [...pickerItems, chunk].map((v, i) => ({
-              ...v,
-              id: i.toString(),
-            }));
-          },
-        }),
-        { signal },
-      );
+      stream = await this.#source(denops, ...args);
     } catch (err) {
       await layout.dispose(denops);
       throw err;
     }
+    stream.pipeTo(
+      new WritableStream({
+        write: (chunk, controller) => {
+          pickerItems.push({
+            ...chunk,
+            id: pickerItems.length.toString(),
+          });
+          updateCounter += 1;
+          if (updateCounter > 200) {
+            this.#changed = true;
+            updateCounter = 0;
+          }
+          if (pickerItems.length > 10000) {
+            controller.error(new Error("Too many items"));
+          }
+        },
+        close: () => {
+          this.#changed = true;
+          updateCounter = 0;
+        },
+      }),
+      { signal },
+    ).catch((err) => {
+      console.warn(`[fall] Error in reading source: ${err}`);
+    }).finally(() => {
+      this.#changed = true;
+      updateCounter = 0;
+    });
 
     // Listen cursor movement events
     const eventSelect = () => {
@@ -181,7 +202,7 @@ export class ItemsPicker {
       if (selector.selected.includes(item.id)) {
         selector.selected = selector.selected.filter((v) => v !== item.id);
       } else {
-        selector.selected = [...selector.selected, item.id];
+        selector.selected.push(item.id);
       }
     };
     const eventSorterNext = () => this.sorterIndex += 1;
