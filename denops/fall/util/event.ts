@@ -68,4 +68,8 @@ const subscriberMap: {
 const fallEventDataMap = {
   "cmdline-changed": is.String,
   "cmdpos-changed": is.Number,
+  "item-collector-changed": is.Unknown,
+  "item-collector-succeeded": is.Unknown,
+  "item-collector-failed": is.Unknown,
+  "item-collector-completed": is.Unknown,
 } as const satisfies Record<string, Predicate<unknown>>;
