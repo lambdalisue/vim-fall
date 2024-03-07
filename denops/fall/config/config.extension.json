@@ -1,0 +1,125 @@
+{
+  "action": {
+    "debug": {
+      "uri": "builtin:actions/debug.ts"
+    },
+    "open": {
+      "uri": "builtin:actions/open.ts"
+    },
+    "open:split": {
+      "uri": "builtin:actions/open.ts",
+      "options": {
+        "opener": "split"
+      }
+    },
+    "open:vsplit": {
+      "uri": "builtin:actions/open.ts",
+      "options": {
+        "opener": "vsplit"
+      }
+    },
+    "open:tabedit": {
+      "uri": "builtin:actions/open.ts",
+      "options": {
+        "opener": "tabedit"
+      }
+    },
+    "open:edit-split": {
+      "uri": "builtin:actions/open.ts",
+      "options": {
+        "opener": "edit",
+        "splitter": "split"
+      }
+    },
+    "open:edit-vsplit": {
+      "uri": "builtin:actions/open.ts",
+      "options": {
+        "opener": "edit",
+        "splitter": "vsplit"
+      }
+    },
+    "open:edit-tabedit": {
+      "uri": "builtin:actions/open.ts",
+      "options": {
+        "opener": "edit",
+        "splitter": "tabedit"
+      }
+    },
+    "quickfix:cursor": {
+      "uri": "builtin:actions/quickfix.ts"
+    },
+    "quickfix:cursor:add": {
+      "uri": "builtin:actions/quickfix.ts",
+      "options": {
+        "action": "a"
+      }
+    },
+    "quickfix:cursor:replace": {
+      "uri": "builtin:actions/quickfix.ts",
+      "options": {
+        "action": "r"
+      }
+    },
+    "quickfix:processed": {
+      "uri": "builtin:actions/quickfix.ts",
+      "options": {
+        "target": "selected-or-processed"
+      }
+    },
+    "quickfix:processed:add": {
+      "uri": "builtin:actions/quickfix.ts",
+      "options": {
+        "target": "selected-or-processed",
+        "action": "a"
+      }
+    },
+    "quickfix:processed:replace": {
+      "uri": "builtin:actions/quickfix.ts",
+      "options": {
+        "target": "selected-or-processed",
+        "action": "r"
+      }
+    }
+  },
+  "previewer": {
+    "path": {
+      "uri": "builtin:previewers/path.ts"
+    }
+  },
+  "processor": {
+    "substring": {
+      "uri": "builtin:processors/substring.ts"
+    },
+    "lexical": {
+      "uri": "builtin:processors/lexical.ts"
+    },
+    "lexical:reverse": {
+      "uri": "builtin:processors/lexical.ts",
+      "options": {
+        "reverse": true
+      }
+    }
+  },
+  "renderer": {},
+  "source": {
+    "list": {
+      "uri": "builtin:sources/list.ts"
+    },
+    "file": {
+      "uri": "builtin:sources/file.ts",
+      "options": {
+        "excludes": [
+          "/.git/",
+          "/node_modules/",
+          "/target/",
+          "/.DS_Store",
+          "/Desktop.ini",
+          "/Thumbs.db"
+        ]
+      }
+    },
+    "line": {
+      "uri": "builtin:sources/line.ts"
+    }
+  }
+}
