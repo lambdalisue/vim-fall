@@ -68,6 +68,13 @@ const subscriberMap: {
 const fallEventDataMap = {
   "cmdline-changed": is.String,
   "cmdpos-changed": is.Number,
+  "selector-cursor-move": is.Number,
+  "selector-cursor-move-at": is.UnionOf([is.Number, is.LiteralOf("$")]),
+  "selector-select": is.Unknown,
+  "selector-select-all": is.Unknown,
+  "preview-cursor-move": is.Number,
+  "preview-previous": is.Unknown,
+  "action-invoke": is.String,
   "item-collector-changed": is.Unknown,
   "item-collector-succeeded": is.Unknown,
   "item-collector-failed": is.Unknown,
