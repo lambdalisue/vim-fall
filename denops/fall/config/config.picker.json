@@ -1,0 +1,19 @@
+{
+  "source": {
+    "": {
+      "defaultAction": "open",
+      "actions": ["*"],
+      "previewer": "path",
+      "processors": ["substring", "lexical"],
+      "renderers": ["*"]
+    },
+    "line": {
+      "processors": ["substring"],
+      "renderers": []
+    }
+  },
+  "action": {
+    "processors": ["substring"],
+    "renderers": []
+  }
+}

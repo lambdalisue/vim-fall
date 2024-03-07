@@ -29,6 +29,27 @@ Plug 'lambdalisue/fall.vim'
 
 [vim-plug]: https://github.com/junegunn/vim-plug
 
+## Usage
+
+Use `:Fall` command to open the fuzzy finder. The command accepts the following
+arguments:
+
+```
+:Fall {source} {source_args}...
+```
+
+For example, if you'd like to use `file` source, you can use the following
+
+```
+:Fall file
+```
+
+Or `line` source with `README.md` as an argument
+
+```
+:Fall line README.md
+```
+
 ## Similar Projects
 
 - [ddu.vim](https://github.com/Shougo/ddu.vim)<br>A highly customizable and
