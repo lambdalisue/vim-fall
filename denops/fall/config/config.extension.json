@@ -88,13 +88,13 @@
   },
   "processor": {
     "substring": {
-      "uri": "builtin:processors/substring.ts"
+      "uri": "builtin:processors/substring_filter.ts"
     },
     "lexical": {
-      "uri": "builtin:processors/lexical.ts"
+      "uri": "builtin:processors/lexical_sorter.ts"
     },
     "lexical:reverse": {
-      "uri": "builtin:processors/lexical.ts",
+      "uri": "builtin:processors/lexical_sorter.ts",
       "options": {
         "reverse": true
       }
