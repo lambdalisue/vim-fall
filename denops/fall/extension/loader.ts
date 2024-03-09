@@ -23,7 +23,7 @@ export async function loadExtension<K extends keyof ExtensionConfig>(
     if (cache.has(expr)) {
       return await cache.get(expr)!;
     }
-    const [url, options] = getLoaderInfo(kind, expr);
+    const [url, options] = await getLoaderInfo(kind, expr);
     const mod = await import(url.toString());
     const promise = loader(mod, options);
     cache.set(expr, promise);
@@ -64,16 +64,16 @@ function promish<T>(v: T | Promise<T>): Promise<T> {
   return v instanceof Promise ? v : Promise.resolve(v);
 }
 
-function getLoaderInfo<K extends keyof ExtensionConfig>(
+async function getLoaderInfo<K extends keyof ExtensionConfig>(
   kind: K,
   expr: string,
-): [URL, Record<string, unknown>] {
+): Promise<[URL, Record<string, unknown>]> {
   const [name, variant] = parseExpr(expr);
   const conf = getExtensionConfig()[kind][name];
   if (!conf) {
     throw new Error(`No ${kind} extension '${name}' found.`);
   }
-  const url = resolve(kind, conf.uri);
+  const url = await resolve(kind, conf.uri);
   return [
     url,
     (variant ? (conf.variants ?? {})[variant] : conf.options) ?? {},

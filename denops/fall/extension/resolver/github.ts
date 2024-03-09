@@ -8,8 +8,8 @@ const _baseUrl = `https://raw.githubusercontent.com/`;
 export function resolve<K extends keyof ExtensionConfig>(
   _kind: K,
   uri: string,
-): URL | undefined {
+): Promise<URL | undefined> {
   const m = match(pattern, uri);
-  if (!m) return undefined;
+  if (!m) return Promise.resolve(undefined);
   throw new Error("The 'github:' resolver is not implemented yet");
 }

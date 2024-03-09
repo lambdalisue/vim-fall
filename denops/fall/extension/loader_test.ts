@@ -22,8 +22,8 @@ Deno.test("getLoaderInfo", async (t) => {
     ["source", "line", "../../@fall-builtin/sources/line.ts", {}],
   ] as const;
   for (const [kind, name, path, options] of testcases) {
-    await t.step(`${kind} ${name}`, () => {
-      assertEquals(getLoaderInfo(kind, name), [
+    await t.step(`${kind} ${name}`, async () => {
+      assertEquals(await getLoaderInfo(kind, name), [
         new URL(path, import.meta.url),
         options,
       ]);

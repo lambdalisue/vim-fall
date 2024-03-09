@@ -7,12 +7,12 @@ const pattern = _`builtin:${_("name")}`;
 export function resolve<K extends keyof ExtensionConfig>(
   kind: K,
   uri: string,
-): URL | undefined {
+): Promise<URL | undefined> {
   const m = match(pattern, uri);
-  if (!m) return undefined;
+  if (!m) return Promise.resolve(undefined);
   const { name } = m;
   const path = `../../../@fall-builtin/${pathMap[kind]}/${name}.ts`;
-  return new URL(path, import.meta.url);
+  return Promise.resolve(new URL(path, import.meta.url));
 }
 
 const pathMap = {
