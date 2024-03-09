@@ -1,4 +1,6 @@
 {
+  "$schema": "https://vim-fall.github.io/jsonschema/v1/extension.schema.json",
+  "$version": "1",
   "action": {
     "debug": {
       "uri": "builtin:debug"

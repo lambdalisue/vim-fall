@@ -1,4 +1,6 @@
 {
+  "$schema": "https://vim-fall.github.io/jsonschema/v1/picker.schema.json",
+  "$version": "1",
   "source": {
     "": {
       "defaultAction": "open",
