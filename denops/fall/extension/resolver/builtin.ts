@@ -1,9 +1,24 @@
-import { match, placeholder as _ } from "jsr:@core/match@0.1.4";
+import { match, placeholder as _ } from "jsr:@core/match@0.2.5";
 
-const pattern = _`builtin:${_("path")}`;
+import type { ExtensionConfig } from "../../config/extension.ts";
 
-export function resolve(uri: string): URL | undefined {
+const pattern = _`builtin:${_("name")}`;
+
+export function resolve<K extends keyof ExtensionConfig>(
+  kind: K,
+  uri: string,
+): URL | undefined {
   const m = match(pattern, uri);
   if (!m) return undefined;
-  return new URL(`../../../@fall-builtin/${m.path}`, import.meta.url);
+  const { name } = m;
+  const path = `../../../@fall-builtin/${pathMap[kind]}/${name}.ts`;
+  return new URL(path, import.meta.url);
 }
+
+const pathMap = {
+  action: "actions",
+  processor: "processors",
+  previewer: "previewers",
+  renderer: "renderers",
+  source: "sources",
+} satisfies Record<keyof ExtensionConfig, string>;

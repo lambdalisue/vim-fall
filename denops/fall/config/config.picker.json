@@ -2,18 +2,29 @@
   "source": {
     "": {
       "defaultAction": "open",
-      "actions": ["*"],
+      "actions": [
+        "*"
+      ],
       "previewer": "path",
-      "processors": ["substring", "lexical"],
-      "renderers": ["*"]
+      "processors": [
+        "substring_filter"
+      ],
+      "renderers": [
+        "*"
+      ]
     },
     "line": {
-      "processors": ["substring"],
+      "processors": [
+        "substring_filter"
+      ],
       "renderers": []
     }
   },
   "action": {
-    "processors": ["substring"],
+    "processors": [
+      "substring_filter",
+      "lexical_sorter"
+    ],
     "renderers": []
   }
 }

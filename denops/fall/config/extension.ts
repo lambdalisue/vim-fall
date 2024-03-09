@@ -11,6 +11,9 @@ export type ExtensionConfig = PredicateType<typeof isExtensionConfig>;
 export const isLoaderConfig = is.ObjectOf({
   uri: is.String,
   options: is.OptionalOf(is.RecordOf(is.Unknown, is.String)),
+  variants: is.OptionalOf(
+    is.RecordOf(is.RecordOf(is.Unknown, is.String), is.String),
+  ),
 });
 
 export const isExtensionConfig = is.ObjectOf({

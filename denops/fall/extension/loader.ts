@@ -8,50 +8,49 @@ import type {
 
 import { ExtensionConfig, getExtensionConfig } from "../config/extension.ts";
 import { isDefined } from "../util/collection.ts";
-import { expand } from "./util.ts";
 import { resolve } from "./resolver.ts";
 
 export async function loadExtension<K extends keyof ExtensionConfig>(
-  type: K,
-  name: string,
+  kind: K,
+  expr: string,
 ): Promise<Extension<K> | undefined> {
-  const cache = cacheMap[type] as Map<string, Promise<Extension<K>>>;
-  const loader = loaderMap[type] as (
+  const cache = cacheMap[kind] as Map<string, Promise<Extension<K>>>;
+  const loader = loaderMap[kind] as (
     mod: unknown,
     options: Record<string, unknown>,
   ) => Promise<Extension<K>>;
   try {
-    if (cache.has(name)) {
-      return await cache.get(name)!;
+    if (cache.has(expr)) {
+      return await cache.get(expr)!;
     }
-    const loaderConfig = getExtensionConfig()[type][name];
-    if (!loaderConfig) {
-      throw new Error(`No extension '${name}' found in ${type}.`);
-    }
-    const url = resolve(loaderConfig.uri);
+    const [url, options] = getLoaderInfo(kind, expr);
     const mod = await import(url.toString());
-    const promise = loader(
-      mod,
-      loaderConfig.options ?? {},
-    );
-    cache.set(name, promise);
+    const promise = loader(mod, options);
+    cache.set(expr, promise);
     return await promise;
   } catch (err) {
-    console.warn(`Failed to load '${name}' in ${type}:`, err);
+    console.warn(`Failed to load ${kind} '${expr}':`, err);
     return undefined;
   }
 }
 
 export async function loadExtensions<K extends keyof ExtensionConfig>(
-  type: K,
-  exprs: string[],
+  kind: K,
+  patterns: string[],
 ): Promise<Map<string, Extension<K>>> {
-  const names = Object.keys(getExtensionConfig()[type]);
+  const exprs = Object.entries(getExtensionConfig()[kind]).flatMap(
+    ([name, config]) => {
+      if (!config.variants) {
+        return [name];
+      }
+      return [name, ...Object.keys(config.variants).map((v) => `${name}:${v}`)];
+    },
+  );
   const entries = await Promise.all(
-    exprs
-      .flatMap((v) => expand(v, names))
+    patterns
+      .flatMap((v) => parsePattern(v, exprs))
       .map(async (v) => {
-        const extension = await loadExtension(type, v);
+        const extension = await loadExtension(kind, v);
         if (!extension) {
           return undefined;
         }
@@ -63,6 +62,41 @@ export async function loadExtensions<K extends keyof ExtensionConfig>(
 
 function promish<T>(v: T | Promise<T>): Promise<T> {
   return v instanceof Promise ? v : Promise.resolve(v);
+}
+
+function getLoaderInfo<K extends keyof ExtensionConfig>(
+  kind: K,
+  expr: string,
+): [URL, Record<string, unknown>] {
+  const [name, variant] = parseExpr(expr);
+  const conf = getExtensionConfig()[kind][name];
+  if (!conf) {
+    throw new Error(`No ${kind} extension '${name}' found.`);
+  }
+  const url = resolve(kind, conf.uri);
+  return [
+    url,
+    (variant ? (conf.variants ?? {})[variant] : conf.options) ?? {},
+  ];
+}
+
+function parseExpr(expr: string): [string, string | undefined] {
+  const [name, ...rest] = expr.split(":");
+  if (rest.length === 0) {
+    return [name, undefined];
+  }
+  return [name, rest.join(":")];
+}
+
+function parsePattern(pattern: string, exprs: string[]): string[] {
+  if (!pattern.includes("*")) {
+    return [pattern];
+  }
+  const [head, tail, ...rest] = pattern.split("*");
+  if (rest.length > 0) {
+    throw new Error("Only one '*' is allowed in the expression.");
+  }
+  return exprs.filter((expr) => expr.startsWith(head) && expr.endsWith(tail));
 }
 
 type Extension<K extends keyof ExtensionConfig> = K extends "action" ? Action
@@ -123,4 +157,10 @@ const loaderMap = {
     mod: unknown,
     options: Record<string, unknown>,
   ) => Promise<Extension<K>>;
+};
+
+export const _internal = {
+  getLoaderInfo,
+  parseExpr,
+  parsePattern,
 };

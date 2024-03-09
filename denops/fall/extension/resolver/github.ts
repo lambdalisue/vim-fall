@@ -1,10 +1,15 @@
-import { match, placeholder as _ } from "jsr:@core/match@0.1.4";
+import { match, placeholder as _ } from "jsr:@core/match@0.2.5";
 
-const pattern = _`github:${_("path")}`;
-const baseUrl = `https://raw.githubusercontent.com/`;
+import type { ExtensionConfig } from "../../config/extension.ts";
 
-export function resolve(uri: string): URL | undefined {
+const pattern = _`github:${_("owner")}/${_("repo")}/${_("path")}`;
+const _baseUrl = `https://raw.githubusercontent.com/`;
+
+export function resolve<K extends keyof ExtensionConfig>(
+  _kind: K,
+  uri: string,
+): URL | undefined {
   const m = match(pattern, uri);
   if (!m) return undefined;
-  return new URL(`${baseUrl}${m.path}`);
+  throw new Error("The 'github:' resolver is not implemented yet");
 }

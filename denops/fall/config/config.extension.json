@@ -1,112 +1,57 @@
 {
   "action": {
     "debug": {
-      "uri": "builtin:actions/debug.ts"
+      "uri": "builtin:debug"
     },
     "open": {
-      "uri": "builtin:actions/open.ts"
-    },
-    "open:split": {
-      "uri": "builtin:actions/open.ts",
-      "options": {
-        "opener": "split"
-      }
-    },
-    "open:vsplit": {
-      "uri": "builtin:actions/open.ts",
-      "options": {
-        "opener": "vsplit"
-      }
-    },
-    "open:tabedit": {
-      "uri": "builtin:actions/open.ts",
-      "options": {
-        "opener": "tabedit"
-      }
-    },
-    "open:edit-split": {
-      "uri": "builtin:actions/open.ts",
-      "options": {
-        "opener": "edit",
-        "splitter": "split"
-      }
-    },
-    "open:edit-vsplit": {
-      "uri": "builtin:actions/open.ts",
-      "options": {
-        "opener": "edit",
-        "splitter": "vsplit"
-      }
-    },
-    "open:edit-tabedit": {
-      "uri": "builtin:actions/open.ts",
-      "options": {
-        "opener": "edit",
-        "splitter": "tabedit"
-      }
-    },
-    "quickfix:cursor": {
-      "uri": "builtin:actions/quickfix.ts"
-    },
-    "quickfix:cursor:add": {
-      "uri": "builtin:actions/quickfix.ts",
-      "options": {
-        "action": "a"
-      }
-    },
-    "quickfix:cursor:replace": {
-      "uri": "builtin:actions/quickfix.ts",
-      "options": {
-        "action": "r"
-      }
-    },
-    "quickfix:processed": {
-      "uri": "builtin:actions/quickfix.ts",
-      "options": {
-        "target": "selected-or-processed"
-      }
-    },
-    "quickfix:processed:add": {
-      "uri": "builtin:actions/quickfix.ts",
-      "options": {
-        "target": "selected-or-processed",
-        "action": "a"
-      }
-    },
-    "quickfix:processed:replace": {
-      "uri": "builtin:actions/quickfix.ts",
-      "options": {
-        "target": "selected-or-processed",
-        "action": "r"
+      "uri": "builtin:open",
+      "variants": {
+        "split": {
+          "opener": "split"
+        },
+        "vsplit": {
+          "opener": "vsplit"
+        },
+        "tabedit": {
+          "opener": "tabedit"
+        },
+        "edit-split": {
+          "splitter": "split"
+        },
+        "edit-vsplit": {
+          "splitter": "vsplit"
+        },
+        "edit-tabedit": {
+          "splitter": "tabedit"
+        }
       }
     }
   },
   "previewer": {
     "path": {
-      "uri": "builtin:previewers/path.ts"
+      "uri": "builtin:path"
     }
   },
   "processor": {
-    "substring": {
-      "uri": "builtin:processors/substring_filter.ts"
+    "substring_filter": {
+      "uri": "builtin:substring_filter"
     },
-    "lexical": {
-      "uri": "builtin:processors/lexical_sorter.ts"
-    },
-    "lexical:reverse": {
-      "uri": "builtin:processors/lexical_sorter.ts",
-      "options": {
-        "reverse": true
+    "lexical_sorter": {
+      "uri": "builtin:lexical_sorter",
+      "variants": {
+        "reverse": {
+          "reverse": true
+        }
       }
     }
   },
   "renderer": {},
   "source": {
     "list": {
-      "uri": "builtin:sources/list.ts"
+      "uri": "builtin:list"
     },
     "file": {
-      "uri": "builtin:sources/file.ts",
+      "uri": "builtin:file",
       "options": {
         "excludes": [
           "/.git/",
@@ -119,7 +64,7 @@
       }
     },
     "line": {
-      "uri": "builtin:sources/line.ts"
+      "uri": "builtin:line"
     }
   }
 }
