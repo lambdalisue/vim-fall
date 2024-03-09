@@ -4,16 +4,16 @@ import {
   is,
   type PredicateType,
 } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
-import builtin from "./config.picker.json" with { type: "json" };
+import defaultConfig from "./config.picker.json" with { type: "json" };
 
 import { isLayoutParams as isSourcePickerLayoutParams } from "../view/layout/prompt_top_preview_right.ts";
 import { isLayoutParams as isActionPickerLayoutParams } from "../view/layout/prompt_top.ts";
 
-export type SourcePickerConfig = PredicateType<typeof isSourcePickerConfig>;
-export type ActionPickerConfig = PredicateType<typeof isActionPickerConfig>;
-export type PickerConfig = PredicateType<typeof isPickerConfig>;
+type SourcePickerConfig = PredicateType<typeof isSourcePickerConfig>;
+type ActionPickerConfig = PredicateType<typeof isActionPickerConfig>;
+type PickerConfig = PredicateType<typeof isPickerConfig>;
 
-export const isSourcePickerConfig = is.ObjectOf({
+const isSourcePickerConfig = is.ObjectOf({
   defaultAction: is.String,
   actions: is.ArrayOf(is.String),
   previewer: is.String,
@@ -36,7 +36,7 @@ export const isSourcePickerConfig = is.ObjectOf({
   }))),
 });
 
-export const isActionPickerConfig = is.ObjectOf({
+const isActionPickerConfig = is.ObjectOf({
   processors: is.ArrayOf(is.String),
   renderers: is.ArrayOf(is.String),
   options: is.OptionalOf(is.PartialOf(is.ObjectOf({
@@ -50,7 +50,7 @@ export const isActionPickerConfig = is.ObjectOf({
   }))),
 });
 
-export const isPickerConfig = is.ObjectOf({
+const isPickerConfig = is.ObjectOf({
   source: is.RecordOf(is.PartialOf(isSourcePickerConfig), is.String),
   action: isActionPickerConfig,
 });
@@ -60,28 +60,25 @@ export function getPickerConfig(): PickerConfig {
 }
 
 export function getSourcePickerConfig(name: string): SourcePickerConfig {
-  const d = pickerConfig.source[""];
-  const c = (pickerConfig as PickerConfig).source[name] ?? {};
+  const conf = getPickerConfig();
+  const d = conf.source[""];
+  const c = conf.source[name] ?? {};
   return deepMerge(d, c, { arrays: "replace" });
 }
 
 export function getActionPickerConfig(): ActionPickerConfig {
-  return pickerConfig.action;
+  const conf = getPickerConfig();
+  return conf.action;
 }
 
-export function resetPickerConfig(): void {
-  Object.assign(pickerConfig, builtin);
-}
-
-export async function loadPickerConfig(url: URL): Promise<void> {
-  const response = await fetch(url);
-  const data = ensure(response.json(), isPickerConfig);
-  Object.assign(
-    pickerConfig,
-    deepMerge(pickerConfig, data, { arrays: "replace" }),
+export async function loadPickerConfig(path: string): Promise<void> {
+  const customConfig = JSON.parse(await Deno.readTextFile(path));
+  pickerConfig = ensure(
+    deepMerge(defaultConfig, customConfig, {
+      arrays: "replace",
+    }),
+    isPickerConfig,
   );
 }
 
-const pickerConfig = deepMerge({}, builtin, {
-  arrays: "replace",
-}) satisfies PickerConfig;
+let pickerConfig: PickerConfig = deepMerge(defaultConfig, {});
