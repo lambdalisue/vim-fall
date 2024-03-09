@@ -5,12 +5,6 @@ function! fall#start(name, args, options) abort
         \)
 endfunction
 
-function! fall#command(cmdargs) abort
-  let l:args = split(a:cmdargs, ' ', v:true)
-  const l:name = remove(l:args, 0)
-  call fall#start(l:name, l:args, {})
-endfunction
-
 function! fall#action(name) abort
   call denops#plugin#wait_async(
         \ 'fall',
