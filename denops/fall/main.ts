@@ -5,16 +5,24 @@ import {
   ensure,
   is,
 } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
+import { unreachable } from "https://deno.land/x/errorutil@v0.1.1/mod.ts";
+
 import { isStartOptions, start } from "./start.ts";
 import {
   editExtensionConfig,
   editPickerConfig,
+  editRegistryConfig,
   reloadExtensionConfig,
   reloadPickerConfig,
+  reloadRegistryConfig,
 } from "./config.ts";
 import { dispatch, isFallEventName } from "./util/event.ts";
 
 import "./polyfill.ts";
+
+const isConfigType = is.LiteralOneOf(
+  ["picker", "extension", "registry"] as const,
+);
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -36,7 +44,7 @@ export function main(denops: Denops): void {
     },
     "reloadConfig": (type) => {
       return friendlyCall(denops, async () => {
-        assert(type, is.LiteralOneOf(["picker", "extension"] as const));
+        assert(type, isConfigType);
         switch (type) {
           case "picker":
             await reloadPickerConfig(denops);
@@ -44,12 +52,17 @@ export function main(denops: Denops): void {
           case "extension":
             await reloadExtensionConfig(denops);
             break;
+          case "registry":
+            await reloadRegistryConfig(denops);
+            break;
+          default:
+            unreachable(type);
         }
       });
     },
     "editConfig": (type) => {
       return friendlyCall(denops, async () => {
-        assert(type, is.LiteralOneOf(["picker", "extension"] as const));
+        assert(type, isConfigType);
         switch (type) {
           case "picker":
             await editPickerConfig(denops);
@@ -57,6 +70,11 @@ export function main(denops: Denops): void {
           case "extension":
             await editExtensionConfig(denops);
             break;
+          case "registry":
+            await editRegistryConfig(denops);
+            break;
+          default:
+            unreachable(type);
         }
       });
     },

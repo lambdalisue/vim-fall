@@ -1,0 +1,47 @@
+{
+  "$schema": "https://vim-fall.github.io/jsonschema/v1/registry-config.schema.json",
+  "package": {
+    "vim-fall/package-common": {
+      "base": "https://raw.githubusercontent.com/vim-fall/package-common/main/fall-package.json",
+      "action": {
+        "quickfix": {
+          "url": "./action/quickfix.ts",
+          "variants": {
+            "add": {
+              "action": "a"
+            },
+            "replace": {
+              "action": "r"
+            },
+            "processed": {
+              "target": "selected-or-processed"
+            },
+            "processed:add": {
+              "target": "selected-or-processed",
+              "action": "a"
+            },
+            "processed:replace": {
+              "target": "selected-or-processed",
+              "action": "r"
+            }
+          }
+        }
+      },
+      "processor": {
+        "lexical_sorter": {
+          "url": "./processor/lexical_sorter.ts",
+          "variants": {
+            "reverse": {
+              "reverse": true
+            }
+          }
+        }
+      },
+      "source": {
+        "line": {
+          "url": "./source/line.ts"
+        }
+      }
+    }
+  }
+}
