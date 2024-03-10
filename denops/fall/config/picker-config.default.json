@@ -6,7 +6,7 @@
       "actions": [
         "*"
       ],
-      "previewer": "path",
+      "previewer": "text",
       "processors": [
         "substring_filter",
         "lexical_sorter"

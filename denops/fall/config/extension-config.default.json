@@ -47,15 +47,7 @@
       }
     }
   },
-  "previewer": {
-    "path": {
-      "uri": "builtin:previewer/path"
-    }
-  },
   "processor": {
-    "substring_filter": {
-      "uri": "builtin:processor/substring_filter"
-    },
     "lexical_sorter": {
       "uri": "package:vim-fall/package-common:processor/lexical_sorter",
       "variants": {

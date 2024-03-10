@@ -6,8 +6,8 @@
     }
   },
   "previewer": {
-    "path": {
-      "uri": "builtin:previewer/path"
+    "text": {
+      "uri": "builtin:previewer/text"
     }
   },
   "processor": {
@@ -19,6 +19,9 @@
   "source": {
     "file": {
       "uri": "builtin:source/file"
+    },
+    "fall-catalog": {
+      "uri": "builtin:source/fall_catalog"
     }
   }
 }
