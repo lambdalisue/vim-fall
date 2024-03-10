@@ -6,11 +6,11 @@ import type {
   Source,
 } from "https://deno.land/x/fall_core@v0.3.0/mod.ts";
 
-import { ExtensionConfig, getExtensionConfig } from "../config/extension.ts";
+import { ExtensionKind, getExtensionConfig } from "../config/extension.ts";
 import { isDefined } from "../util/collection.ts";
 import { resolve } from "./resolver.ts";
 
-export async function loadExtension<K extends keyof ExtensionConfig>(
+export async function loadExtension<K extends ExtensionKind>(
   kind: K,
   expr: string,
 ): Promise<Extension<K> | undefined> {
@@ -34,7 +34,7 @@ export async function loadExtension<K extends keyof ExtensionConfig>(
   }
 }
 
-export async function loadExtensions<K extends keyof ExtensionConfig>(
+export async function loadExtensions<K extends ExtensionKind>(
   kind: K,
   patterns: string[],
 ): Promise<Map<string, Extension<K>>> {
@@ -64,7 +64,7 @@ function promish<T>(v: T | Promise<T>): Promise<T> {
   return v instanceof Promise ? v : Promise.resolve(v);
 }
 
-async function getLoaderInfo<K extends keyof ExtensionConfig>(
+async function getLoaderInfo<K extends ExtensionKind>(
   kind: K,
   expr: string,
 ): Promise<[URL, Record<string, unknown>]> {
@@ -99,7 +99,7 @@ function parsePattern(pattern: string, exprs: string[]): string[] {
   return exprs.filter((expr) => expr.startsWith(head) && expr.endsWith(tail));
 }
 
-type Extension<K extends keyof ExtensionConfig> = K extends "action" ? Action
+type Extension<K extends ExtensionKind> = K extends "action" ? Action
   : K extends "previewer" ? Previewer
   : K extends "processor" ? Processor
   : K extends "renderer" ? Renderer
@@ -113,7 +113,7 @@ const cacheMap = {
   renderer: new Map<string, Promise<Renderer>>(),
   source: new Map<string, Promise<Source>>(),
 } as const satisfies {
-  [K in keyof ExtensionConfig]: Map<string, Promise<Extension<K>>>;
+  [K in ExtensionKind]: Map<string, Promise<Extension<K>>>;
 };
 
 const loaderMap = {
@@ -153,7 +153,7 @@ const loaderMap = {
     return promish((mod as any).getSource(options));
   },
 } as const satisfies {
-  [K in keyof ExtensionConfig]: (
+  [K in ExtensionKind]: (
     mod: unknown,
     options: Record<string, unknown>,
   ) => Promise<Extension<K>>;
