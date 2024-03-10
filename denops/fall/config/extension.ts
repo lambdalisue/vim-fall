@@ -5,7 +5,24 @@ import {
   is,
   type PredicateType,
 } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
-import defaultConfig from "./config.extension.json" with { type: "json" };
+import builtinConfig from "./extension-config.builtin.json" with {
+  type: "json",
+};
+import defaultConfig from "./extension-config.default.json" with {
+  type: "json",
+};
+
+export const isExtensionKind = is.LiteralOneOf(
+  [
+    "action",
+    "previewer",
+    "processor",
+    "renderer",
+    "source",
+  ] as const,
+);
+
+export type ExtensionKind = PredicateType<typeof isExtensionKind>;
 
 const isLoaderConfig = is.ObjectOf({
   uri: is.String,
@@ -26,8 +43,6 @@ const isExtensionConfig = is.ObjectOf({
 
 type ExtensionConfig = PredicateType<typeof isExtensionConfig>;
 
-export type ExtensionKind = keyof Omit<ExtensionConfig, "base">;
-
 export function getExtensionConfig(): ExtensionConfig {
   return extensionConfig;
 }
@@ -35,11 +50,13 @@ export function getExtensionConfig(): ExtensionConfig {
 export async function loadExtensionConfig(path: string): Promise<void> {
   const customConfig = JSON.parse(await Deno.readTextFile(path));
   extensionConfig = ensure({
-    ...deepMerge(defaultConfig, customConfig, {
+    ...deepMerge(builtinConfig, customConfig, {
       arrays: "replace",
     }),
     base: toFileUrl(path),
   }, isExtensionConfig);
 }
 
-let extensionConfig: ExtensionConfig = deepMerge(defaultConfig, {});
+let extensionConfig: ExtensionConfig = deepMerge(builtinConfig, defaultConfig);
+
+export { defaultConfig };

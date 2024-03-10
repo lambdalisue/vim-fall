@@ -1,0 +1,24 @@
+{
+  "$schema": "https://vim-fall.github.io/jsonschema/v1/picker-config.schema.json",
+  "source": {
+    "": {
+      "defaultAction": "open",
+      "actions": [
+        "*"
+      ],
+      "previewer": "path",
+      "processors": [
+        "substring_filter"
+      ],
+      "renderers": [
+        "*"
+      ]
+    }
+  },
+  "action": {
+    "processors": [
+      "substring_filter"
+    ],
+    "renderers": []
+  }
+}

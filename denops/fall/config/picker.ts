@@ -4,7 +4,8 @@ import {
   is,
   type PredicateType,
 } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
-import defaultConfig from "./config.picker.json" with { type: "json" };
+import builtinConfig from "./picker-config.builtin.json" with { type: "json" };
+import defaultConfig from "./picker-config.default.json" with { type: "json" };
 
 import { isLayoutParams as isSourcePickerLayoutParams } from "../view/layout/prompt_top_preview_right.ts";
 import { isLayoutParams as isActionPickerLayoutParams } from "../view/layout/prompt_top.ts";
@@ -74,11 +75,13 @@ export function getActionPickerConfig(): ActionPickerConfig {
 export async function loadPickerConfig(path: string): Promise<void> {
   const customConfig = JSON.parse(await Deno.readTextFile(path));
   pickerConfig = ensure(
-    deepMerge(defaultConfig, customConfig, {
+    deepMerge(builtinConfig, customConfig, {
       arrays: "replace",
     }),
     isPickerConfig,
   );
 }
 
-let pickerConfig: PickerConfig = deepMerge(defaultConfig, {});
+let pickerConfig: PickerConfig = deepMerge(builtinConfig, defaultConfig);
+
+export { defaultConfig };

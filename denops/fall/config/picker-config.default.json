@@ -1,6 +1,5 @@
 {
-  "$schema": "https://vim-fall.github.io/jsonschema/v1/picker.schema.json",
-  "$version": "1",
+  "$schema": "https://vim-fall.github.io/jsonschema/v1/picker-config.schema.json",
   "source": {
     "": {
       "defaultAction": "open",
@@ -9,7 +8,8 @@
       ],
       "previewer": "path",
       "processors": [
-        "substring_filter"
+        "substring_filter",
+        "lexical_sorter"
       ],
       "renderers": [
         "*"
@@ -26,7 +26,6 @@
     "processors": [
       "substring_filter",
       "lexical_sorter"
-    ],
-    "renderers": []
+    ]
   }
 }

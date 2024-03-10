@@ -1,10 +1,6 @@
 {
-  "$schema": "https://vim-fall.github.io/jsonschema/v1/extension.schema.json",
-  "$version": "1",
+  "$schema": "https://vim-fall.github.io/jsonschema/v1/extension-config.schema.json",
   "action": {
-    "debug": {
-      "uri": "builtin:action/debug"
-    },
     "open": {
       "uri": "builtin:action/open",
       "variants": {
@@ -47,11 +43,7 @@
       }
     }
   },
-  "renderer": {},
   "source": {
-    "list": {
-      "uri": "builtin:source/list"
-    },
     "file": {
       "uri": "builtin:source/file",
       "options": {
@@ -63,6 +55,11 @@
           "/Desktop.ini",
           "/Thumbs.db"
         ]
+      },
+      "variants": {
+        "file:all": {
+          "excludes": []
+        }
       }
     },
     "line": {

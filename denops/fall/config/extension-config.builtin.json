@@ -1,0 +1,24 @@
+{
+  "$schema": "https://vim-fall.github.io/jsonschema/v1/extension-config.schema.json",
+  "action": {
+    "open": {
+      "uri": "builtin:action/open"
+    }
+  },
+  "previewer": {
+    "path": {
+      "uri": "builtin:previewer/path"
+    }
+  },
+  "processor": {
+    "substring_filter": {
+      "uri": "builtin:processor/substring_filter"
+    }
+  },
+  "renderer": {},
+  "source": {
+    "file": {
+      "uri": "builtin:source/file"
+    }
+  }
+}

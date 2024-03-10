@@ -7,13 +7,14 @@ import * as opt from "https://deno.land/x/denops_std@v6.3.0/option/mod.ts";
 import { dirname } from "https://deno.land/std@0.219.0/path/mod.ts";
 import { ensureDir, exists } from "https://deno.land/std@0.219.0/fs/mod.ts";
 
-import { loadPickerConfig } from "./config/picker.ts";
-import { loadExtensionConfig } from "./config/extension.ts";
-
-const pickerConfigSchema =
-  "https://vim-fall.github.io/jsonschema/v1/picker.schema.json";
-const extensionConfigSchema =
-  "https://vim-fall.github.io/jsonschema/v1/extension.schema.json";
+import {
+  defaultConfig as defaultPickerConfig,
+  loadPickerConfig,
+} from "./config/picker.ts";
+import {
+  defaultConfig as defaultExtensionConfig,
+  loadExtensionConfig,
+} from "./config/extension.ts";
 
 export async function editPickerConfig(
   denops: Denops,
@@ -23,14 +24,7 @@ export async function editPickerConfig(
   if (!await exists(path)) {
     await Deno.writeTextFile(
       path,
-      JSON.stringify(
-        {
-          $schema: pickerConfigSchema,
-          $version: "1",
-        },
-        null,
-        2,
-      ),
+      JSON.stringify(defaultPickerConfig, null, 2),
     );
   }
   await buffer.open(denops, path);
@@ -56,14 +50,7 @@ export async function editExtensionConfig(
   if (!await exists(path)) {
     await Deno.writeTextFile(
       path,
-      JSON.stringify(
-        {
-          $schema: extensionConfigSchema,
-          $version: "1",
-        },
-        null,
-        2,
-      ),
+      JSON.stringify(defaultExtensionConfig, null, 2),
     );
   }
   await buffer.open(denops, path);
