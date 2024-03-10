@@ -69,14 +69,15 @@ async function getLoaderInfo<K extends ExtensionKind>(
   expr: string,
 ): Promise<[URL, Record<string, unknown>]> {
   const [name, variant] = parseExpr(expr);
-  const conf = getExtensionConfig()[kind][name];
-  if (!conf) {
+  const econf = getExtensionConfig();
+  const lconf = econf[kind][name];
+  if (!lconf) {
     throw new Error(`No ${kind} extension '${name}' found.`);
   }
-  const url = await resolve(conf.uri);
+  const url = await resolve(lconf.uri, econf.base);
   return [
     url,
-    (variant ? (conf.variants ?? {})[variant] : conf.options) ?? {},
+    (variant ? (lconf.variants ?? {})[variant] : lconf.options) ?? {},
   ];
 }
 

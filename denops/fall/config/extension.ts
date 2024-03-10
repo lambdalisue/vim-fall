@@ -16,6 +16,7 @@ const isLoaderConfig = is.ObjectOf({
 });
 
 const isExtensionConfig = is.ObjectOf({
+  base: is.OptionalOf(is.InstanceOf(URL)),
   action: is.RecordOf(isLoaderConfig, is.String),
   previewer: is.RecordOf(isLoaderConfig, is.String),
   processor: is.RecordOf(isLoaderConfig, is.String),
@@ -25,7 +26,7 @@ const isExtensionConfig = is.ObjectOf({
 
 type ExtensionConfig = PredicateType<typeof isExtensionConfig>;
 
-export type ExtensionKind = keyof ExtensionConfig;
+export type ExtensionKind = keyof Omit<ExtensionConfig, "base">;
 
 export function getExtensionConfig(): ExtensionConfig {
   return extensionConfig;
@@ -33,12 +34,12 @@ export function getExtensionConfig(): ExtensionConfig {
 
 export async function loadExtensionConfig(path: string): Promise<void> {
   const customConfig = JSON.parse(await Deno.readTextFile(path));
-  extensionConfig = ensure(
-    deepMerge(defaultConfig, customConfig, {
+  extensionConfig = ensure({
+    ...deepMerge(defaultConfig, customConfig, {
       arrays: "replace",
     }),
-    isExtensionConfig,
-  );
+    base: toFileUrl(path),
+  }, isExtensionConfig);
 }
 
 let extensionConfig: ExtensionConfig = deepMerge(defaultConfig, {});
