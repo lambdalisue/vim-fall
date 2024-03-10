@@ -278,7 +278,7 @@ export class SourcePicker implements AsyncDisposable {
       } else {
         this.#index = Math.max(
           0,
-          Math.min(this.processedItems.length - 1, data),
+          Math.min(this.processedItems.length - 1, data - 1),
         );
       }
       selector.index = this.#index;
