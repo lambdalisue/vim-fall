@@ -1,9 +1,7 @@
-import type { ExtensionConfig } from "../config/extension.ts";
 import { resolve as builtin } from "./resolver/builtin.ts";
 
-export async function resolve<K extends keyof ExtensionConfig>(
-  kind: K,
+export async function resolve(
   uri: string,
 ): Promise<URL> {
-  return await builtin(kind, uri) || new URL(uri);
+  return await builtin(uri) || new URL(uri);
 }

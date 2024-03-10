@@ -73,7 +73,7 @@ async function getLoaderInfo<K extends keyof ExtensionConfig>(
   if (!conf) {
     throw new Error(`No ${kind} extension '${name}' found.`);
   }
-  const url = await resolve(kind, conf.uri);
+  const url = await resolve(conf.uri);
   return [
     url,
     (variant ? (conf.variants ?? {})[variant] : conf.options) ?? {},

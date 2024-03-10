@@ -3,10 +3,10 @@
   "$version": "1",
   "action": {
     "debug": {
-      "uri": "builtin:debug"
+      "uri": "builtin:action/debug"
     },
     "open": {
-      "uri": "builtin:open",
+      "uri": "builtin:action/open",
       "variants": {
         "split": {
           "opener": "split"
@@ -31,15 +31,15 @@
   },
   "previewer": {
     "path": {
-      "uri": "builtin:path"
+      "uri": "builtin:previewer/path"
     }
   },
   "processor": {
     "substring_filter": {
-      "uri": "builtin:substring_filter"
+      "uri": "builtin:processor/substring_filter"
     },
     "lexical_sorter": {
-      "uri": "builtin:lexical_sorter",
+      "uri": "builtin:processor/lexical_sorter",
       "variants": {
         "reverse": {
           "reverse": true
@@ -50,10 +50,10 @@
   "renderer": {},
   "source": {
     "list": {
-      "uri": "builtin:list"
+      "uri": "builtin:source/list"
     },
     "file": {
-      "uri": "builtin:file",
+      "uri": "builtin:source/file",
       "options": {
         "excludes": [
           "/.git/",
@@ -66,7 +66,7 @@
       }
     },
     "line": {
-      "uri": "builtin:line"
+      "uri": "builtin:source/line"
     }
   }
 }
