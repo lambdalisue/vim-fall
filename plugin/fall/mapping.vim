@@ -8,12 +8,22 @@ function! s:dispatch(name, ...) abort
   call denops#notify('fall', 'dispatch', l:args)
 endfunction
 
+function! s:scroll() abort
+  let l:winid = get(g:, '_fall_layout_selector_winid')
+  if !l:winid
+    return &scroll
+  endif
+  return getwinvar(l:winid, '&l:scroll', &scroll)
+endfunction
+
 cnoremap <silent> <Plug>(fall-select) <Cmd>call <SID>dispatch('selector-select')<CR>
 cnoremap <silent> <Plug>(fall-select-all) <Cmd>call <SID>dispatch('selector-select-all')<CR>
 cnoremap <silent> <Plug>(fall-cursor-first) <Cmd>call <SID>dispatch('selector-cursor-move-at', 1)<CR>
 cnoremap <silent> <Plug>(fall-cursor-last) <Cmd>call <SID>dispatch('selector-cursor-move-at', '$')<CR>
 cnoremap <silent> <Plug>(fall-cursor-next) <Cmd>call <SID>dispatch('selector-cursor-move', 1)<CR>
 cnoremap <silent> <Plug>(fall-cursor-prev) <Cmd>call <SID>dispatch('selector-cursor-move', -1)<CR>
+cnoremap <silent> <Plug>(fall-cursor-next-scroll) <Cmd>call <SID>dispatch('selector-cursor-move', <SID>scroll())<CR>
+cnoremap <silent> <Plug>(fall-cursor-prev-scroll) <Cmd>call <SID>dispatch('selector-cursor-move', -1 * <SID>scroll())<CR>
 cnoremap <silent> <Plug>(fall-preview-first) <Cmd>call <SID>dispatch('preview-cursor-move-at', 1)<CR>
 cnoremap <silent> <Plug>(fall-preview-last) <Cmd>call <SID>dispatch('preview-cursor-move-at', '$')<CR>
 cnoremap <silent> <Plug>(fall-preview-next) <Cmd>call <SID>dispatch('preview-cursor-move', 1)<CR>
@@ -30,9 +40,9 @@ function! s:map_source_picker() abort
   cnoremap <nowait><buffer> <Down> <Plug>(fall-cursor-next)
   cnoremap <nowait><buffer> <C-p> <Plug>(fall-cursor-prev)
   cnoremap <nowait><buffer> <Up> <Plug>(fall-cursor-prev)
-  cnoremap <nowait><buffer> <C-d> <Plug>(fall-preview-next)
+  cnoremap <nowait><buffer> <C-d> <Plug>(fall-cursor-next-scroll)
+  cnoremap <nowait><buffer> <C-u> <Plug>(fall-cursor-prev-scroll)
   cnoremap <nowait><buffer> <PageDown> <Plug>(fall-preview-next)
-  cnoremap <nowait><buffer> <C-u> <Plug>(fall-preview-prev)
   cnoremap <nowait><buffer> <PageUp> <Plug>(fall-preview-prev)
   cnoremap <nowait><buffer> <C-,> <Plug>(fall-select)
   cnoremap <nowait><buffer> <C-.> <Plug>(fall-select-all)

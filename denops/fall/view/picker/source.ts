@@ -1,7 +1,11 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.3.0/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.3.0/function/mod.ts";
 import * as opt from "https://deno.land/x/denops_std@v6.3.0/option/mod.ts";
-import { collect } from "https://deno.land/x/denops_std@v6.3.0/batch/mod.ts";
+import { g } from "https://deno.land/x/denops_std@v6.3.0/variable/mod.ts";
+import {
+  batch,
+  collect,
+} from "https://deno.land/x/denops_std@v6.3.0/batch/mod.ts";
 import type {
   Previewer,
   Processor,
@@ -162,6 +166,25 @@ export class SourcePicker implements AsyncDisposable {
       } catch {
         // Fail silently
       }
+    });
+
+    // Set internal variables
+    await batch(denops, async (denops) => {
+      await g.set(
+        denops,
+        "_fall_layout_prompt_winid",
+        this.#layout.prompt.winid,
+      );
+      await g.set(
+        denops,
+        "_fall_layout_selector_winid",
+        this.#layout.selector.winid,
+      );
+      await g.set(
+        denops,
+        "_fall_layout_preview_winid",
+        this.#layout.preview.winid,
+      );
     });
 
     // Collect informations
