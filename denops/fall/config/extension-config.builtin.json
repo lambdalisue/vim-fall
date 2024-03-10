@@ -8,6 +8,12 @@
   "previewer": {
     "text": {
       "uri": "builtin:previewer/text"
+    },
+    "deno-doc": {
+      "uri": "builtin:previewer/deno_doc"
+    },
+    "deno-doc-module": {
+      "uri": "builtin:previewer/deno_doc_module"
     }
   },
   "processor": {
