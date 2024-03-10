@@ -23,6 +23,28 @@
           "splitter": "tabedit"
         }
       }
+    },
+    "quickfix": {
+      "uri": "package:vim-fall/package-common:action/quickfix",
+      "variants": {
+        "add": {
+          "action": "a"
+        },
+        "replace": {
+          "action": "r"
+        },
+        "processed": {
+          "target": "selected-or-processed"
+        },
+        "processed:add": {
+          "target": "selected-or-processed",
+          "action": "a"
+        },
+        "processed:replace": {
+          "target": "selected-or-processed",
+          "action": "r"
+        }
+      }
     }
   },
   "previewer": {
@@ -35,7 +57,7 @@
       "uri": "builtin:processor/substring_filter"
     },
     "lexical_sorter": {
-      "uri": "builtin:processor/lexical_sorter",
+      "uri": "package:vim-fall/package-common:processor/lexical_sorter",
       "variants": {
         "reverse": {
           "reverse": true
@@ -63,7 +85,7 @@
       }
     },
     "line": {
-      "uri": "builtin:source/line"
+      "uri": "package:vim-fall/package-common:source/line"
     }
   }
 }
