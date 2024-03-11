@@ -2,10 +2,10 @@ import { resolve as resolveBuiltin } from "./resolver/builtin.ts";
 import { resolve as resolveGitHub } from "./resolver/github.ts";
 
 export async function resolve(
-  uri: string,
+  url: string,
   base?: URL | string,
 ): Promise<URL> {
-  return await resolveBuiltin(uri) ||
-    await resolveGitHub(uri) ||
-    new URL(uri, base);
+  return await resolveBuiltin(url) ||
+    await resolveGitHub(url) ||
+    new URL(url, base);
 }

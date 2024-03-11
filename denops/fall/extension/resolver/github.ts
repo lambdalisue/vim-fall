@@ -4,9 +4,9 @@ import { match, placeholder as _ } from "jsr:@core/match@0.2.5";
 const pattern = _`https://github.com/${_("owner")}/${_("repo")}/blob/${_("rev")}/${_("path")}`;
 
 export function resolve(
-  uri: string,
+  url: string,
 ): Promise<URL | undefined> {
-  const m = match(pattern, uri);
+  const m = match(pattern, url);
   if (!m) return Promise.resolve(undefined);
   const { owner, repo, rev, path } = m;
   return Promise.resolve(

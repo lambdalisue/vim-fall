@@ -74,7 +74,7 @@ async function getLoaderInfo<K extends ExtensionKind>(
   if (!lconf) {
     throw new Error(`No ${kind} extension '${name}' found.`);
   }
-  const url = await resolve(lconf.uri, econf.base);
+  const url = await resolve(lconf.url, econf.base);
   return [
     url,
     (variant ? (lconf.variants ?? {})[variant] : lconf.options) ?? {},

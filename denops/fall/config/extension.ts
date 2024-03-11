@@ -25,7 +25,7 @@ export const isExtensionKind = is.LiteralOneOf(
 export type ExtensionKind = PredicateType<typeof isExtensionKind>;
 
 const isLoaderConfig = is.ObjectOf({
-  uri: is.String,
+  url: is.String,
   options: is.OptionalOf(is.RecordOf(is.Unknown, is.String)),
   variants: is.OptionalOf(
     is.RecordOf(is.RecordOf(is.Unknown, is.String), is.String),
