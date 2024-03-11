@@ -2,32 +2,32 @@
   "$schema": "https://vim-fall.github.io/jsonschema/v1alpha/extension-config.schema.json",
   "action": {
     "open": {
-      "uri": "builtin:action/open"
+      "uri": "fallbuiltin://action/open.ts"
     }
   },
   "previewer": {
     "text": {
-      "uri": "builtin:previewer/text"
+      "uri": "fallbuiltin://previewer/text.ts"
     },
     "deno-doc": {
-      "uri": "builtin:previewer/deno_doc"
+      "uri": "fallbuiltin://previewer/deno_doc.ts"
     },
     "deno-doc-module": {
-      "uri": "builtin:previewer/deno_doc_module"
+      "uri": "fallbuiltin://previewer/deno_doc_module.ts"
     }
   },
   "processor": {
     "substring_filter": {
-      "uri": "builtin:processor/substring_filter"
+      "uri": "fallbuiltin://processor/substring_filter.ts"
     }
   },
   "renderer": {},
   "source": {
     "file": {
-      "uri": "builtin:source/file"
+      "uri": "fallbuiltin://source/file.ts"
     },
     "fall-catalog": {
-      "uri": "builtin:source/fall_catalog"
+      "uri": "fallbuiltin://source/fall_catalog.ts"
     }
   }
 }

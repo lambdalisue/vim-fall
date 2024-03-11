@@ -2,7 +2,7 @@
   "$schema": "https://vim-fall.github.io/jsonschema/v1alpha/extension-config.schema.json",
   "action": {
     "open": {
-      "uri": "builtin:action/open",
+      "uri": "fallbuiltin://action/open.ts",
       "variants": {
         "split": {
           "opener": "split"
@@ -59,7 +59,7 @@
   },
   "source": {
     "file": {
-      "uri": "builtin:source/file",
+      "uri": "fallbuiltin://source/file.ts",
       "options": {
         "excludes": [
           "/.git/",

@@ -1,6 +1,6 @@
 import { match, placeholder as _ } from "jsr:@core/match@0.2.5";
 
-const pattern = _`builtin:${_("path")}`;
+const pattern = _`fallbuiltin://${_("path")}`;
 
 export function resolve(
   uri: string,
@@ -9,6 +9,6 @@ export function resolve(
   if (!m) return Promise.resolve(undefined);
   const { path } = m;
   return Promise.resolve(
-    new URL(`../../../@fall-builtin/${path}.ts`, import.meta.url),
+    new URL(`../../../@fall-builtin/${path}`, import.meta.url),
   );
 }
