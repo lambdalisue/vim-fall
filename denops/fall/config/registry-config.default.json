@@ -1,5 +1,5 @@
 {
-  "$schema": "https://vim-fall.github.io/jsonschema/v1/registry-config.schema.json",
+  "$schema": "https://vim-fall.github.io/jsonschema/v1alpha/registry-config.schema.json",
   "package": {
     "vim-fall/package-common": {
       "base": "https://raw.githubusercontent.com/vim-fall/package-common/main/fall-package.json",

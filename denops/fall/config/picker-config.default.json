@@ -1,31 +1,19 @@
 {
-  "$schema": "https://vim-fall.github.io/jsonschema/v1/picker-config.schema.json",
+  "$schema": "https://vim-fall.github.io/jsonschema/v1alpha/picker-config.schema.json",
   "source": {
     "": {
       "defaultAction": "open",
-      "actions": [
-        "*"
-      ],
+      "actions": ["*"],
       "previewer": "text",
-      "processors": [
-        "substring_filter",
-        "lexical_sorter"
-      ],
-      "renderers": [
-        "*"
-      ]
+      "processors": ["substring_filter", "lexical_sorter"],
+      "renderers": ["*"]
     },
     "line": {
-      "processors": [
-        "substring_filter"
-      ],
+      "processors": ["substring_filter"],
       "renderers": []
     }
   },
   "action": {
-    "processors": [
-      "substring_filter",
-      "lexical_sorter"
-    ]
+    "processors": ["substring_filter", "lexical_sorter"]
   }
 }
