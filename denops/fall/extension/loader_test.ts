@@ -8,18 +8,23 @@ Deno.test("getLoaderInfo", async (t) => {
   const { getLoaderInfo } = _internal;
 
   const testcases = [
-    ["action", "open", "../../@fall-builtin/actions/open.ts", {}],
-    ["action", "open:split", "../../@fall-builtin/actions/open.ts", {
+    ["action", "open", "../../@fall-builtin/action/open.ts", {}],
+    ["action", "open:split", "../../@fall-builtin/action/open.ts", {
       opener: "split",
     }],
     [
       "processor",
       "substring_filter",
-      "../../@fall-builtin/processors/substring_filter.ts",
+      "../../@fall-builtin/processor/substring_filter.ts",
       {},
     ],
-    ["previewer", "path", "../../@fall-builtin/previewers/path.ts", {}],
-    ["source", "line", "../../@fall-builtin/sources/line.ts", {}],
+    ["previewer", "text", "../../@fall-builtin/previewer/text.ts", {}],
+    [
+      "source",
+      "line",
+      "https://raw.githubusercontent.com/vim-fall/package-common/main/source/line.ts",
+      {},
+    ],
   ] as const;
   for (const [kind, name, path, options] of testcases) {
     await t.step(`${kind} ${name}`, async () => {
