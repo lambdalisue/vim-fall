@@ -2,7 +2,10 @@ import type { Action } from "https://deno.land/x/fall_core@v0.4.0/mod.ts";
 import { assert, is } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
 
 import { type PartialExtensionConfig } from "../../fall/config/extension.ts";
-import { saveExtensionConfig } from "../../fall/config/extension.ts";
+import {
+  loadExtensionConfig,
+  saveExtensionConfig,
+} from "../../fall/config/extension.ts";
 import { isExtensionDetail } from "../source/fall_catalog.ts";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({})));
@@ -34,6 +37,7 @@ export function getAction(
         econf[item.detail.kind] = m;
         urls.push(item.detail.url);
       }
+      await loadExtensionConfig();
       await saveExtensionConfig(econf);
       // Reload extension files
       try {
