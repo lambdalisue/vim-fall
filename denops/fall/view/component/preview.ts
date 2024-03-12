@@ -8,7 +8,7 @@ import * as buffer from "https://deno.land/x/denops_std@v6.3.0/buffer/mod.ts";
 import type {
   Previewer,
   PreviewerItem,
-} from "https://deno.land/x/fall_core@v0.3.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.4.0/mod.ts";
 import { equal } from "https://deno.land/std@0.203.0/assert/equal.ts";
 
 const DEFAULT_DEBOUNCE_WAIT = 100;

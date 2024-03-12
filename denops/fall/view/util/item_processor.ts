@@ -2,7 +2,7 @@ import type { Denops } from "https://deno.land/x/denops_std@v6.3.0/mod.ts";
 import type {
   Processor,
   ProcessorItem,
-} from "https://deno.land/x/fall_core@v0.3.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.4.0/mod.ts";
 
 import { isDefined } from "../../util/collection.ts";
 import { dispatch } from "../../util/event.ts";

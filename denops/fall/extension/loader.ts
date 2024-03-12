@@ -5,7 +5,7 @@ import type {
   Processor,
   Renderer,
   Source,
-} from "https://deno.land/x/fall_core@v0.3.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.4.0/mod.ts";
 
 import { getExtensionConfigPath } from "../const.ts";
 import { ExtensionKind, getExtensionConfig } from "../config/extension.ts";

@@ -1,7 +1,7 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.3.0/mod.ts";
 import { send } from "https://deno.land/x/denops_std@v6.3.0/helper/keymap.ts";
 import { exprQuote as q } from "https://deno.land/x/denops_std@v6.3.0/helper/expr_string.ts";
-import type { Action } from "https://deno.land/x/fall_core@v0.3.0/mod.ts";
+import type { Action } from "https://deno.land/x/fall_core@v0.4.0/mod.ts";
 import {
   is,
   maybe,
