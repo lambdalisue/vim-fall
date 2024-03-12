@@ -33,7 +33,7 @@ const isLoaderConfig = is.ObjectOf({
   ),
 });
 
-const isExtensionConfig = is.ObjectOf({
+export const isExtensionConfig = is.ObjectOf({
   action: is.RecordOf(isLoaderConfig, is.String),
   previewer: is.RecordOf(isLoaderConfig, is.String),
   processor: is.RecordOf(isLoaderConfig, is.String),
@@ -45,7 +45,9 @@ type ExtensionConfig = PredicateType<typeof isExtensionConfig>;
 
 const isPartialExtensionConfig = is.PartialOf(isExtensionConfig);
 
-type PartialExtensionConfig = PredicateType<typeof isPartialExtensionConfig>;
+export type PartialExtensionConfig = PredicateType<
+  typeof isPartialExtensionConfig
+>;
 
 export function getExtensionConfig(): ExtensionConfig {
   return ensure(
@@ -69,6 +71,22 @@ export async function loadExtensionConfig(): Promise<void> {
     }
     throw err;
   }
+}
+
+export async function saveExtensionConfig(
+  patch: PartialExtensionConfig,
+): Promise<void> {
+  const config = deepMerge(
+    customConfig,
+    patch,
+    {
+      arrays: "replace",
+    },
+  );
+  await Deno.writeTextFile(
+    getExtensionConfigPath(),
+    JSON.stringify(config, null, 2),
+  );
 }
 
 let customConfig: PartialExtensionConfig = defaultConfig;
