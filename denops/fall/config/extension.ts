@@ -1,5 +1,4 @@
 import { deepMerge } from "https://deno.land/std@0.218.2/collections/deep_merge.ts";
-import { toFileUrl } from "https://deno.land/std@0.218.2/path/to_file_url.ts";
 import {
   ensure,
   is,
@@ -11,6 +10,8 @@ import builtinConfig from "./extension-config.builtin.json" with {
 import defaultConfig from "./extension-config.default.json" with {
   type: "json",
 };
+
+import { getExtensionConfigPath } from "../const.ts";
 
 export const isExtensionKind = is.LiteralOneOf(
   [
@@ -33,7 +34,6 @@ const isLoaderConfig = is.ObjectOf({
 });
 
 const isExtensionConfig = is.ObjectOf({
-  base: is.OptionalOf(is.InstanceOf(URL)),
   action: is.RecordOf(isLoaderConfig, is.String),
   previewer: is.RecordOf(isLoaderConfig, is.String),
   processor: is.RecordOf(isLoaderConfig, is.String),
@@ -43,20 +43,34 @@ const isExtensionConfig = is.ObjectOf({
 
 type ExtensionConfig = PredicateType<typeof isExtensionConfig>;
 
-export function getExtensionConfig(): ExtensionConfig {
-  return extensionConfig;
-}
+const isPartialExtensionConfig = is.PartialOf(isExtensionConfig);
 
-export async function loadExtensionConfig(path: string): Promise<void> {
-  const customConfig = JSON.parse(await Deno.readTextFile(path));
-  extensionConfig = ensure({
-    ...deepMerge(builtinConfig, customConfig, {
+type PartialExtensionConfig = PredicateType<typeof isPartialExtensionConfig>;
+
+export function getExtensionConfig(): ExtensionConfig {
+  return ensure(
+    deepMerge(builtinConfig, customConfig, {
       arrays: "replace",
     }),
-    base: toFileUrl(path),
-  }, isExtensionConfig);
+    isExtensionConfig,
+  );
 }
 
-let extensionConfig: ExtensionConfig = deepMerge(builtinConfig, defaultConfig);
+export async function loadExtensionConfig(): Promise<void> {
+  try {
+    customConfig = ensure(
+      JSON.parse(await Deno.readTextFile(getExtensionConfigPath())),
+      isPartialExtensionConfig,
+    );
+  } catch (err) {
+    if (err instanceof Deno.errors.NotFound) {
+      customConfig = defaultConfig;
+      return;
+    }
+    throw err;
+  }
+}
+
+let customConfig: PartialExtensionConfig = defaultConfig;
 
 export { defaultConfig };

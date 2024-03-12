@@ -6,6 +6,7 @@ import type {
   Source,
 } from "https://deno.land/x/fall_core@v0.3.0/mod.ts";
 
+import { getExtensionConfigPath } from "../const.ts";
 import { ExtensionKind, getExtensionConfig } from "../config/extension.ts";
 import { isDefined } from "../util/collection.ts";
 import { resolve } from "./resolver.ts";
@@ -74,7 +75,7 @@ async function getLoaderInfo<K extends ExtensionKind>(
   if (!lconf) {
     throw new Error(`No ${kind} extension '${name}' found.`);
   }
-  const url = await resolve(lconf.url, econf.base);
+  const url = await resolve(lconf.url, getExtensionConfigPath());
   return [
     url,
     (variant ? (lconf.variants ?? {})[variant] : lconf.options) ?? {},

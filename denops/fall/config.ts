@@ -7,14 +7,8 @@ import { dirname } from "https://deno.land/std@0.219.0/path/mod.ts";
 import { ensureDir, exists } from "https://deno.land/std@0.219.0/fs/mod.ts";
 
 import { getExtensionConfigPath, getPickerConfigPath } from "./const.ts";
-import {
-  defaultConfig as defaultPickerConfig,
-  loadPickerConfig,
-} from "./config/picker.ts";
-import {
-  defaultConfig as defaultExtensionConfig,
-  loadExtensionConfig,
-} from "./config/extension.ts";
+import { defaultConfig as defaultPickerConfig } from "./config/picker.ts";
+import { defaultConfig as defaultExtensionConfig } from "./config/extension.ts";
 
 export async function editPickerConfig(
   denops: Denops,
@@ -66,28 +60,4 @@ export async function editExtensionConfig(
       `call denops#notify('${denops.name}', 'reloadConfig', ['extension'])`,
     );
   });
-}
-
-export async function reloadPickerConfig(): Promise<void> {
-  const path = getPickerConfigPath();
-  try {
-    await loadPickerConfig(path);
-  } catch (err) {
-    if (err instanceof Deno.errors.NotFound) {
-      return;
-    }
-    throw err;
-  }
-}
-
-export async function reloadExtensionConfig(): Promise<void> {
-  const path = getExtensionConfigPath();
-  try {
-    await loadExtensionConfig(path);
-  } catch (err) {
-    if (err instanceof Deno.errors.NotFound) {
-      return;
-    }
-    throw err;
-  }
 }

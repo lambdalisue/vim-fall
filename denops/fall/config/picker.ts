@@ -7,12 +7,10 @@ import {
 import builtinConfig from "./picker-config.builtin.json" with { type: "json" };
 import defaultConfig from "./picker-config.default.json" with { type: "json" };
 
+import { getPickerConfigPath } from "../const.ts";
+
 import { isLayoutParams as isSourcePickerLayoutParams } from "../view/layout/prompt_top_preview_right.ts";
 import { isLayoutParams as isActionPickerLayoutParams } from "../view/layout/prompt_top.ts";
-
-type SourcePickerConfig = PredicateType<typeof isSourcePickerConfig>;
-type ActionPickerConfig = PredicateType<typeof isActionPickerConfig>;
-type PickerConfig = PredicateType<typeof isPickerConfig>;
 
 const isSourcePickerConfig = is.ObjectOf({
   defaultAction: is.String,
@@ -37,6 +35,8 @@ const isSourcePickerConfig = is.ObjectOf({
   }))),
 });
 
+type SourcePickerConfig = PredicateType<typeof isSourcePickerConfig>;
+
 const isActionPickerConfig = is.ObjectOf({
   processors: is.ArrayOf(is.String),
   renderers: is.ArrayOf(is.String),
@@ -51,13 +51,29 @@ const isActionPickerConfig = is.ObjectOf({
   }))),
 });
 
+type ActionPickerConfig = PredicateType<typeof isActionPickerConfig>;
+
 const isPickerConfig = is.ObjectOf({
   source: is.RecordOf(is.PartialOf(isSourcePickerConfig), is.String),
   action: isActionPickerConfig,
 });
 
+type PickerConfig = PredicateType<typeof isPickerConfig>;
+
+const isPartialPickerConfig = is.ObjectOf({
+  source: is.RecordOf(is.PartialOf(isSourcePickerConfig), is.String),
+  action: is.PartialOf(isActionPickerConfig),
+});
+
+type PartialPickerConfig = PredicateType<typeof isPartialPickerConfig>;
+
 export function getPickerConfig(): PickerConfig {
-  return pickerConfig;
+  return ensure(
+    deepMerge(builtinConfig, customConfig, {
+      arrays: "replace",
+    }),
+    isPickerConfig,
+  );
 }
 
 export function getSourcePickerConfig(name: string): SourcePickerConfig {
@@ -72,16 +88,21 @@ export function getActionPickerConfig(): ActionPickerConfig {
   return conf.action;
 }
 
-export async function loadPickerConfig(path: string): Promise<void> {
-  const customConfig = JSON.parse(await Deno.readTextFile(path));
-  pickerConfig = ensure(
-    deepMerge(builtinConfig, customConfig, {
-      arrays: "replace",
-    }),
-    isPickerConfig,
-  );
+export async function loadPickerConfig(): Promise<void> {
+  try {
+    customConfig = ensure(
+      JSON.parse(await Deno.readTextFile(getPickerConfigPath())),
+      isPartialPickerConfig,
+    );
+  } catch (err) {
+    if (err instanceof Deno.errors.NotFound) {
+      customConfig = defaultConfig;
+      return;
+    }
+    throw err;
+  }
 }
 
-let pickerConfig: PickerConfig = deepMerge(builtinConfig, defaultConfig);
+let customConfig: PartialPickerConfig = defaultConfig;
 
 export { defaultConfig };
