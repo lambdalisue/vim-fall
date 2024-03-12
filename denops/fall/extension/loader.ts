@@ -1,3 +1,4 @@
+import { toFileUrl } from "https://deno.land/std@0.218.2/path/to_file_url.ts";
 import type {
   Action,
   Previewer,
@@ -75,7 +76,7 @@ async function getLoaderInfo<K extends ExtensionKind>(
   if (!lconf) {
     throw new Error(`No ${kind} extension '${name}' found.`);
   }
-  const url = await resolve(lconf.url, getExtensionConfigPath());
+  const url = await resolve(lconf.url, toFileUrl(getExtensionConfigPath()));
   return [
     url,
     (variant ? (lconf.variants ?? {})[variant] : lconf.options) ?? {},
