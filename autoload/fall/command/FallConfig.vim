@@ -4,5 +4,5 @@ function! fall#command#FallConfig#call(qargs) abort
 endfunction
 
 function! fall#command#FallConfig#complete(arglead, cmdline, cursorpos) abort
-  return filter(['picker', 'extension', 'registry'], { _, v -> v =~# '^' . a:arglead})
+  return filter(['picker', 'extension'], { _, v -> v =~# '^' . a:arglead})
 endfunction

@@ -11,17 +11,15 @@ import { isStartOptions, start } from "./start.ts";
 import {
   editExtensionConfig,
   editPickerConfig,
-  editRegistryConfig,
   reloadExtensionConfig,
   reloadPickerConfig,
-  reloadRegistryConfig,
 } from "./config.ts";
 import { dispatch, isFallEventName } from "./util/event.ts";
 
 import "./polyfill.ts";
 
 const isConfigType = is.LiteralOneOf(
-  ["picker", "extension", "registry"] as const,
+  ["picker", "extension"] as const,
 );
 
 export function main(denops: Denops): void {
@@ -52,9 +50,6 @@ export function main(denops: Denops): void {
           case "extension":
             await reloadExtensionConfig(denops);
             break;
-          case "registry":
-            await reloadRegistryConfig(denops);
-            break;
           default:
             unreachable(type);
         }
@@ -69,9 +64,6 @@ export function main(denops: Denops): void {
             break;
           case "extension":
             await editExtensionConfig(denops);
-            break;
-          case "registry":
-            await editRegistryConfig(denops);
             break;
           default:
             unreachable(type);
