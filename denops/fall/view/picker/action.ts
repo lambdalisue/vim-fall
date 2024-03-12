@@ -191,23 +191,23 @@ export class ActionPicker implements AsyncDisposable {
     stack.use(subscribe("item-processor-failed", () => {
       prompt.processing = "failed";
     }));
-    stack.use(subscribe("cmdline-changed", (data) => {
-      this.#query = data;
+    stack.use(subscribe("cmdline-changed", (cmdline) => {
+      this.#query = cmdline;
       this.#itemProcessor.start(denops, this.collectedItems, this.#query);
       prompt.cmdline = this.#query;
     }));
-    stack.use(subscribe("cmdpos-changed", (data) => {
-      prompt.cmdpos = data;
+    stack.use(subscribe("cmdpos-changed", (cmdpos) => {
+      prompt.cmdpos = cmdpos;
     }));
-    stack.use(subscribe("selector-cursor-move", (data) => {
-      this.#index += data;
+    stack.use(subscribe("selector-cursor-move", (offset) => {
+      this.#index += offset;
       selector.index = this.#index;
     }));
-    stack.use(subscribe("selector-cursor-move-at", (data) => {
-      if (data === "$") {
+    stack.use(subscribe("selector-cursor-move-at", (line) => {
+      if (line === "$") {
         this.#index = this.processedItems.length - 1;
       } else {
-        this.#index = data;
+        this.#index = line;
       }
       selector.index = this.#index;
     }));

@@ -133,4 +133,33 @@ export class PreviewComponent {
       );
     }
   }
+
+  /**
+   * Move the cursor at in the preview window.
+   */
+  async moveCursorAt(
+    denops: Denops,
+    line: number,
+    { signal }: { signal: AbortSignal },
+  ): Promise<void> {
+    try {
+      const linecount = await fn.line(denops, "$", this.#winid);
+      if (signal.aborted) return;
+
+      const newLine = Math.max(1, Math.min(line, linecount));
+      await batch(denops, async (denops) => {
+        await fn.win_execute(
+          denops,
+          this.#winid,
+          `normal! ${newLine}G`,
+        );
+        await denops.cmd("redraw");
+      });
+    } catch (err) {
+      // Fail silently
+      console.debug(
+        `[fall] Failed to move cursor on the preview window: ${err}`,
+      );
+    }
+  }
 }

@@ -256,29 +256,29 @@ export class SourcePicker implements AsyncDisposable {
     stack.use(subscribe("item-processor-failed", () => {
       prompt.processing = "failed";
     }));
-    stack.use(subscribe("cmdline-changed", (data) => {
-      this.#query = data;
+    stack.use(subscribe("cmdline-changed", (cmdline) => {
+      this.#query = cmdline;
       this.#itemProcessor.start(denops, this.collectedItems, this.#query);
       prompt.cmdline = this.#query;
     }));
-    stack.use(subscribe("cmdpos-changed", (data) => {
-      prompt.cmdpos = data;
+    stack.use(subscribe("cmdpos-changed", (cmdpos) => {
+      prompt.cmdpos = cmdpos;
     }));
-    stack.use(subscribe("selector-cursor-move", (data) => {
+    stack.use(subscribe("selector-cursor-move", (offset) => {
       const nextIndex = Math.max(
         0,
-        Math.min(this.processedItems.length - 1, this.#index + data),
+        Math.min(this.processedItems.length - 1, this.#index + offset),
       );
       this.#index = nextIndex;
       selector.index = this.#index;
     }));
-    stack.use(subscribe("selector-cursor-move-at", (data) => {
-      if (data === "$") {
+    stack.use(subscribe("selector-cursor-move-at", (line) => {
+      if (line === "$") {
         this.#index = this.processedItems.length - 1;
       } else {
         this.#index = Math.max(
           0,
-          Math.min(this.processedItems.length - 1, data - 1),
+          Math.min(this.processedItems.length - 1, line - 1),
         );
       }
       selector.index = this.#index;
@@ -301,8 +301,11 @@ export class SourcePicker implements AsyncDisposable {
       }
       selector.selected = new Set(this.#selected);
     }));
-    stack.use(subscribe("preview-cursor-move", (data) => {
-      preview.moveCursor(denops, data, { signal: options.signal });
+    stack.use(subscribe("preview-cursor-move", (offset) => {
+      preview.moveCursor(denops, offset, { signal: options.signal });
+    }));
+    stack.use(subscribe("preview-cursor-move-at", (line) => {
+      preview.moveCursorAt(denops, line, { signal: options.signal });
     }));
 
     // Update UI in background
