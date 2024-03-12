@@ -90,6 +90,7 @@ export async function start(
   await using itemsPicker = await SourcePicker.create(
     denops,
     args,
+    name,
     source,
     processors,
     renderers,
