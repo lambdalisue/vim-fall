@@ -96,7 +96,7 @@ export class SourcePicker implements AsyncDisposable {
     // Build layout
     const layout = stack.use(
       await buildLayout(denops, {
-        title: title,
+        title: ` ${title} `,
         width: options.layout?.width,
         widthRatio: options.layout?.widthRatio ?? WIDTH_RATION,
         widthMin: options.layout?.widthMin ?? WIDTH_MIN,
