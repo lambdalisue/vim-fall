@@ -1,5 +1,4 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.3.0/mod.ts";
-import { g } from "https://deno.land/x/denops_std@v6.3.0/variable/mod.ts";
 import { batch } from "https://deno.land/x/denops_std@v6.3.0/batch/mod.ts";
 import * as autocmd from "https://deno.land/x/denops_std@v6.3.0/autocmd/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.3.0/buffer/mod.ts";
@@ -7,6 +6,7 @@ import * as opt from "https://deno.land/x/denops_std@v6.3.0/option/mod.ts";
 import { dirname } from "https://deno.land/std@0.219.0/path/mod.ts";
 import { ensureDir, exists } from "https://deno.land/std@0.219.0/fs/mod.ts";
 
+import { getExtensionConfigPath, getPickerConfigPath } from "./const.ts";
 import {
   defaultConfig as defaultPickerConfig,
   loadPickerConfig,
@@ -19,7 +19,7 @@ import {
 export async function editPickerConfig(
   denops: Denops,
 ): Promise<void> {
-  const path = await getPickerConfigPath(denops);
+  const path = getPickerConfigPath();
   await ensureDir(dirname(path));
   if (!await exists(path)) {
     await Deno.writeTextFile(
@@ -45,7 +45,7 @@ export async function editPickerConfig(
 export async function editExtensionConfig(
   denops: Denops,
 ): Promise<void> {
-  const path = await getExtensionConfigPath(denops);
+  const path = getExtensionConfigPath();
   await ensureDir(dirname(path));
   if (!await exists(path)) {
     await Deno.writeTextFile(
@@ -68,8 +68,8 @@ export async function editExtensionConfig(
   });
 }
 
-export async function reloadPickerConfig(denops: Denops): Promise<void> {
-  const path = await getPickerConfigPath(denops);
+export async function reloadPickerConfig(): Promise<void> {
+  const path = getPickerConfigPath();
   try {
     await loadPickerConfig(path);
   } catch (err) {
@@ -80,8 +80,8 @@ export async function reloadPickerConfig(denops: Denops): Promise<void> {
   }
 }
 
-export async function reloadExtensionConfig(denops: Denops): Promise<void> {
-  const path = await getExtensionConfigPath(denops);
+export async function reloadExtensionConfig(): Promise<void> {
+  const path = getExtensionConfigPath();
   try {
     await loadExtensionConfig(path);
   } catch (err) {
@@ -90,12 +90,4 @@ export async function reloadExtensionConfig(denops: Denops): Promise<void> {
     }
     throw err;
   }
-}
-
-function getPickerConfigPath(denops: Denops): Promise<string> {
-  return g.get(denops, "fall_picker_config_path");
-}
-
-function getExtensionConfigPath(denops: Denops): Promise<string> {
-  return g.get(denops, "fall_extension_config_path");
 }
