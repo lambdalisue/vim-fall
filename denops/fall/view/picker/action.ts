@@ -251,14 +251,21 @@ export class ActionPicker implements AsyncDisposable {
       prompt.cmdpos = cmdpos;
     }));
     stack.use(subscribe("selector-cursor-move", (offset) => {
-      this.#index += offset;
+      const nextIndex = Math.max(
+        0,
+        Math.min(this.processedItems.length - 1, this.#index + offset),
+      );
+      this.#index = nextIndex;
       selector.index = this.#index;
     }));
     stack.use(subscribe("selector-cursor-move-at", (line) => {
       if (line === "$") {
         this.#index = this.processedItems.length - 1;
       } else {
-        this.#index = line;
+        this.#index = Math.max(
+          0,
+          Math.min(this.processedItems.length - 1, line - 1),
+        );
       }
       selector.index = this.#index;
     }));
