@@ -2,10 +2,17 @@ import {
   assertEquals,
   assertThrows,
 } from "https://deno.land/std@0.218.2/assert/mod.ts";
+import { fromFileUrl } from "https://deno.land/std@0.218.2/path/mod.ts";
+import { assign } from "../const.ts";
 import { _internal } from "./loader.ts";
 
 Deno.test("getLoaderInfo", async (t) => {
   const { getLoaderInfo } = _internal;
+
+  assign({
+    pickerConfigPath: fromFileUrl(import.meta.url),
+    extensionConfigPath: fromFileUrl(import.meta.url),
+  });
 
   const testcases = [
     ["action", "open", "../../@fall-builtin/action/open.ts", {}],
