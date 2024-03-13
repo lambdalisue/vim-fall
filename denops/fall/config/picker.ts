@@ -81,7 +81,7 @@ export function getPickerConfig(): PickerConfig {
 export function getSourcePickerConfig(name: string): SourcePickerConfig {
   const conf = getPickerConfig();
   const d = conf.source[""];
-  const c = conf.source[name] ?? {};
+  const c = conf.source[name] ?? conf.source[name.split(":", 1)[0]] ?? {};
   return deepMerge(d, c, { arrays: "replace" });
 }
 
