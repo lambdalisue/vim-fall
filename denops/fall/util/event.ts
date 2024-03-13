@@ -74,7 +74,6 @@ const fallEventDataMap = {
   "selector-select-all": is.Unknown,
   "preview-cursor-move": is.Number,
   "preview-cursor-move-at": is.Number,
-  "preview-previous": is.Unknown,
   "action-invoke": is.String,
   "item-collector-changed": is.Unknown,
   "item-collector-succeeded": is.Unknown,
@@ -83,4 +82,8 @@ const fallEventDataMap = {
   "item-processor-succeeded": is.Unknown,
   "item-processor-failed": is.Unknown,
   "item-processor-completed": is.Unknown,
+  "item-processor-filter-prev": is.Unknown,
+  "item-processor-filter-next": is.Unknown,
+  "item-processor-sorter-prev": is.Unknown,
+  "item-processor-sorter-next": is.Unknown,
 } as const satisfies Record<string, Predicate<unknown>>;

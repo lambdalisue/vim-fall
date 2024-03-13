@@ -10,7 +10,19 @@
   },
   "filter": {
     "substring": {
-      "url": "fallbuiltin://filter/substring.ts"
+      "url": "fallbuiltin://filter/substring.ts",
+      "variants": {
+        "smart-case": {
+          "smartCase": true
+        },
+        "ignore-case": {
+          "ignoreCase": true
+        },
+        "none": {
+          "smartCase": false,
+          "ignoreCase": false
+        }
+      }
     }
   },
   "previewer": {
@@ -25,7 +37,16 @@
     }
   },
   "renderer": {},
-  "sorter": {},
+  "sorter": {
+    "none": {
+      "url": "fallbuiltin://sorter/none.ts",
+      "variants": {
+        "reverse": {
+          "reverse": true
+        }
+      }
+    }
+  },
   "source": {
     "file": {
       "url": "fallbuiltin://source/file.ts"

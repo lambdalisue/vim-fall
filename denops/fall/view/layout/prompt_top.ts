@@ -30,6 +30,7 @@ import {
 import { calcProperSize } from "./util.ts";
 
 export const isLayoutParams = is.ObjectOf({
+  title: is.String,
   width: is.OptionalOf(is.Number),
   widthRatio: is.Number,
   widthMin: is.Number,
@@ -102,6 +103,7 @@ export async function buildLayout(
 
   const prompt = stack.use(
     await popup.open(denops, {
+      title: params.title,
       relative: "editor",
       anchor: "NW",
       width: width - 2, // -2 for border

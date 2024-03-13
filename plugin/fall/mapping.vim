@@ -16,6 +16,12 @@ function! s:map_source_picker() abort
   cnoremap <nowait><buffer> <C-.> <Plug>(fall-select-all)
   cnoremap <nowait><buffer> <C-j> <Plug>(fall-select)<Plug>(fall-cursor-next)
   cnoremap <nowait><buffer> <C-k> <Plug>(fall-cursor-prev)<Plug>(fall-select)
+  " Filter
+  cnoremap <nowait><buffer> <F1> <Plug>(fall-filter-prev)
+  cnoremap <nowait><buffer> <F2> <Plug>(fall-filter-next)
+  " Sorter
+  cnoremap <nowait><buffer> <F3> <Plug>(fall-sorter-prev)
+  cnoremap <nowait><buffer> <F4> <Plug>(fall-sorter-next)
   " Action
   cnoremap <nowait><buffer> <Tab> <Plug>(fall-action-select)
   cnoremap <nowait><buffer> <Return> <Plug>(fall-action-default)
@@ -41,6 +47,12 @@ function! s:unmap_source_picker() abort
   silent cunmap <buffer> <C-.>
   silent cunmap <buffer> <C-j>
   silent cunmap <buffer> <C-k>
+  " Filter
+  silent cunmap <buffer> <F1>
+  silent cunmap <buffer> <F2>
+  " Sorter
+  silent cunmap <buffer> <F3>
+  silent cunmap <buffer> <F4>
   " Action
   silent cunmap <buffer> <Tab>
   silent cunmap <buffer> <Return>
@@ -61,6 +73,12 @@ function! s:map_action_picker() abort
   cnoremap <nowait><buffer> <C-d> <Plug>(fall-cursor-next-scroll)
   cnoremap <nowait><buffer> <C-t> <Plug>(fall-cursor-first)
   cnoremap <nowait><buffer> <C-g> <Plug>(fall-cursor-last)
+  " Filter
+  cnoremap <nowait><buffer> <F1> <Plug>(fall-filter-prev)
+  cnoremap <nowait><buffer> <F2> <Plug>(fall-filter-next)
+  " Sorter
+  cnoremap <nowait><buffer> <F3> <Plug>(fall-sorter-prev)
+  cnoremap <nowait><buffer> <F4> <Plug>(fall-sorter-next)
 endfunction
 
 function! s:unmap_action_picker() abort
@@ -71,6 +89,12 @@ function! s:unmap_action_picker() abort
   silent cunmap <buffer> <C-d>
   silent cunmap <buffer> <C-t>
   silent cunmap <buffer> <C-g>
+  " Filter
+  silent cunmap <buffer> <F1>
+  silent cunmap <buffer> <F2>
+  " Sorter
+  silent cunmap <buffer> <F3>
+  silent cunmap <buffer> <F4>
 endfunction
 
 " Cursor
@@ -83,6 +107,12 @@ cnoremap <silent> <Plug>(fall-cursor-prev-scroll) <Cmd>call <SID>dispatch('selec
 " Select
 cnoremap <silent> <Plug>(fall-select) <Cmd>call <SID>dispatch('selector-select')<CR>
 cnoremap <silent> <Plug>(fall-select-all) <Cmd>call <SID>dispatch('selector-select-all')<CR>
+" Filter
+cnoremap <silent> <Plug>(fall-filter-next) <Cmd>call <SID>dispatch('item-processor-filter-next')<CR>
+cnoremap <silent> <Plug>(fall-filter-prev) <Cmd>call <SID>dispatch('item-processor-filter-prev')<CR>
+" Sorter
+cnoremap <silent> <Plug>(fall-sorter-next) <Cmd>call <SID>dispatch('item-processor-sorter-next')<CR>
+cnoremap <silent> <Plug>(fall-sorter-prev) <Cmd>call <SID>dispatch('item-processor-sorter-prev')<CR>
 " Action
 cnoremap <silent> <Plug>(fall-action-select) <Cmd>call <SID>dispatch('action-invoke', '@select')<CR>
 cnoremap <silent> <Plug>(fall-action-default) <Cmd>call <SID>dispatch('action-invoke', '@default')<CR>

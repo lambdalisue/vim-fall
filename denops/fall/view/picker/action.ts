@@ -6,6 +6,7 @@ import {
   batch,
   collect,
 } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
+import * as popup from "https://deno.land/x/denops_std@v6.4.0/popup/mod.ts";
 import type {
   Action,
   Filter,
@@ -71,9 +72,16 @@ export class ActionPicker implements AsyncDisposable {
   ): Promise<ActionPicker> {
     const stack = new AsyncDisposableStack();
 
+    const itemProcessor = stack.use(new ItemProcessor(filters, sorters));
+
     // Build layout
+    const title = [
+      itemProcessor.currentFilterName,
+      itemProcessor.currentSorterName,
+    ].join(" / ");
     const layout = stack.use(
       await buildLayout(denops, {
+        title: ` ${title} `,
         width: options.layout?.width,
         widthRatio: options.layout?.widthRatio ?? WIDTH_RATION,
         widthMin: options.layout?.widthMin ?? WIDTH_MIN,
@@ -87,8 +95,6 @@ export class ActionPicker implements AsyncDisposable {
       }),
     );
 
-    const itemProcessor = stack.use(new ItemProcessor(filters, sorters));
-
     return new ActionPicker(
       actions,
       renderers,
@@ -97,6 +103,13 @@ export class ActionPicker implements AsyncDisposable {
       itemProcessor,
       stack.move(),
     );
+  }
+
+  get #title(): string {
+    return [
+      this.#itemProcessor.currentFilterName,
+      this.#itemProcessor.currentSorterName,
+    ].join(" / ");
   }
 
   get collectedItems(): Item[] {
@@ -196,6 +209,38 @@ export class ActionPicker implements AsyncDisposable {
     }));
     stack.use(subscribe("item-processor-failed", () => {
       prompt.processing = "failed";
+    }));
+    stack.use(subscribe("item-processor-filter-prev", () => {
+      this.#itemProcessor.currentFilterIndex -= 1;
+      popup.config(denops, this.#layout.prompt.winid, {
+        title: ` ${this.#title} `,
+      }).catch((err) => {
+        console.warn(`[fall] Failed to set popup config: ${err}`);
+      });
+    }));
+    stack.use(subscribe("item-processor-filter-next", () => {
+      this.#itemProcessor.currentFilterIndex += 1;
+      popup.config(denops, this.#layout.prompt.winid, {
+        title: ` ${this.#title} `,
+      }).catch((err) => {
+        console.warn(`[fall] Failed to set popup config: ${err}`);
+      });
+    }));
+    stack.use(subscribe("item-processor-sorter-prev", () => {
+      this.#itemProcessor.currentSorterIndex -= 1;
+      popup.config(denops, this.#layout.prompt.winid, {
+        title: ` ${this.#title} `,
+      }).catch((err) => {
+        console.warn(`[fall] Failed to set popup config: ${err}`);
+      });
+    }));
+    stack.use(subscribe("item-processor-sorter-next", () => {
+      this.#itemProcessor.currentSorterIndex += 1;
+      popup.config(denops, this.#layout.prompt.winid, {
+        title: ` ${this.#title} `,
+      }).catch((err) => {
+        console.warn(`[fall] Failed to set popup config: ${err}`);
+      });
     }));
     stack.use(subscribe("cmdline-changed", (cmdline) => {
       this.#query = cmdline;
