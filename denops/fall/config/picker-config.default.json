@@ -4,16 +4,19 @@
     "": {
       "defaultAction": "open",
       "actions": ["*"],
+      "filters": ["*"],
       "previewer": "text",
-      "processors": ["substring_filter", "lexical_sorter"],
-      "renderers": ["*"]
+      "renderers": ["*"],
+      "sorters": ["*"]
     },
     "line": {
-      "processors": ["substring_filter"],
-      "renderers": []
+      "renderers": [],
+      "sorters": []
     }
   },
   "action": {
-    "processors": ["substring_filter", "lexical_sorter"]
+    "filters": ["*"],
+    "renderers": [],
+    "sorters": ["*"]
   }
 }

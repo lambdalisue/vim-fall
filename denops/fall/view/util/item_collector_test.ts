@@ -26,9 +26,9 @@ Deno.test("ItemCollector", async (t) => {
     collector.start();
     await promise;
     assertEquals(collector.items, [
-      { id: "0", value: "1", decorations: [] },
-      { id: "1", value: "2", decorations: [] },
-      { id: "2", value: "3", decorations: [] },
+      { id: "0", value: "1", detail: {}, decorations: [] },
+      { id: "1", value: "2", detail: {}, decorations: [] },
+      { id: "2", value: "3", detail: {}, decorations: [] },
     ]);
   });
 

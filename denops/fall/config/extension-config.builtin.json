@@ -8,6 +8,11 @@
       "url": "fallbuiltin://action/fall_extension_install.ts"
     }
   },
+  "filter": {
+    "substring": {
+      "url": "fallbuiltin://filter/substring.ts"
+    }
+  },
   "previewer": {
     "text": {
       "url": "fallbuiltin://previewer/text.ts"
@@ -19,12 +24,8 @@
       "url": "fallbuiltin://previewer/deno_doc_module.ts"
     }
   },
-  "processor": {
-    "substring_filter": {
-      "url": "fallbuiltin://processor/substring_filter.ts"
-    }
-  },
   "renderer": {},
+  "sorter": {},
   "source": {
     "file": {
       "url": "fallbuiltin://source/file.ts"

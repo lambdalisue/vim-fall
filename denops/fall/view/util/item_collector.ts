@@ -1,7 +1,7 @@
 import type {
-  ProcessorItem,
+  Item,
   SourceItem,
-} from "https://deno.land/x/fall_core@v0.4.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
 
 import { ChunkStream } from "../../util/stream.ts";
 import { dispatch } from "../../util/event.ts";
@@ -18,7 +18,7 @@ export class ItemCollector implements Disposable {
   #chunkSize: number;
 
   #controller?: AbortController;
-  #items: ProcessorItem[] = [];
+  #items: Item[] = [];
 
   constructor(stream: ReadableStream<SourceItem>, params: ItemCollectorParams) {
     this.#stream = stream;
@@ -28,7 +28,7 @@ export class ItemCollector implements Disposable {
   /**
    * Collected items
    */
-  get items(): ProcessorItem[] {
+  get items(): Item[] {
     return this.#items;
   }
 
@@ -92,11 +92,12 @@ export class ItemCollector implements Disposable {
 function toProcessorItems(
   items: SourceItem[],
   offset: number,
-): ProcessorItem[] {
+): Item[] {
   return items.map((v, i) => ({
+    detail: {},
+    decorations: [],
     ...v,
     id: (i + offset).toString(),
-    decorations: [],
   }));
 }
 

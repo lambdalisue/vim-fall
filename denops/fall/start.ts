@@ -1,7 +1,7 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.3.0/mod.ts";
 import { send } from "https://deno.land/x/denops_std@v6.3.0/helper/keymap.ts";
 import { exprQuote as q } from "https://deno.land/x/denops_std@v6.3.0/helper/expr_string.ts";
-import type { Action } from "https://deno.land/x/fall_core@v0.4.0/mod.ts";
+import type { Action } from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
 import {
   is,
   maybe,
@@ -19,12 +19,14 @@ import { SourcePicker } from "./view/picker/source.ts";
 import { ActionPicker } from "./view/picker/action.ts";
 
 export const isStartOptions = is.PartialOf(is.ObjectOf({
-  processors: is.ArrayOf(is.String),
-  renderers: is.ArrayOf(is.String),
+  filters: is.ArrayOf(is.String),
   previewer: is.String,
+  renderers: is.ArrayOf(is.String),
+  sorters: is.ArrayOf(is.String),
   actions: is.ArrayOf(is.String),
-  actionProcessors: is.ArrayOf(is.String),
+  actionFilters: is.ArrayOf(is.String),
   actionRenderers: is.ArrayOf(is.String),
+  actionSorters: is.ArrayOf(is.String),
 }));
 
 export type StartOptions = PredicateType<typeof isStartOptions>;
@@ -60,30 +62,40 @@ export async function start(
   );
   const [
     actions,
-    processors,
+    filters,
     renderers,
-    actionProcessors,
+    sorters,
+    actionFilters,
     actionRenderers,
+    actionSorters,
   ] = await Promise.all([
     loadExtensions(
       "action",
       options.actions ?? itemsPickerConfig.actions,
     ),
     loadExtensions(
-      "processor",
-      options.processors ?? itemsPickerConfig.processors,
+      "filter",
+      options.filters ?? itemsPickerConfig.filters,
     ),
     loadExtensions(
       "renderer",
       options.renderers ?? itemsPickerConfig.renderers,
     ),
     loadExtensions(
-      "processor",
-      options.actionProcessors ?? actionPickerConfig.processors,
+      "sorter",
+      options.sorters ?? itemsPickerConfig.sorters,
+    ),
+    loadExtensions(
+      "filter",
+      options.actionFilters ?? actionPickerConfig.filters,
     ),
     loadExtensions(
       "renderer",
       options.actionRenderers ?? actionPickerConfig.renderers,
+    ),
+    loadExtensions(
+      "sorter",
+      options.actionSorters ?? actionPickerConfig.sorters,
     ),
   ]);
 
@@ -92,9 +104,10 @@ export async function start(
     args,
     name,
     source,
-    processors,
-    renderers,
+    filters,
     previewer,
+    renderers,
+    sorters,
     itemsPickerConfig.options ?? {},
   );
 
@@ -123,8 +136,9 @@ export async function start(
       await using actionPicker = await ActionPicker.create(
         denops,
         actions,
-        actionProcessors,
+        actionFilters,
         actionRenderers,
+        actionSorters,
         actionPickerConfig.options ?? {},
       );
       if (await actionPicker.start(denops, { signal })) {

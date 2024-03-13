@@ -8,10 +8,11 @@ import {
 } from "https://deno.land/x/denops_std@v6.3.0/batch/mod.ts";
 import type {
   Action,
-  Processor,
-  ProcessorItem,
+  Filter,
+  Item,
   Renderer,
-} from "https://deno.land/x/fall_core@v0.4.0/mod.ts";
+  Sorter,
+} from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
 
 import { any } from "../../util/collection.ts";
 import { startAsyncScheduler } from "../../util/async_scheduler.ts";
@@ -63,8 +64,9 @@ export class ActionPicker implements AsyncDisposable {
   static async create(
     denops: Denops,
     actions: Map<string, Action>,
-    processors: Map<string, Processor>,
+    filters: Map<string, Filter>,
     renderers: Map<string, Renderer>,
+    sorters: Map<string, Sorter>,
     options: ActionPickerOptions,
   ): Promise<ActionPicker> {
     const stack = new AsyncDisposableStack();
@@ -85,7 +87,7 @@ export class ActionPicker implements AsyncDisposable {
       }),
     );
 
-    const itemProcessor = stack.use(new ItemProcessor(processors));
+    const itemProcessor = stack.use(new ItemProcessor(filters, sorters));
 
     return new ActionPicker(
       actions,
@@ -97,19 +99,20 @@ export class ActionPicker implements AsyncDisposable {
     );
   }
 
-  get collectedItems(): ProcessorItem[] {
+  get collectedItems(): Item[] {
     return [...this.#actions.keys()].map((v) => ({
       id: v,
       value: v,
+      detail: {},
       decorations: [],
     }));
   }
 
-  get processedItems(): ProcessorItem[] {
+  get processedItems(): Item[] {
     return this.#itemProcessor.items;
   }
 
-  get cursorItem(): ProcessorItem | undefined {
+  get cursorItem(): Item | undefined {
     return this.processedItems.at(this.#index);
   }
 
@@ -148,14 +151,16 @@ export class ActionPicker implements AsyncDisposable {
     });
 
     // Collect informations
-    const [scrolloff, promptWinwidth, selectorWinheight] = await collect(
-      denops,
-      (denops) => [
-        opt.scrolloff.get(denops),
-        fn.winwidth(denops, this.#layout.prompt.winid),
-        fn.winheight(denops, this.#layout.selector.winid),
-      ],
-    );
+    const [scrolloff, promptWinwidth, selectorWinwidth, selectorWinheight] =
+      await collect(
+        denops,
+        (denops) => [
+          opt.scrolloff.get(denops),
+          fn.winwidth(denops, this.#layout.prompt.winid),
+          fn.winwidth(denops, this.#layout.selector.winid),
+          fn.winheight(denops, this.#layout.selector.winid),
+        ],
+      );
 
     // Bind components to the layout
     const prompt = new PromptComponent(
@@ -173,6 +178,7 @@ export class ActionPicker implements AsyncDisposable {
       this.#layout.selector.winid,
       {
         scrolloff,
+        winwidth: selectorWinwidth,
         winheight: selectorWinheight,
         renderers: this.#renderers,
       },

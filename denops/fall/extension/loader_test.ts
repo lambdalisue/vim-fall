@@ -20,9 +20,9 @@ Deno.test("getLoaderInfo", async (t) => {
       opener: "split",
     }],
     [
-      "processor",
-      "substring_filter",
-      "../../@fall-builtin/processor/substring_filter.ts",
+      "filter",
+      "substring",
+      "../../@fall-builtin/filter/substring.ts",
       {},
     ],
     ["previewer", "text", "../../@fall-builtin/previewer/text.ts", {}],

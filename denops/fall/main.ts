@@ -1,7 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.3.0/mod.ts";
 import { collect } from "https://deno.land/x/denops_std@v6.3.0/batch/mod.ts";
 import { g } from "https://deno.land/x/denops_std@v6.3.0/variable/mod.ts";
-import { friendlyCall } from "https://deno.land/x/denops_std@v6.3.0/helper/mod.ts";
 import {
   assert,
   ensure,
@@ -24,54 +23,46 @@ const isConfigType = is.LiteralOneOf(
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
-    "start": (name, args, options) => {
-      return friendlyCall(denops, async () => {
-        await init(denops);
-        await start(
-          denops,
-          ensure(name, is.String),
-          ensure(args, is.ArrayOf(is.String)),
-          ensure(options, is.OptionalOf(isStartOptions)),
-        );
-      });
+    "start": async (name, args, options) => {
+      await init(denops);
+      await start(
+        denops,
+        ensure(name, is.String),
+        ensure(args, is.ArrayOf(is.String)),
+        ensure(options, is.OptionalOf(isStartOptions)),
+      );
     },
     "dispatch": (name, data) => {
-      return friendlyCall(denops, () => {
-        dispatch(ensure(name, isFallEventName), data);
-        return Promise.resolve();
-      });
+      dispatch(ensure(name, isFallEventName), data);
+      return Promise.resolve();
     },
-    "editConfig": (type) => {
-      return friendlyCall(denops, async () => {
-        await init(denops);
-        assert(type, isConfigType);
-        switch (type) {
-          case "picker":
-            await editPickerConfig(denops);
-            break;
-          case "extension":
-            await editExtensionConfig(denops);
-            break;
-          default:
-            unreachable(type);
-        }
-      });
+    "editConfig": async (type) => {
+      await init(denops);
+      assert(type, isConfigType);
+      switch (type) {
+        case "picker":
+          await editPickerConfig(denops);
+          break;
+        case "extension":
+          await editExtensionConfig(denops);
+          break;
+        default:
+          unreachable(type);
+      }
     },
-    "reloadConfig": (type) => {
-      return friendlyCall(denops, async () => {
-        await init(denops);
-        assert(type, isConfigType);
-        switch (type) {
-          case "picker":
-            await loadPickerConfig();
-            break;
-          case "extension":
-            await loadExtensionConfig();
-            break;
-          default:
-            unreachable(type);
-        }
-      });
+    "reloadConfig": async (type) => {
+      await init(denops);
+      assert(type, isConfigType);
+      switch (type) {
+        case "picker":
+          await loadPickerConfig();
+          break;
+        case "extension":
+          await loadExtensionConfig();
+          break;
+        default:
+          unreachable(type);
+      }
     },
   };
 }

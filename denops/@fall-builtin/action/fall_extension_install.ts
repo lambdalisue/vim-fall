@@ -1,4 +1,4 @@
-import type { Action } from "https://deno.land/x/fall_core@v0.4.0/mod.ts";
+import type { Action } from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
 import { assert, is } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
 
 import { type PartialExtensionConfig } from "../../fall/config/extension.ts";

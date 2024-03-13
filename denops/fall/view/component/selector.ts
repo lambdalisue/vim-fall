@@ -4,10 +4,10 @@ import { batch } from "https://deno.land/x/denops_std@v6.3.0/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.3.0/function/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.3.0/buffer/mod.ts";
 import type {
-  ProcessorItem,
+  Item,
   Renderer,
   RendererItem,
-} from "https://deno.land/x/fall_core@v0.4.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
 import { equal } from "https://deno.land/std@0.203.0/assert/equal.ts";
 
 import { calcScrollOffset } from "../util/scrolloffset.ts";
@@ -15,6 +15,7 @@ import { isDefined } from "../../util/collection.ts";
 
 export interface SelectorComponentParams {
   scrolloff: number;
+  winwidth: number;
   winheight: number;
   renderers: Map<string, Renderer>;
 }
@@ -25,6 +26,7 @@ export interface SelectorComponentParams {
 export class SelectorComponent {
   #bufnr: number;
   #scrolloff: number;
+  #winwidth: number;
   #winheight: number;
   #renderers: Map<string, Renderer>;
 
@@ -33,7 +35,7 @@ export class SelectorComponent {
   #changed: boolean = false;
   #index: number = 0;
   #selected: Set<unknown> = new Set();
-  #items: ProcessorItem[] = [];
+  #items: Item[] = [];
 
   constructor(
     bufnr: number,
@@ -42,6 +44,7 @@ export class SelectorComponent {
   ) {
     this.#bufnr = bufnr;
     this.#scrolloff = params.scrolloff;
+    this.#winwidth = params.winwidth;
     this.#winheight = params.winheight;
     this.#renderers = params.renderers;
   }
@@ -72,7 +75,7 @@ export class SelectorComponent {
   /**
    * Set the items to be rendered.
    */
-  set items(value: ProcessorItem[]) {
+  set items(value: Item[]) {
     const changed = !equal(this.#items, value);
     this.#changed = this.#changed || changed;
     this.#items = value;
@@ -116,6 +119,7 @@ export class SelectorComponent {
         denops,
         items,
         this.#renderers,
+        { width: this.#winwidth },
       );
 
       const content = rendererItems.map((v) => v.label ?? v.value);
@@ -190,13 +194,13 @@ async function applyRenderers(
   denops: Denops,
   items: RendererItem[],
   renderers: Map<string, Renderer>,
-  { bufnr, winid }: { bufnr: number; winid: number } = {},
+  params: { width: number },
 ): Promise<RendererItem[]> {
   const size = items.length;
   if (size === 0) return [];
   for (const [name, renderer] of renderers.entries()) {
     try {
-      const newItems = await renderer.render(denops, items, { bufnr, winid });
+      const newItems = await renderer.render(denops, items, params);
       if (newItems.length !== size) {
         console.warn(
           `[fall] Renderer ${name} returned different size of items. Ignore.`,

@@ -3,25 +3,19 @@
   "source": {
     "": {
       "defaultAction": "open",
-      "actions": [
-        "*"
-      ],
+      "actions": ["*"],
+      "filters": ["*"],
       "previewer": "text",
-      "processors": [
-        "substring_filter"
-      ],
-      "renderers": [
-        "*"
-      ]
+      "renderers": ["*"],
+      "sorters": ["*"]
     },
     "fall-catalog": {
       "previewer": "deno-doc-module"
     }
   },
   "action": {
-    "processors": [
-      "substring_filter"
-    ],
-    "renderers": []
+    "filters": ["*"],
+    "renderers": [],
+    "sorters": ["*"]
   }
 }

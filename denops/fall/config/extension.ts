@@ -16,9 +16,10 @@ import { getExtensionConfigPath } from "../const.ts";
 export const isExtensionKind = is.LiteralOneOf(
   [
     "action",
+    "filter",
     "previewer",
-    "processor",
     "renderer",
+    "sorter",
     "source",
   ] as const,
 );
@@ -35,9 +36,10 @@ const isLoaderConfig = is.ObjectOf({
 
 export const isExtensionConfig = is.ObjectOf({
   action: is.RecordOf(isLoaderConfig, is.String),
+  filter: is.RecordOf(isLoaderConfig, is.String),
   previewer: is.RecordOf(isLoaderConfig, is.String),
-  processor: is.RecordOf(isLoaderConfig, is.String),
   renderer: is.RecordOf(isLoaderConfig, is.String),
+  sorter: is.RecordOf(isLoaderConfig, is.String),
   source: is.RecordOf(isLoaderConfig, is.String),
 });
 

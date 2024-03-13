@@ -7,12 +7,13 @@ import {
   collect,
 } from "https://deno.land/x/denops_std@v6.3.0/batch/mod.ts";
 import type {
+  Filter,
+  Item,
   Previewer,
-  Processor,
-  ProcessorItem,
   Renderer,
+  Sorter,
   Source,
-} from "https://deno.land/x/fall_core@v0.4.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
 
 import { any, isDefined } from "../../util/collection.ts";
 import { startAsyncScheduler } from "../../util/async_scheduler.ts";
@@ -51,8 +52,8 @@ export class SourcePicker implements AsyncDisposable {
   #index = 0;
   #selected: Set<unknown> = new Set();
 
-  #renderers: Map<string, Renderer>;
   #previewer: Previewer | undefined;
+  #renderers: Map<string, Renderer>;
   #options: SourcePickerOptions;
   #layout: Layout;
   #itemCollector: ItemCollector;
@@ -60,8 +61,8 @@ export class SourcePicker implements AsyncDisposable {
   #disposable: AsyncDisposableStack;
 
   private constructor(
-    renderers: Map<string, Renderer>,
     previewer: Previewer | undefined,
+    renderers: Map<string, Renderer>,
     options: SourcePickerOptions,
     layout: Layout,
     itemCollector: ItemCollector,
@@ -82,9 +83,10 @@ export class SourcePicker implements AsyncDisposable {
     args: string[],
     title: string,
     source: Source,
-    processors: Map<string, Processor>,
-    renderers: Map<string, Renderer>,
+    filters: Map<string, Filter>,
     previewer: Previewer | undefined,
+    renderers: Map<string, Renderer>,
+    sorters: Map<string, Sorter>,
     options: SourcePickerOptions,
   ): Promise<SourcePicker> {
     const stack = new AsyncDisposableStack();
@@ -125,11 +127,11 @@ export class SourcePicker implements AsyncDisposable {
     );
     itemCollector.start();
 
-    const itemProcessor = stack.use(new ItemProcessor(processors));
+    const itemProcessor = stack.use(new ItemProcessor(filters, sorters));
 
     return new SourcePicker(
-      renderers,
       previewer,
+      renderers,
       options,
       layout,
       itemCollector,
@@ -138,20 +140,20 @@ export class SourcePicker implements AsyncDisposable {
     );
   }
 
-  get collectedItems(): ProcessorItem[] {
+  get collectedItems(): Item[] {
     return this.#itemCollector.items;
   }
 
-  get processedItems(): ProcessorItem[] {
+  get processedItems(): Item[] {
     return this.#itemProcessor.items;
   }
 
-  get selectedItems(): ProcessorItem[] {
+  get selectedItems(): Item[] {
     const m = new Map(this.processedItems.map((v) => [v.id, v]));
     return [...this.#selected].map((v) => m.get(v)).filter(isDefined);
   }
 
-  get cursorItem(): ProcessorItem | undefined {
+  get cursorItem(): Item | undefined {
     return this.processedItems.at(this.#index);
   }
 
@@ -190,14 +192,16 @@ export class SourcePicker implements AsyncDisposable {
     });
 
     // Collect informations
-    const [scrolloff, promptWinwidth, selectorWinheight] = await collect(
-      denops,
-      (denops) => [
-        opt.scrolloff.get(denops),
-        fn.winwidth(denops, this.#layout.prompt.winid),
-        fn.winheight(denops, this.#layout.selector.winid),
-      ],
-    );
+    const [scrolloff, promptWinwidth, selectorWinwidth, selectorWinheight] =
+      await collect(
+        denops,
+        (denops) => [
+          opt.scrolloff.get(denops),
+          fn.winwidth(denops, this.#layout.prompt.winid),
+          fn.winwidth(denops, this.#layout.selector.winid),
+          fn.winheight(denops, this.#layout.selector.winid),
+        ],
+      );
 
     // Bind components to the layout
     const prompt = new PromptComponent(
@@ -215,6 +219,7 @@ export class SourcePicker implements AsyncDisposable {
       this.#layout.selector.winid,
       {
         scrolloff,
+        winwidth: selectorWinwidth,
         winheight: selectorWinheight,
         renderers: this.#renderers,
       },

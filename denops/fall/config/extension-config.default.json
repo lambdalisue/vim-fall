@@ -47,9 +47,9 @@
       }
     }
   },
-  "processor": {
-    "lexical_sorter": {
-      "url": "https://raw.githubusercontent.com/vim-fall/package-common/main/processor/lexical_sorter.ts",
+  "sorter": {
+    "lexical": {
+      "url": "https://raw.githubusercontent.com/vim-fall/package-common/main/sorter/lexical.ts",
       "variants": {
         "reverse": {
           "reverse": true

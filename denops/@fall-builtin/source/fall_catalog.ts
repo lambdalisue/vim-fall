@@ -1,4 +1,4 @@
-import type { Source } from "https://deno.land/x/fall_core@v0.4.0/mod.ts";
+import type { Source } from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
 import {
   assert,
   ensure,
@@ -43,9 +43,10 @@ export const isExtensionDetail = is.ObjectOf({
 
 const kinds = [
   "action",
+  "filter",
   "previewer",
-  "processor",
   "renderer",
+  "sorter",
   "source",
 ] as const;
 
@@ -117,9 +118,10 @@ async function fetchPackage(
       name,
       base: new URL(url),
       action: {},
+      filter: {},
       previewer: {},
-      processor: {},
       renderer: {},
+      sorter: {},
       source: {},
       ...json,
     }, isPackage);

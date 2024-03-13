@@ -15,9 +15,10 @@ import { isLayoutParams as isActionPickerLayoutParams } from "../view/layout/pro
 const isSourcePickerConfig = is.ObjectOf({
   defaultAction: is.String,
   actions: is.ArrayOf(is.String),
+  filters: is.ArrayOf(is.String),
   previewer: is.String,
-  processors: is.ArrayOf(is.String),
   renderers: is.ArrayOf(is.String),
+  sorters: is.ArrayOf(is.String),
   options: is.OptionalOf(is.PartialOf(is.ObjectOf({
     layout: is.PartialOf(isSourcePickerLayoutParams),
     itemCollector: is.PartialOf(is.ObjectOf({
@@ -38,8 +39,9 @@ const isSourcePickerConfig = is.ObjectOf({
 type SourcePickerConfig = PredicateType<typeof isSourcePickerConfig>;
 
 const isActionPickerConfig = is.ObjectOf({
-  processors: is.ArrayOf(is.String),
+  filters: is.ArrayOf(is.String),
   renderers: is.ArrayOf(is.String),
+  sorters: is.ArrayOf(is.String),
   options: is.OptionalOf(is.PartialOf(is.ObjectOf({
     layout: is.PartialOf(isActionPickerLayoutParams),
     prompt: is.PartialOf(is.ObjectOf({

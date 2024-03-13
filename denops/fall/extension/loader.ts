@@ -1,11 +1,12 @@
 import { toFileUrl } from "https://deno.land/std@0.218.2/path/to_file_url.ts";
 import type {
   Action,
+  Filter,
   Previewer,
-  Processor,
   Renderer,
+  Sorter,
   Source,
-} from "https://deno.land/x/fall_core@v0.4.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
 
 import { getExtensionConfigPath } from "../const.ts";
 import { ExtensionKind, getExtensionConfig } from "../config/extension.ts";
@@ -103,17 +104,19 @@ function parsePattern(pattern: string, exprs: string[]): string[] {
 }
 
 type Extension<K extends ExtensionKind> = K extends "action" ? Action
+  : K extends "filter" ? Filter
   : K extends "previewer" ? Previewer
-  : K extends "processor" ? Processor
   : K extends "renderer" ? Renderer
+  : K extends "sorter" ? Sorter
   : K extends "source" ? Source
   : never;
 
 const cacheMap = {
   action: new Map<string, Promise<Action>>(),
+  filter: new Map<string, Promise<Filter>>(),
   previewer: new Map<string, Promise<Previewer>>(),
-  processor: new Map<string, Promise<Processor>>(),
   renderer: new Map<string, Promise<Renderer>>(),
+  sorter: new Map<string, Promise<Sorter>>(),
   source: new Map<string, Promise<Source>>(),
 } as const satisfies {
   [K in ExtensionKind]: Map<string, Promise<Extension<K>>>;
@@ -127,6 +130,13 @@ const loaderMap = {
     // deno-lint-ignore no-explicit-any
     return promish((mod as any).getAction(options));
   },
+  filter: (
+    mod: unknown,
+    options: Record<string, unknown>,
+  ): Promise<Filter> => {
+    // deno-lint-ignore no-explicit-any
+    return promish((mod as any).getFilter(options));
+  },
   previewer: (
     mod: unknown,
     options: Record<string, unknown>,
@@ -134,19 +144,19 @@ const loaderMap = {
     // deno-lint-ignore no-explicit-any
     return promish((mod as any).getPreviewer(options));
   },
-  processor: (
-    mod: unknown,
-    options: Record<string, unknown>,
-  ): Promise<Processor> => {
-    // deno-lint-ignore no-explicit-any
-    return promish((mod as any).getProcessor(options));
-  },
   renderer: (
     mod: unknown,
     options: Record<string, unknown>,
   ): Promise<Renderer> => {
     // deno-lint-ignore no-explicit-any
     return promish((mod as any).getRenderer(options));
+  },
+  sorter: (
+    mod: unknown,
+    options: Record<string, unknown>,
+  ): Promise<Sorter> => {
+    // deno-lint-ignore no-explicit-any
+    return promish((mod as any).getSorter(options));
   },
   source: (
     mod: unknown,
