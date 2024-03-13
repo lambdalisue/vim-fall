@@ -1,9 +1,9 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.3.0/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v6.3.0/function/mod.ts";
-import { collect } from "https://deno.land/x/denops_std@v6.3.0/batch/mod.ts";
-import { input } from "https://deno.land/x/denops_std@v6.3.0/helper/input.ts";
-import { send } from "https://deno.land/x/denops_std@v6.3.0/helper/keymap.ts";
-import { exprQuote as q } from "https://deno.land/x/denops_std@v6.3.0/helper/expr_string.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
+import { collect } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
+import { input } from "https://deno.land/x/denops_std@v6.4.0/helper/input.ts";
+import { send } from "https://deno.land/x/denops_std@v6.4.0/helper/keymap.ts";
+import { exprQuote as q } from "https://deno.land/x/denops_std@v6.4.0/helper/expr_string.ts";
 
 import { startAsyncScheduler } from "../../util/async_scheduler.ts";
 import { dispatch } from "../../util/event.ts";

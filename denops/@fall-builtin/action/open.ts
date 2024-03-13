@@ -1,6 +1,6 @@
 import type { Action } from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v6.3.0/buffer/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v6.3.0/function/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import { assert, is } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({

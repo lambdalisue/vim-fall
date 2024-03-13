@@ -1,11 +1,11 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.3.0/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v6.3.0/function/mod.ts";
-import * as opt from "https://deno.land/x/denops_std@v6.3.0/option/mod.ts";
-import { g } from "https://deno.land/x/denops_std@v6.3.0/variable/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
+import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
+import { g } from "https://deno.land/x/denops_std@v6.4.0/variable/mod.ts";
 import {
   batch,
   collect,
-} from "https://deno.land/x/denops_std@v6.3.0/batch/mod.ts";
+} from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import type {
   Filter,
   Item,

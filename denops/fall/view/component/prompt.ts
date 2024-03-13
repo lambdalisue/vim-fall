@@ -1,5 +1,5 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.3.0/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v6.3.0/buffer/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 
 import { Spinner } from "../util/spinner.ts";
 

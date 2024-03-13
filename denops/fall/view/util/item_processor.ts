@@ -1,4 +1,4 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.3.0/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import type {
   Filter,
   Item,

@@ -1,8 +1,8 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.3.0/mod.ts";
-import { batch } from "https://deno.land/x/denops_std@v6.3.0/batch/mod.ts";
-import * as autocmd from "https://deno.land/x/denops_std@v6.3.0/autocmd/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v6.3.0/buffer/mod.ts";
-import * as opt from "https://deno.land/x/denops_std@v6.3.0/option/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
+import { batch } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
+import * as autocmd from "https://deno.land/x/denops_std@v6.4.0/autocmd/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
+import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 import { dirname } from "https://deno.land/std@0.219.0/path/mod.ts";
 import { ensureDir, exists } from "https://deno.land/std@0.219.0/fs/mod.ts";
 

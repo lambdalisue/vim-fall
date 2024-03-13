@@ -1,5 +1,5 @@
 import type { Source } from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v6.3.0/function/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import { walk } from "https://deno.land/std@0.217.0/fs/walk.ts";
 import { relative } from "https://deno.land/std@0.217.0/path/relative.ts";
 import { assert, is } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";

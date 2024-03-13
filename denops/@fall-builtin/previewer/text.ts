@@ -1,8 +1,8 @@
 import type { Previewer } from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
-import type { Denops } from "https://deno.land/x/denops_std@v6.3.0/mod.ts";
-import { batch } from "https://deno.land/x/denops_std@v6.3.0/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v6.3.0/function/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v6.3.0/buffer/mod.ts";
+import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
+import { batch } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
+import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import { basename } from "https://deno.land/std@0.218.2/path/basename.ts";
 import {
   assert,
