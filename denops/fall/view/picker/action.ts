@@ -271,7 +271,7 @@ export class ActionPicker implements AsyncDisposable {
           await selector.render(denops, { signal }),
         ]);
         if (isUpdated) {
-          await denops.cmd(`redraw | echo ''`);
+          await denops.cmd(`redraw`);
         }
       },
       this.#options.updateInterval ?? UPDATE_INTERVAL,

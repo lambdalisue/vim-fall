@@ -375,14 +375,14 @@ export class SourcePicker implements AsyncDisposable {
         preview.render(denops, { signal })
           .then((isUpdated) => {
             if (isUpdated) {
-              return denops.cmd(`redraw | echo ''`);
+              return denops.cmd(`redraw`);
             }
           })
           .catch((err) => {
             console.warn(`[fall] Failed to render preview: ${err}`);
           });
         if (isUpdated) {
-          await denops.cmd(`redraw | echo ''`);
+          await denops.cmd(`redraw`);
         }
       },
       this.#options.updateInterval ?? UPDATE_INTERVAL,
