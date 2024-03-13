@@ -2,6 +2,7 @@
   "$schema": "https://vim-fall.github.io/jsonschema/v1alpha/picker-config.schema.json",
   "source": {
     "": {
+      "actionAlias": {},
       "defaultAction": "open",
       "actions": ["*"],
       "filters": ["*"],
@@ -10,6 +11,10 @@
       "sorters": ["*"]
     },
     "fall-catalog": {
+      "actionAlias": {
+        "fall-extension-install": "install"
+      },
+      "defaultAction": "fall-extension-install",
       "previewer": "deno-doc-module"
     }
   },

@@ -99,6 +99,16 @@ export async function start(
     ),
   ]);
 
+  const aliasedActions = new Map(
+    [...actions.entries()].map(([name, action]) => {
+      const alias: string | undefined = itemsPickerConfig.actionAlias[name];
+      if (alias) {
+        return [alias, action];
+      }
+      return [name, action];
+    }),
+  );
+
   await using itemsPicker = await SourcePicker.create(
     denops,
     args,
@@ -135,7 +145,7 @@ export async function start(
     if (nextAction == "@select") {
       await using actionPicker = await ActionPicker.create(
         denops,
-        actions,
+        aliasedActions,
         actionFilters,
         actionRenderers,
         actionSorters,
@@ -151,7 +161,7 @@ export async function start(
         // Cancel
         return;
       }
-      action = actions.get(actionName);
+      action = aliasedActions.get(actionName);
     } else if (nextAction == "@default") {
       action = actions.get(itemsPickerConfig.defaultAction);
     } else {

@@ -13,6 +13,7 @@ import { isLayoutParams as isSourcePickerLayoutParams } from "../view/layout/pro
 import { isLayoutParams as isActionPickerLayoutParams } from "../view/layout/prompt_top.ts";
 
 const isSourcePickerConfig = is.ObjectOf({
+  actionAlias: is.RecordOf(is.String, is.String),
   defaultAction: is.String,
   actions: is.ArrayOf(is.String),
   filters: is.ArrayOf(is.String),
