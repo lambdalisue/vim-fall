@@ -16,8 +16,11 @@ import { resolve } from "./resolver.ts";
 export async function loadExtension<K extends ExtensionKind>(
   kind: K,
   expr: string,
-): Promise<Extension<K> | undefined> {
-  const cache = cacheMap[kind] as Map<string, Promise<Extension<K>>>;
+): Promise<WithUrl<Extension<K>> | undefined> {
+  const cache = cacheMap[kind] as unknown as Map<
+    string,
+    Promise<WithUrl<Extension<K>>>
+  >;
   const loader = loaderMap[kind] as (
     mod: unknown,
     options: Record<string, unknown>,
@@ -28,7 +31,9 @@ export async function loadExtension<K extends ExtensionKind>(
     }
     const [url, options] = await getLoaderInfo(kind, expr);
     const mod = await import(url.toString());
-    const promise = loader(mod, options);
+    const promise = (async () => {
+      return { url: url.href, ...(await loader(mod, options)) };
+    })();
     cache.set(expr, promise);
     return await promise;
   } catch (err) {
@@ -40,7 +45,7 @@ export async function loadExtension<K extends ExtensionKind>(
 export async function loadExtensions<K extends ExtensionKind>(
   kind: K,
   patterns: string[],
-): Promise<Map<string, Extension<K>>> {
+): Promise<Map<string, WithUrl<Extension<K>>>> {
   const exprs = Object.entries(getExtensionConfig()[kind]).flatMap(
     ([name, config]) => {
       if (!config.variants) {
@@ -111,15 +116,17 @@ type Extension<K extends ExtensionKind> = K extends "action" ? Action
   : K extends "source" ? Source
   : never;
 
+type WithUrl<T> = T & { url: string };
+
 const cacheMap = {
-  action: new Map<string, Promise<Action>>(),
-  filter: new Map<string, Promise<Filter>>(),
-  previewer: new Map<string, Promise<Previewer>>(),
-  renderer: new Map<string, Promise<Renderer>>(),
-  sorter: new Map<string, Promise<Sorter>>(),
-  source: new Map<string, Promise<Source>>(),
+  action: new Map<string, Promise<WithUrl<Action>>>(),
+  filter: new Map<string, Promise<WithUrl<Filter>>>(),
+  previewer: new Map<string, Promise<WithUrl<Previewer>>>(),
+  renderer: new Map<string, Promise<WithUrl<Renderer>>>(),
+  sorter: new Map<string, Promise<WithUrl<Sorter>>>(),
+  source: new Map<string, Promise<WithUrl<Source>>>(),
 } as const satisfies {
-  [K in ExtensionKind]: Map<string, Promise<Extension<K>>>;
+  [K in ExtensionKind]: Map<string, Promise<WithUrl<Extension<K>>>>;
 };
 
 const loaderMap = {

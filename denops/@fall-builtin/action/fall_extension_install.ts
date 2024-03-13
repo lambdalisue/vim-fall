@@ -1,3 +1,8 @@
+/**
+ * Install the selected extension(s) to the local environment.
+ *
+ * @module
+ */
 import type { Action } from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
 import { assert, is } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
 

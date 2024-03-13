@@ -25,6 +25,7 @@ export const isStartOptions = is.PartialOf(is.ObjectOf({
   sorters: is.ArrayOf(is.String),
   actions: is.ArrayOf(is.String),
   actionFilters: is.ArrayOf(is.String),
+  actionPreviewer: is.String,
   actionRenderers: is.ArrayOf(is.String),
   actionSorters: is.ArrayOf(is.String),
 }));
@@ -59,6 +60,10 @@ export async function start(
   const previewer = await loadExtension(
     "previewer",
     options.previewer ?? itemsPickerConfig.previewer,
+  );
+  const actionPreviewer = await loadExtension(
+    "previewer",
+    options.actionPreviewer ?? actionPickerConfig.previewer,
   );
   const [
     actions,
@@ -147,6 +152,7 @@ export async function start(
         denops,
         aliasedActions,
         actionFilters,
+        actionPreviewer,
         actionRenderers,
         actionSorters,
         actionPickerConfig.options ?? {},

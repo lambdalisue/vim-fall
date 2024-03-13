@@ -4,11 +4,19 @@
     "": {
       "actionAlias": {},
       "defaultAction": "open",
-      "actions": ["*"],
-      "filters": ["*"],
+      "actions": [
+        "*"
+      ],
+      "filters": [
+        "*"
+      ],
       "previewer": "text",
-      "renderers": ["*"],
-      "sorters": ["*"]
+      "renderers": [
+        "*"
+      ],
+      "sorters": [
+        "*"
+      ]
     },
     "fall-catalog": {
       "actionAlias": {
@@ -19,8 +27,13 @@
     }
   },
   "action": {
-    "filters": ["*"],
+    "filters": [
+      "*"
+    ],
+    "previewer": "deno-doc-module",
     "renderers": [],
-    "sorters": ["*"]
+    "sorters": [
+      "*"
+    ]
   }
 }

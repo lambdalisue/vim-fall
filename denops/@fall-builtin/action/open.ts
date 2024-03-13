@@ -1,3 +1,12 @@
+/**
+ * Open the selected or cursor item
+ *
+ * The following variants are available in default:
+ *
+ * - `edit` (default)
+ *
+ * @module
+ */
 import type { Action } from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";

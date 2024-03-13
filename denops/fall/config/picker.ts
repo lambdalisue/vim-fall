@@ -9,8 +9,7 @@ import defaultConfig from "./picker-config.default.json" with { type: "json" };
 
 import { getPickerConfigPath } from "../const.ts";
 
-import { isLayoutParams as isSourcePickerLayoutParams } from "../view/layout/prompt_top_preview_right.ts";
-import { isLayoutParams as isActionPickerLayoutParams } from "../view/layout/prompt_top.ts";
+import { isLayoutParams as isPickerLayoutParams } from "../view/layout/prompt_top_preview_right.ts";
 
 const isSourcePickerConfig = is.ObjectOf({
   actionAlias: is.RecordOf(is.String, is.String),
@@ -21,7 +20,7 @@ const isSourcePickerConfig = is.ObjectOf({
   renderers: is.ArrayOf(is.String),
   sorters: is.ArrayOf(is.String),
   options: is.OptionalOf(is.PartialOf(is.ObjectOf({
-    layout: is.PartialOf(isSourcePickerLayoutParams),
+    layout: is.PartialOf(isPickerLayoutParams),
     itemCollector: is.PartialOf(is.ObjectOf({
       chunkSize: is.Number,
     })),
@@ -41,14 +40,18 @@ type SourcePickerConfig = PredicateType<typeof isSourcePickerConfig>;
 
 const isActionPickerConfig = is.ObjectOf({
   filters: is.ArrayOf(is.String),
+  previewer: is.String,
   renderers: is.ArrayOf(is.String),
   sorters: is.ArrayOf(is.String),
   options: is.OptionalOf(is.PartialOf(is.ObjectOf({
-    layout: is.PartialOf(isActionPickerLayoutParams),
+    layout: is.PartialOf(isPickerLayoutParams),
     prompt: is.PartialOf(is.ObjectOf({
       spinner: is.ArrayOf(is.String),
       headSymbol: is.String,
       failSymbol: is.String,
+    })),
+    preview: is.PartialOf(is.ObjectOf({
+      debounceWait: is.Number,
     })),
     updateInterval: is.Number,
   }))),

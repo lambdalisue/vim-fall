@@ -11,6 +11,7 @@ import type {
   Action,
   Filter,
   Item,
+  Previewer,
   Renderer,
   Sorter,
 } from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
@@ -18,9 +19,14 @@ import type {
 import { any } from "../../util/collection.ts";
 import { startAsyncScheduler } from "../../util/async_scheduler.ts";
 import { subscribe } from "../../util/event.ts";
-import { buildLayout, Layout, LayoutParams } from "../layout/prompt_top.ts";
+import {
+  buildLayout,
+  Layout,
+  LayoutParams,
+} from "../layout/prompt_top_preview_right.ts";
 import { PromptComponent } from "../component/prompt.ts";
 import { SelectorComponent } from "../component/selector.ts";
+import { PreviewComponent } from "../component/preview.ts";
 import { emitPickerEnter, emitPickerLeave } from "../util/emitter.ts";
 import { observePrompt, startPrompt } from "../util/prompt.ts";
 import { ItemProcessor } from "../util/item_processor.ts";
@@ -32,6 +38,9 @@ export interface ActionPickerOptions {
     headSymbol?: string;
     failSymbol?: string;
   };
+  preview?: {
+    debounceWait?: number;
+  };
   updateInterval?: number;
 }
 
@@ -39,7 +48,8 @@ export class ActionPicker implements AsyncDisposable {
   #query = "";
   #index = 0;
 
-  #actions: Map<string, Action>;
+  #actions: Map<string, Action & { url: string }>;
+  #previewer: Previewer | undefined;
   #renderers: Map<string, Renderer>;
   #options: ActionPickerOptions;
   #layout: Layout;
@@ -47,7 +57,8 @@ export class ActionPicker implements AsyncDisposable {
   #disposable: AsyncDisposableStack;
 
   private constructor(
-    actions: Map<string, Action>,
+    actions: Map<string, Action & { url: string }>,
+    previewer: Previewer | undefined,
     renderers: Map<string, Renderer>,
     options: ActionPickerOptions,
     layout: Layout,
@@ -55,6 +66,7 @@ export class ActionPicker implements AsyncDisposable {
     disposable: AsyncDisposableStack,
   ) {
     this.#actions = actions;
+    this.#previewer = previewer;
     this.#renderers = renderers;
     this.#options = options;
     this.#layout = layout;
@@ -64,8 +76,9 @@ export class ActionPicker implements AsyncDisposable {
 
   static async create(
     denops: Denops,
-    actions: Map<string, Action>,
+    actions: Map<string, Action & { url: string }>,
     filters: Map<string, Filter>,
+    previewer: Previewer | undefined,
     renderers: Map<string, Renderer>,
     sorters: Map<string, Sorter>,
     options: ActionPickerOptions,
@@ -90,6 +103,13 @@ export class ActionPicker implements AsyncDisposable {
         heightRatio: options.layout?.heightRatio ?? HEIGHT_RATION,
         heightMin: options.layout?.heightMin ?? HEIGHT_MIN,
         heightMax: options.layout?.heightMax ?? HEIGHT_MAX,
+        previewWidth: options.layout?.previewWidth,
+        previewWidthRatio: options.layout?.previewWidthRatio ??
+          PREVIEW_WIDTH_RATION,
+        previewWidthMin: options.layout?.previewWidthMin ??
+          PREVIEW_WIDTH_MIN,
+        previewWidthMax: options.layout?.previewWidthMax ??
+          PREVIEW_WIDTH_MAX,
         border: options.layout?.border,
         zindex: options.layout?.zindex ?? 51,
       }),
@@ -97,6 +117,7 @@ export class ActionPicker implements AsyncDisposable {
 
     return new ActionPicker(
       actions,
+      previewer,
       renderers,
       options,
       layout,
@@ -113,10 +134,12 @@ export class ActionPicker implements AsyncDisposable {
   }
 
   get collectedItems(): Item[] {
-    return [...this.#actions.keys()].map((v) => ({
-      id: v,
-      value: v,
-      detail: {},
+    return [...this.#actions.entries()].map(([k, v]) => ({
+      id: k,
+      value: k,
+      detail: {
+        url: v.url,
+      },
       decorations: [],
     }));
   }
@@ -159,7 +182,7 @@ export class ActionPicker implements AsyncDisposable {
       await g.set(
         denops,
         "_fall_layout_preview_winid",
-        null,
+        this.#layout.preview.winid,
       );
     });
 
@@ -196,6 +219,15 @@ export class ActionPicker implements AsyncDisposable {
         renderers: this.#renderers,
       },
     );
+    const preview = new PreviewComponent(
+      this.#layout.preview.bufnr,
+      this.#layout.preview.winid,
+      {
+        previewer: this.#previewer,
+        debounceWait: this.#options.preview?.debounceWait ??
+          PREVIEW_DEBOUNCE_WAIT,
+      },
+    );
 
     // Subscribe custom events
     stack.use(subscribe("item-processor-succeeded", () => {
@@ -206,6 +238,7 @@ export class ActionPicker implements AsyncDisposable {
       };
       selector.items = this.processedItems;
       selector.index = this.#index;
+      preview.item = this.cursorItem;
     }));
     stack.use(subscribe("item-processor-failed", () => {
       prompt.processing = "failed";
@@ -269,6 +302,12 @@ export class ActionPicker implements AsyncDisposable {
       }
       selector.index = this.#index;
     }));
+    stack.use(subscribe("preview-cursor-move", (offset) => {
+      preview.moveCursor(denops, offset, { signal: options.signal });
+    }));
+    stack.use(subscribe("preview-cursor-move-at", (line) => {
+      preview.moveCursorAt(denops, line, { signal: options.signal });
+    }));
 
     // Update UI in background
     stack.use(startAsyncScheduler(
@@ -277,6 +316,15 @@ export class ActionPicker implements AsyncDisposable {
           await prompt.render(denops, { signal }),
           await selector.render(denops, { signal }),
         ]);
+        preview.render(denops, { signal })
+          .then((isUpdated) => {
+            if (isUpdated) {
+              return denops.cmd(`redraw`);
+            }
+          })
+          .catch((err) => {
+            console.warn(`[fall] Failed to render preview: ${err}`);
+          });
         if (isUpdated) {
           await denops.cmd(`redraw`);
         }
@@ -308,5 +356,8 @@ const WIDTH_MAX = 300;
 const HEIGHT_RATION = 0.8;
 const HEIGHT_MIN = 4;
 const HEIGHT_MAX = 30;
-
+const PREVIEW_WIDTH_RATION = 0.45;
+const PREVIEW_WIDTH_MIN = 30;
+const PREVIEW_WIDTH_MAX = 100;
 const UPDATE_INTERVAL = 20;
+const PREVIEW_DEBOUNCE_WAIT = 100;
