@@ -103,13 +103,7 @@ export class ActionPicker implements AsyncDisposable {
         heightRatio: options.layout?.heightRatio ?? HEIGHT_RATION,
         heightMin: options.layout?.heightMin ?? HEIGHT_MIN,
         heightMax: options.layout?.heightMax ?? HEIGHT_MAX,
-        previewWidth: options.layout?.previewWidth,
-        previewWidthRatio: options.layout?.previewWidthRatio ??
-          PREVIEW_WIDTH_RATION,
-        previewWidthMin: options.layout?.previewWidthMin ??
-          PREVIEW_WIDTH_MIN,
-        previewWidthMax: options.layout?.previewWidthMax ??
-          PREVIEW_WIDTH_MAX,
+        previewRatio: options.layout?.previewRatio ?? PREVIEW_RATION,
         border: options.layout?.border,
         zindex: options.layout?.zindex ?? 51,
       }),
@@ -356,8 +350,6 @@ const WIDTH_MAX = 300;
 const HEIGHT_RATION = 0.8;
 const HEIGHT_MIN = 4;
 const HEIGHT_MAX = 30;
-const PREVIEW_WIDTH_RATION = 0.45;
-const PREVIEW_WIDTH_MIN = 30;
-const PREVIEW_WIDTH_MAX = 100;
+const PREVIEW_RATION = 0.45;
 const UPDATE_INTERVAL = 20;
 const PREVIEW_DEBOUNCE_WAIT = 100;

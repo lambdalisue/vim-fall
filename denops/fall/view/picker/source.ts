@@ -126,13 +126,7 @@ export class SourcePicker implements AsyncDisposable {
         heightRatio: options.layout?.heightRatio ?? HEIGHT_RATION,
         heightMin: options.layout?.heightMin ?? HEIGHT_MIN,
         heightMax: options.layout?.heightMax ?? HEIGHT_MAX,
-        previewWidth: options.layout?.previewWidth,
-        previewWidthRatio: options.layout?.previewWidthRatio ??
-          PREVIEW_WIDTH_RATION,
-        previewWidthMin: options.layout?.previewWidthMin ??
-          PREVIEW_WIDTH_MIN,
-        previewWidthMax: options.layout?.previewWidthMax ??
-          PREVIEW_WIDTH_MAX,
+        previewRatio: options.layout?.previewRatio ?? PREVIEW_RATION,
         border: options.layout?.border,
         zindex: options.layout?.zindex ?? 50,
       }),
@@ -412,9 +406,7 @@ const WIDTH_MAX = 400;
 const HEIGHT_RATION = 0.9;
 const HEIGHT_MIN = 5;
 const HEIGHT_MAX = 40;
-const PREVIEW_WIDTH_RATION = 0.45;
-const PREVIEW_WIDTH_MIN = 40;
-const PREVIEW_WIDTH_MAX = 200;
+const PREVIEW_RATION = 0.45;
 const UPDATE_INTERVAL = 20;
 const PREVIEW_DEBOUNCE_WAIT = 100;
 const SOURCE_ITEM_CHUNK_SIZE = 100;

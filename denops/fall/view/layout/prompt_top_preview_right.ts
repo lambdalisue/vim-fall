@@ -44,10 +44,7 @@ export const isLayoutParams = is.ObjectOf({
   heightRatio: is.Number,
   heightMin: is.Number,
   heightMax: is.Number,
-  previewWidth: is.OptionalOf(is.Number),
-  previewWidthRatio: is.Number,
-  previewWidthMin: is.Number,
-  previewWidthMax: is.Number,
+  previewRatio: is.Number,
   border: is.OptionalOf(isBorder),
   divider: is.OptionalOf(isDivider),
   zindex: is.OptionalOf(is.Number),
@@ -111,11 +108,11 @@ export async function buildLayout(
   const x = Math.floor((screenWidth - width) / 2);
   const y = Math.floor((screenHeight - height) / 2);
 
-  const previewWidth = params.previewWidth ?? calcProperSize(
+  const previewWidth = calcProperSize(
     width,
-    params.previewWidthRatio,
-    params.previewWidthMin,
-    params.previewWidthMax,
+    params.previewRatio,
+    params.widthMin * params.previewRatio,
+    params.widthMax * params.previewRatio,
   );
   const mainWidth = width - previewWidth;
 
