@@ -16,10 +16,7 @@ import {
   BORDER_BL,
   BORDER_BR,
   BORDER_L,
-  BORDER_LSEP,
   BORDER_R,
-  BORDER_RSEP,
-  BORDER_SEP,
   BORDER_T,
   BORDER_TL,
   BORDER_TR,
@@ -27,6 +24,14 @@ import {
   getDefaultBorder,
   isBorder,
 } from "./border.ts";
+import {
+  DIVIDER_H,
+  DIVIDER_L,
+  DIVIDER_R,
+  getDefaultDivider,
+  getDivider,
+  isDivider,
+} from "./divider.ts";
 import { calcProperSize } from "./util.ts";
 
 export const isLayoutParams = is.ObjectOf({
@@ -44,6 +49,7 @@ export const isLayoutParams = is.ObjectOf({
   previewWidthMin: is.Number,
   previewWidthMax: is.Number,
   border: is.OptionalOf(isBorder),
+  divider: is.OptionalOf(isDivider),
   zindex: is.OptionalOf(is.Number),
 });
 
@@ -116,6 +122,9 @@ export async function buildLayout(
   const border = params.border
     ? getBorder(params.border)
     : await getDefaultBorder(denops);
+  const divider = params.divider
+    ? getDivider(params.divider)
+    : await getDefaultDivider(denops);
 
   const prompt = stack.use(
     await popup.open(denops, {
@@ -131,9 +140,9 @@ export async function buildLayout(
         border[BORDER_T],
         border[BORDER_TR],
         border[BORDER_R],
-        border[BORDER_RSEP],
-        border[BORDER_SEP],
-        border[BORDER_LSEP],
+        divider[DIVIDER_R],
+        divider[DIVIDER_H],
+        divider[DIVIDER_L],
         border[BORDER_L],
       ],
       highlight: {

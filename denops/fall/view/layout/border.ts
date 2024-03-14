@@ -8,7 +8,7 @@ import {
 
 export const isBorder: Predicate<Parameters<typeof getBorder>[0]> = is.UnionOf([
   is.LiteralOneOf(["none", "ascii", "single", "double", "rounded"] as const),
-  is.UniformTupleOf(11, is.String),
+  is.UniformTupleOf(8, is.String),
 ]);
 
 export type Border = readonly [
@@ -20,9 +20,6 @@ export type Border = readonly [
   bottom: string,
   botleft: string,
   left: string,
-  leftsep: string,
-  sep: string,
-  rightsep: string,
 ];
 
 export const BORDER_TL = 0;
@@ -33,9 +30,6 @@ export const BORDER_BR = 4;
 export const BORDER_B = 5;
 export const BORDER_BL = 6;
 export const BORDER_L = 7;
-export const BORDER_LSEP = 8;
-export const BORDER_SEP = 9;
-export const BORDER_RSEP = 10;
 
 const DEFAULT_BORDER_SINGLE: Border = [
   "┌",
@@ -45,9 +39,6 @@ const DEFAULT_BORDER_SINGLE: Border = [
   "┘",
   "─",
   "└",
-  "│",
-  "│",
-  "╌",
   "│",
 ] as const;
 
@@ -60,9 +51,6 @@ const DEFAULT_BORDER_DOUBLE: Border = [
   "═",
   "╚",
   "║",
-  "║",
-  "╌",
-  "║",
 ] as const;
 
 const DEFAULT_BORDER_ROUNDED: Border = [
@@ -73,9 +61,6 @@ const DEFAULT_BORDER_ROUNDED: Border = [
   "╯",
   "─",
   "╰",
-  "│",
-  "│",
-  "╌",
   "│",
 ] as const;
 
@@ -88,15 +73,9 @@ const DEFAULT_BORDER_ASCII: Border = [
   "-",
   "+",
   "|",
-  "|",
-  "-",
-  "|",
 ] as const;
 
 const DEFAULT_BORDER_NONE: Border = [
-  "",
-  "",
-  "",
   "",
   "",
   "",
