@@ -11,12 +11,12 @@ import {
 import {
   getActionPickerConfig,
   getSourcePickerConfig,
-} from "./config/picker.ts";
-import { loadExtension, loadExtensions } from "./extension/loader.ts";
-import { subscribe } from "./util/event.ts";
-import { isDefined } from "./util/collection.ts";
-import { SourcePicker } from "./view/picker/source.ts";
-import { ActionPicker } from "./view/picker/action.ts";
+} from "../config/picker.ts";
+import { loadExtension, loadExtensions } from "../extension/loader.ts";
+import { subscribe } from "../util/event.ts";
+import { isDefined } from "../util/collection.ts";
+import { SourcePicker } from "../view/picker/source.ts";
+import { ActionPicker } from "../view/picker/action.ts";
 
 export const isStartOptions = is.PartialOf(is.ObjectOf({
   filters: is.ArrayOf(is.String),
