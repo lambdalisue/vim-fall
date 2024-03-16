@@ -74,7 +74,7 @@ const DEFAULT_DIVIDER_NONE: Divider = [
 ] as const;
 
 /**
- * Get default border characters based on conditions explained in Vim's 'borderchars'.
+ * Get default divider characters based on conditions explained in Vim's 'borderchars'.
  *
  * Note that the result is cached.
  */
@@ -82,17 +82,26 @@ export async function getDefaultDivider(denops: Denops): Promise<Divider> {
   if (getDefaultDividerCache !== undefined) {
     return getDefaultDividerCache;
   }
-  const [encoding, ambiwidth] = await collect(
-    denops,
-    (denops) => [
-      opt.encoding.get(denops),
-      opt.ambiwidth.get(denops),
-    ],
-  );
-  getDefaultDividerCache = encoding === "utf-8" && ambiwidth === "single"
-    ? DEFAULT_DIVIDER_DOUBLE
-    : DEFAULT_DIVIDER_ASCII;
-  return getDefaultDividerCache;
+  try {
+    const [encoding, ambiwidth] = await collect(
+      denops,
+      (denops) => [
+        opt.encoding.get(denops),
+        opt.ambiwidth.get(denops),
+      ],
+    );
+    getDefaultDividerCache = encoding === "utf-8" && ambiwidth === "single"
+      ? DEFAULT_DIVIDER_DOUBLE
+      : DEFAULT_DIVIDER_ASCII;
+    return getDefaultDividerCache;
+  } catch (err) {
+    // Fail silently
+    console.debug(
+      `[fall] Failed to get properties to determine default divider: ${err}`,
+    );
+    getDefaultDividerCache = DEFAULT_DIVIDER_ASCII;
+    return getDefaultDividerCache;
+  }
 }
 let getDefaultDividerCache: Divider | undefined;
 

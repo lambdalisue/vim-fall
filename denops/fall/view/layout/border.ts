@@ -95,17 +95,26 @@ export async function getDefaultBorder(denops: Denops): Promise<Border> {
   if (getDefaultBorderCache !== undefined) {
     return getDefaultBorderCache;
   }
-  const [encoding, ambiwidth] = await collect(
-    denops,
-    (denops) => [
-      opt.encoding.get(denops),
-      opt.ambiwidth.get(denops),
-    ],
-  );
-  getDefaultBorderCache = encoding === "utf-8" && ambiwidth === "single"
-    ? DEFAULT_BORDER_DOUBLE
-    : DEFAULT_BORDER_ASCII;
-  return getDefaultBorderCache;
+  try {
+    const [encoding, ambiwidth] = await collect(
+      denops,
+      (denops) => [
+        opt.encoding.get(denops),
+        opt.ambiwidth.get(denops),
+      ],
+    );
+    getDefaultBorderCache = encoding === "utf-8" && ambiwidth === "single"
+      ? DEFAULT_BORDER_DOUBLE
+      : DEFAULT_BORDER_ASCII;
+    return getDefaultBorderCache;
+  } catch (err) {
+    // Fail silently
+    console.debug(
+      `[fall] Failed to get properties to determine default border: ${err}`,
+    );
+    getDefaultBorderCache = DEFAULT_BORDER_ASCII;
+    return getDefaultBorderCache;
+  }
 }
 let getDefaultBorderCache: Border | undefined;
 
