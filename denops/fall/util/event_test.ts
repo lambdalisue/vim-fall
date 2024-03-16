@@ -5,31 +5,38 @@ import {
 import { dispatch, isFallEventName, subscribe } from "./event.ts";
 
 Deno.test("subscribe and dispatch events", () => {
-  let called = 0;
-  const callback = (data: unknown) => {
-    assertEquals(data, "test data");
-    called += 1;
-  };
-
-  // Subscribe to an event
-  const disposable = subscribe("cmdline-changed", callback);
+  // Subscribe "cmdline-changed" event
+  let called1: string = "";
+  let called2: string = "";
+  using disposable1 = subscribe("cmdline-changed", (cmdline) => {
+    called1 = cmdline;
+  });
+  using _disposable2 = subscribe("cmdline-changed", (cmdline) => {
+    called2 = cmdline;
+  });
 
   // Dispatch the event
   dispatch("cmdline-changed", "test data");
-  assertEquals(called, 1);
+  assertEquals(called1, "test data");
+  assertEquals(called2, "test data");
 
   // Dispose the subscription
-  disposable[Symbol.dispose]();
+  disposable1[Symbol.dispose]();
 
   // Ensure that the callback is not called after disposal
-  dispatch("cmdline-changed", "test data");
-  assertEquals(called, 1);
+  dispatch("cmdline-changed", "test data2");
+  assertEquals(called1, "test data");
+  assertEquals(called2, "test data2");
 });
 
-Deno.test("isFallEventName function", () => {
-  // Test with a valid fall event name
-  assert(isFallEventName("cmdline-changed"));
+Deno.test("isFallEventName", async (t) => {
+  await t.step("returns true for a valid fall event name", () => {
+    // Test with a valid fall event name
+    assert(isFallEventName("cmdline-changed"));
+  });
 
-  // Test with an invalid fall event name
-  assert(!isFallEventName("invalid-event-name"));
+  await t.step("returns false for an invalid fall event name", () => {
+    // Test with an invalid fall event name
+    assert(!isFallEventName("invalid-event-name"));
+  });
 });

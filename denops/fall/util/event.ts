@@ -17,8 +17,7 @@ export function subscribe<K extends keyof FallEventDataMap>(
 ): Disposable {
   const subscribers = subscriberMap[name] ?? new Set();
   subscribers.add(callback);
-  // deno-lint-ignore no-explicit-any
-  (subscriberMap as any)[name] = subscribers;
+  (subscriberMap as Record<K, Set<FallEventCallback<K>>>)[name] = subscribers;
   return {
     [Symbol.dispose]: () => {
       const subscribers = subscriberMap[name] ?? new Set();
