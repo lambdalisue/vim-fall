@@ -7,56 +7,100 @@ import type {
 
 import { dispatch } from "../../util/event.ts";
 
+/**
+ * Process items with a filter and a sorter and store them in the internal state.
+ */
 export class ItemProcessor implements Disposable {
   #controller: AbortController = new AbortController();
   #filters: [string, Filter][];
   #sorters: [string, Sorter][];
 
   #items: Item[] = [];
-  #currentFilterIndex: number = 0;
-  #currentSorterIndex: number = 0;
+  #filterIndex = 0;
+  #sorterIndex = 0;
 
   constructor(filters: Map<string, Filter>, sorters: Map<string, Sorter>) {
     this.#filters = [...filters.entries()];
     this.#sorters = [...sorters.entries()];
   }
 
+  /**
+   * Processed items
+   */
   get items(): Item[] {
     return this.#items;
   }
 
-  get currentFilterIndex(): number {
-    return this.#currentFilterIndex;
+  /**
+   * Current filter index
+   */
+  get filterIndex(): number {
+    return this.#filterIndex;
   }
 
-  set currentFilterIndex(value: number) {
-    this.#currentFilterIndex = value % this.#filters.length;
+  set filterIndex(value: number) {
+    this.#filterIndex = value % this.#filters.length;
   }
 
-  get currentFilter(): Filter | undefined {
-    return this.#filters.at(this.#currentFilterIndex)?.[1];
+  /**
+   * Current filter
+   *
+   * Returns `undefined` if no filter is available.
+   */
+  get filter(): Filter | undefined {
+    return this.#filters.at(this.#filterIndex)?.[1];
   }
 
-  get currentFilterName(): string | undefined {
-    return this.#filters.at(this.#currentFilterIndex)?.[0];
+  /**
+   * Name of the current filter
+   *
+   * Returns `undefined` if no filter is available.
+   */
+  get filterName(): string | undefined {
+    return this.#filters.at(this.#filterIndex)?.[0];
   }
 
-  get currentSorterIndex(): number {
-    return this.#currentSorterIndex;
+  /**
+   * Current sorter index
+   */
+  get sorterIndex(): number {
+    return this.#sorterIndex;
   }
 
-  set currentSorterIndex(value: number) {
-    this.#currentSorterIndex = value % this.#sorters.length;
+  set sorterIndex(value: number) {
+    this.#sorterIndex = value % this.#sorters.length;
   }
 
-  get currentSorter(): Sorter | undefined {
-    return this.#sorters.at(this.#currentSorterIndex)?.[1];
+  /**
+   * Current sorter
+   *
+   * Returns `undefined` if no sorter is available.
+   */
+  get sorter(): Sorter | undefined {
+    return this.#sorters.at(this.#sorterIndex)?.[1];
   }
 
-  get currentSorterName(): string | undefined {
-    return this.#sorters.at(this.#currentSorterIndex)?.[0];
+  /**
+   * Name of the current sorter
+   *
+   * Returns `undefined` if no sorter is available.
+   */
+  get sorterName(): string | undefined {
+    return this.#sorters.at(this.#sorterIndex)?.[0];
   }
 
+  /**
+   * Start processing items with the given query.
+   *
+   * It dispatch the following events:
+   *
+   * - `item-processor-succeeded`: When processing items is succeeded.
+   * - `item-processor-failed`: When processing items is failed.
+   * - `item-processor-completed`: When processing items is succeeded or failed.
+   *
+   * Note that when case of aborting, `item-processor-failed` is not dispatched.
+   * To check if the processing is completed, you should use `item-processor-completed`.
+   */
   start(
     denops: Denops,
     items: Item[],
@@ -66,11 +110,12 @@ export class ItemProcessor implements Disposable {
 
     const { signal } = this.#controller;
     const inner = async () => {
-      const filter = await this.currentFilter?.getStream(denops, query);
+      // TODO: Pass 'signal'
+      const filter = await this.filter?.getStream(denops, query);
       if (signal.aborted) return;
 
       const stream = filter
-        ? ReadableStream.from(items).pipeThrough(filter)
+        ? ReadableStream.from(items).pipeThrough(filter, { signal })
         : ReadableStream.from(items);
       const filteredItems: Item[] = [];
       await stream.pipeTo(
@@ -81,18 +126,18 @@ export class ItemProcessor implements Disposable {
         }),
         { signal },
       );
-
-      const processedItems = this.currentSorter
-        ? await this.currentSorter.sort(denops, filteredItems)
-        : filteredItems;
       if (signal.aborted) return;
 
+      const processedItems = this.sorter
+        // TODO: Pass 'signal'
+        ? await this.sorter.sort(denops, filteredItems)
+        : filteredItems;
       this.#items = processedItems;
       dispatch("item-processor-succeeded", undefined);
     };
     inner()
       .catch((err) => {
-        if (err.name === "AbortError") return;
+        if (err instanceof DOMException && err.name === "AbortError") return;
         console.warn(`[fall] Failed to process items: ${err}`);
         dispatch("item-processor-failed", undefined);
       })

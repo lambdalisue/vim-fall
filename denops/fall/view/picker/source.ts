@@ -112,8 +112,8 @@ export class SourcePicker implements AsyncDisposable {
     // Build layout
     const title = [
       sourceName,
-      itemProcessor.currentFilterName,
-      itemProcessor.currentSorterName,
+      itemProcessor.filterName,
+      itemProcessor.sorterName,
     ].join(" / ");
     const layout = stack.use(
       await buildLayout(denops, {
@@ -147,8 +147,8 @@ export class SourcePicker implements AsyncDisposable {
   get #title(): string {
     return [
       this.#sourceName,
-      this.#itemProcessor.currentFilterName,
-      this.#itemProcessor.currentSorterName,
+      this.#itemProcessor.filterName,
+      this.#itemProcessor.sorterName,
     ].join(" / ");
   }
 
@@ -276,7 +276,7 @@ export class SourcePicker implements AsyncDisposable {
       prompt.processing = "failed";
     }));
     stack.use(subscribe("item-processor-filter-prev", () => {
-      this.#itemProcessor.currentFilterIndex -= 1;
+      this.#itemProcessor.filterIndex -= 1;
       popup.config(denops, this.#layout.prompt.winid, {
         title: ` ${this.#title} `,
       }).catch((err) => {
@@ -284,7 +284,7 @@ export class SourcePicker implements AsyncDisposable {
       });
     }));
     stack.use(subscribe("item-processor-filter-next", () => {
-      this.#itemProcessor.currentFilterIndex += 1;
+      this.#itemProcessor.filterIndex += 1;
       popup.config(denops, this.#layout.prompt.winid, {
         title: ` ${this.#title} `,
       }).catch((err) => {
@@ -292,7 +292,7 @@ export class SourcePicker implements AsyncDisposable {
       });
     }));
     stack.use(subscribe("item-processor-sorter-prev", () => {
-      this.#itemProcessor.currentSorterIndex -= 1;
+      this.#itemProcessor.sorterIndex -= 1;
       popup.config(denops, this.#layout.prompt.winid, {
         title: ` ${this.#title} `,
       }).catch((err) => {
@@ -300,7 +300,7 @@ export class SourcePicker implements AsyncDisposable {
       });
     }));
     stack.use(subscribe("item-processor-sorter-next", () => {
-      this.#itemProcessor.currentSorterIndex += 1;
+      this.#itemProcessor.sorterIndex += 1;
       popup.config(denops, this.#layout.prompt.winid, {
         title: ` ${this.#title} `,
       }).catch((err) => {
