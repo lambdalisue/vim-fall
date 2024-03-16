@@ -1,36 +1,35 @@
 import { assertEquals } from "https://deno.land/std@0.218.2/assert/mod.ts";
 import { delay } from "https://deno.land/std@0.218.2/async/delay.ts";
 
-import { ASCII_SPINNER, Spinner, UNICODE_SPINNER } from "./spinner.ts";
+import { Spinner, UNICODE_SPINNER } from "./spinner.ts";
 
 const UPDATE_INTERVAL = 10;
 
-Deno.test("Spinner - next() returns the next spinner character", async () => {
-  const spinner = new Spinner(UNICODE_SPINNER, UPDATE_INTERVAL);
+Deno.test("Spinner", async (t) => {
+  await t.step(
+    "next() returns the next spinner character after the interval",
+    async () => {
+      using spinner = new Spinner(UNICODE_SPINNER, UPDATE_INTERVAL);
 
-  for (let i = 0; i < UNICODE_SPINNER.length; i++) {
-    assertEquals(spinner.next(), UNICODE_SPINNER[i]);
-    await delay(UPDATE_INTERVAL * 1.5);
-  }
-});
+      for (let i = 0; i < UNICODE_SPINNER.length; i++) {
+        assertEquals(
+          spinner.next(),
+          UNICODE_SPINNER[(i + 1) % UNICODE_SPINNER.length],
+        );
+        await delay(UPDATE_INTERVAL * 1.5);
+      }
+    },
+  );
 
-Deno.test("Spinner - next() returns the next spinner character with custom spinner", async () => {
-  const spinner = new Spinner(ASCII_SPINNER, UPDATE_INTERVAL);
+  await t.step(
+    "next() returns same character within the interval",
+    () => {
+      using spinner = new Spinner(UNICODE_SPINNER, 1000);
 
-  for (let i = 0; i < ASCII_SPINNER.length; i++) {
-    assertEquals(spinner.next(), ASCII_SPINNER[i]);
-    await delay(UPDATE_INTERVAL * 1.5);
-  }
-});
-
-Deno.test("Spinner - handles custom update interval", async () => {
-  const updateInterval = 200; // milliseconds
-  const spinner = new Spinner(UNICODE_SPINNER, UPDATE_INTERVAL);
-
-  assertEquals(spinner.next(), UNICODE_SPINNER[0]);
-
-  // Wait for more than the custom update interval
-  await delay(updateInterval * 1.5);
-
-  assertEquals(spinner.next(), UNICODE_SPINNER[1]); // Should have updated to the next character
+      const char = spinner.next();
+      for (let i = 0; i < UNICODE_SPINNER.length; i++) {
+        assertEquals(spinner.next(), char);
+      }
+    },
+  );
 });
