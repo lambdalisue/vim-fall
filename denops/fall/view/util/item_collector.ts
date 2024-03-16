@@ -57,26 +57,22 @@ export class ItemCollector implements Disposable {
         new WritableStream({
           write: (chunk) => {
             const offset = this.#items.length;
-            this.#items.push(...toProcessorItems(chunk, offset));
+            this.#items.push(...toItems(chunk, offset));
             dispatch("item-collector-changed", undefined);
-            performance.mark("item-collector-changed");
           },
         }),
         { signal },
       )
       .then(() => {
         dispatch("item-collector-succeeded", undefined);
-        performance.mark("item-collector-succeeded");
       })
       .catch((err) => {
-        if (err.name === "AbortError") return;
+        if (err instanceof DOMException && err.name === "AbortError") return;
         console.warn(`[fall] Error in reading source steam: ${err}`);
         dispatch("item-collector-failed", undefined);
-        performance.mark("item-collector-failed");
       })
       .finally(() => {
         dispatch("item-collector-completed", undefined);
-        performance.mark("item-collector-completed");
       });
   }
 
@@ -89,7 +85,7 @@ export class ItemCollector implements Disposable {
   }
 }
 
-function toProcessorItems(
+function toItems(
   items: SourceItem[],
   offset: number,
 ): Item[] {
