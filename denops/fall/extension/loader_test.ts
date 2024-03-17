@@ -4,6 +4,7 @@ import {
 } from "https://deno.land/std@0.218.2/assert/mod.ts";
 import { fromFileUrl } from "https://deno.land/std@0.218.2/path/mod.ts";
 import { assign } from "../const.ts";
+import { getExtensionConfig } from "../config/extension.ts";
 import { _internal } from "./loader.ts";
 
 Deno.test("getLoaderInfo", async (t) => {
@@ -13,6 +14,8 @@ Deno.test("getLoaderInfo", async (t) => {
     pickerConfigPath: fromFileUrl(import.meta.url),
     extensionConfigPath: fromFileUrl(import.meta.url),
   });
+
+  const extensionConfig = getExtensionConfig();
 
   const testcases = [
     ["action", "open", "../../@fall-builtin/action/open.ts", {}],
@@ -35,7 +38,7 @@ Deno.test("getLoaderInfo", async (t) => {
   ] as const;
   for (const [kind, name, path, options] of testcases) {
     await t.step(`${kind} ${name}`, async () => {
-      assertEquals(await getLoaderInfo(kind, name), [
+      assertEquals(await getLoaderInfo(kind, name, extensionConfig), [
         new URL(path, import.meta.url),
         options,
       ]);

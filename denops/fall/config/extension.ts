@@ -43,7 +43,7 @@ export const isExtensionConfig = is.ObjectOf({
   source: is.RecordOf(isLoaderConfig, is.String),
 });
 
-type ExtensionConfig = PredicateType<typeof isExtensionConfig>;
+export type ExtensionConfig = PredicateType<typeof isExtensionConfig>;
 
 const isPartialExtensionConfig = is.PartialOf(isExtensionConfig);
 

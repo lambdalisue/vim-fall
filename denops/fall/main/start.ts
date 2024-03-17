@@ -8,6 +8,7 @@ import {
   type PredicateType,
 } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
 
+import { getExtensionConfig } from "../config/extension.ts";
 import {
   getActionPickerConfig,
   getSourcePickerConfig,
@@ -51,19 +52,22 @@ export async function start(
     }
   });
 
+  const extensionConfig = getExtensionConfig();
   const itemsPickerConfig = getSourcePickerConfig(name);
   const actionPickerConfig = getActionPickerConfig();
-  const source = await loadExtension("source", name);
+  const source = await loadExtension("source", name, extensionConfig);
   if (!source) {
     return;
   }
   const previewer = await loadExtension(
     "previewer",
     options.previewer ?? itemsPickerConfig.previewer,
+    extensionConfig,
   );
   const actionPreviewer = await loadExtension(
     "previewer",
     options.actionPreviewer ?? actionPickerConfig.previewer,
+    extensionConfig,
   );
   const [
     actions,
@@ -77,30 +81,37 @@ export async function start(
     loadExtensions(
       "action",
       options.actions ?? itemsPickerConfig.actions,
+      extensionConfig,
     ),
     loadExtensions(
       "filter",
       options.filters ?? itemsPickerConfig.filters,
+      extensionConfig,
     ),
     loadExtensions(
       "renderer",
       options.renderers ?? itemsPickerConfig.renderers,
+      extensionConfig,
     ),
     loadExtensions(
       "sorter",
       options.sorters ?? itemsPickerConfig.sorters,
+      extensionConfig,
     ),
     loadExtensions(
       "filter",
       options.actionFilters ?? actionPickerConfig.filters,
+      extensionConfig,
     ),
     loadExtensions(
       "renderer",
       options.actionRenderers ?? actionPickerConfig.renderers,
+      extensionConfig,
     ),
     loadExtensions(
       "sorter",
       options.actionSorters ?? actionPickerConfig.sorters,
+      extensionConfig,
     ),
   ]);
 

@@ -9,13 +9,17 @@ import type {
 } from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
 
 import { getExtensionConfigPath } from "../const.ts";
-import { ExtensionKind, getExtensionConfig } from "../config/extension.ts";
+import {
+  type ExtensionConfig,
+  type ExtensionKind,
+} from "../config/extension.ts";
 import { isDefined } from "../util/collection.ts";
 import { resolve } from "./resolver.ts";
 
 export async function loadExtension<K extends ExtensionKind>(
   kind: K,
   expr: string,
+  econf: ExtensionConfig,
 ): Promise<WithUrl<Extension<K>> | undefined> {
   const cache = cacheMap[kind] as unknown as Map<
     string,
@@ -29,7 +33,7 @@ export async function loadExtension<K extends ExtensionKind>(
     if (cache.has(expr)) {
       return await cache.get(expr)!;
     }
-    const [url, options] = await getLoaderInfo(kind, expr);
+    const [url, options] = await getLoaderInfo(kind, expr, econf);
     const mod = await import(url.toString());
     const promise = (async () => {
       return { url: url.href, ...(await loader(mod, options)) };
@@ -45,8 +49,10 @@ export async function loadExtension<K extends ExtensionKind>(
 export async function loadExtensions<K extends ExtensionKind>(
   kind: K,
   patterns: string[],
+  econf: ExtensionConfig,
 ): Promise<Map<string, WithUrl<Extension<K>>>> {
-  const exprs = Object.entries(getExtensionConfig()[kind]).flatMap(
+  const conf: ExtensionConfig[K] = econf[kind] ?? {};
+  const exprs = Object.entries(conf).flatMap(
     ([name, config]) => {
       if (!config.variants) {
         return [name];
@@ -58,7 +64,7 @@ export async function loadExtensions<K extends ExtensionKind>(
     patterns
       .flatMap((v) => parsePattern(v, exprs))
       .map(async (v) => {
-        const extension = await loadExtension(kind, v);
+        const extension = await loadExtension(kind, v, econf);
         if (!extension) {
           return undefined;
         }
@@ -75,10 +81,11 @@ function promish<T>(v: T | Promise<T>): Promise<T> {
 async function getLoaderInfo<K extends ExtensionKind>(
   kind: K,
   expr: string,
+  econf: ExtensionConfig,
 ): Promise<[URL, Record<string, unknown>]> {
+  const conf: ExtensionConfig[K] = econf[kind] ?? {};
   const [name, variant] = parseExpr(expr);
-  const econf = getExtensionConfig();
-  const lconf = econf[kind][name];
+  const lconf = conf[name];
   if (!lconf) {
     throw new Error(`No ${kind} extension '${name}' found.`);
   }
