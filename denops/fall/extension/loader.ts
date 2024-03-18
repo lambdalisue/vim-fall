@@ -1,4 +1,3 @@
-import { toFileUrl } from "https://deno.land/std@0.218.2/path/to_file_url.ts";
 import type {
   Action,
   Filter,
@@ -8,7 +7,6 @@ import type {
   Source,
 } from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
 
-import { getExtensionConfigPath } from "../const.ts";
 import {
   type ExtensionConfig,
   type ExtensionKind,
@@ -89,7 +87,7 @@ async function getLoaderInfo<K extends ExtensionKind>(
   if (!lconf) {
     throw new Error(`No ${kind} extension '${name}' found.`);
   }
-  const url = await resolve(lconf.url, toFileUrl(getExtensionConfigPath()));
+  const url = await resolve(lconf.url);
   return [
     url,
     (variant ? (lconf.variants ?? {})[variant] : lconf.options) ?? {},

@@ -4,9 +4,8 @@ const builtinPattern = _`fallbuiltin://${_("path")}`;
 
 export async function resolve(
   url: string,
-  base?: URL | string,
 ): Promise<URL> {
-  return await resolveBuiltin(url) || new URL(url, base);
+  return await resolveBuiltin(url) || new URL(url);
 }
 
 function resolveBuiltin(
