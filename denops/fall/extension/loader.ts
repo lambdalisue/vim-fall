@@ -1,3 +1,4 @@
+import { deepMerge } from "https://deno.land/std@0.219.0/collections/deep_merge.ts";
 import type {
   Action,
   Filter,
@@ -14,6 +15,17 @@ import {
 import { isDefined } from "../util/collection.ts";
 import { parseExpr, parsePattern, promish } from "./util.ts";
 
+/**
+ * Load an extension.
+ *
+ * This function never throws an error. Instead, it returns `undefined` if the
+ * extension is not found or an error occurred.
+ *
+ * @param kind The kind of the extension.
+ * @param expr The expression of the extension.
+ * @param econf The extension configuration.
+ * @returns The loaded extension if found.
+ */
 export async function loadExtension<K extends ExtensionKind>(
   kind: K,
   expr: string,
@@ -34,7 +46,7 @@ export async function loadExtension<K extends ExtensionKind>(
     const [url, options] = getLoaderInfo(kind, expr, econf);
     const mod = await import(url);
     const promise = (async () => {
-      return { url, ...(await loader(mod, options)) };
+      return await loader(mod, options);
     })();
     cache.set(expr, promise);
     return await promise;
@@ -44,6 +56,17 @@ export async function loadExtension<K extends ExtensionKind>(
   }
 }
 
+/**
+ * Load extensions.
+ *
+ * This function never throws an error. Instead, it returns an empty map if an
+ * error occurred.
+ *
+ * @param kind The kind of the extensions.
+ * @param patterns The patterns of the extensions.
+ * @param econf The extension configuration.
+ * @returns The loaded extensions.
+ */
 export async function loadExtensions<K extends ExtensionKind>(
   kind: K,
   patterns: string[],
@@ -83,10 +106,12 @@ function getLoaderInfo<K extends ExtensionKind>(
   if (!lconf) {
     throw new Error(`No ${kind} extension '${name}' found.`);
   }
-  return [
-    lconf.url,
-    (variant ? (lconf.variants ?? {})[variant] : lconf.options) ?? {},
-  ];
+  const options = deepMerge(
+    lconf.options ?? {},
+    variant ? (lconf.variants ?? {})[variant] : {},
+    { arrays: "replace" },
+  );
+  return [lconf.url, options];
 }
 
 type Extension<K extends ExtensionKind> = K extends "action" ? Action

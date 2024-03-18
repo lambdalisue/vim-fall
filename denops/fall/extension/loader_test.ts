@@ -15,21 +15,44 @@ Deno.test("getLoaderInfo", async (t) => {
     action: {
       open: {
         url: resolve("../../@fall-builtin/action/open.ts"),
+        options: {
+          opener: "edit",
+        },
         variants: {
           split: {
             opener: "split",
           },
+          "edit-split": {
+            splitter: "split",
+          },
         },
       },
-    },
-    filter: {
-      substring: {
-        url: resolve("../../@fall-builtin/filter/substring.ts"),
-      },
-    },
-    previewer: {
-      text: {
-        url: resolve("../../@fall-builtin/previewer/text.ts"),
+      nested: {
+        url: resolve("../../@fall-builtin/action/nested.ts"),
+        options: {
+          nested: {
+            a: 1,
+            b: [2, 3],
+          },
+        },
+        variants: {
+          a: {
+            nested: {
+              a: 2,
+            },
+          },
+          b: {
+            nested: {
+              b: [3, 4],
+            },
+          },
+          c: {
+            nested: {
+              a: 2,
+              b: [3, 4],
+            },
+          },
+        },
       },
     },
     source: {
@@ -41,17 +64,40 @@ Deno.test("getLoaderInfo", async (t) => {
   };
 
   const testcases = [
-    ["action", "open", "../../@fall-builtin/action/open.ts", {}],
+    ["action", "open", "../../@fall-builtin/action/open.ts", {
+      opener: "edit",
+    }],
     ["action", "open:split", "../../@fall-builtin/action/open.ts", {
       opener: "split",
     }],
-    [
-      "filter",
-      "substring",
-      "../../@fall-builtin/filter/substring.ts",
-      {},
-    ],
-    ["previewer", "text", "../../@fall-builtin/previewer/text.ts", {}],
+    ["action", "open:edit-split", "../../@fall-builtin/action/open.ts", {
+      opener: "edit",
+      splitter: "split",
+    }],
+    ["action", "nested", "../../@fall-builtin/action/nested.ts", {
+      nested: {
+        a: 1,
+        b: [2, 3],
+      },
+    }],
+    ["action", "nested:a", "../../@fall-builtin/action/nested.ts", {
+      nested: {
+        a: 2,
+        b: [2, 3],
+      },
+    }],
+    ["action", "nested:b", "../../@fall-builtin/action/nested.ts", {
+      nested: {
+        a: 1,
+        b: [3, 4],
+      },
+    }],
+    ["action", "nested:c", "../../@fall-builtin/action/nested.ts", {
+      nested: {
+        a: 2,
+        b: [3, 4],
+      },
+    }],
     [
       "source",
       "line",
@@ -67,4 +113,14 @@ Deno.test("getLoaderInfo", async (t) => {
       ]);
     });
   }
+
+  await t.step("throws an error if no corresponding extension is found", () => {
+    assertThrows(
+      () => {
+        getLoaderInfo("action", "nonexistent", extensionConfig);
+      },
+      Error,
+      "No action extension 'nonexistent' found",
+    );
+  });
 });
