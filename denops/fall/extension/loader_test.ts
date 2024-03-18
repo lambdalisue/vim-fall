@@ -2,20 +2,43 @@ import {
   assertEquals,
   assertThrows,
 } from "https://deno.land/std@0.218.2/assert/mod.ts";
-import { fromFileUrl } from "https://deno.land/std@0.218.2/path/mod.ts";
-import { assign } from "../const.ts";
-import { getExtensionConfig } from "../config/extension.ts";
 import { _internal } from "./loader.ts";
+
+function resolve(url: string): string {
+  return new URL(url, import.meta.url).toString();
+}
 
 Deno.test("getLoaderInfo", async (t) => {
   const { getLoaderInfo } = _internal;
 
-  assign({
-    pickerConfigPath: fromFileUrl(import.meta.url),
-    extensionConfigPath: fromFileUrl(import.meta.url),
-  });
-
-  const extensionConfig = getExtensionConfig();
+  const extensionConfig = {
+    action: {
+      open: {
+        url: resolve("../../@fall-builtin/action/open.ts"),
+        variants: {
+          split: {
+            opener: "split",
+          },
+        },
+      },
+    },
+    filter: {
+      substring: {
+        url: resolve("../../@fall-builtin/filter/substring.ts"),
+      },
+    },
+    previewer: {
+      text: {
+        url: resolve("../../@fall-builtin/previewer/text.ts"),
+      },
+    },
+    source: {
+      line: {
+        url:
+          "https://raw.githubusercontent.com/vim-fall/package-common/main/source/line.ts",
+      },
+    },
+  };
 
   const testcases = [
     ["action", "open", "../../@fall-builtin/action/open.ts", {}],
