@@ -47,21 +47,21 @@ const DEFAULT_DIVIDER_DOUBLE: Divider = [
 ] as const;
 
 const DEFAULT_DIVIDER_DASHED: Divider = [
-  "",
+  "│",
   "╌",
-  "",
-  "",
+  "│",
+  "─",
   "╎",
-  "",
+  "─",
 ] as const;
 
 const DEFAULT_DIVIDER_ASCII: Divider = [
-  "",
-  "-",
-  "",
-  "",
   "|",
-  "",
+  "-",
+  "|",
+  "-",
+  "|",
+  "-",
 ] as const;
 
 const DEFAULT_DIVIDER_NONE: Divider = [
@@ -106,9 +106,9 @@ export async function getDefaultDivider(denops: Denops): Promise<Divider> {
 let getDefaultDividerCache: Divider | undefined;
 
 export function getDivider(
-  border: "none" | "ascii" | "single" | "double" | "dashed" | Divider,
+  divider: "none" | "ascii" | "single" | "double" | "dashed" | Divider,
 ): Divider {
-  switch (border) {
+  switch (divider) {
     case "none":
       return DEFAULT_DIVIDER_NONE;
     case "ascii":
@@ -120,6 +120,6 @@ export function getDivider(
     case "dashed":
       return DEFAULT_DIVIDER_DASHED;
     default:
-      return border;
+      return divider;
   }
 }

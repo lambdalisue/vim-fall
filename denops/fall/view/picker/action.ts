@@ -105,6 +105,7 @@ export class ActionPicker implements AsyncDisposable {
         heightMax: options.layout?.heightMax ?? HEIGHT_MAX,
         previewRatio: options.layout?.previewRatio ?? PREVIEW_RATION,
         border: options.layout?.border,
+        divider: options.layout?.divider,
         zindex: options.layout?.zindex ?? 51,
       }),
     );
