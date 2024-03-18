@@ -1,64 +1,178 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import { batch } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
+import { g } from "https://deno.land/x/denops_std@v6.4.0/variable/mod.ts";
 import * as autocmd from "https://deno.land/x/denops_std@v6.4.0/autocmd/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
+import { deepMerge } from "https://deno.land/std@0.219.0/collections/deep_merge.ts";
 import { dirname } from "https://deno.land/std@0.219.0/path/mod.ts";
-import { ensureDir, exists } from "https://deno.land/std@0.219.0/fs/mod.ts";
-import { unreachable } from "https://deno.land/x/errorutil@v0.1.1/mod.ts";
-
-import { getExtensionConfigPath, getPickerConfigPath } from "../const.ts";
 import {
-  defaultConfig as defaultPickerConfig,
+  copy,
+  ensureDir,
+  exists,
+} from "https://deno.land/std@0.219.0/fs/mod.ts";
+import { is, maybe } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
+
+import {
+  type ActionPickerConfig,
   loadPickerConfig,
+  type PickerConfig,
+  type SourcePickerConfig,
 } from "../config/picker.ts";
 import {
-  defaultConfig as defaultExtensionConfig,
+  type ExtensionConfig,
   loadExtensionConfig,
 } from "../config/extension.ts";
 
-type ConfigType = "picker" | "extension";
+export function getExtensionConfig(): ExtensionConfig {
+  return deepMerge(builtinExtensionConfig, customExtensionConfig, {
+    arrays: "replace",
+  });
+}
 
-export async function reloadConfig(
-  type: ConfigType,
+export function getPickerConfig(): PickerConfig {
+  return deepMerge(builtinPickerConfig, customPickerConfig, {
+    arrays: "replace",
+  });
+}
+
+export function getActionPickerConfig(): ActionPickerConfig {
+  return getPickerConfig().action ?? {};
+}
+
+export function getSourcePickerConfig(expr: string): SourcePickerConfig {
+  const sconf = getPickerConfig().source ?? {};
+  const dconf = sconf[""] ?? {};
+  const rconf = sconf[expr.split(":", 1)[0]] ?? {};
+  const vconf = sconf[expr] ?? {};
+  return deepMerge(deepMerge(dconf, rconf, { arrays: "replace" }), vconf, {
+    arrays: "replace",
+  });
+}
+
+export async function getExtensionConfigPath(
+  denops: Denops,
+): Promise<string | undefined> {
+  const path = maybe(
+    await g.get(denops, "fall_extension_config_path"),
+    is.String,
+  );
+  if (path == undefined) {
+    console.warn(
+      `[fall] The 'g:fall_extension_config_path' variable is not valid string.`,
+    );
+  }
+  return path;
+}
+
+export async function getPickerConfigPath(
+  denops: Denops,
+): Promise<string | undefined> {
+  const path = maybe(
+    await g.get(denops, "fall_picker_config_path"),
+    is.String,
+  );
+  if (path == undefined) {
+    console.warn(
+      `[fall] The 'g:fall_picker_config_path' variable is not valid string.`,
+    );
+  }
+  return path;
+}
+
+export async function reloadExtensionConfig(
+  denops: Denops,
 ): Promise<void> {
-  switch (type) {
-    case "picker":
-      await loadPickerConfig();
-      break;
-    case "extension":
-      await loadExtensionConfig();
-      break;
-    default:
-      unreachable(type);
+  const path = await getExtensionConfigPath(denops);
+  if (!path) {
+    console.warn(
+      `[fall] Skip loading the user extension config.`,
+    );
+    customExtensionConfig = {};
+    return;
+  }
+  try {
+    customExtensionConfig = await loadExtensionConfig(path);
+  } catch (err) {
+    if (!(err instanceof Deno.errors.NotFound)) {
+      console.warn(
+        `[fall] Failed to load extension config "${path}": ${err}`,
+      );
+    }
+    customExtensionConfig = {};
   }
 }
 
-export async function editConfig(
+export async function reloadPickerConfig(
   denops: Denops,
-  type: ConfigType,
 ): Promise<void> {
-  switch (type) {
-    case "picker":
-      await editPickerConfig(denops);
-      break;
-    case "extension":
-      await editExtensionConfig(denops);
-      break;
-    default:
-      unreachable(type);
+  const path = await getPickerConfigPath(denops);
+  if (!path) {
+    console.warn(
+      `[fall] Skip loading the user picker config.`,
+    );
+    customPickerConfig = {};
+    return;
+  }
+  try {
+    customPickerConfig = await loadPickerConfig(path);
+  } catch (err) {
+    if (!(err instanceof Deno.errors.NotFound)) {
+      console.warn(
+        `[fall] Failed to load "${path}": ${err}`,
+      );
+    }
+    customPickerConfig = {};
   }
 }
 
-async function editPickerConfig(
+export async function editExtensionConfig(
   denops: Denops,
 ): Promise<void> {
-  const path = getPickerConfigPath();
+  const path = await getExtensionConfigPath(denops);
+  if (!path) {
+    console.error(
+      `[fall] Failed to open user extension config.`,
+    );
+    return;
+  }
   await ensureDir(dirname(path));
   if (!await exists(path)) {
-    await Deno.writeTextFile(
+    await copy(
+      new URL("../assets/extension-config.default.json", import.meta.url),
       path,
-      JSON.stringify(defaultPickerConfig, null, 2),
+    );
+  }
+  await buffer.open(denops, path);
+  await batch(denops, async (denops) => {
+    await opt.autochdir.set(denops, false);
+    await opt.bufhidden.set(denops, "wipe");
+  });
+  await autocmd.group(denops, "fall_extension_config_edit", (helper) => {
+    helper.remove("*", "<buffer>");
+    helper.define(
+      "BufWritePost",
+      "<buffer>",
+      `call denops#notify('${denops.name}', 'reloadConfig', ['extension'])`,
+    );
+  });
+}
+
+export async function editPickerConfig(
+  denops: Denops,
+): Promise<void> {
+  const path = await getPickerConfigPath(denops);
+  if (!path) {
+    console.error(
+      `[fall] Failed to open user picker config.`,
+    );
+    return;
+  }
+  await ensureDir(dirname(path));
+  if (!await exists(path)) {
+    await copy(
+      new URL("../assets/picker-config.default.json", import.meta.url),
+      path,
     );
   }
   await buffer.open(denops, path);
@@ -76,28 +190,12 @@ async function editPickerConfig(
   });
 }
 
-async function editExtensionConfig(
-  denops: Denops,
-): Promise<void> {
-  const path = getExtensionConfigPath();
-  await ensureDir(dirname(path));
-  if (!await exists(path)) {
-    await Deno.writeTextFile(
-      path,
-      JSON.stringify(defaultExtensionConfig, null, 2),
-    );
-  }
-  await buffer.open(denops, path);
-  await batch(denops, async (denops) => {
-    await opt.autochdir.set(denops, false);
-    await opt.bufhidden.set(denops, "wipe");
-  });
-  await autocmd.group(denops, "fall_extension_config_edit", (helper) => {
-    helper.remove("*", "<buffer>");
-    helper.define(
-      "BufWritePost",
-      "<buffer>",
-      `call denops#notify('${denops.name}', 'reloadConfig', ['extension'])`,
-    );
-  });
-}
+const builtinExtensionConfig: ExtensionConfig = await loadExtensionConfig(
+  new URL("../assets/extension-config.builtin.json", import.meta.url),
+);
+const builtinPickerConfig: PickerConfig = await loadPickerConfig(
+  new URL("../assets/picker-config.builtin.json", import.meta.url),
+);
+
+let customExtensionConfig: ExtensionConfig = {};
+let customPickerConfig: PickerConfig = {};

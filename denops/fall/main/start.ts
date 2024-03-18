@@ -8,16 +8,16 @@ import {
   type PredicateType,
 } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
 
-import { getExtensionConfig } from "../config/extension.ts";
-import {
-  getActionPickerConfig,
-  getSourcePickerConfig,
-} from "../config/picker.ts";
 import { loadExtension, loadExtensions } from "../extension/loader.ts";
 import { subscribe } from "../util/event.ts";
 import { isDefined } from "../util/collection.ts";
 import { SourcePicker } from "../view/picker/source.ts";
 import { ActionPicker } from "../view/picker/action.ts";
+import {
+  getActionPickerConfig,
+  getExtensionConfig,
+  getSourcePickerConfig,
+} from "./config.ts";
 
 export const isStartOptions = is.PartialOf(is.ObjectOf({
   filters: is.ArrayOf(is.String),
@@ -61,12 +61,12 @@ export async function start(
   }
   const previewer = await loadExtension(
     "previewer",
-    options.previewer ?? itemsPickerConfig.previewer,
+    options.previewer ?? itemsPickerConfig.previewer ?? "",
     extensionConfig,
   );
   const actionPreviewer = await loadExtension(
     "previewer",
-    options.actionPreviewer ?? actionPickerConfig.previewer,
+    options.actionPreviewer ?? actionPickerConfig.previewer ?? "",
     extensionConfig,
   );
   const [
@@ -80,44 +80,44 @@ export async function start(
   ] = await Promise.all([
     loadExtensions(
       "action",
-      options.actions ?? itemsPickerConfig.actions,
+      options.actions ?? itemsPickerConfig.actions ?? [],
       extensionConfig,
     ),
     loadExtensions(
       "filter",
-      options.filters ?? itemsPickerConfig.filters,
+      options.filters ?? itemsPickerConfig.filters ?? [],
       extensionConfig,
     ),
     loadExtensions(
       "renderer",
-      options.renderers ?? itemsPickerConfig.renderers,
+      options.renderers ?? itemsPickerConfig.renderers ?? [],
       extensionConfig,
     ),
     loadExtensions(
       "sorter",
-      options.sorters ?? itemsPickerConfig.sorters,
+      options.sorters ?? itemsPickerConfig.sorters ?? [],
       extensionConfig,
     ),
     loadExtensions(
       "filter",
-      options.actionFilters ?? actionPickerConfig.filters,
+      options.actionFilters ?? actionPickerConfig.filters ?? [],
       extensionConfig,
     ),
     loadExtensions(
       "renderer",
-      options.actionRenderers ?? actionPickerConfig.renderers,
+      options.actionRenderers ?? actionPickerConfig.renderers ?? [],
       extensionConfig,
     ),
     loadExtensions(
       "sorter",
-      options.actionSorters ?? actionPickerConfig.sorters,
+      options.actionSorters ?? actionPickerConfig.sorters ?? [],
       extensionConfig,
     ),
   ]);
 
   const aliasedActions = new Map(
     [...actions.entries()].map(([name, action]) => {
-      const alias: string | undefined = itemsPickerConfig.actionAlias[name];
+      const alias: string | undefined = itemsPickerConfig.actionAlias?.[name];
       if (alias) {
         return [alias, action];
       }
@@ -180,7 +180,7 @@ export async function start(
       }
       action = aliasedActions.get(actionName);
     } else if (nextAction == "@default") {
-      action = actions.get(itemsPickerConfig.defaultAction);
+      action = actions.get(itemsPickerConfig.defaultAction ?? "");
     } else {
       action = actions.get(nextAction);
     }

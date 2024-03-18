@@ -12,17 +12,17 @@ import {
   type ExtensionKind,
 } from "../config/extension.ts";
 import { isDefined } from "../util/collection.ts";
-import { resolve } from "./resolver.ts";
+import { parseExpr, parsePattern, promish } from "./util.ts";
 
 export async function loadExtension<K extends ExtensionKind>(
   kind: K,
   expr: string,
   econf: ExtensionConfig,
-): Promise<WithUrl<Extension<K>> | undefined> {
-  const cache = cacheMap[kind] as unknown as Map<
-    string,
-    Promise<WithUrl<Extension<K>>>
-  >;
+): Promise<Extension<K> | undefined> {
+  if (expr === "") {
+    return undefined;
+  }
+  const cache = cacheMap[kind] as Map<string, Promise<Extension<K>>>;
   const loader = loaderMap[kind] as (
     mod: unknown,
     options: Record<string, unknown>,
@@ -31,15 +31,15 @@ export async function loadExtension<K extends ExtensionKind>(
     if (cache.has(expr)) {
       return await cache.get(expr)!;
     }
-    const [url, options] = await getLoaderInfo(kind, expr, econf);
-    const mod = await import(url.toString());
+    const [url, options] = getLoaderInfo(kind, expr, econf);
+    const mod = await import(url);
     const promise = (async () => {
-      return { url: url.href, ...(await loader(mod, options)) };
+      return { url, ...(await loader(mod, options)) };
     })();
     cache.set(expr, promise);
     return await promise;
   } catch (err) {
-    console.warn(`Failed to load ${kind} '${expr}':`, err);
+    console.warn(`[fall] Failed to load ${kind} extension '${expr}': ${err}`);
     return undefined;
   }
 }
@@ -48,7 +48,7 @@ export async function loadExtensions<K extends ExtensionKind>(
   kind: K,
   patterns: string[],
   econf: ExtensionConfig,
-): Promise<Map<string, WithUrl<Extension<K>>>> {
+): Promise<Map<string, Extension<K>>> {
   const conf: ExtensionConfig[K] = econf[kind] ?? {};
   const exprs = Object.entries(conf).flatMap(
     ([name, config]) => {
@@ -72,45 +72,21 @@ export async function loadExtensions<K extends ExtensionKind>(
   return new Map(entries.filter(isDefined));
 }
 
-function promish<T>(v: T | Promise<T>): Promise<T> {
-  return v instanceof Promise ? v : Promise.resolve(v);
-}
-
-async function getLoaderInfo<K extends ExtensionKind>(
+function getLoaderInfo<K extends ExtensionKind>(
   kind: K,
   expr: string,
   econf: ExtensionConfig,
-): Promise<[URL, Record<string, unknown>]> {
+): [string, Record<string, unknown>] {
   const conf: ExtensionConfig[K] = econf[kind] ?? {};
   const [name, variant] = parseExpr(expr);
   const lconf = conf[name];
   if (!lconf) {
     throw new Error(`No ${kind} extension '${name}' found.`);
   }
-  const url = await resolve(lconf.url);
   return [
-    url,
+    lconf.url,
     (variant ? (lconf.variants ?? {})[variant] : lconf.options) ?? {},
   ];
-}
-
-function parseExpr(expr: string): [string, string | undefined] {
-  const [name, ...rest] = expr.split(":");
-  if (rest.length === 0) {
-    return [name, undefined];
-  }
-  return [name, rest.join(":")];
-}
-
-function parsePattern(pattern: string, exprs: string[]): string[] {
-  if (!pattern.includes("*")) {
-    return [pattern];
-  }
-  const [head, tail, ...rest] = pattern.split("*");
-  if (rest.length > 0) {
-    throw new Error("Only one '*' is allowed in the expression.");
-  }
-  return exprs.filter((expr) => expr.startsWith(head) && expr.endsWith(tail));
 }
 
 type Extension<K extends ExtensionKind> = K extends "action" ? Action
@@ -121,17 +97,15 @@ type Extension<K extends ExtensionKind> = K extends "action" ? Action
   : K extends "source" ? Source
   : never;
 
-type WithUrl<T> = T & { url: string };
-
 const cacheMap = {
-  action: new Map<string, Promise<WithUrl<Action>>>(),
-  filter: new Map<string, Promise<WithUrl<Filter>>>(),
-  previewer: new Map<string, Promise<WithUrl<Previewer>>>(),
-  renderer: new Map<string, Promise<WithUrl<Renderer>>>(),
-  sorter: new Map<string, Promise<WithUrl<Sorter>>>(),
-  source: new Map<string, Promise<WithUrl<Source>>>(),
+  action: new Map<string, Promise<Action>>(),
+  filter: new Map<string, Promise<Filter>>(),
+  previewer: new Map<string, Promise<Previewer>>(),
+  renderer: new Map<string, Promise<Renderer>>(),
+  sorter: new Map<string, Promise<Sorter>>(),
+  source: new Map<string, Promise<Source>>(),
 } as const satisfies {
-  [K in ExtensionKind]: Map<string, Promise<WithUrl<Extension<K>>>>;
+  [K in ExtensionKind]: Map<string, Promise<Extension<K>>>;
 };
 
 const loaderMap = {
@@ -186,6 +160,4 @@ const loaderMap = {
 
 export const _internal = {
   getLoaderInfo,
-  parseExpr,
-  parsePattern,
 };

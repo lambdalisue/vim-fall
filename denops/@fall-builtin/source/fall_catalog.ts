@@ -68,7 +68,7 @@ export function getSource(
                 if (kind && k !== kind) {
                   continue;
                 }
-                for (const [name, lconf] of Object.entries(pkg[k])) {
+                for (const [name, lconf] of Object.entries(pkg[k] ?? {})) {
                   controller.enqueue({
                     value: `${pkg.name}/${k}/${name}`,
                     detail: toExtensionDetail(
