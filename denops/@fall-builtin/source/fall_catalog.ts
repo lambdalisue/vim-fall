@@ -1,4 +1,4 @@
-import type { Source } from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
+import type { Source } from "https://deno.land/x/fall_core@v0.6.0/mod.ts";
 import {
   assert,
   ensure,

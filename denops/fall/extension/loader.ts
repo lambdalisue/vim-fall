@@ -5,7 +5,7 @@ import type {
   Renderer,
   Sorter,
   Source,
-} from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
+} from "https://deno.land/x/fall_core@v0.6.0/mod.ts";
 
 import {
   type ExtensionConfig,

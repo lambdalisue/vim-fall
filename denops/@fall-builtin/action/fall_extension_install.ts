@@ -3,7 +3,7 @@
  *
  * @module
  */
-import type { Action } from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
+import type { Action } from "https://deno.land/x/fall_core@v0.6.0/mod.ts";
 import { deepMerge } from "https://deno.land/std@0.218.2/collections/deep_merge.ts";
 import { assert, is } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
 

@@ -1,7 +1,7 @@
 import type {
   Filter,
   ItemDecoration,
-} from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
+} from "https://deno.land/x/fall_core@v0.6.0/mod.ts";
 import { collect } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 import { assert, is } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";

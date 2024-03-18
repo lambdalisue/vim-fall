@@ -8,7 +8,7 @@ import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import type {
   Previewer,
   PreviewerItem,
-} from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
+} from "https://deno.land/x/fall_core@v0.6.0/mod.ts";
 import { equal } from "https://deno.land/std@0.203.0/assert/equal.ts";
 
 const DEFAULT_DEBOUNCE_WAIT = 100;
@@ -61,7 +61,7 @@ export class PreviewComponent {
    */
   async render(
     denops: Denops,
-    { signal: _signal }: { signal: AbortSignal },
+    { signal }: { signal: AbortSignal },
   ): Promise<boolean> {
     if (!this.#changed) return false;
     if (
@@ -79,7 +79,7 @@ export class PreviewComponent {
         await this.#previewer.preview(denops, this.#item, {
           bufnr: this.#bufnr,
           winid: this.#winid,
-        });
+        }, { signal });
         // Overwrite buffer local options may configured by ftplugin
         await fn.win_execute(
           denops,

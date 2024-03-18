@@ -1,7 +1,7 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import { send } from "https://deno.land/x/denops_std@v6.4.0/helper/keymap.ts";
 import { exprQuote as q } from "https://deno.land/x/denops_std@v6.4.0/helper/expr_string.ts";
-import type { Action } from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
+import type { Action } from "https://deno.land/x/fall_core@v0.6.0/mod.ts";
 import {
   is,
   maybe,
@@ -191,7 +191,7 @@ export async function start(
           cursorItem: itemsPicker.cursorItem,
           selectedItems: itemsPicker.selectedItems,
           processedItems: itemsPicker.processedItems,
-        })
+        }, { signal })
       ) {
         // Continue
         continue;

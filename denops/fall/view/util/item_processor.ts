@@ -3,7 +3,7 @@ import type {
   Filter,
   Item,
   Sorter,
-} from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
+} from "https://deno.land/x/fall_core@v0.6.0/mod.ts";
 
 import { dispatch } from "../../util/event.ts";
 
@@ -111,7 +111,7 @@ export class ItemProcessor implements Disposable {
     const { signal } = this.#controller;
     const inner = async () => {
       // TODO: Pass 'signal'
-      const filter = await this.filter?.getStream(denops, query);
+      const filter = await this.filter?.getStream(denops, query, { signal });
       if (signal.aborted) return;
 
       const stream = filter
@@ -130,7 +130,7 @@ export class ItemProcessor implements Disposable {
 
       const processedItems = this.sorter
         // TODO: Pass 'signal'
-        ? await this.sorter.sort(denops, filteredItems)
+        ? await this.sorter.sort(denops, filteredItems, { signal })
         : filteredItems;
       this.#items = processedItems;
       dispatch("item-processor-succeeded", undefined);

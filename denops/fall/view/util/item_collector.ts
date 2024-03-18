@@ -1,7 +1,7 @@
 import type {
   Item,
   SourceItem,
-} from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
+} from "https://deno.land/x/fall_core@v0.6.0/mod.ts";
 
 import { ChunkStream } from "../../util/stream.ts";
 import { dispatch } from "../../util/event.ts";

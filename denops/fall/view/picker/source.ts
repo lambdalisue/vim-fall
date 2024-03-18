@@ -14,7 +14,7 @@ import type {
   Renderer,
   Sorter,
   Source,
-} from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
+} from "https://deno.land/x/fall_core@v0.6.0/mod.ts";
 
 import { any, isDefined } from "../../util/collection.ts";
 import { startAsyncScheduler } from "../../util/async_scheduler.ts";

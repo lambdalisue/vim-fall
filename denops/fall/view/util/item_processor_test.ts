@@ -4,7 +4,7 @@ import type {
   Filter,
   Item,
   Sorter,
-} from "https://deno.land/x/fall_core@v0.5.1/mod.ts";
+} from "https://deno.land/x/fall_core@v0.6.0/mod.ts";
 import { subscribe } from "../../util/event.ts";
 import { ItemProcessor } from "./item_processor.ts";
 
