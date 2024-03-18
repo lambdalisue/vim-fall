@@ -48,7 +48,7 @@ export class ActionPicker implements AsyncDisposable {
   #query = "";
   #index = 0;
 
-  #actions: Map<string, Action & { url: string }>;
+  #actions: Map<string, Action>;
   #previewer: Previewer | undefined;
   #renderers: Map<string, Renderer>;
   #options: ActionPickerOptions;
@@ -57,7 +57,7 @@ export class ActionPicker implements AsyncDisposable {
   #disposable: AsyncDisposableStack;
 
   private constructor(
-    actions: Map<string, Action & { url: string }>,
+    actions: Map<string, Action>,
     previewer: Previewer | undefined,
     renderers: Map<string, Renderer>,
     options: ActionPickerOptions,
@@ -76,7 +76,7 @@ export class ActionPicker implements AsyncDisposable {
 
   static async create(
     denops: Denops,
-    actions: Map<string, Action & { url: string }>,
+    actions: Map<string, Action>,
     filters: Map<string, Filter>,
     previewer: Previewer | undefined,
     renderers: Map<string, Renderer>,
@@ -128,12 +128,10 @@ export class ActionPicker implements AsyncDisposable {
   }
 
   get collectedItems(): Item[] {
-    return [...this.#actions.entries()].map(([k, v]) => ({
+    return [...this.#actions.entries()].map(([k, _v]) => ({
       id: k,
       value: k,
-      detail: {
-        url: v.url,
-      },
+      detail: {},
       decorations: [],
     }));
   }
