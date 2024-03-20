@@ -55,8 +55,82 @@ export async function loadExtensionConfig(
 function purifyExtensionConfig(
   data: unknown,
 ): ExtensionConfig {
-  // TODO: Check fields one by one to recover from invalid data
-  return maybe(data, isExtensionConfig) ?? {};
+  if (!is.Record(data)) {
+    console.warn(
+      `[fall] The given extension config is not an object.`,
+    );
+    return {};
+  }
+  const conf: ExtensionConfig = {};
+  for (const kind of extensionKinds) {
+    if (!isExtensionKind(kind)) {
+      console.warn(
+        `[fall] The key '${kind}' in the extension config is not a valid extension kind.`,
+      );
+      continue;
+    }
+    const lconfs = data[kind];
+    if (!lconfs) {
+      continue;
+    }
+    if (!is.Record(lconfs)) {
+      console.warn(
+        `[fall] The value of '${kind}' in the extension config is not an object.`,
+      );
+      continue;
+    }
+    conf[kind] = {};
+    for (const name in lconfs) {
+      const lconf = lconfs[name];
+      if (!lconf) {
+        continue;
+      }
+      if (!is.Record(lconf)) {
+        console.warn(
+          `[fall] The value of '${kind}.${name}' in the extension config is not an object.`,
+        );
+        continue;
+      }
+      if (!is.String(lconf.url)) {
+        console.warn(
+          `[fall] The value of '${kind}.${name}.url' in the extension config is not a string.`,
+        );
+        continue;
+      }
+      conf[kind]![name] = {
+        url: lconf.url,
+      };
+      if (lconf.options) {
+        if (!isUnknownStringRecord(lconf.options)) {
+          console.warn(
+            `[fall] The value of '${kind}.${name}.options' in the extension config is not valid`,
+          );
+        } else {
+          conf[kind]![name].options = lconf.options;
+        }
+      }
+      if (lconf.variants) {
+        if (!is.Record(lconf.variants)) {
+          console.warn(
+            `[fall] The value of '${kind}.${name}.variants' in the extension config is not valid.`,
+          );
+        } else {
+          conf[kind]![name].variants = {};
+          for (const vname in lconf.variants) {
+            const variant = lconf.variants[vname];
+            if (!isUnknownStringRecord(variant)) {
+              console.warn(
+                `[fall] The value of '${kind}.${name}.variants.${variant}' in the extension config is not valid.`,
+              );
+              continue;
+            }
+            conf[kind]![name].variants![vname] = variant;
+          }
+        }
+      }
+    }
+  }
+  return conf;
 }
 
 function resolveExtensionConfig(
