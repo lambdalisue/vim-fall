@@ -4,36 +4,17 @@
     "": {
       "actionAlias": {},
       "defaultAction": "open",
-      "actions": [
-        "*"
-      ],
-      "filters": [
-        "*"
-      ],
+      "actions": ["*"],
+      "filters": ["*"],
       "previewer": "text",
-      "renderers": [
-        "*"
-      ],
-      "sorters": [
-        "*"
-      ]
-    },
-    "fall-catalog": {
-      "actionAlias": {
-        "fall-extension-install": "install"
-      },
-      "defaultAction": "fall-extension-install",
-      "previewer": "text"
+      "renderers": ["*"],
+      "sorters": ["*"]
     }
   },
   "action": {
-    "filters": [
-      "*"
-    ],
+    "filters": ["*"],
     "previewer": "text",
     "renderers": [],
-    "sorters": [
-      "*"
-    ]
+    "sorters": ["*"]
   }
 }

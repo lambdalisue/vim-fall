@@ -3,9 +3,6 @@
   "action": {
     "open": {
       "url": "fallbuiltin://action/open.ts"
-    },
-    "fall-extension-install": {
-      "url": "fallbuiltin://action/fall_extension_install.ts"
     }
   },
   "filter": {
@@ -44,26 +41,6 @@
   "source": {
     "file": {
       "url": "fallbuiltin://source/file.ts"
-    },
-    "fall-catalog": {
-      "url": "fallbuiltin://source/fall_catalog.ts",
-      "variants": {
-        "action": {
-          "kind": "action"
-        },
-        "previewer": {
-          "kind": "previewer"
-        },
-        "processor": {
-          "kind": "processor"
-        },
-        "renderer": {
-          "kind": "renderer"
-        },
-        "source": {
-          "kind": "source"
-        }
-      }
     }
   }
 }
