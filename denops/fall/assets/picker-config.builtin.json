@@ -23,14 +23,14 @@
         "fall-extension-install": "install"
       },
       "defaultAction": "fall-extension-install",
-      "previewer": "deno-doc-module"
+      "previewer": "text"
     }
   },
   "action": {
     "filters": [
       "*"
     ],
-    "previewer": "deno-doc-module",
+    "previewer": "text",
     "renderers": [],
     "sorters": [
       "*"

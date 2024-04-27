@@ -28,12 +28,6 @@
   "previewer": {
     "text": {
       "url": "fallbuiltin://previewer/text.ts"
-    },
-    "deno-doc": {
-      "url": "fallbuiltin://previewer/deno_doc.ts"
-    },
-    "deno-doc-module": {
-      "url": "fallbuiltin://previewer/deno_doc_module.ts"
     }
   },
   "renderer": {},
