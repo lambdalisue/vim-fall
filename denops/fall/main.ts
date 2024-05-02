@@ -8,7 +8,7 @@ import { unreachable } from "https://deno.land/x/errorutil@v0.1.1/mod.ts";
 
 import { init } from "./main/init.ts";
 import { dispatch, isFallEventName } from "./util/event.ts";
-import { isStartOptions, start } from "./main/start.ts";
+import { isSourceOptions, isStartOptions, start } from "./main/start.ts";
 import {
   editExtensionConfig,
   editPickerConfig,
@@ -28,13 +28,14 @@ export function main(denops: Denops): void {
       dispatch(ensure(name, isFallEventName), data);
       return Promise.resolve();
     },
-    "start": async (name, args, options) => {
+    "start": async (name, cmdline, sourceOptions, startOptions) => {
       await init(denops);
       await start(
         denops,
         ensure(name, is.String),
-        ensure(args, is.ArrayOf(is.String)),
-        ensure(options, is.OptionalOf(isStartOptions)),
+        ensure(cmdline, is.String),
+        ensure(sourceOptions ?? {}, isSourceOptions),
+        ensure(startOptions ?? {}, isStartOptions),
       );
     },
     "reloadConfig": async (type) => {

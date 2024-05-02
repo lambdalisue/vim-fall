@@ -7,7 +7,7 @@ import type {
   Item,
   Renderer,
   RendererItem,
-} from "https://deno.land/x/fall_core@v0.6.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.7.0/mod.ts";
 import { equal } from "https://deno.land/std@0.203.0/assert/equal.ts";
 
 import { calcScrollOffset } from "../util/scrolloffset.ts";

@@ -14,7 +14,8 @@ import type {
   Renderer,
   Sorter,
   Source,
-} from "https://deno.land/x/fall_core@v0.6.0/mod.ts";
+  SourceOptions,
+} from "https://deno.land/x/fall_core@v0.7.0/mod.ts";
 
 import { any, isDefined } from "../../util/collection.ts";
 import { startAsyncScheduler } from "../../util/async_scheduler.ts";
@@ -84,17 +85,18 @@ export class SourcePicker implements AsyncDisposable {
 
   static async create(
     denops: Denops,
-    args: string[],
+    cmdline: string,
+    sourceOptions: SourceOptions,
     sourceName: string,
     source: Source,
     filters: Map<string, Filter>,
     previewer: Previewer | undefined,
     renderers: Map<string, Renderer>,
     sorters: Map<string, Sorter>,
-    options: SourcePickerOptions,
+    pickerOptions: SourcePickerOptions,
   ): Promise<SourcePicker> {
     const stack = new AsyncDisposableStack();
-    const sourceStream = await source.getStream(denops, ...args);
+    const sourceStream = await source.getStream(denops, cmdline, sourceOptions);
     if (!sourceStream) {
       throw new Error("Failed to get source stream.");
     }
@@ -102,7 +104,8 @@ export class SourcePicker implements AsyncDisposable {
     // Start collecting source items
     const itemCollector = stack.use(
       new ItemCollector(sourceStream, {
-        chunkSize: options.itemCollector?.chunkSize ?? SOURCE_ITEM_CHUNK_SIZE,
+        chunkSize: pickerOptions.itemCollector?.chunkSize ??
+          SOURCE_ITEM_CHUNK_SIZE,
       }),
     );
     itemCollector.start();
@@ -118,18 +121,18 @@ export class SourcePicker implements AsyncDisposable {
     const layout = stack.use(
       await buildLayout(denops, {
         title: ` ${title} `,
-        width: options.layout?.width,
-        widthRatio: options.layout?.widthRatio ?? WIDTH_RATION,
-        widthMin: options.layout?.widthMin ?? WIDTH_MIN,
-        widthMax: options.layout?.widthMax ?? WIDTH_MAX,
-        height: options.layout?.height,
-        heightRatio: options.layout?.heightRatio ?? HEIGHT_RATION,
-        heightMin: options.layout?.heightMin ?? HEIGHT_MIN,
-        heightMax: options.layout?.heightMax ?? HEIGHT_MAX,
-        previewRatio: options.layout?.previewRatio ?? PREVIEW_RATION,
-        border: options.layout?.border,
-        divider: options.layout?.divider,
-        zindex: options.layout?.zindex ?? 50,
+        width: pickerOptions.layout?.width,
+        widthRatio: pickerOptions.layout?.widthRatio ?? WIDTH_RATION,
+        widthMin: pickerOptions.layout?.widthMin ?? WIDTH_MIN,
+        widthMax: pickerOptions.layout?.widthMax ?? WIDTH_MAX,
+        height: pickerOptions.layout?.height,
+        heightRatio: pickerOptions.layout?.heightRatio ?? HEIGHT_RATION,
+        heightMin: pickerOptions.layout?.heightMin ?? HEIGHT_MIN,
+        heightMax: pickerOptions.layout?.heightMax ?? HEIGHT_MAX,
+        previewRatio: pickerOptions.layout?.previewRatio ?? PREVIEW_RATION,
+        border: pickerOptions.layout?.border,
+        divider: pickerOptions.layout?.divider,
+        zindex: pickerOptions.layout?.zindex ?? 50,
       }),
     );
 
@@ -137,7 +140,7 @@ export class SourcePicker implements AsyncDisposable {
       sourceName,
       previewer,
       renderers,
-      options,
+      pickerOptions,
       layout,
       itemCollector,
       itemProcessor,

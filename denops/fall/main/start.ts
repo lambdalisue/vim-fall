@@ -1,10 +1,14 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import { send } from "https://deno.land/x/denops_std@v6.4.0/helper/keymap.ts";
 import { exprQuote as q } from "https://deno.land/x/denops_std@v6.4.0/helper/expr_string.ts";
-import type { Action } from "https://deno.land/x/fall_core@v0.6.0/mod.ts";
+import type {
+  Action,
+  SourceOptions,
+} from "https://deno.land/x/fall_core@v0.7.0/mod.ts";
 import {
   is,
   maybe,
+  type Predicate,
   type PredicateType,
 } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
 
@@ -18,6 +22,11 @@ import {
   getExtensionConfig,
   getSourcePickerConfig,
 } from "./config.ts";
+
+export const isSourceOptions = is.RecordOf(
+  is.Unknown,
+  is.String,
+) satisfies Predicate<SourceOptions>;
 
 export const isStartOptions = is.PartialOf(is.ObjectOf({
   filters: is.ArrayOf(is.String),
@@ -36,13 +45,14 @@ export type StartOptions = PredicateType<typeof isStartOptions>;
 export async function start(
   denops: Denops,
   name: string,
-  args: string[],
-  options: StartOptions & { signal?: AbortSignal } = {},
+  cmdline: string,
+  sourceOptions: SourceOptions,
+  startOptions: StartOptions & { signal?: AbortSignal } = {},
 ): Promise<void> {
   await using stack = new AsyncDisposableStack();
   const controller = new AbortController();
   const signal = AbortSignal.any(
-    [controller.signal, options.signal].filter(isDefined),
+    [controller.signal, startOptions.signal].filter(isDefined),
   );
   stack.defer(() => {
     try {
@@ -61,12 +71,12 @@ export async function start(
   }
   const previewer = await loadExtension(
     "previewer",
-    options.previewer ?? itemsPickerConfig.previewer ?? "",
+    startOptions.previewer ?? itemsPickerConfig.previewer ?? "",
     extensionConfig,
   );
   const actionPreviewer = await loadExtension(
     "previewer",
-    options.actionPreviewer ?? actionPickerConfig.previewer ?? "",
+    startOptions.actionPreviewer ?? actionPickerConfig.previewer ?? "",
     extensionConfig,
   );
   const [
@@ -80,37 +90,37 @@ export async function start(
   ] = await Promise.all([
     loadExtensions(
       "action",
-      options.actions ?? itemsPickerConfig.actions ?? [],
+      startOptions.actions ?? itemsPickerConfig.actions ?? [],
       extensionConfig,
     ),
     loadExtensions(
       "filter",
-      options.filters ?? itemsPickerConfig.filters ?? [],
+      startOptions.filters ?? itemsPickerConfig.filters ?? [],
       extensionConfig,
     ),
     loadExtensions(
       "renderer",
-      options.renderers ?? itemsPickerConfig.renderers ?? [],
+      startOptions.renderers ?? itemsPickerConfig.renderers ?? [],
       extensionConfig,
     ),
     loadExtensions(
       "sorter",
-      options.sorters ?? itemsPickerConfig.sorters ?? [],
+      startOptions.sorters ?? itemsPickerConfig.sorters ?? [],
       extensionConfig,
     ),
     loadExtensions(
       "filter",
-      options.actionFilters ?? actionPickerConfig.filters ?? [],
+      startOptions.actionFilters ?? actionPickerConfig.filters ?? [],
       extensionConfig,
     ),
     loadExtensions(
       "renderer",
-      options.actionRenderers ?? actionPickerConfig.renderers ?? [],
+      startOptions.actionRenderers ?? actionPickerConfig.renderers ?? [],
       extensionConfig,
     ),
     loadExtensions(
       "sorter",
-      options.actionSorters ?? actionPickerConfig.sorters ?? [],
+      startOptions.actionSorters ?? actionPickerConfig.sorters ?? [],
       extensionConfig,
     ),
   ]);
@@ -127,7 +137,8 @@ export async function start(
 
   await using itemsPicker = await SourcePicker.create(
     denops,
-    args,
+    cmdline,
+    sourceOptions,
     name,
     source,
     filters,

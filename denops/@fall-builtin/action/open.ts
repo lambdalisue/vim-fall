@@ -7,7 +7,7 @@
  *
  * @module
  */
-import type { Action } from "https://deno.land/x/fall_core@v0.6.0/mod.ts";
+import type { Action } from "https://deno.land/x/fall_core@v0.7.0/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import { assert, is } from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";

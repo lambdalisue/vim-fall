@@ -3,7 +3,7 @@ import type {
   Filter,
   Item,
   Sorter,
-} from "https://deno.land/x/fall_core@v0.6.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.7.0/mod.ts";
 
 import { dispatch } from "../../util/event.ts";
 
