@@ -4,7 +4,7 @@ function! fall#command#Fall#call(qargs) abort
   const l:cmdline = join(l:args, ' ')
   call denops#plugin#wait_async(
         \ 'fall',
-        \ { -> denops#notify('fall', 'start', [l:name, l:cmdline]) },
+        \ { -> denops#notify('fall', 'picker:start', [l:name, l:cmdline]) },
         \)
 endfunction
 

@@ -12,17 +12,17 @@ import "./polyfill.ts";
 
 export async function main(denops: Denops): Promise<void> {
   denops.dispatcher = {
-    "dispatch": (name, data) => {
+    "event:dispatch": (name, data) => {
       dispatch(ensure(name, isFallEventName), data);
     },
-    "start": async (name, cmdline) => {
+    "picker:start": async (name, cmdline) => {
       await start(
         denops,
         ensure(name, is.String),
         ensure(cmdline, is.String),
       );
     },
-    "editConfig": async () => {
+    "config:edit": async () => {
       const configPath = await getConfigPath(denops);
       await editConfig(denops, configPath);
     },

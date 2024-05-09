@@ -96,7 +96,7 @@ cnoremap <silent> <Plug>(fall-preview-prev-scroll) <Cmd>call <SID>dispatch('prev
 
 function! s:dispatch(name, ...) abort
   const l:args = a:0 ? [a:name, a:1] : [a:name]
-  call denops#notify('fall', 'dispatch', l:args)
+  call denops#notify('fall', 'event:dispatch', l:args)
 endfunction
 
 function! s:selector_scroll() abort

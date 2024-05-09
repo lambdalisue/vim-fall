@@ -1,7 +1,7 @@
 function! fall#command#FallConfig#call() abort
   call denops#plugin#wait_async(
         \ 'fall',
-        \ { -> denops#notify('fall', 'editConfig', []) },
+        \ { -> denops#notify('fall', 'config:edit', []) },
         \)
 endfunction
 
