@@ -54,26 +54,38 @@ export async function start(
   const spc = getSourcePickerConfig(expr, conf);
   const apc = getActionPickerConfig(expr, conf);
   const actions = new Map(
-    (spc.actions ?? defaultActions).map((
-      v,
-    ) => [v, extension.getAction(v, conf)]),
+    (spc.actions ?? defaultActions)
+      .map((v) => {
+        const ext = extension.getAction(v, conf);
+        if (!ext) return;
+        return [v, ext] as const;
+      })
+      .filter(isDefined),
   );
   const filters = (spc.filters ?? defaultFilters)
-    .map((v) => extension.getFilter(v, conf));
+    .map((v) => extension.getFilter(v, conf))
+    .filter(isDefined);
   const sorters = (spc.sorters ?? defaultSorters)
-    .map((v) => extension.getSorter(v, conf));
+    .map((v) => extension.getSorter(v, conf))
+    .filter(isDefined);
   const renderers = (spc.renderers ?? defaultRenderers)
-    .map((v) => extension.getRenderer(v, conf));
+    .map((v) => extension.getRenderer(v, conf))
+    .filter(isDefined);
   const previewers = (spc.previewers ?? defaultPreviewers)
-    .map((v) => extension.getPreviewer(v, conf));
+    .map((v) => extension.getPreviewer(v, conf))
+    .filter(isDefined);
   const actionFilters = (apc.filters ?? defaultActionFilters)
-    .map((v) => extension.getFilter(v, conf));
+    .map((v) => extension.getFilter(v, conf))
+    .filter(isDefined);
   const actionSorters = (apc.sorters ?? defaultActionSorters)
-    .map((v) => extension.getSorter(v, conf));
+    .map((v) => extension.getSorter(v, conf))
+    .filter(isDefined);
   const actionRenderers = (apc.renderers ?? defaultActionRenderers)
-    .map((v) => extension.getRenderer(v, conf));
+    .map((v) => extension.getRenderer(v, conf))
+    .filter(isDefined);
   const actionPreviewers = (apc.previewers ?? defaultActionPreviewers)
-    .map((v) => extension.getPreviewer(v, conf));
+    .map((v) => extension.getPreviewer(v, conf))
+    .filter(isDefined);
 
   await using itemsPicker = await SourcePicker.create(
     denops,

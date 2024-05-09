@@ -71,56 +71,83 @@ export async function register(name: string, script: string): Promise<void> {
   }
 }
 
-export function getSource(expr: string, conf: Config): Source {
-  const [name] = expr.split(":", 1);
-  const mod = registry.source.get(name);
-  if (!mod) {
-    throw new Error(`No source '${name}' is registered`);
+export function getSource(expr: string, conf: Config): Source | undefined {
+  try {
+    const [name] = expr.split(":", 1);
+    const mod = registry.source.get(name);
+    if (!mod) {
+      throw new Error(`No source '${name}' is registered`);
+    }
+    return mod.getSource(config.getSourceOptions(expr, conf));
+  } catch (err) {
+    console.error(`[fall] ${err.message ?? err}`);
   }
-  return mod.getSource(config.getSourceOptions(expr, conf));
 }
 
-export function getFilter(expr: string, conf: Config): Filter {
-  const [name] = expr.split(":", 1);
-  const mod = registry.filter.get(name);
-  if (!mod) {
-    throw new Error(`No filter '${name}' is registered`);
+export function getFilter(expr: string, conf: Config): Filter | undefined {
+  try {
+    const [name] = expr.split(":", 1);
+    const mod = registry.filter.get(name);
+    if (!mod) {
+      throw new Error(`No filter '${name}' is registered`);
+    }
+    return mod.getFilter(config.getFilterOptions(expr, conf));
+  } catch (err) {
+    console.warn(`[fall] ${err.message ?? err}`);
   }
-  return mod.getFilter(config.getFilterOptions(expr, conf));
 }
 
-export function getSorter(expr: string, conf: Config): Sorter {
-  const [name] = expr.split(":", 1);
-  const mod = registry.sorter.get(name);
-  if (!mod) {
-    throw new Error(`No sorter '${name}' is registered`);
+export function getSorter(expr: string, conf: Config): Sorter | undefined {
+  try {
+    const [name] = expr.split(":", 1);
+    const mod = registry.sorter.get(name);
+    if (!mod) {
+      throw new Error(`No sorter '${name}' is registered`);
+    }
+    return mod.getSorter(config.getSorterOptions(expr, conf));
+  } catch (err) {
+    console.warn(`[fall] ${err.message ?? err}`);
   }
-  return mod.getSorter(config.getSorterOptions(expr, conf));
 }
 
-export function getRenderer(expr: string, conf: Config): Renderer {
-  const [name] = expr.split(":", 1);
-  const mod = registry.renderer.get(name);
-  if (!mod) {
-    throw new Error(`No renderer '${name}' is registered`);
+export function getRenderer(expr: string, conf: Config): Renderer | undefined {
+  try {
+    const [name] = expr.split(":", 1);
+    const mod = registry.renderer.get(name);
+    if (!mod) {
+      throw new Error(`No renderer '${name}' is registered`);
+    }
+    return mod.getRenderer(config.getRendererOptions(expr, conf));
+  } catch (err) {
+    console.warn(`[fall] ${err.message ?? err}`);
   }
-  return mod.getRenderer(config.getRendererOptions(expr, conf));
 }
 
-export function getPreviewer(expr: string, conf: Config): Previewer {
-  const [name] = expr.split(":", 1);
-  const mod = registry.previewer.get(name);
-  if (!mod) {
-    throw new Error(`No previewer '${name}' is registered`);
+export function getPreviewer(
+  expr: string,
+  conf: Config,
+): Previewer | undefined {
+  try {
+    const [name] = expr.split(":", 1);
+    const mod = registry.previewer.get(name);
+    if (!mod) {
+      throw new Error(`No previewer '${name}' is registered`);
+    }
+    return mod.getPreviewer(config.getPreviewerOptions(expr, conf));
+  } catch (err) {
+    console.warn(`[fall] ${err.message ?? err}`);
   }
-  return mod.getPreviewer(config.getPreviewerOptions(expr, conf));
 }
 
-export function getAction(expr: string, conf: Config): Action {
-  const [name] = expr.split(":", 1);
-  const mod = registry.action.get(name);
-  if (!mod) {
-    throw new Error(`No action '${name}' is registered`);
+export function getAction(expr: string, conf: Config): Action | undefined {
+  try {
+    const [name] = expr.split(":", 1);
+    const mod = registry.action.get(name);
+    if (!mod) {
+      throw new Error(`No action '${name}' is registered`);
+    }
+    return mod.getAction(config.getActionOptions(expr, conf));
+  } catch (err) {
+    console.warn(`[fall] ${err.message ?? err}`);
   }
-  return mod.getAction(config.getActionOptions(expr, conf));
 }
