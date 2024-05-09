@@ -6,7 +6,6 @@ import {
   batch,
   collect,
 } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
-import * as popup from "https://deno.land/x/denops_std@v6.4.0/popup/mod.ts";
 import type {
   Filter,
   Item,
@@ -14,8 +13,7 @@ import type {
   Renderer,
   Sorter,
   Source,
-  SourceOptions,
-} from "https://deno.land/x/fall_core@v0.7.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
 
 import { any, isDefined } from "../../util/collection.ts";
 import { startAsyncScheduler } from "../../util/async_scheduler.ts";
@@ -54,9 +52,8 @@ export class SourcePicker implements AsyncDisposable {
   #index = 0;
   #selected: Set<unknown> = new Set();
 
-  #sourceName: string;
-  #previewer: Previewer | undefined;
-  #renderers: Map<string, Renderer>;
+  #renderers: Renderer[];
+  #previewers: Previewer[];
   #options: SourcePickerOptions;
   #layout: Layout;
   #itemCollector: ItemCollector;
@@ -64,18 +61,16 @@ export class SourcePicker implements AsyncDisposable {
   #disposable: AsyncDisposableStack;
 
   private constructor(
-    sourceName: string,
-    previewer: Previewer | undefined,
-    renderers: Map<string, Renderer>,
+    renderers: Renderer[],
+    previewers: Previewer[],
     options: SourcePickerOptions,
     layout: Layout,
     itemCollector: ItemCollector,
     itemProcessor: ItemProcessor,
     disposable: AsyncDisposableStack,
   ) {
-    this.#sourceName = sourceName;
     this.#renderers = renderers;
-    this.#previewer = previewer;
+    this.#previewers = previewers;
     this.#options = options;
     this.#layout = layout;
     this.#itemCollector = itemCollector;
@@ -86,17 +81,16 @@ export class SourcePicker implements AsyncDisposable {
   static async create(
     denops: Denops,
     cmdline: string,
-    sourceOptions: SourceOptions,
-    sourceName: string,
+    title: string,
     source: Source,
-    filters: Map<string, Filter>,
-    previewer: Previewer | undefined,
-    renderers: Map<string, Renderer>,
-    sorters: Map<string, Sorter>,
+    filters: Filter[],
+    sorters: Sorter[],
+    renderers: Renderer[],
+    previewers: Previewer[],
     pickerOptions: SourcePickerOptions,
   ): Promise<SourcePicker> {
     const stack = new AsyncDisposableStack();
-    const sourceStream = await source.getStream(denops, cmdline, sourceOptions);
+    const sourceStream = await source.getStream(denops, cmdline);
     if (!sourceStream) {
       throw new Error("Failed to get source stream.");
     }
@@ -113,14 +107,9 @@ export class SourcePicker implements AsyncDisposable {
     const itemProcessor = stack.use(new ItemProcessor(filters, sorters));
 
     // Build layout
-    const title = [
-      sourceName,
-      itemProcessor.filterName,
-      itemProcessor.sorterName,
-    ].join(" / ");
     const layout = stack.use(
       await buildLayout(denops, {
-        title: ` ${title} `,
+        title,
         width: pickerOptions.layout?.width,
         widthRatio: pickerOptions.layout?.widthRatio ?? WIDTH_RATION,
         widthMin: pickerOptions.layout?.widthMin ?? WIDTH_MIN,
@@ -137,23 +126,14 @@ export class SourcePicker implements AsyncDisposable {
     );
 
     return new SourcePicker(
-      sourceName,
-      previewer,
       renderers,
+      previewers,
       pickerOptions,
       layout,
       itemCollector,
       itemProcessor,
       stack.move(),
     );
-  }
-
-  get #title(): string {
-    return [
-      this.#sourceName,
-      this.#itemProcessor.filterName,
-      this.#itemProcessor.sorterName,
-    ].join(" / ");
   }
 
   get collectedItems(): Item[] {
@@ -244,7 +224,7 @@ export class SourcePicker implements AsyncDisposable {
       this.#layout.preview.bufnr,
       this.#layout.preview.winid,
       {
-        previewer: this.#previewer,
+        previewers: this.#previewers,
         debounceWait: this.#options.preview?.debounceWait ??
           PREVIEW_DEBOUNCE_WAIT,
       },
@@ -278,38 +258,6 @@ export class SourcePicker implements AsyncDisposable {
     }));
     stack.use(subscribe("item-processor-failed", () => {
       prompt.processing = "failed";
-    }));
-    stack.use(subscribe("item-processor-filter-prev", () => {
-      this.#itemProcessor.filterIndex -= 1;
-      popup.config(denops, this.#layout.prompt.winid, {
-        title: ` ${this.#title} `,
-      }).catch((err) => {
-        console.warn(`[fall] Failed to set popup config: ${err}`);
-      });
-    }));
-    stack.use(subscribe("item-processor-filter-next", () => {
-      this.#itemProcessor.filterIndex += 1;
-      popup.config(denops, this.#layout.prompt.winid, {
-        title: ` ${this.#title} `,
-      }).catch((err) => {
-        console.warn(`[fall] Failed to set popup config: ${err}`);
-      });
-    }));
-    stack.use(subscribe("item-processor-sorter-prev", () => {
-      this.#itemProcessor.sorterIndex -= 1;
-      popup.config(denops, this.#layout.prompt.winid, {
-        title: ` ${this.#title} `,
-      }).catch((err) => {
-        console.warn(`[fall] Failed to set popup config: ${err}`);
-      });
-    }));
-    stack.use(subscribe("item-processor-sorter-next", () => {
-      this.#itemProcessor.sorterIndex += 1;
-      popup.config(denops, this.#layout.prompt.winid, {
-        title: ` ${this.#title} `,
-      }).catch((err) => {
-        console.warn(`[fall] Failed to set popup config: ${err}`);
-      });
     }));
     stack.use(subscribe("cmdline-changed", (cmdline) => {
       this.#query = cmdline;

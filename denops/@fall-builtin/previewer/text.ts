@@ -1,14 +1,10 @@
-import type { Previewer } from "https://deno.land/x/fall_core@v0.7.0/mod.ts";
+import type { Previewer } from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import { batch } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
-import { basename } from "https://deno.land/std@0.218.2/path/basename.ts";
-import {
-  assert,
-  is,
-  type PredicateType,
-} from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
+import { basename } from "jsr:@std/path@0.225.0/basename";
+import { assert, is, type PredicateType } from "jsr:@core/unknownutil@3.18.0";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({})));
 

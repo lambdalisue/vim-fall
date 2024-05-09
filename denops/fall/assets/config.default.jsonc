@@ -1,0 +1,58 @@
+{
+  "$schema": "https://vim-fall.github.io/jsonschema/v1alpha/config.schema.json",
+  "picker": {
+    "source": {
+      "": {
+        "filters": [
+          "substring"
+        ],
+        "sorters": [
+          "lexical"
+        ],
+        "renderers": [],
+        "previewers": [
+          "text"
+        ],
+        "actions": [
+          "open",
+          "open:split",
+          "open:vsplit",
+          "debug",
+          "qf",
+          "qf:loclist"
+        ],
+        "defaultAction": "open"
+      },
+      "line": {
+        "sorters": []
+      }
+    },
+    "action": {
+      "": {
+        "filters": [
+          "substring"
+        ],
+        "sorters": [
+          "lexical"
+        ],
+        "renderers": [],
+        "previewers": [
+          "text"
+        ]
+      }
+    }
+  },
+  "source": {},
+  "filter": {},
+  "sorter": {},
+  "renderer": {},
+  "previewer": {},
+  "action": {
+    "open:split": {
+      "opener": "split"
+    },
+    "open:vsplit": {
+      "opener": "vsplit"
+    }
+  }
+}

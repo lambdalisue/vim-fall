@@ -7,8 +7,8 @@ import type {
   Item,
   Renderer,
   RendererItem,
-} from "https://deno.land/x/fall_core@v0.7.0/mod.ts";
-import { equal } from "https://deno.land/std@0.203.0/assert/equal.ts";
+} from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
+import { equal } from "jsr:@std/assert@0.225.1/equal";
 
 import { calcScrollOffset } from "../util/scrolloffset.ts";
 import { isDefined } from "../../util/collection.ts";
@@ -17,7 +17,7 @@ export interface SelectorComponentParams {
   scrolloff: number;
   winwidth: number;
   winheight: number;
-  renderers: Map<string, Renderer>;
+  renderers: Renderer[];
 }
 
 /**
@@ -28,7 +28,7 @@ export class SelectorComponent {
   #scrolloff: number;
   #winwidth: number;
   #winheight: number;
-  #renderers: Map<string, Renderer>;
+  #renderers: Renderer[];
 
   #offset: number = 0;
 
@@ -194,25 +194,27 @@ export class SelectorComponent {
 async function applyRenderers(
   denops: Denops,
   items: RendererItem[],
-  renderers: Map<string, Renderer>,
+  renderers: Renderer[],
   params: { width: number },
   { signal }: { signal: AbortSignal },
 ): Promise<RendererItem[]> {
   const size = items.length;
   if (size === 0) return [];
-  for (const [name, renderer] of renderers.entries()) {
+  for (
+    const [index, renderer] of renderers.map((v, index) => [index, v] as const)
+  ) {
     try {
       const newItems = await renderer.render(denops, items, params, { signal });
       if (newItems.length !== size) {
         console.warn(
-          `[fall] Renderer ${name} returned different size of items. Ignore.`,
+          `[fall] Renderer ${index} returned different size of items. Ignore.`,
         );
         continue;
       }
       items = newItems;
     } catch (err) {
       // Fail silently
-      console.debug(`[fall] Failed to apply renderer ${name}: ${err}`);
+      console.debug(`[fall] Failed to apply renderer ${index}: ${err}`);
     }
   }
   return items;

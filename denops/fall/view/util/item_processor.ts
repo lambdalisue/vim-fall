@@ -3,7 +3,7 @@ import type {
   Filter,
   Item,
   Sorter,
-} from "https://deno.land/x/fall_core@v0.7.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
 
 import { dispatch } from "../../util/event.ts";
 
@@ -12,16 +12,14 @@ import { dispatch } from "../../util/event.ts";
  */
 export class ItemProcessor implements Disposable {
   #controller: AbortController = new AbortController();
-  #filters: [string, Filter][];
-  #sorters: [string, Sorter][];
+  #filters: Filter[];
+  #sorters: Sorter[];
 
   #items: Item[] = [];
-  #filterIndex = 0;
-  #sorterIndex = 0;
 
-  constructor(filters: Map<string, Filter>, sorters: Map<string, Sorter>) {
-    this.#filters = [...filters.entries()];
-    this.#sorters = [...sorters.entries()];
+  constructor(filters: Filter[], sorters: Sorter[]) {
+    this.#filters = filters;
+    this.#sorters = sorters;
   }
 
   /**
@@ -29,64 +27,6 @@ export class ItemProcessor implements Disposable {
    */
   get items(): Item[] {
     return this.#items;
-  }
-
-  /**
-   * Current filter index
-   */
-  get filterIndex(): number {
-    return this.#filterIndex;
-  }
-
-  set filterIndex(value: number) {
-    this.#filterIndex = value % this.#filters.length;
-  }
-
-  /**
-   * Current filter
-   *
-   * Returns `undefined` if no filter is available.
-   */
-  get filter(): Filter | undefined {
-    return this.#filters.at(this.#filterIndex)?.[1];
-  }
-
-  /**
-   * Name of the current filter
-   *
-   * Returns `undefined` if no filter is available.
-   */
-  get filterName(): string | undefined {
-    return this.#filters.at(this.#filterIndex)?.[0];
-  }
-
-  /**
-   * Current sorter index
-   */
-  get sorterIndex(): number {
-    return this.#sorterIndex;
-  }
-
-  set sorterIndex(value: number) {
-    this.#sorterIndex = value % this.#sorters.length;
-  }
-
-  /**
-   * Current sorter
-   *
-   * Returns `undefined` if no sorter is available.
-   */
-  get sorter(): Sorter | undefined {
-    return this.#sorters.at(this.#sorterIndex)?.[1];
-  }
-
-  /**
-   * Name of the current sorter
-   *
-   * Returns `undefined` if no sorter is available.
-   */
-  get sorterName(): string | undefined {
-    return this.#sorters.at(this.#sorterIndex)?.[0];
   }
 
   /**
@@ -110,13 +50,16 @@ export class ItemProcessor implements Disposable {
 
     const { signal } = this.#controller;
     const inner = async () => {
-      // TODO: Pass 'signal'
-      const filter = await this.filter?.getStream(denops, query, { signal });
       if (signal.aborted) return;
 
-      const stream = filter
-        ? ReadableStream.from(items).pipeThrough(filter, { signal })
-        : ReadableStream.from(items);
+      let stream = ReadableStream.from(items);
+      for (const filter of this.#filters) {
+        const transform = await filter.getStream(denops, query, { signal });
+        if (transform) {
+          stream = stream.pipeThrough(transform, { signal });
+        }
+      }
+
       const filteredItems: Item[] = [];
       await stream.pipeTo(
         new WritableStream({
@@ -128,10 +71,10 @@ export class ItemProcessor implements Disposable {
       );
       if (signal.aborted) return;
 
-      const processedItems = this.sorter
-        // TODO: Pass 'signal'
-        ? await this.sorter.sort(denops, filteredItems, { signal })
-        : filteredItems;
+      let processedItems = [...filteredItems];
+      for (const sorter of this.#sorters) {
+        processedItems = await sorter.sort(denops, processedItems, { signal });
+      }
       this.#items = processedItems;
       dispatch("item-processor-succeeded", undefined);
     };

@@ -9,9 +9,13 @@ export function getSorter(
   options: Record<string, unknown>,
 ): Sorter {
   assert(options, isOptions);
+  const alpha = options.reverse ? -1 : 1;
   return {
     sort: (_denops, items) => {
-      return options.reverse ? items.reverse() : items;
+      items.sort((a, b) => {
+        return a.value.localeCompare(b.value) * alpha;
+      });
+      return items;
     },
   };
 }

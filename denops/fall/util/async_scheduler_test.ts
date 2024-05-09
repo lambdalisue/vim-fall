@@ -1,5 +1,5 @@
-import { delay } from "https://deno.land/std@0.218.2/async/mod.ts";
-import { assertEquals } from "https://deno.land/std@0.218.2/assert/mod.ts";
+import { delay } from "jsr:@std/async@0.224.0";
+import { assertEquals } from "jsr:@std/assert@0.225.1";
 import { startAsyncScheduler } from "./async_scheduler.ts";
 
 Deno.test("startAsyncScheduler", async (t) => {

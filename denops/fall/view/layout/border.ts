@@ -1,15 +1,12 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import { collect } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
-import {
-  is,
-  type Predicate,
-} from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
+import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
-export const isBorder: Predicate<Parameters<typeof getBorder>[0]> = is.UnionOf([
+export const isBorder = is.UnionOf([
   is.LiteralOneOf(["none", "ascii", "single", "double", "rounded"] as const),
   is.UniformTupleOf(8, is.String),
-]);
+]) satisfies Predicate<Parameters<typeof getBorder>[0]>;
 
 export type Border = readonly [
   topleft: string,

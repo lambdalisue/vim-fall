@@ -6,12 +6,10 @@ import {
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 import * as popup from "https://deno.land/x/denops_std@v6.4.0/popup/mod.ts";
-import {
-  is,
-  type PredicateType,
-} from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
+import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
 import {
+  type Border,
   BORDER_B,
   BORDER_BL,
   BORDER_BR,
@@ -25,6 +23,7 @@ import {
   isBorder,
 } from "./border.ts";
 import {
+  type Divider,
   DIVIDER_H,
   DIVIDER_L,
   DIVIDER_R,
@@ -33,6 +32,22 @@ import {
   isDivider,
 } from "./divider.ts";
 import { calcProperSize } from "./util.ts";
+
+export type LayoutParams = {
+  title?: string;
+  width?: number;
+  widthRatio: number;
+  widthMin: number;
+  widthMax: number;
+  height?: number;
+  heightRatio: number;
+  heightMin: number;
+  heightMax: number;
+  previewRatio: number;
+  border?: "none" | "ascii" | "single" | "double" | "rounded" | Border;
+  divider?: "none" | "ascii" | "single" | "double" | "dashed" | Divider;
+  zindex?: number;
+};
 
 export const isLayoutParams = is.ObjectOf({
   title: is.OptionalOf(is.String),
@@ -48,9 +63,7 @@ export const isLayoutParams = is.ObjectOf({
   border: is.OptionalOf(isBorder),
   divider: is.OptionalOf(isDivider),
   zindex: is.OptionalOf(is.Number),
-});
-
-export type LayoutParams = PredicateType<typeof isLayoutParams>;
+}) satisfies Predicate<LayoutParams>;
 
 export interface Layout extends AsyncDisposable {
   prompt: popup.PopupWindow;

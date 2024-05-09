@@ -8,13 +8,13 @@ import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import type {
   Previewer,
   PreviewerItem,
-} from "https://deno.land/x/fall_core@v0.7.0/mod.ts";
-import { equal } from "https://deno.land/std@0.203.0/assert/equal.ts";
+} from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
+import { equal } from "jsr:@std/assert@0.225.1/equal";
 
 const DEFAULT_DEBOUNCE_WAIT = 100;
 
 export interface PreviewComponentParams {
-  previewer?: Previewer;
+  previewers?: Previewer[];
   debounceWait?: number;
 }
 
@@ -24,7 +24,7 @@ export interface PreviewComponentParams {
 export class PreviewComponent {
   #bufnr: number;
   #winid: number;
-  #previewer: Previewer | undefined;
+  #previewers: Previewer[];
   #debounceWait: number;
 
   #changedAt: number | undefined;
@@ -38,7 +38,7 @@ export class PreviewComponent {
   ) {
     this.#bufnr = bufnr;
     this.#winid = winid;
-    this.#previewer = params.previewer;
+    this.#previewers = params.previewers ?? [];
     this.#debounceWait = params.debounceWait ?? DEFAULT_DEBOUNCE_WAIT;
   }
 
@@ -75,11 +75,17 @@ export class PreviewComponent {
 
     // Render UI
     try {
-      if (this.#item && this.#previewer) {
-        await this.#previewer.preview(denops, this.#item, {
+      if (this.#item) {
+        const target = {
           bufnr: this.#bufnr,
           winid: this.#winid,
-        }, { signal });
+        };
+        for (const previewer of this.#previewers) {
+          if (await previewer.preview(denops, this.#item, target, { signal })) {
+            continue;
+          }
+          break;
+        }
         // Overwrite buffer local options may configured by ftplugin
         await fn.win_execute(
           denops,

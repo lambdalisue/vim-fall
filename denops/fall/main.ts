@@ -1,71 +1,44 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
-import {
-  assert,
-  ensure,
-  is,
-} from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
-import { unreachable } from "https://deno.land/x/errorutil@v0.1.1/mod.ts";
+import { basename } from "jsr:@std/path@0.225.0/basename";
+import { walk } from "jsr:@std/fs@0.229.0/walk";
+import { ensure, is } from "jsr:@core/unknownutil@3.18.0";
 
-import { init } from "./main/init.ts";
 import { dispatch, isFallEventName } from "./util/event.ts";
-import { isSourceOptions, isStartOptions, start } from "./main/start.ts";
-import {
-  editExtensionConfig,
-  editPickerConfig,
-  reloadExtensionConfig,
-  reloadPickerConfig,
-} from "./main/config.ts";
+import { start } from "./start.ts";
+import { editConfig } from "./config.ts";
+import { register } from "./extension.ts";
 
 import "./polyfill.ts";
 
-const isConfigType = is.LiteralOneOf(
-  ["extension", "picker"] as const,
-);
-
-export function main(denops: Denops): void {
+export async function main(denops: Denops): Promise<void> {
   denops.dispatcher = {
     "dispatch": (name, data) => {
       dispatch(ensure(name, isFallEventName), data);
-      return Promise.resolve();
     },
-    "start": async (name, cmdline, sourceOptions, startOptions) => {
-      await init(denops);
+    "start": async (name, cmdline) => {
       await start(
         denops,
         ensure(name, is.String),
         ensure(cmdline, is.String),
-        ensure(sourceOptions ?? {}, isSourceOptions),
-        ensure(startOptions ?? {}, isStartOptions),
       );
     },
-    "reloadConfig": async (type) => {
-      assert(type, isConfigType);
-      await init(denops);
-      switch (type) {
-        case "extension":
-          await reloadExtensionConfig(denops);
-          break;
-        case "picker":
-          await reloadPickerConfig(denops);
-          break;
-        default:
-          unreachable(type);
-      }
-    },
-    "editConfig": async (type) => {
-      await init(denops);
-      assert(type, isConfigType);
-      await init(denops);
-      switch (type) {
-        case "extension":
-          await editExtensionConfig(denops);
-          break;
-        case "picker":
-          await editPickerConfig(denops);
-          break;
-        default:
-          unreachable(type);
-      }
+    "editConfig": async () => {
+      await editConfig(denops);
     },
   };
+  // Register builtin extensions
+  await registerBuiltinExtensions();
+}
+
+async function registerBuiltinExtensions(): Promise<void> {
+  const promises: Promise<void>[] = [];
+  for await (
+    const entry of walk(new URL("../@fall-builtin/", import.meta.url), {
+      includeDirs: false,
+      match: [/^.*\.ts$/],
+    })
+  ) {
+    promises.push(register(basename(entry.path, ".ts"), entry.path));
+  }
+  await Promise.allSettled(promises);
 }

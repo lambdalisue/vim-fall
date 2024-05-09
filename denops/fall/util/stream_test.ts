@@ -1,4 +1,4 @@
-import { assertEquals } from "https://deno.land/std@0.218.2/assert/mod.ts";
+import { assertEquals } from "jsr:@std/assert@0.225.1";
 import * as stream from "./stream.ts";
 
 Deno.test("ChunkStream", async (t) => {

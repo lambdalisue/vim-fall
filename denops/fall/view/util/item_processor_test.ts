@@ -1,15 +1,14 @@
-import { assertEquals } from "https://deno.land/std@0.218.2/assert/mod.ts";
+import { assertEquals } from "jsr:@std/assert@0.225.1";
 import { DenopsStub } from "https://deno.land/x/denops_test@v1.6.2/mod.ts";
 import type {
   Filter,
   Item,
   Sorter,
-} from "https://deno.land/x/fall_core@v0.7.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
 import { subscribe } from "../../util/event.ts";
 import { ItemProcessor } from "./item_processor.ts";
 
-const testFilters: Map<string, Filter> = new Map([[
-  "testFilter",
+const testFilters: Filter[] = [
   {
     getStream(_denops, query) {
       return new TransformStream({
@@ -23,16 +22,15 @@ const testFilters: Map<string, Filter> = new Map([[
       });
     },
   },
-]]);
+];
 
-const testSorters: Map<string, Sorter> = new Map([[
-  "testSorter",
+const testSorters: Sorter[] = [
   {
     sort(_denops, items) {
       return items.sort((a, b) => -1 * a.value.localeCompare(b.value));
     },
   },
-]]);
+];
 
 Deno.test("ItemProcessor", async (t) => {
   await t.step("process items with given query", async () => {

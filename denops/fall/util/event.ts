@@ -2,7 +2,7 @@ import {
   is,
   type Predicate,
   type PredicateType,
-} from "https://deno.land/x/unknownutil@v3.16.3/mod.ts";
+} from "jsr:@core/unknownutil@3.18.0";
 
 /**
  * Subscribe to an event.
