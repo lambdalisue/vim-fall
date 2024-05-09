@@ -1,9 +1,9 @@
-# 🍂 fall.vim
+# 🍂 fall
 
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![vim help](https://img.shields.io/badge/vim-%3Ah%20fall-orange.svg)](doc/fall.txt)
 
-Fall (_fall.vim_) is an abbreviation for "Filter All," another fuzzy finder
+Fall (_vim-fall_) is an abbreviation for "Filter All," another fuzzy finder
 designed for Vim and Neovim and implemented in [Denops].
 
 **Alpha version. Please note that any changes, including those that may be
