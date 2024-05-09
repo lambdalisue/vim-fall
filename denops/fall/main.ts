@@ -10,6 +10,8 @@ import { register } from "./extension.ts";
 
 import "./polyfill.ts";
 
+const isDefs = is.RecordOf(is.String, is.String);
+
 export async function main(denops: Denops): Promise<void> {
   denops.dispatcher = {
     "event:dispatch": (name, data) => {
@@ -25,6 +27,11 @@ export async function main(denops: Denops): Promise<void> {
     "config:edit": async () => {
       const configPath = await getConfigPath(denops);
       await editConfig(denops, configPath);
+    },
+    "extension:register": async (defs) => {
+      await Promise.allSettled(
+        Object.entries(ensure(defs, isDefs)).map(([k, v]) => register(k, v)),
+      );
     },
   };
   // Register builtin extensions
