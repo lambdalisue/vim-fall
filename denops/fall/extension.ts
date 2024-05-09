@@ -1,3 +1,8 @@
+import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
+import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
+import { walk, WalkError } from "jsr:@std/fs@0.229.0/walk";
+import { join } from "jsr:@std/path@0.225.0/join";
+import { basename } from "jsr:@std/path@0.225.0/basename";
 import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 import type {
   Action,
@@ -48,28 +53,6 @@ const isPreviewerModule = is.ObjectOf({
 const isActionModule = is.ObjectOf({
   getAction: is.Function as Predicate<ActionModule["getAction"]>,
 }) satisfies Predicate<ActionModule>;
-
-export async function register(name: string, script: string): Promise<void> {
-  const mod = await import(script);
-  if (isSourceModule(mod)) {
-    registry.source.set(name, mod);
-  }
-  if (isFilterModule(mod)) {
-    registry.filter.set(name, mod);
-  }
-  if (isSorterModule(mod)) {
-    registry.sorter.set(name, mod);
-  }
-  if (isRendererModule(mod)) {
-    registry.renderer.set(name, mod);
-  }
-  if (isPreviewerModule(mod)) {
-    registry.previewer.set(name, mod);
-  }
-  if (isActionModule(mod)) {
-    registry.action.set(name, mod);
-  }
-}
 
 export function getSource(expr: string, conf: Config): Source | undefined {
   try {
@@ -150,4 +133,51 @@ export function getAction(expr: string, conf: Config): Action | undefined {
   } catch (err) {
     console.warn(`[fall] ${err.message ?? err}`);
   }
+}
+
+export async function register(name: string, script: string): Promise<void> {
+  const mod = await import(script);
+  if (isSourceModule(mod)) {
+    registry.source.set(name, mod);
+  }
+  if (isFilterModule(mod)) {
+    registry.filter.set(name, mod);
+  }
+  if (isSorterModule(mod)) {
+    registry.sorter.set(name, mod);
+  }
+  if (isRendererModule(mod)) {
+    registry.renderer.set(name, mod);
+  }
+  if (isPreviewerModule(mod)) {
+    registry.previewer.set(name, mod);
+  }
+  if (isActionModule(mod)) {
+    registry.action.set(name, mod);
+  }
+}
+
+export async function discover(denops: Denops): Promise<void> {
+  const walkOptions = {
+    includeDirs: false,
+    match: [/.*\.ts/],
+  };
+  const runtimepath = await opt.runtimepath.get(denops);
+  const roots = runtimepath.split(",").map((v) =>
+    join(v, "denops", "@fall-extensions")
+  );
+  const promises: Promise<void>[] = [];
+  for (const root of roots) {
+    try {
+      for await (const { path } of walk(root, walkOptions)) {
+        promises.push(register(basename(path, ".ts"), path));
+      }
+    } catch (err) {
+      if (err instanceof WalkError) {
+        continue;
+      }
+      throw err;
+    }
+  }
+  await Promise.allSettled(promises);
 }
