@@ -222,7 +222,6 @@ export async function loadConfig(configPath: string): Promise<Config> {
     await ensureConfig(configPath);
     const text = await Deno.readTextFile(configPath);
     const data = parseJsonc(text);
-    console.log(data);
     return ensure(data, isConfig);
   } catch (err) {
     if (err instanceof Deno.errors.NotFound) {
