@@ -9,6 +9,9 @@ import { ensureDir } from "jsr:@std/fs@0.229.0/ensure-dir";
 import { copy } from "jsr:@std/fs@0.229.0/copy";
 import { exists } from "jsr:@std/fs@0.229.0/exists";
 import { dirname } from "jsr:@std/path@0.225.0/dirname";
+import type { SourcePickerOptions } from "./view/picker/source.ts";
+import type { ActionPickerOptions } from "./view/picker/action.ts";
+import { isLayoutParams } from "./view/layout/prompt_top_preview_right.ts";
 
 type Options = Record<string, unknown>;
 
@@ -19,6 +22,7 @@ export type SourcePickerConfig = Partial<{
   previewers: string[];
   actions: string[];
   defaultAction: string;
+  options: SourcePickerOptions;
 }>;
 
 export type ActionPickerConfig = Partial<{
@@ -26,6 +30,7 @@ export type ActionPickerConfig = Partial<{
   sorters: string[];
   renderers: string[];
   previewers: string[];
+  options: ActionPickerOptions;
 }>;
 
 export type PickerConfig = Partial<{
@@ -47,6 +52,35 @@ const isOptions = is.RecordOf(is.Unknown, is.String) satisfies Predicate<
   Options
 >;
 
+const isSourcePickerOptions = is.PartialOf(is.ObjectOf({
+  layout: is.PartialOf(isLayoutParams),
+  itemCollector: is.PartialOf(is.ObjectOf({
+    chunkSize: is.Number,
+  })),
+  prompt: is.PartialOf(is.ObjectOf({
+    spinner: is.ArrayOf(is.String),
+    headSymbol: is.String,
+    failSymbol: is.String,
+  })),
+  preview: is.PartialOf(is.ObjectOf({
+    debounceWait: is.Number,
+  })),
+  updateInterval: is.Number,
+})) satisfies Predicate<SourcePickerOptions>;
+
+const isActionPickerOptions = is.PartialOf(is.ObjectOf({
+  layout: is.PartialOf(isLayoutParams),
+  prompt: is.PartialOf(is.ObjectOf({
+    spinner: is.ArrayOf(is.String),
+    headSymbol: is.String,
+    failSymbol: is.String,
+  })),
+  preview: is.PartialOf(is.ObjectOf({
+    debounceWait: is.Number,
+  })),
+  updateInterval: is.Number,
+})) satisfies Predicate<ActionPickerOptions>;
+
 const isSourcePickerConfig = is.PartialOf(is.ObjectOf({
   filters: is.ArrayOf(is.String),
   sorters: is.ArrayOf(is.String),
@@ -54,6 +88,7 @@ const isSourcePickerConfig = is.PartialOf(is.ObjectOf({
   previewers: is.ArrayOf(is.String),
   actions: is.ArrayOf(is.String),
   defaultAction: is.String,
+  options: isSourcePickerOptions,
 })) satisfies Predicate<SourcePickerConfig>;
 
 const isActionPickerConfig = is.PartialOf(is.ObjectOf({
@@ -61,6 +96,7 @@ const isActionPickerConfig = is.PartialOf(is.ObjectOf({
   sorters: is.ArrayOf(is.String),
   renderers: is.ArrayOf(is.String),
   previewers: is.ArrayOf(is.String),
+  options: isActionPickerOptions,
 })) satisfies Predicate<ActionPickerConfig>;
 
 const isPickerConfig = is.PartialOf(is.ObjectOf({
@@ -186,6 +222,7 @@ export async function loadConfig(configPath: string): Promise<Config> {
     await ensureConfig(configPath);
     const text = await Deno.readTextFile(configPath);
     const data = parseJsonc(text);
+    console.log(data);
     return ensure(data, isConfig);
   } catch (err) {
     if (err instanceof Deno.errors.NotFound) {

@@ -9,7 +9,6 @@ import { isDefined } from "./util/collection.ts";
 import { SourcePicker } from "./view/picker/source.ts";
 import { ActionPicker } from "./view/picker/action.ts";
 import {
-  ensureConfig,
   getActionPickerConfig,
   getConfigPath,
   getSourcePickerConfig,
@@ -85,7 +84,7 @@ export async function start(
     sorters,
     renderers,
     previewers,
-    {},
+    spc.options ?? {},
   );
 
   // Listen cursor movement events
@@ -117,7 +116,7 @@ export async function start(
         actionSorters,
         actionRenderers,
         actionPreviewers,
-        {},
+        apc.options ?? {},
       );
       if (await actionPicker.start(denops, { signal })) {
         // Continue
