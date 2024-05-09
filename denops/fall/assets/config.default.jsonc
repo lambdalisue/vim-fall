@@ -18,8 +18,7 @@
           "open:split",
           "open:vsplit",
           "debug",
-          "qf",
-          "qf:loclist"
+          "quickfix"
         ],
         "defaultAction": "open"
       },
