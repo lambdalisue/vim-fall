@@ -5,7 +5,7 @@ import { ensure, is } from "jsr:@core/unknownutil@3.18.0";
 
 import { dispatch, isFallEventName } from "./util/event.ts";
 import { start } from "./start.ts";
-import { editConfig } from "./config.ts";
+import { editConfig, getConfigPath } from "./config.ts";
 import { register } from "./extension.ts";
 
 import "./polyfill.ts";
@@ -23,7 +23,8 @@ export async function main(denops: Denops): Promise<void> {
       );
     },
     "editConfig": async () => {
-      await editConfig(denops);
+      const configPath = await getConfigPath(denops);
+      await editConfig(denops, configPath);
     },
   };
   // Register builtin extensions
