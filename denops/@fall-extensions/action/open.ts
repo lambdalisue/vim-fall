@@ -3,6 +3,12 @@ import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 
+const description = `
+Open the cursor item or selected items.
+
+TODO: Better description.
+`.trim();
+
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
   bang: is.Boolean,
   mods: is.String,
@@ -25,6 +31,8 @@ export const getAction: GetAction = (denops, options) => {
   const firstOpener = options.opener ?? "edit";
   const splitter = options.splitter ?? firstOpener;
   return {
+    description,
+
     async trigger({ cursorItem, selectedItems }, { signal }) {
       if (signal?.aborted) return;
 

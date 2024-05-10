@@ -116,10 +116,12 @@ export class ActionPicker implements AsyncDisposable {
   }
 
   get collectedItems(): Item[] {
-    return [...this.#actions.entries()].map(([k, _v]) => ({
+    return [...this.#actions.entries()].map(([k, v]) => ({
       id: k,
       value: k,
-      detail: {},
+      detail: {
+        content: v.description,
+      },
       decorations: [],
     }));
   }

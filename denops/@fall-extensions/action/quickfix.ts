@@ -2,6 +2,12 @@ import type { GetAction } from "https://deno.land/x/fall_core@v0.10.0/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.3.0/function/mod.ts";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 
+const description = `
+Send the cursor item, selected items, or available items to quickfix.
+
+TODO: Better description.
+`.trim();
+
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
   what: is.PartialOf(is.ObjectOf({
     context: is.Unknown,
@@ -35,6 +41,8 @@ export const getAction: GetAction = (denops, options) => {
   const action = options.action ?? " ";
   const target = options.target ?? "selected-or-cursor";
   return {
+    description,
+
     async trigger({ cursorItem, selectedItems, availableItems }, { signal }) {
       if (signal?.aborted) return;
 
