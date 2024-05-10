@@ -61,6 +61,13 @@ function! s:map_action_picker() abort
   cnoremap <nowait><buffer> <C-d> <Plug>(fall-cursor-next-scroll)
   cnoremap <nowait><buffer> <C-t> <Plug>(fall-cursor-first)
   cnoremap <nowait><buffer> <C-g> <Plug>(fall-cursor-last)
+  " Preview
+  cnoremap <nowait><buffer> <Up> <Plug>(fall-preview-prev)
+  cnoremap <nowait><buffer> <Down> <Plug>(fall-preview-next)
+  cnoremap <nowait><buffer> <PageUp> <Plug>(fall-preview-prev-scroll)
+  cnoremap <nowait><buffer> <PageDown> <Plug>(fall-preview-next-scroll)
+  cnoremap <nowait><buffer> <Home> <Plug>(fall-preview-first)
+  cnoremap <nowait><buffer> <End> <Plug>(fall-preview-last)
 endfunction
 
 function! s:unmap_action_picker() abort
@@ -71,6 +78,13 @@ function! s:unmap_action_picker() abort
   silent cunmap <buffer> <C-d>
   silent cunmap <buffer> <C-t>
   silent cunmap <buffer> <C-g>
+  " Preview
+  silent cunmap <buffer> <Up>
+  silent cunmap <buffer> <Down>
+  silent cunmap <buffer> <Home>
+  silent cunmap <buffer> <End>
+  silent cunmap <buffer> <PageUp>
+  silent cunmap <buffer> <PageDown>
 endfunction
 
 " Cursor
