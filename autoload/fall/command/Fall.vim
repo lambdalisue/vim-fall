@@ -9,5 +9,7 @@ function! fall#command#Fall#call(qargs) abort
 endfunction
 
 function! fall#command#Fall#complete(arglead, cmdline, cursorpos) abort
-  return []
+  let l:pattern = printf('\M^%s', escape(a:arglead, '^$~.*[]\'))
+  let l:sources = denops#request('fall', 'extension:list', ['source'])
+  return filter(l:sources, { _, v -> v =~? l:pattern })
 endfunction

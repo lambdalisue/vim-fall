@@ -5,7 +5,7 @@ import { ensure, is } from "jsr:@core/unknownutil@3.18.0";
 import { dispatch, isFallEventName } from "./util/event.ts";
 import { start } from "./start.ts";
 import { editConfig, getConfigPath } from "./config.ts";
-import { discover, register } from "./extension.ts";
+import { discover, list, register } from "./extension.ts";
 
 import "./polyfill.ts";
 
@@ -38,6 +38,9 @@ export async function main(denops: Denops): Promise<void> {
     },
     "extension:discover": async () => {
       await discoverExtensions();
+    },
+    "extension:list": (type) => {
+      return list(ensure(type, is.String));
     },
   };
   await discoverExtensions();

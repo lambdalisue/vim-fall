@@ -193,6 +193,12 @@ export async function getExtensions<T extends Extension>(
   return vs.filter(isDefined);
 }
 
+export function list(
+  type: string,
+): string[] {
+  return [...(registry[type as keyof typeof registry]?.keys() ?? [])];
+}
+
 export async function register(name: string, script: string): Promise<void> {
   const mod = await import(script);
   if (isSourceModule(mod)) {
