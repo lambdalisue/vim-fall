@@ -113,7 +113,7 @@ export async function start(
   await using itemsPicker = await SourcePicker.create(
     denops,
     cmdline,
-    ` ${expr}${cmdline ? cmdline + " " : ""} `,
+    ` ${expr}${cmdline ? " " + cmdline + " " : ""} `,
     source,
     transformers,
     projectors,
