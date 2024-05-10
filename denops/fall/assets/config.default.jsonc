@@ -51,7 +51,7 @@
         ],
         "renderers": [],
         "previewers": [
-          "content:description"
+          "content"
         ],
         "options": {
           "layout": {
@@ -74,11 +74,7 @@
   "transformer": {},
   "projector": {},
   "renderer": {},
-  "previewer": {
-    "content:description": {
-      "contentAttribute": "description"
-    }
-  },
+  "previewer": {},
   "action": {
     "open:split": {
       "opener": "split"
