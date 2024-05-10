@@ -1,4 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
+import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 import { ensure, is } from "jsr:@core/unknownutil@3.18.0";
 
 import { dispatch, isFallEventName } from "./util/event.ts";
@@ -11,6 +12,10 @@ import "./polyfill.ts";
 const isDefs = is.RecordOf(is.String, is.String);
 
 export async function main(denops: Denops): Promise<void> {
+  const discoverExtensions = async () => {
+    const runtimepath = await opt.runtimepath.get(denops);
+    await discover(runtimepath);
+  };
   denops.dispatcher = {
     "event:dispatch": (name, data) => {
       dispatch(ensure(name, isFallEventName), data);
@@ -32,9 +37,8 @@ export async function main(denops: Denops): Promise<void> {
       );
     },
     "extension:discover": async () => {
-      await discover(denops);
+      await discoverExtensions();
     },
   };
-  // Discover extensions
-  await discover(denops);
+  await discoverExtensions();
 }

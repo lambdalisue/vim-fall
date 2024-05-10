@@ -1,5 +1,3 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
-import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 import { walk, WalkError } from "jsr:@std/fs@0.229.0/walk";
 import { join } from "jsr:@std/path@0.225.0/join";
 import { basename } from "jsr:@std/path@0.225.0/basename";
@@ -18,8 +16,15 @@ import type {
   Source,
   SourceModule,
 } from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
-import type { Config } from "./config.ts";
-import * as config from "./config.ts";
+import {
+  type Config,
+  getActionOptions,
+  getFilterOptions,
+  getPreviewerOptions,
+  getRendererOptions,
+  getSorterOptions,
+  getSourceOptions,
+} from "./config.ts";
 
 const registry = {
   source: new Map<string, SourceModule>(),
@@ -54,53 +59,56 @@ const isActionModule = is.ObjectOf({
   getAction: is.Function as Predicate<ActionModule["getAction"]>,
 }) satisfies Predicate<ActionModule>;
 
-export function getSource(expr: string, conf: Config): Source | undefined {
+export function getSource(expr: string, config: Config): Source | undefined {
   try {
     const [name] = expr.split(":", 1);
     const mod = registry.source.get(name);
     if (!mod) {
       throw new Error(`No source '${name}' is registered`);
     }
-    return mod.getSource(config.getSourceOptions(expr, conf));
+    return mod.getSource(getSourceOptions(expr, config));
   } catch (err) {
     console.error(`[fall] ${err.message ?? err}`);
   }
 }
 
-export function getFilter(expr: string, conf: Config): Filter | undefined {
+export function getFilter(expr: string, config: Config): Filter | undefined {
   try {
     const [name] = expr.split(":", 1);
     const mod = registry.filter.get(name);
     if (!mod) {
       throw new Error(`No filter '${name}' is registered`);
     }
-    return mod.getFilter(config.getFilterOptions(expr, conf));
+    return mod.getFilter(getFilterOptions(expr, config));
   } catch (err) {
     console.warn(`[fall] ${err.message ?? err}`);
   }
 }
 
-export function getSorter(expr: string, conf: Config): Sorter | undefined {
+export function getSorter(expr: string, config: Config): Sorter | undefined {
   try {
     const [name] = expr.split(":", 1);
     const mod = registry.sorter.get(name);
     if (!mod) {
       throw new Error(`No sorter '${name}' is registered`);
     }
-    return mod.getSorter(config.getSorterOptions(expr, conf));
+    return mod.getSorter(getSorterOptions(expr, config));
   } catch (err) {
     console.warn(`[fall] ${err.message ?? err}`);
   }
 }
 
-export function getRenderer(expr: string, conf: Config): Renderer | undefined {
+export function getRenderer(
+  expr: string,
+  config: Config,
+): Renderer | undefined {
   try {
     const [name] = expr.split(":", 1);
     const mod = registry.renderer.get(name);
     if (!mod) {
       throw new Error(`No renderer '${name}' is registered`);
     }
-    return mod.getRenderer(config.getRendererOptions(expr, conf));
+    return mod.getRenderer(getRendererOptions(expr, config));
   } catch (err) {
     console.warn(`[fall] ${err.message ?? err}`);
   }
@@ -108,7 +116,7 @@ export function getRenderer(expr: string, conf: Config): Renderer | undefined {
 
 export function getPreviewer(
   expr: string,
-  conf: Config,
+  config: Config,
 ): Previewer | undefined {
   try {
     const [name] = expr.split(":", 1);
@@ -116,20 +124,20 @@ export function getPreviewer(
     if (!mod) {
       throw new Error(`No previewer '${name}' is registered`);
     }
-    return mod.getPreviewer(config.getPreviewerOptions(expr, conf));
+    return mod.getPreviewer(getPreviewerOptions(expr, config));
   } catch (err) {
     console.warn(`[fall] ${err.message ?? err}`);
   }
 }
 
-export function getAction(expr: string, conf: Config): Action | undefined {
+export function getAction(expr: string, config: Config): Action | undefined {
   try {
     const [name] = expr.split(":", 1);
     const mod = registry.action.get(name);
     if (!mod) {
       throw new Error(`No action '${name}' is registered`);
     }
-    return mod.getAction(config.getActionOptions(expr, conf));
+    return mod.getAction(getActionOptions(expr, config));
   } catch (err) {
     console.warn(`[fall] ${err.message ?? err}`);
   }
@@ -157,12 +165,11 @@ export async function register(name: string, script: string): Promise<void> {
   }
 }
 
-export async function discover(denops: Denops): Promise<void> {
+export async function discover(runtimepath: string): Promise<void> {
   const walkOptions = {
     includeDirs: false,
     match: [/.*\.ts/],
   };
-  const runtimepath = await opt.runtimepath.get(denops);
   const roots = runtimepath.split(",").map((v) =>
     join(v, "denops", "@fall-extensions")
   );

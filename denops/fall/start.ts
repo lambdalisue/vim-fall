@@ -46,45 +46,45 @@ export async function start(
   });
 
   const configPath = await getConfigPath(denops);
-  const conf = await loadConfig(configPath);
-  const source = extension.getSource(expr, conf);
+  const config = await loadConfig(configPath);
+  const source = extension.getSource(expr, config);
   if (!source) {
     return;
   }
-  const spc = getSourcePickerConfig(expr, conf);
-  const apc = getActionPickerConfig(expr, conf);
+  const spc = getSourcePickerConfig(expr, config);
+  const apc = getActionPickerConfig(expr, config);
   const actions = new Map(
     (spc.actions ?? defaultActions)
       .map((v) => {
-        const ext = extension.getAction(v, conf);
+        const ext = extension.getAction(v, config);
         if (!ext) return;
         return [v, ext] as const;
       })
       .filter(isDefined),
   );
   const filters = (spc.filters ?? defaultFilters)
-    .map((v) => extension.getFilter(v, conf))
+    .map((v) => extension.getFilter(v, config))
     .filter(isDefined);
   const sorters = (spc.sorters ?? defaultSorters)
-    .map((v) => extension.getSorter(v, conf))
+    .map((v) => extension.getSorter(v, config))
     .filter(isDefined);
   const renderers = (spc.renderers ?? defaultRenderers)
-    .map((v) => extension.getRenderer(v, conf))
+    .map((v) => extension.getRenderer(v, config))
     .filter(isDefined);
   const previewers = (spc.previewers ?? defaultPreviewers)
-    .map((v) => extension.getPreviewer(v, conf))
+    .map((v) => extension.getPreviewer(v, config))
     .filter(isDefined);
   const actionFilters = (apc.filters ?? defaultActionFilters)
-    .map((v) => extension.getFilter(v, conf))
+    .map((v) => extension.getFilter(v, config))
     .filter(isDefined);
   const actionSorters = (apc.sorters ?? defaultActionSorters)
-    .map((v) => extension.getSorter(v, conf))
+    .map((v) => extension.getSorter(v, config))
     .filter(isDefined);
   const actionRenderers = (apc.renderers ?? defaultActionRenderers)
-    .map((v) => extension.getRenderer(v, conf))
+    .map((v) => extension.getRenderer(v, config))
     .filter(isDefined);
   const actionPreviewers = (apc.previewers ?? defaultActionPreviewers)
-    .map((v) => extension.getPreviewer(v, conf))
+    .map((v) => extension.getPreviewer(v, config))
     .filter(isDefined);
 
   await using itemsPicker = await SourcePicker.create(
