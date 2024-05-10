@@ -7,13 +7,13 @@ import {
   collect,
 } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import type {
-  Filter,
   Item,
   Previewer,
+  Projector,
   Renderer,
-  Sorter,
   Source,
-} from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
+  Transformer,
+} from "https://deno.land/x/fall_core@v0.10.0/mod.ts";
 
 import { any, isDefined } from "../../util/collection.ts";
 import { startAsyncScheduler } from "../../util/async_scheduler.ts";
@@ -83,8 +83,8 @@ export class SourcePicker implements AsyncDisposable {
     cmdline: string,
     title: string,
     source: Source,
-    filters: Filter[],
-    sorters: Sorter[],
+    filters: Transformer[],
+    sorters: Projector[],
     renderers: Renderer[],
     previewers: Previewer[],
     pickerOptions: SourcePickerOptions,

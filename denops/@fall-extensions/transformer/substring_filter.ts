@@ -1,7 +1,7 @@
 import type {
-  GetFilter,
+  GetTransformer,
   ItemDecoration,
-} from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.10.0/mod.ts";
 import { collect } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
@@ -11,7 +11,11 @@ const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
   ignoreCase: is.Boolean,
 })));
 
-export const getFilter: GetFilter = (denops, options) => {
+function getByteLength(str: string): number {
+  return new TextEncoder().encode(str).length;
+}
+
+export const getTransformer: GetTransformer = (denops, options) => {
   assert(options, isOptions);
   let flag = options.smartCase === undefined && options.ignoreCase === undefined
     ? "auto"
@@ -21,7 +25,7 @@ export const getFilter: GetFilter = (denops, options) => {
     ? "ignore"
     : "none";
   return {
-    async stream({ query }, { signal }) {
+    async transform({ query }, { signal }) {
       if (signal?.aborted) return;
 
       if (flag === "auto") {
@@ -68,7 +72,3 @@ export const getFilter: GetFilter = (denops, options) => {
     },
   };
 };
-
-function getByteLength(str: string): number {
-  return new TextEncoder().encode(str).length;
-}

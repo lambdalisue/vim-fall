@@ -1,8 +1,8 @@
 import type {
-  Filter,
   Item,
-  Sorter,
-} from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
+  Projector,
+  Transformer,
+} from "https://deno.land/x/fall_core@v0.10.0/mod.ts";
 
 import { dispatch } from "../../util/event.ts";
 
@@ -11,14 +11,14 @@ import { dispatch } from "../../util/event.ts";
  */
 export class ItemProcessor implements Disposable {
   #controller: AbortController = new AbortController();
-  #filters: Filter[];
-  #sorters: Sorter[];
+  #transformers: Transformer[];
+  #projectors: Projector[];
 
   #items: Item[] = [];
 
-  constructor(filters: Filter[], sorters: Sorter[]) {
-    this.#filters = filters;
-    this.#sorters = sorters;
+  constructor(filters: Transformer[], sorters: Projector[]) {
+    this.#transformers = filters;
+    this.#projectors = sorters;
   }
 
   /**
@@ -51,31 +51,34 @@ export class ItemProcessor implements Disposable {
       if (signal.aborted) return;
 
       let stream = ReadableStream.from(items);
-      for (const filter of this.#filters) {
-        const transform = await filter.stream({ query }, { signal });
+      for (const transformer of this.#transformers) {
+        const transform = await transformer.transform({ query }, { signal });
         if (transform) {
           stream = stream.pipeThrough(transform, { signal });
         }
       }
 
-      const filteredItems: Item[] = [];
+      const transformedItems: Item[] = [];
       await stream.pipeTo(
         new WritableStream({
           write: (chunk) => {
-            filteredItems.push(chunk);
+            transformedItems.push(chunk);
           },
         }),
         { signal },
       );
       if (signal.aborted) return;
 
-      let processedItems = [...filteredItems];
-      for (const sorter of this.#sorters) {
-        processedItems = await sorter.sort({ query, items: processedItems }, {
+      let projectedItems = [...transformedItems];
+      for (const projector of this.#projectors) {
+        projectedItems = await projector.project({
+          query,
+          items: projectedItems,
+        }, {
           signal,
         });
       }
-      this.#items = processedItems;
+      this.#items = projectedItems;
       dispatch("item-processor-succeeded", undefined);
     };
     inner()

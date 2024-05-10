@@ -1,15 +1,15 @@
 import { assertEquals } from "jsr:@std/assert@0.225.1";
 import type {
-  Filter,
   Item,
-  Sorter,
-} from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
+  Projector,
+  Transformer,
+} from "https://deno.land/x/fall_core@v0.10.0/mod.ts";
 import { subscribe } from "../../util/event.ts";
 import { ItemProcessor } from "./item_processor.ts";
 
-const testFilters: Filter[] = [
+const testTransformers: Transformer[] = [
   {
-    stream({ query }) {
+    transform({ query }) {
       return new TransformStream({
         transform(chunk, controller) {
           if (chunk.detail.error) {
@@ -23,9 +23,9 @@ const testFilters: Filter[] = [
   },
 ];
 
-const testSorters: Sorter[] = [
+const testProjectors: Projector[] = [
   {
-    sort({ items }) {
+    project({ items }) {
       return items.sort((a, b) => -1 * a.value.localeCompare(b.value));
     },
   },
@@ -46,7 +46,7 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "8", value: "32", detail: {}, decorations: [] },
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
-    await using processor = new ItemProcessor(testFilters, testSorters);
+    await using processor = new ItemProcessor(testTransformers, testProjectors);
     processor.start(items, "2");
     await promise;
     assertEquals(processor.items, [
@@ -74,7 +74,7 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "8", value: "32", detail: {}, decorations: [] },
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
-    await using processor = new ItemProcessor(testFilters, testSorters);
+    await using processor = new ItemProcessor(testTransformers, testProjectors);
     processor.start(items, "2");
     await promise;
     assertEquals(called, true);
@@ -101,7 +101,7 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "8", value: "32", detail: {}, decorations: [] },
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
-    await using processor = new ItemProcessor(testFilters, testSorters);
+    await using processor = new ItemProcessor(testTransformers, testProjectors);
     processor.start(items, "2");
     await promise;
     assertEquals(called, true);

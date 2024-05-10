@@ -5,33 +5,33 @@ import { basename } from "jsr:@std/path@0.225.0/basename";
 import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 import type {
   Action,
-  Filter,
   GetAction,
-  GetFilter,
   GetPreviewer,
+  GetProjector,
   GetRenderer,
-  GetSorter,
   GetSource,
+  GetTransformer,
   Previewer,
+  Projector,
   Renderer,
-  Sorter,
   Source,
-} from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
+  Transformer,
+} from "https://deno.land/x/fall_core@v0.10.0/mod.ts";
 import { isDefined } from "./util/collection.ts";
 import {
   type Config,
   getActionOptions,
-  getFilterOptions,
   getPreviewerOptions,
+  getProjectorOptions,
   getRendererOptions,
-  getSorterOptions,
   getSourceOptions,
+  getTransformerOptions,
 } from "./config.ts";
 
 const registry = {
   source: new Map<string, { getSource: GetSource }>(),
-  filter: new Map<string, { getFilter: GetFilter }>(),
-  sorter: new Map<string, { getSorter: GetSorter }>(),
+  filter: new Map<string, { getTransformer: GetTransformer }>(),
+  sorter: new Map<string, { getProjector: GetProjector }>(),
   renderer: new Map<string, { getRenderer: GetRenderer }>(),
   previewer: new Map<string, { getPreviewer: GetPreviewer }>(),
   action: new Map<string, { getAction: GetAction }>(),
@@ -41,12 +41,12 @@ const isSourceModule = is.ObjectOf({
   getSource: is.Function as Predicate<GetSource>,
 });
 
-const isFilterModule = is.ObjectOf({
-  getFilter: is.Function as Predicate<GetFilter>,
+const isTransformerModule = is.ObjectOf({
+  getTransformer: is.Function as Predicate<GetTransformer>,
 });
 
-const isSorterModule = is.ObjectOf({
-  getSorter: is.Function as Predicate<GetSorter>,
+const isProjectorModule = is.ObjectOf({
+  getProjector: is.Function as Predicate<GetProjector>,
 });
 
 const isRendererModule = is.ObjectOf({
@@ -78,35 +78,38 @@ export async function getSource(
   }
 }
 
-export async function getFilter(
+export async function getTransformer(
   denops: Denops,
   expr: string,
   config: Config,
-): Promise<Filter | undefined> {
+): Promise<Transformer | undefined> {
   try {
     const [name] = expr.split(":", 1);
     const mod = registry.filter.get(name);
     if (!mod) {
       throw new Error(`No filter '${name}' is registered`);
     }
-    return await mod.getFilter(denops, getFilterOptions(expr, config));
+    return await mod.getTransformer(
+      denops,
+      getTransformerOptions(expr, config),
+    );
   } catch (err) {
     console.warn(`[fall] ${err.message ?? err}`);
   }
 }
 
-export async function getSorter(
+export async function getProjector(
   denops: Denops,
   expr: string,
   config: Config,
-): Promise<Sorter | undefined> {
+): Promise<Projector | undefined> {
   try {
     const [name] = expr.split(":", 1);
     const mod = registry.sorter.get(name);
     if (!mod) {
       throw new Error(`No sorter '${name}' is registered`);
     }
-    return await mod.getSorter(denops, getSorterOptions(expr, config));
+    return await mod.getProjector(denops, getProjectorOptions(expr, config));
   } catch (err) {
     console.warn(`[fall] ${err.message ?? err}`);
   }
@@ -165,8 +168,8 @@ export async function getAction(
 
 type Extension =
   | Source
-  | Filter
-  | Sorter
+  | Transformer
+  | Projector
   | Renderer
   | Previewer
   | Action;
@@ -195,10 +198,10 @@ export async function register(name: string, script: string): Promise<void> {
   if (isSourceModule(mod)) {
     registry.source.set(name, mod);
   }
-  if (isFilterModule(mod)) {
+  if (isTransformerModule(mod)) {
     registry.filter.set(name, mod);
   }
-  if (isSorterModule(mod)) {
+  if (isProjectorModule(mod)) {
     registry.sorter.set(name, mod);
   }
   if (isRendererModule(mod)) {

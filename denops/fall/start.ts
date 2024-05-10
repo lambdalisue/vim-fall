@@ -1,7 +1,7 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import { send } from "https://deno.land/x/denops_std@v6.4.0/helper/keymap.ts";
 import { exprQuote as q } from "https://deno.land/x/denops_std@v6.4.0/helper/expr_string.ts";
-import type { Action } from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
+import type { Action } from "https://deno.land/x/fall_core@v0.10.0/mod.ts";
 import { is, maybe } from "jsr:@core/unknownutil@3.18.0";
 
 import { subscribe } from "./util/event.ts";
@@ -17,12 +17,12 @@ import {
 import * as extension from "./extension.ts";
 
 const defaultActions: string[] = ["open"];
-const defaultFilters: string[] = ["substring"];
-const defaultSorters: string[] = ["lexical"];
+const defaultTransformers: string[] = ["substring"];
+const defaultProjectors: string[] = ["lexical"];
 const defaultRenderers: string[] = [];
 const defaultPreviewers: string[] = ["text"];
-const defaultActionFilters: string[] = ["substring"];
-const defaultActionSorters: string[] = [];
+const defaultActionTransformers: string[] = ["substring"];
+const defaultActionProjectors: string[] = [];
 const defaultActionRenderers: string[] = [];
 const defaultActionPreviewers: string[] = ["text"];
 
@@ -61,17 +61,17 @@ export async function start(
       extension.getAction,
     ),
   );
-  const filters = (await extension.getExtensions(
+  const transformers = (await extension.getExtensions(
     denops,
-    spc.filters ?? defaultFilters,
+    spc.transformers ?? defaultTransformers,
     config,
-    extension.getFilter,
+    extension.getTransformer,
   )).map(([_, v]) => v);
-  const sorters = (await extension.getExtensions(
+  const projectors = (await extension.getExtensions(
     denops,
-    spc.sorters ?? defaultSorters,
+    spc.projectors ?? defaultProjectors,
     config,
-    extension.getSorter,
+    extension.getProjector,
   )).map(([_, v]) => v);
   const renderers = (await extension.getExtensions(
     denops,
@@ -85,17 +85,17 @@ export async function start(
     config,
     extension.getPreviewer,
   )).map(([_, v]) => v);
-  const actionFilters = (await extension.getExtensions(
+  const actionTransformers = (await extension.getExtensions(
     denops,
-    apc.filters ?? defaultActionFilters,
+    apc.transformers ?? defaultActionTransformers,
     config,
-    extension.getFilter,
+    extension.getTransformer,
   )).map(([_, v]) => v);
-  const actionSorters = (await extension.getExtensions(
+  const actionProjectors = (await extension.getExtensions(
     denops,
-    apc.sorters ?? defaultActionSorters,
+    apc.projectors ?? defaultActionProjectors,
     config,
-    extension.getSorter,
+    extension.getProjector,
   )).map(([_, v]) => v);
   const actionRenderers = (await extension.getExtensions(
     denops,
@@ -115,8 +115,8 @@ export async function start(
     cmdline,
     ` ${expr}${cmdline ? cmdline + " " : ""} `,
     source,
-    filters,
-    sorters,
+    transformers,
+    projectors,
     renderers,
     previewers,
     spc.options ?? {},
@@ -147,8 +147,8 @@ export async function start(
       await using actionPicker = await ActionPicker.create(
         denops,
         actions,
-        actionFilters,
-        actionSorters,
+        actionTransformers,
+        actionProjectors,
         actionRenderers,
         actionPreviewers,
         apc.options ?? {},

@@ -16,8 +16,8 @@ import { isLayoutParams } from "./view/layout/prompt_top_preview_right.ts";
 type Options = Record<string, unknown>;
 
 export type SourcePickerConfig = Partial<{
-  filters: string[];
-  sorters: string[];
+  transformers: string[];
+  projectors: string[];
   renderers: string[];
   previewers: string[];
   actions: string[];
@@ -26,8 +26,8 @@ export type SourcePickerConfig = Partial<{
 }>;
 
 export type ActionPickerConfig = Partial<{
-  filters: string[];
-  sorters: string[];
+  transformers: string[];
+  projectors: string[];
   renderers: string[];
   previewers: string[];
   options: ActionPickerOptions;
@@ -41,8 +41,8 @@ export type PickerConfig = Partial<{
 export type Config = Partial<{
   picker: PickerConfig;
   source: Partial<Record<string, Options>>;
-  filter: Partial<Record<string, Options>>;
-  sorter: Partial<Record<string, Options>>;
+  transformer: Partial<Record<string, Options>>;
+  projector: Partial<Record<string, Options>>;
   renderer: Partial<Record<string, Options>>;
   previewer: Partial<Record<string, Options>>;
   action: Partial<Record<string, Options>>;
@@ -82,8 +82,8 @@ const isActionPickerOptions = is.PartialOf(is.ObjectOf({
 })) satisfies Predicate<ActionPickerOptions>;
 
 const isSourcePickerConfig = is.PartialOf(is.ObjectOf({
-  filters: is.ArrayOf(is.String),
-  sorters: is.ArrayOf(is.String),
+  transformers: is.ArrayOf(is.String),
+  projectors: is.ArrayOf(is.String),
   renderers: is.ArrayOf(is.String),
   previewers: is.ArrayOf(is.String),
   actions: is.ArrayOf(is.String),
@@ -92,8 +92,8 @@ const isSourcePickerConfig = is.PartialOf(is.ObjectOf({
 })) satisfies Predicate<SourcePickerConfig>;
 
 const isActionPickerConfig = is.PartialOf(is.ObjectOf({
-  filters: is.ArrayOf(is.String),
-  sorters: is.ArrayOf(is.String),
+  transformers: is.ArrayOf(is.String),
+  projectors: is.ArrayOf(is.String),
   renderers: is.ArrayOf(is.String),
   previewers: is.ArrayOf(is.String),
   options: isActionPickerOptions,
@@ -107,8 +107,8 @@ const isPickerConfig = is.PartialOf(is.ObjectOf({
 const isConfig = is.PartialOf(is.ObjectOf({
   picker: isPickerConfig,
   source: is.RecordOf(is.OptionalOf(isOptions), is.String),
-  filter: is.RecordOf(is.OptionalOf(isOptions), is.String),
-  sorter: is.RecordOf(is.OptionalOf(isOptions), is.String),
+  transformer: is.RecordOf(is.OptionalOf(isOptions), is.String),
+  projector: is.RecordOf(is.OptionalOf(isOptions), is.String),
   renderer: is.RecordOf(is.OptionalOf(isOptions), is.String),
   previewer: is.RecordOf(is.OptionalOf(isOptions), is.String),
   action: is.RecordOf(is.OptionalOf(isOptions), is.String),
@@ -150,27 +150,27 @@ export function getSourceOptions(
   };
 }
 
-export function getFilterOptions(
+export function getTransformerOptions(
   expr: string,
   config: Config,
 ): Options {
   const [name] = expr.split(":", 1);
   return {
-    ...(config.filter?.[""] ?? {}),
-    ...(config.filter?.[name] ?? {}),
-    ...(config.filter?.[expr] ?? {}),
+    ...(config.transformer?.[""] ?? {}),
+    ...(config.transformer?.[name] ?? {}),
+    ...(config.transformer?.[expr] ?? {}),
   };
 }
 
-export function getSorterOptions(
+export function getProjectorOptions(
   expr: string,
   config: Config,
 ): Options {
   const [name] = expr.split(":", 1);
   return {
-    ...(config.sorter?.[""] ?? {}),
-    ...(config.sorter?.[name] ?? {}),
-    ...(config.sorter?.[expr] ?? {}),
+    ...(config.projector?.[""] ?? {}),
+    ...(config.projector?.[name] ?? {}),
+    ...(config.projector?.[expr] ?? {}),
   };
 }
 

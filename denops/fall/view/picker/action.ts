@@ -8,12 +8,12 @@ import {
 } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import type {
   Action,
-  Filter,
   Item,
   Previewer,
+  Projector,
   Renderer,
-  Sorter,
-} from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
+  Transformer,
+} from "https://deno.land/x/fall_core@v0.10.0/mod.ts";
 
 import { any } from "../../util/collection.ts";
 import { startAsyncScheduler } from "../../util/async_scheduler.ts";
@@ -76,8 +76,8 @@ export class ActionPicker implements AsyncDisposable {
   static async create(
     denops: Denops,
     actions: Map<string, Action>,
-    filters: Filter[],
-    sorters: Sorter[],
+    filters: Transformer[],
+    sorters: Projector[],
     renderers: Renderer[],
     previewers: Previewer[],
     options: ActionPickerOptions,
