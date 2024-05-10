@@ -27,7 +27,13 @@ export const getPreviewer: GetPreviewer = (denops, options) => {
 
       const line = maybe(item.detail[lineAttribute], is.Number) ?? 1;
       const column = maybe(item.detail[columnAttribute], is.Number) ?? 1;
-      await buffer.replace(denops, bufnr, content.split("\n"));
+      const width = await fn.winwidth(denops, winid);
+      const wrap = (s: string) =>
+        s.replace(
+          new RegExp(`(?![^\\n]{1,${width}}$)([^\\n]{1,${width}})\\s`, "g"),
+          "$1\n",
+        );
+      await buffer.replace(denops, bufnr, wrap(content).split("\n"));
       await batch(denops, async (denops) => {
         await fn.win_execute(
           denops,
