@@ -5,15 +5,12 @@ import type {
 import { collect } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
+import { getByteLength } from "../utils.ts";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
   smartCase: is.Boolean,
   ignoreCase: is.Boolean,
 })));
-
-function getByteLength(str: string): number {
-  return new TextEncoder().encode(str).length;
-}
 
 export const getTransformer: GetTransformer = (denops, options) => {
   assert(options, isOptions);

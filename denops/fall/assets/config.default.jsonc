@@ -3,25 +3,11 @@
   "picker": {
     "source": {
       "": {
-        "transformers": [
-          "substring_filter"
-        ],
-        "projectors": [
-          "lexical_sort"
-        ],
-        "renderers": [
-          "nerdfont"
-        ],
-        "previewers": [
-          "text"
-        ],
-        "actions": [
-          "open",
-          "open:split",
-          "open:vsplit",
-          "debug",
-          "quickfix"
-        ],
+        "transformers": ["substring_filter"],
+        "projectors": ["lexical_sort"],
+        "renderers": ["smart_path"],
+        "previewers": ["text"],
+        "actions": ["open", "open:split", "open:vsplit", "debug", "quickfix"],
         "defaultAction": "open",
         "options": {
           "layout": {
@@ -36,16 +22,10 @@
     },
     "action": {
       "": {
-        "transformers": [
-          "substring_filter"
-        ],
-        "projectors": [
-          "lexical_sort"
-        ],
+        "transformers": ["substring_filter"],
+        "projectors": ["lexical_sort"],
         "renderers": [],
-        "previewers": [
-          "text"
-        ],
+        "previewers": ["text"],
         "options": {
           "layout": {
             "border": "rounded",
@@ -57,11 +37,7 @@
   },
   "source": {
     "file": {
-      "excludes": [
-        ".*/\\.DS_Store",
-        ".*/\\.git/.*",
-        ".*/node_modules/.*"
-      ]
+      "excludes": [".*/\\.DS_Store", ".*/\\.git/.*", ".*/node_modules/.*"]
     }
   },
   "transformer": {},
