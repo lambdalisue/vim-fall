@@ -53,6 +53,7 @@ export class ItemProcessor implements Disposable {
       let stream = ReadableStream.from(items);
       for (const transformer of this.#transformers) {
         const transform = await transformer.transform({ query }, { signal });
+        if (signal.aborted) return;
         if (transform) {
           stream = stream.pipeThrough(transform, { signal });
         }
@@ -77,6 +78,7 @@ export class ItemProcessor implements Disposable {
         }, {
           signal,
         });
+        if (signal.aborted) return;
       }
       this.#items = projectedItems;
       dispatch("item-processor-succeeded", undefined);
