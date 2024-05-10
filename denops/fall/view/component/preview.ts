@@ -92,7 +92,7 @@ export class PreviewComponent {
         await fn.win_execute(
           denops,
           this.#winid,
-          `setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile cursorline nomodifiable`,
+          `setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile cursorline nomodifiable nowrap`,
         );
       } else if (!this.#item) {
         await buffer.replace(denops, this.#bufnr, ["No preview is available"]);
