@@ -10,8 +10,8 @@ const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
 })));
 
 const defaultExcludes: string[] = [
-  ".*/.DS_Store",
-  ".*/.git/.*",
+  ".*/\.DS_Store",
+  ".*/\.git/.*",
   ".*/node_modules/.*",
 ];
 
