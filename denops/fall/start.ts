@@ -1,7 +1,7 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import { send } from "https://deno.land/x/denops_std@v6.4.0/helper/keymap.ts";
 import { exprQuote as q } from "https://deno.land/x/denops_std@v6.4.0/helper/expr_string.ts";
-import type { Action } from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
+import type { Action } from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 import { is, maybe } from "jsr:@core/unknownutil@3.18.0";
 
 import { subscribe } from "./util/event.ts";
@@ -47,45 +47,68 @@ export async function start(
 
   const configPath = await getConfigPath(denops);
   const config = await loadConfig(configPath);
-  const source = extension.getSource(expr, config);
+  const source = await extension.getSource(denops, expr, config);
   if (!source) {
     return;
   }
   const spc = getSourcePickerConfig(expr, config);
   const apc = getActionPickerConfig(expr, config);
   const actions = new Map(
-    (spc.actions ?? defaultActions)
-      .map((v) => {
-        const ext = extension.getAction(v, config);
-        if (!ext) return;
-        return [v, ext] as const;
-      })
-      .filter(isDefined),
+    await extension.getExtensions(
+      denops,
+      spc.actions ?? defaultActions,
+      config,
+      extension.getAction,
+    ),
   );
-  const filters = (spc.filters ?? defaultFilters)
-    .map((v) => extension.getFilter(v, config))
-    .filter(isDefined);
-  const sorters = (spc.sorters ?? defaultSorters)
-    .map((v) => extension.getSorter(v, config))
-    .filter(isDefined);
-  const renderers = (spc.renderers ?? defaultRenderers)
-    .map((v) => extension.getRenderer(v, config))
-    .filter(isDefined);
-  const previewers = (spc.previewers ?? defaultPreviewers)
-    .map((v) => extension.getPreviewer(v, config))
-    .filter(isDefined);
-  const actionFilters = (apc.filters ?? defaultActionFilters)
-    .map((v) => extension.getFilter(v, config))
-    .filter(isDefined);
-  const actionSorters = (apc.sorters ?? defaultActionSorters)
-    .map((v) => extension.getSorter(v, config))
-    .filter(isDefined);
-  const actionRenderers = (apc.renderers ?? defaultActionRenderers)
-    .map((v) => extension.getRenderer(v, config))
-    .filter(isDefined);
-  const actionPreviewers = (apc.previewers ?? defaultActionPreviewers)
-    .map((v) => extension.getPreviewer(v, config))
-    .filter(isDefined);
+  const filters = (await extension.getExtensions(
+    denops,
+    spc.filters ?? defaultFilters,
+    config,
+    extension.getFilter,
+  )).map(([_, v]) => v);
+  const sorters = (await extension.getExtensions(
+    denops,
+    spc.sorters ?? defaultSorters,
+    config,
+    extension.getSorter,
+  )).map(([_, v]) => v);
+  const renderers = (await extension.getExtensions(
+    denops,
+    spc.renderers ?? defaultRenderers,
+    config,
+    extension.getRenderer,
+  )).map(([_, v]) => v);
+  const previewers = (await extension.getExtensions(
+    denops,
+    spc.previewers ?? defaultPreviewers,
+    config,
+    extension.getPreviewer,
+  )).map(([_, v]) => v);
+  const actionFilters = (await extension.getExtensions(
+    denops,
+    apc.filters ?? defaultActionFilters,
+    config,
+    extension.getFilter,
+  )).map(([_, v]) => v);
+  const actionSorters = (await extension.getExtensions(
+    denops,
+    apc.sorters ?? defaultActionSorters,
+    config,
+    extension.getSorter,
+  )).map(([_, v]) => v);
+  const actionRenderers = (await extension.getExtensions(
+    denops,
+    apc.renderers ?? defaultActionRenderers,
+    config,
+    extension.getRenderer,
+  )).map(([_, v]) => v);
+  const actionPreviewers = (await extension.getExtensions(
+    denops,
+    apc.previewers ?? defaultActionPreviewers,
+    config,
+    extension.getPreviewer,
+  )).map(([_, v]) => v);
 
   await using itemsPicker = await SourcePicker.create(
     denops,
@@ -149,10 +172,10 @@ export async function start(
     // Execute action
     if (action) {
       if (
-        await action.invoke(denops, {
+        await action.trigger({
           cursorItem: itemsPicker.cursorItem,
           selectedItems: itemsPicker.selectedItems,
-          processedItems: itemsPicker.processedItems,
+          availableItems: itemsPicker.availableItems,
         }, { signal })
       ) {
         // Continue

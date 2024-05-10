@@ -1,9 +1,8 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import type {
   Filter,
   Item,
   Sorter,
-} from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 
 import { dispatch } from "../../util/event.ts";
 
@@ -42,7 +41,6 @@ export class ItemProcessor implements Disposable {
    * To check if the processing is completed, you should use `item-processor-completed`.
    */
   start(
-    denops: Denops,
     items: Item[],
     query: string,
   ): void {
@@ -54,7 +52,7 @@ export class ItemProcessor implements Disposable {
 
       let stream = ReadableStream.from(items);
       for (const filter of this.#filters) {
-        const transform = await filter.getStream(denops, query, { signal });
+        const transform = await filter.stream({ query }, { signal });
         if (transform) {
           stream = stream.pipeThrough(transform, { signal });
         }
@@ -73,7 +71,9 @@ export class ItemProcessor implements Disposable {
 
       let processedItems = [...filteredItems];
       for (const sorter of this.#sorters) {
-        processedItems = await sorter.sort(denops, processedItems, { signal });
+        processedItems = await sorter.sort({ query, items: processedItems }, {
+          signal,
+        });
       }
       this.#items = processedItems;
       dispatch("item-processor-succeeded", undefined);

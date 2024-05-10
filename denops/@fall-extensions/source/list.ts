@@ -1,4 +1,4 @@
-import { type Source } from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
+import type { GetSource } from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 
 const isSourceItem = is.ObjectOf({
@@ -11,14 +11,12 @@ const isOptions = is.StrictOf(is.ObjectOf({
   items: is.ArrayOf(isSourceItem),
 }));
 
-export function getSource(
-  options: Record<string, unknown>,
-): Source {
+export const getSource: GetSource = (_denops, options) => {
   assert(options, isOptions);
   const items = options.items;
   return {
-    getStream: (_denops, _cmdline) => {
+    stream() {
       return ReadableStream.from(items);
     },
   };
-}
+};

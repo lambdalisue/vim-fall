@@ -1,4 +1,4 @@
-import type { Action } from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
+import type { GetAction } from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.3.0/function/mod.ts";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 
@@ -29,20 +29,20 @@ function isDefined<T>(value: T | undefined): value is T {
   return value !== undefined;
 }
 
-export function getAction(
-  options: Record<string, unknown>,
-): Action {
+export const getAction: GetAction = (denops, options) => {
   assert(options, isOptions);
   const what = options.what ?? {};
   const action = options.action ?? " ";
   const target = options.target ?? "selected-or-cursor";
   return {
-    invoke: async (denops, { cursorItem, selectedItems, processedItems }) => {
+    async trigger({ cursorItem, selectedItems, availableItems }, { signal }) {
+      if (signal?.aborted) return;
+
       const source = selectedItems.length > 0
         ? selectedItems
         : target === "selected-or-cursor"
         ? cursorItem ? [cursorItem] : []
-        : processedItems;
+        : availableItems;
       const items = source
         .map((item) => {
           if (isPathDetail(item.detail)) {
@@ -70,4 +70,4 @@ export function getAction(
       return false;
     },
   };
-}
+};

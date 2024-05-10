@@ -13,7 +13,7 @@ import type {
   Previewer,
   Renderer,
   Sorter,
-} from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 
 import { any } from "../../util/collection.ts";
 import { startAsyncScheduler } from "../../util/async_scheduler.ts";
@@ -225,7 +225,7 @@ export class ActionPicker implements AsyncDisposable {
     }));
     stack.use(subscribe("cmdline-changed", (cmdline) => {
       this.#query = cmdline;
-      this.#itemProcessor.start(denops, this.collectedItems, this.#query);
+      this.#itemProcessor.start(this.collectedItems, this.#query);
       prompt.cmdline = this.#query;
     }));
     stack.use(subscribe("cmdpos-changed", (cmdpos) => {

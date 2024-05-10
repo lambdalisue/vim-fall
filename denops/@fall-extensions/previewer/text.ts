@@ -1,4 +1,4 @@
-import type { Previewer } from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
+import type { GetPreviewer } from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import { batch } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
@@ -20,17 +20,19 @@ const isUrlDetail = is.ObjectOf({
   column: is.OptionalOf(is.Number),
 });
 
-export function getPreviewer(
-  options: Record<string, unknown>,
-): Previewer {
+export const getPreviewer: GetPreviewer = (denops, options) => {
   assert(options, isOptions);
   return {
-    preview: async (denops, item, { bufnr, winid }) => {
+    async preview({ item, bufnr, winid }, { signal }) {
+      if (signal?.aborted) return;
+
       if (isPathDetail(item.detail)) {
         await pathPreview(denops, winid, item.detail);
       } else if (isUrlDetail(item.detail)) {
         const resp = await fetch(item.detail.url);
+        if (signal?.aborted) return;
         const text = await resp.text();
+        if (signal?.aborted) return;
         const content = text.split("\n");
         await contentPreview(
           denops,
@@ -52,7 +54,7 @@ export function getPreviewer(
       }
     },
   };
-}
+};
 
 async function pathPreview(
   denops: Denops,

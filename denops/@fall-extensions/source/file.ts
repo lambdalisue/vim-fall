@@ -1,4 +1,4 @@
-import type { Source } from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
+import type { GetSource } from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import { walk } from "jsr:@std/fs@0.229.0/walk";
 import { relative } from "jsr:@std/path@0.225.0/relative";
@@ -15,14 +15,12 @@ const defaultExcludes: string[] = [
   ".*/node_modules/.*",
 ];
 
-export function getSource(
-  options: Record<string, unknown>,
-): Source {
+export const getSource: GetSource = (denops, options) => {
   assert(options, isOptions);
   const includes = options.includes;
   const excludes = options.excludes ?? defaultExcludes;
   return {
-    getStream: async (denops, cmdline) => {
+    async stream({ cmdline }) {
       const abspath = await fn.fnamemodify(
         denops,
         await fn.expand(denops, cmdline || "."),
@@ -47,4 +45,4 @@ export function getSource(
       });
     },
   };
-}
+};

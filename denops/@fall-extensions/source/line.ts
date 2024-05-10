@@ -1,15 +1,13 @@
-import type { Source } from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
+import type { GetSource } from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.3.0/function/mod.ts";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({})));
 
-export function getSource(
-  options: Record<string, unknown>,
-): Source {
+export const getSource: GetSource = (denops, options) => {
   assert(options, isOptions);
   return {
-    getStream: async (denops, cmdline: string) => {
+    async stream({ cmdline }) {
       const path = await fn.expand(denops, cmdline || "%") as string;
       const bufnr = await fn.bufadd(denops, path);
       await fn.bufload(denops, bufnr);
@@ -28,4 +26,4 @@ export function getSource(
       );
     },
   };
-}
+};

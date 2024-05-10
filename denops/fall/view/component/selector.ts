@@ -7,7 +7,7 @@ import type {
   Item,
   Renderer,
   RendererItem,
-} from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 import { equal } from "jsr:@std/assert@0.225.1/equal";
 
 import { calcScrollOffset } from "../util/scrolloffset.ts";
@@ -116,7 +116,6 @@ export class SelectorComponent {
     // Render UI
     try {
       const rendererItems = await applyRenderers(
-        denops,
         items,
         this.#renderers,
         { width: this.#winwidth },
@@ -192,7 +191,6 @@ export class SelectorComponent {
  * It ignore the result of the renderer if the renderer returns different size of items.
  */
 async function applyRenderers(
-  denops: Denops,
   items: RendererItem[],
   renderers: Renderer[],
   params: { width: number },
@@ -204,7 +202,7 @@ async function applyRenderers(
     const [index, renderer] of renderers.map((v, index) => [index, v] as const)
   ) {
     try {
-      const newItems = await renderer.render(denops, items, params, { signal });
+      const newItems = await renderer.render({ items, ...params }, { signal });
       if (newItems.length !== size) {
         console.warn(
           `[fall] Renderer ${index} returned different size of items. Ignore.`,

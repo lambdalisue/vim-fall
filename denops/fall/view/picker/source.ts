@@ -13,7 +13,7 @@ import type {
   Renderer,
   Sorter,
   Source,
-} from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 
 import { any, isDefined } from "../../util/collection.ts";
 import { startAsyncScheduler } from "../../util/async_scheduler.ts";
@@ -90,7 +90,7 @@ export class SourcePicker implements AsyncDisposable {
     pickerOptions: SourcePickerOptions,
   ): Promise<SourcePicker> {
     const stack = new AsyncDisposableStack();
-    const sourceStream = await source.getStream(denops, cmdline);
+    const sourceStream = await source.stream({ cmdline });
     if (!sourceStream) {
       throw new Error("Failed to get source stream.");
     }
@@ -140,17 +140,17 @@ export class SourcePicker implements AsyncDisposable {
     return this.#itemCollector.items;
   }
 
-  get processedItems(): Item[] {
+  get availableItems(): Item[] {
     return this.#itemProcessor.items;
   }
 
   get selectedItems(): Item[] {
-    const m = new Map(this.processedItems.map((v) => [v.id, v]));
+    const m = new Map(this.availableItems.map((v) => [v.id, v]));
     return [...this.#selected].map((v) => m.get(v)).filter(isDefined);
   }
 
   get cursorItem(): Item | undefined {
-    return this.processedItems.at(this.#index);
+    return this.availableItems.at(this.#index);
   }
 
   async start(
@@ -234,11 +234,11 @@ export class SourcePicker implements AsyncDisposable {
     stack.use(subscribe("item-collector-changed", () => {
       prompt.collecting = true;
       prompt.counter = {
-        processed: this.processedItems.length,
+        processed: this.availableItems.length,
         collected: this.collectedItems.length,
       };
       prompt.processing = true;
-      this.#itemProcessor.start(denops, this.collectedItems, this.#query);
+      this.#itemProcessor.start(this.collectedItems, this.#query);
     }));
     stack.use(subscribe("item-collector-succeeded", () => {
       prompt.collecting = false;
@@ -249,10 +249,10 @@ export class SourcePicker implements AsyncDisposable {
     stack.use(subscribe("item-processor-succeeded", () => {
       prompt.processing = false;
       prompt.counter = {
-        processed: this.processedItems.length,
+        processed: this.availableItems.length,
         collected: this.collectedItems.length,
       };
-      selector.items = this.processedItems;
+      selector.items = this.availableItems;
       selector.index = this.#index;
       preview.item = this.cursorItem;
     }));
@@ -261,7 +261,7 @@ export class SourcePicker implements AsyncDisposable {
     }));
     stack.use(subscribe("cmdline-changed", (cmdline) => {
       this.#query = cmdline;
-      this.#itemProcessor.start(denops, this.collectedItems, this.#query);
+      this.#itemProcessor.start(this.collectedItems, this.#query);
       prompt.cmdline = this.#query;
     }));
     stack.use(subscribe("cmdpos-changed", (cmdpos) => {
@@ -270,18 +270,18 @@ export class SourcePicker implements AsyncDisposable {
     stack.use(subscribe("selector-cursor-move", (offset) => {
       const nextIndex = Math.max(
         0,
-        Math.min(this.processedItems.length - 1, this.#index + offset),
+        Math.min(this.availableItems.length - 1, this.#index + offset),
       );
       this.#index = nextIndex;
       selector.index = this.#index;
     }));
     stack.use(subscribe("selector-cursor-move-at", (line) => {
       if (line === "$") {
-        this.#index = this.processedItems.length - 1;
+        this.#index = this.availableItems.length - 1;
       } else {
         this.#index = Math.max(
           0,
-          Math.min(this.processedItems.length - 1, line - 1),
+          Math.min(this.availableItems.length - 1, line - 1),
         );
       }
       selector.index = this.#index;
@@ -297,10 +297,10 @@ export class SourcePicker implements AsyncDisposable {
       selector.selected = new Set(this.#selected);
     }));
     stack.use(subscribe("selector-select-all", () => {
-      if (this.#selected.size === this.processedItems.length) {
+      if (this.#selected.size === this.availableItems.length) {
         this.#selected.clear();
       } else {
-        this.#selected = new Set(this.processedItems.map((v) => v.id));
+        this.#selected = new Set(this.availableItems.map((v) => v.id));
       }
       selector.selected = new Set(this.#selected);
     }));

@@ -1,4 +1,4 @@
-import type { Action } from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
+import type { GetAction } from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
@@ -17,9 +17,7 @@ const isPathDetail = is.ObjectOf({
   column: is.OptionalOf(is.Number),
 });
 
-export function getAction(
-  options: Record<string, unknown>,
-): Action {
+export const getAction: GetAction = (denops, options) => {
   assert(options, isOptions);
   const bang = options.bang ?? false;
   const mods = options.mods ?? "";
@@ -27,7 +25,9 @@ export function getAction(
   const firstOpener = options.opener ?? "edit";
   const splitter = options.splitter ?? firstOpener;
   return {
-    invoke: async (denops, { cursorItem, selectedItems }) => {
+    async trigger({ cursorItem, selectedItems }, { signal }) {
+      if (signal?.aborted) return;
+
       const items = selectedItems.length > 0
         ? selectedItems
         : cursorItem
@@ -45,6 +45,8 @@ export function getAction(
             cmdarg,
             opener,
           });
+          if (signal?.aborted) return;
+
           opener = splitter;
           if (item.detail.line || item.detail.column) {
             const line = item.detail.line ?? 1;
@@ -55,6 +57,7 @@ export function getAction(
               `silent! call cursor(${line}, ${column})`,
             );
           }
+          if (signal?.aborted) return;
         } catch (err) {
           // Fail silently
           console.debug(
@@ -66,4 +69,4 @@ export function getAction(
       return false;
     },
   };
-}
+};

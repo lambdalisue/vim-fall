@@ -8,7 +8,7 @@ import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import type {
   Previewer,
   PreviewerItem,
-} from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 import { equal } from "jsr:@std/assert@0.225.1/equal";
 
 const DEFAULT_DEBOUNCE_WAIT = 100;
@@ -81,7 +81,9 @@ export class PreviewComponent {
           winid: this.#winid,
         };
         for (const previewer of this.#previewers) {
-          if (await previewer.preview(denops, this.#item, target, { signal })) {
+          if (
+            await previewer.preview({ item: this.#item, ...target }, { signal })
+          ) {
             continue;
           }
           break;

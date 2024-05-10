@@ -1,16 +1,15 @@
 import { assertEquals } from "jsr:@std/assert@0.225.1";
-import { DenopsStub } from "https://deno.land/x/denops_test@v1.6.2/mod.ts";
 import type {
   Filter,
   Item,
   Sorter,
-} from "https://deno.land/x/fall_core@v0.8.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 import { subscribe } from "../../util/event.ts";
 import { ItemProcessor } from "./item_processor.ts";
 
 const testFilters: Filter[] = [
   {
-    getStream(_denops, query) {
+    stream({ query }) {
       return new TransformStream({
         transform(chunk, controller) {
           if (chunk.detail.error) {
@@ -26,7 +25,7 @@ const testFilters: Filter[] = [
 
 const testSorters: Sorter[] = [
   {
-    sort(_denops, items) {
+    sort({ items }) {
       return items.sort((a, b) => -1 * a.value.localeCompare(b.value));
     },
   },
@@ -36,7 +35,6 @@ Deno.test("ItemProcessor", async (t) => {
   await t.step("process items with given query", async () => {
     const { promise, resolve } = Promise.withResolvers<void>();
     using _ = subscribe("item-processor-completed", () => resolve());
-    const denops = new DenopsStub();
     const items: Item[] = [
       { id: "1", value: "11", detail: {}, decorations: [] },
       { id: "2", value: "12", detail: {}, decorations: [] },
@@ -49,7 +47,7 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
     await using processor = new ItemProcessor(testFilters, testSorters);
-    processor.start(denops, items, "2");
+    processor.start(items, "2");
     await promise;
     assertEquals(processor.items, [
       { id: "8", value: "32", detail: {}, decorations: [] },
@@ -65,7 +63,6 @@ Deno.test("ItemProcessor", async (t) => {
     let called = false;
     using _a = subscribe("item-processor-completed", () => resolve());
     using _b = subscribe("item-processor-succeeded", () => called = true);
-    const denops = new DenopsStub();
     const items: Item[] = [
       { id: "1", value: "11", detail: {}, decorations: [] },
       { id: "2", value: "12", detail: {}, decorations: [] },
@@ -78,7 +75,7 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
     await using processor = new ItemProcessor(testFilters, testSorters);
-    processor.start(denops, items, "2");
+    processor.start(items, "2");
     await promise;
     assertEquals(called, true);
   });
@@ -88,7 +85,6 @@ Deno.test("ItemProcessor", async (t) => {
     let called = false;
     using _a = subscribe("item-processor-completed", () => resolve());
     using _b = subscribe("item-processor-failed", () => called = true);
-    const denops = new DenopsStub();
     const items: Item[] = [
       { id: "1", value: "11", detail: {}, decorations: [] },
       { id: "2", value: "12", detail: {}, decorations: [] },
@@ -106,7 +102,7 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
     await using processor = new ItemProcessor(testFilters, testSorters);
-    processor.start(denops, items, "2");
+    processor.start(items, "2");
     await promise;
     assertEquals(called, true);
   });
