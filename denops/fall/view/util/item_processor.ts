@@ -16,9 +16,9 @@ export class ItemProcessor implements Disposable {
 
   #items: Item[] = [];
 
-  constructor(filters: Transformer[], sorters: Projector[]) {
-    this.#transformers = filters;
-    this.#projectors = sorters;
+  constructor(transformers: Transformer[], projectors: Projector[]) {
+    this.#transformers = transformers;
+    this.#projectors = projectors;
   }
 
   /**
