@@ -3,6 +3,7 @@ import type {
   SourceItem,
 } from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
 import { TextLineStream } from "https://deno.land/std@0.224.0/streams/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v6.4.2/function/mod.ts";
 import { assert, is, maybe } from "jsr:@core/unknownutil@3.18.0";
 
 import { input } from "../../@fall-util/input.ts";
@@ -100,11 +101,13 @@ export const getSource: GetSource = (denops, options) => {
       }
       if (!cmdline) return; // Cancel this source
 
+      const cwd = await fn.getcwd(denops);
       const cmd = new Deno.Command("rg", {
+        cwd,
         args: [...args, "--json", "--", cmdline],
         stdin: "null",
         stdout: "piped",
-        stderr: "piped",
+        stderr: "null",
       });
       const proc = cmd.spawn();
       return proc.stdout
