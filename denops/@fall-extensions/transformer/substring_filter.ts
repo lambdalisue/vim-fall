@@ -62,7 +62,7 @@ export const getTransformer: GetTransformer = (denops, options) => {
           controller.enqueue({
             ...chunk,
             label,
-            decorations,
+            decorations: [...chunk.decorations, ...decorations],
           });
         },
       });
