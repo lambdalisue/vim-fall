@@ -2,6 +2,7 @@ import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 
 import { Spinner } from "../util/spinner.ts";
+import { getByteLength } from "../../util/text.ts";
 
 const DEFAULT_HEAD_SYMBOL = ">";
 const DEFAULT_FAIL_SYMBOL = "☓";
@@ -155,8 +156,4 @@ export class PromptComponent {
     }
     return true;
   }
-}
-
-function getByteLength(str: string): number {
-  return new TextEncoder().encode(str).length;
 }
