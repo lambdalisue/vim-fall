@@ -3,7 +3,7 @@ import type {
   Item,
   Projector,
   Transformer,
-} from "https://deno.land/x/fall_core@v0.10.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
 import { subscribe } from "../../util/event.ts";
 import { ItemProcessor } from "./item_processor.ts";
 

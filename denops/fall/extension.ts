@@ -16,7 +16,7 @@ import type {
   Renderer,
   Source,
   Transformer,
-} from "https://deno.land/x/fall_core@v0.10.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
 import { isDefined } from "./util/collection.ts";
 import {
   type Config,

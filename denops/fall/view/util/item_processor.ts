@@ -2,7 +2,7 @@ import type {
   Item,
   Projector,
   Transformer,
-} from "https://deno.land/x/fall_core@v0.10.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
 
 import { dispatch } from "../../util/event.ts";
 

@@ -1,7 +1,7 @@
 import type {
   GetTransformer,
   ItemDecoration,
-} from "https://deno.land/x/fall_core@v0.10.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
 import { collect } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";

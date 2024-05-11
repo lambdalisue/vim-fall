@@ -13,7 +13,7 @@ import type {
   Projector,
   Renderer,
   Transformer,
-} from "https://deno.land/x/fall_core@v0.10.0/mod.ts";
+} from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
 
 import { any } from "../../util/collection.ts";
 import { startAsyncScheduler } from "../../util/async_scheduler.ts";
