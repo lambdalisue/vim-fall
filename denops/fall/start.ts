@@ -111,6 +111,9 @@ export async function start(
     previewers,
     spc.options ?? {},
   );
+  if (!itemsPicker) {
+    return;
+  }
 
   // Listen cursor movement events
   let nextAction: "@select" | "@default" | string = "@select";

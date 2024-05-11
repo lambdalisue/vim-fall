@@ -88,11 +88,12 @@ export class SourcePicker implements AsyncDisposable {
     renderers: Renderer[],
     previewers: Previewer[],
     pickerOptions: SourcePickerOptions,
-  ): Promise<SourcePicker> {
+  ): Promise<SourcePicker | undefined> {
     const stack = new AsyncDisposableStack();
     const sourceStream = await source.stream({ cmdline });
     if (!sourceStream) {
-      throw new Error("Failed to get source stream.");
+      // Canceled by source
+      return;
     }
 
     // Start collecting source items
