@@ -6,6 +6,8 @@ import {
   batch,
   collect,
 } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
+import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
+
 import type {
   Action,
   Item,
@@ -13,9 +15,7 @@ import type {
   Projector,
   Renderer,
   Transformer,
-} from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
-import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
-
+} from "../extension/type.ts";
 import { any } from "../util/collection.ts";
 import { startAsyncScheduler } from "../util/async_scheduler.ts";
 import { subscribe } from "../util/event.ts";
@@ -62,7 +62,7 @@ export class ActionPicker implements AsyncDisposable {
   #query = "";
   #index = 0;
 
-  #actions: Map<string, Action>;
+  #actions: Action[];
   #renderers: Renderer[];
   #previewers: Previewer[];
   #options: ActionPickerOptions;
@@ -71,7 +71,7 @@ export class ActionPicker implements AsyncDisposable {
   #disposable: AsyncDisposableStack;
 
   private constructor(
-    actions: Map<string, Action>,
+    actions: Action[],
     renderers: Renderer[],
     previewers: Previewer[],
     options: ActionPickerOptions,
@@ -90,7 +90,7 @@ export class ActionPicker implements AsyncDisposable {
 
   static async create(
     denops: Denops,
-    actions: Map<string, Action>,
+    actions: Action[],
     filters: Transformer[],
     sorters: Projector[],
     renderers: Renderer[],
@@ -131,9 +131,9 @@ export class ActionPicker implements AsyncDisposable {
   }
 
   get collectedItems(): Item[] {
-    return [...this.#actions.entries()].map(([k, v]) => ({
-      id: k,
-      value: k,
+    return this.#actions.map((v, idx) => ({
+      id: idx,
+      value: v.name,
       detail: {
         content: v.description,
       },

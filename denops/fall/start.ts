@@ -43,67 +43,64 @@ export async function start(
   }
   const spc = getSourcePickerConfig(expr, config);
   const apc = getActionPickerConfig(expr, config);
-  const actions = new Map(
-    await getExtensions(
-      denops,
-      "action",
-      spc.actions ?? [],
-      config,
-    ),
+  const actions = await getExtensions(
+    denops,
+    "action",
+    spc.actions ?? [],
+    config,
   );
-  const transformers = (await getExtensions(
+  const transformers = await getExtensions(
     denops,
     "transformer",
     spc.transformers ?? [],
     config,
-  )).map(([_, v]) => v);
-  const projectors = (await getExtensions(
+  );
+  const projectors = await getExtensions(
     denops,
     "projector",
     spc.projectors ?? [],
     config,
-  )).map(([_, v]) => v);
-  const renderers = (await getExtensions(
+  );
+  const renderers = await getExtensions(
     denops,
     "renderer",
     spc.renderers ?? [],
     config,
-  )).map(([_, v]) => v);
-  const previewers = (await getExtensions(
+  );
+  const previewers = await getExtensions(
     denops,
     "previewer",
     spc.previewers ?? [],
     config,
-  )).map(([_, v]) => v);
-  const actionTransformers = (await getExtensions(
+  );
+  const actionTransformers = await getExtensions(
     denops,
     "transformer",
     apc.transformers ?? [],
     config,
-  )).map(([_, v]) => v);
-  const actionProjectors = (await getExtensions(
+  );
+  const actionProjectors = await getExtensions(
     denops,
     "projector",
     apc.projectors ?? [],
     config,
-  )).map(([_, v]) => v);
-  const actionRenderers = (await getExtensions(
+  );
+  const actionRenderers = await getExtensions(
     denops,
     "renderer",
     apc.renderers ?? [],
     config,
-  )).map(([_, v]) => v);
-  const actionPreviewers = (await getExtensions(
+  );
+  const actionPreviewers = await getExtensions(
     denops,
     "previewer",
     apc.previewers ?? [],
     config,
-  )).map(([_, v]) => v);
+  );
 
   await using itemsPicker = await SourcePicker.create(
     denops,
     cmdline,
-    ` ${expr}${cmdline ? " " + cmdline + " " : ""} `,
     source,
     transformers,
     projectors,
@@ -156,11 +153,11 @@ export async function start(
         // Cancel
         return;
       }
-      action = actions.get(actionName);
+      action = actions.find((v) => v.name === actionName);
     } else if (nextAction == "@default") {
-      action = actions.get(spc.defaultAction ?? "");
+      action = actions.find((v) => v.name === spc.defaultAction);
     } else {
-      action = actions.get(nextAction);
+      action = actions.find((v) => v.name === nextAction);
     }
     // Execute action
     if (action) {

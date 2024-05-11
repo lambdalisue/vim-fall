@@ -6,6 +6,8 @@ import {
   batch,
   collect,
 } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
+import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
+
 import type {
   Item,
   Previewer,
@@ -13,9 +15,7 @@ import type {
   Renderer,
   Source,
   Transformer,
-} from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
-import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
-
+} from "../extension/type.ts";
 import { any, isDefined } from "../util/collection.ts";
 import { startAsyncScheduler } from "../util/async_scheduler.ts";
 import { subscribe } from "../util/event.ts";
@@ -99,7 +99,6 @@ export class SourcePicker implements AsyncDisposable {
   static async create(
     denops: Denops,
     cmdline: string,
-    title: string,
     source: Source,
     filters: Transformer[],
     sorters: Projector[],
@@ -126,6 +125,7 @@ export class SourcePicker implements AsyncDisposable {
     const itemProcessor = stack.use(new ItemProcessor(filters, sorters));
 
     // Build layout
+    const title = `${source.name} ${cmdline}`.trim();
     const layout = stack.use(
       await buildLayout(denops, {
         title,

@@ -75,14 +75,11 @@ export async function getExtensions<
   type: T,
   exprs: string[],
   config: Config,
-): Promise<[string, R][]> {
-  const vs = await Promise.all(exprs.map(async (v) => {
-    const ext = await getExtension(denops, type, v, config);
-    if (ext) {
-      return [v, ext] as const;
-    }
-  }));
-  return vs.filter(isDefined) as [string, R][];
+): Promise<R[]> {
+  const vs = await Promise.all(
+    exprs.map((v) => getExtension(denops, type, v, config)),
+  );
+  return vs.filter(isDefined) as R[];
 }
 
 export function listExtensionNames<T extends ExtensionType>(
