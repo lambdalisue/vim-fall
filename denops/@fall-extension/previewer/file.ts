@@ -67,11 +67,6 @@ export const getPreviewer: GetPreviewer = (denops, options) => {
         await fn.win_execute(
           denops,
           winid,
-          `silent! doautocmd <nomodeline> BufRead`,
-        );
-        await fn.win_execute(
-          denops,
-          winid,
           `setlocal nomodifiable`,
         );
         await fn.win_execute(denops, winid, `normal! ${line}G${column}|`);

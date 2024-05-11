@@ -45,11 +45,6 @@ export const getPreviewer: GetPreviewer = (denops, options) => {
           winid,
           `silent! file fall://preview/${name}`,
         );
-        await fn.win_execute(
-          denops,
-          winid,
-          `silent! doautocmd <nomodeline> BufRead`,
-        );
         await fn.win_execute(denops, winid, `normal! ${line}G${column}|`);
       });
     },

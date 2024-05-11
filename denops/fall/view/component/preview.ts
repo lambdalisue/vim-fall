@@ -80,6 +80,12 @@ export class PreviewComponent {
           bufnr: this.#bufnr,
           winid: this.#winid,
         };
+        // Overwrite buffer local options may configured by ftplugin
+        await fn.win_execute(
+          denops,
+          this.#winid,
+          `setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile cursorline nomodifiable nowrap`,
+        );
         for (const previewer of this.#previewers) {
           if (
             await previewer.preview({ item: this.#item, ...target }, { signal })
@@ -88,11 +94,10 @@ export class PreviewComponent {
           }
           break;
         }
-        // Overwrite buffer local options may configured by ftplugin
         await fn.win_execute(
           denops,
           this.#winid,
-          `setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile cursorline nomodifiable nowrap`,
+          `silent! filetype detect`,
         );
       } else if (!this.#item) {
         await buffer.replace(denops, this.#bufnr, ["No preview is available"]);
