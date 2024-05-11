@@ -15,8 +15,8 @@
     "source": {
       "": {
         "transformers": ["substring_filter"],
-        "projectors": ["lexical_sort"],
-        "previewers": ["content", "buffer", "file"],
+        "projectors": ["lexical_sorter"],
+        "previewers": ["attribute", "buffer", "file"],
         "actions": [
           "open",
           "open:split",
@@ -45,9 +45,9 @@
     "action": {
       "": {
         "transformers": ["substring_filter"],
-        "projectors": ["lexical_sort"],
+        "projectors": ["lexical_sorter"],
         "renderers": [],
-        "previewers": ["content"],
+        "previewers": ["attribute"],
         "options": {
           "layout": {
             "border": "rounded",
