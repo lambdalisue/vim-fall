@@ -4,6 +4,7 @@ import { ensure, is } from "jsr:@core/unknownutil@3.18.0";
 
 import { dispatch, isFallEventName } from "./util/event.ts";
 import { start } from "./start.ts";
+import { input, isInputParams } from "./input.ts";
 import { editConfig, getConfigPath } from "./config.ts";
 import { discover, list, register } from "./extension.ts";
 
@@ -41,6 +42,9 @@ export async function main(denops: Denops): Promise<void> {
     },
     "extension:list": (type) => {
       return list(ensure(type, is.String));
+    },
+    "util:input": async (params) => {
+      return await input(denops, ensure(params, isInputParams));
     },
   };
   await discoverExtensions();

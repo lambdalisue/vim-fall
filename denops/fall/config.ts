@@ -18,6 +18,7 @@ import {
   type ActionPickerOptions,
   isActionPickerOptions,
 } from "./view/action_picker.ts";
+import { type InputOptions, isInputOptions } from "./view/input.ts";
 
 type Options = Record<string, unknown>;
 
@@ -45,6 +46,7 @@ export type PickerConfig = Partial<{
 }>;
 
 export type Config = Partial<{
+  input: Omit<InputOptions, "input">;
   picker: PickerConfig;
   source: Partial<Record<string, Options>>;
   transformer: Partial<Record<string, Options>>;
@@ -82,6 +84,7 @@ const isPickerConfig = is.PartialOf(is.ObjectOf({
 })) satisfies Predicate<PickerConfig>;
 
 const isConfig = is.PartialOf(is.ObjectOf({
+  input: is.OmitOf(isInputOptions, ["input"]),
   picker: isPickerConfig,
   source: is.RecordOf(is.OptionalOf(isOptions), is.String),
   transformer: is.RecordOf(is.OptionalOf(isOptions), is.String),

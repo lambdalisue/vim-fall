@@ -1,22 +1,22 @@
+/*
+ * Configuration of vim-fall
+ *
+ * This is JSONC file so that comment or trailing comma is available.
+ */
 {
   "$schema": "https://vim-fall.github.io/jsonschema/v1alpha/config.schema.json",
+  "input": {
+    "layout": {
+      "border": "rounded",
+      "divider": "dashed"
+    }
+  },
   "picker": {
     "source": {
       "": {
-        "transformers": [
-          "substring_filter"
-        ],
-        "projectors": [
-          "lexical_sort"
-        ],
-        "renderers": [
-          "smart_path"
-        ],
-        "previewers": [
-          "content",
-          "buffer",
-          "file"
-        ],
+        "transformers": ["substring_filter"],
+        "projectors": ["lexical_sort"],
+        "previewers": ["content", "buffer", "file"],
         "actions": [
           "open",
           "open:split",
@@ -33,26 +33,21 @@
           }
         }
       },
+      "file": {
+        "renderers": ["smart_path"]
+      },
       "line": {
         "projectors": [],
         "renderers": [],
-        "previewers": [
-          "buffer"
-        ]
+        "previewers": ["buffer"]
       }
     },
     "action": {
       "": {
-        "transformers": [
-          "substring_filter"
-        ],
-        "projectors": [
-          "lexical_sort"
-        ],
+        "transformers": ["substring_filter"],
+        "projectors": ["lexical_sort"],
         "renderers": [],
-        "previewers": [
-          "content"
-        ],
+        "previewers": ["content"],
         "options": {
           "layout": {
             "border": "rounded",
@@ -64,11 +59,7 @@
   },
   "source": {
     "file": {
-      "excludes": [
-        ".*/\\.DS_Store",
-        ".*/\\.git/.*",
-        ".*/node_modules/.*"
-      ]
+      "excludes": [".*/\\.DS_Store", ".*/\\.git/.*", ".*/node_modules/.*"]
     }
   },
   "transformer": {},
