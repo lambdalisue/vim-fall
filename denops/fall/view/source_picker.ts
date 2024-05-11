@@ -15,21 +15,21 @@ import type {
   Transformer,
 } from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
 
-import { any, isDefined } from "../../util/collection.ts";
-import { startAsyncScheduler } from "../../util/async_scheduler.ts";
-import { subscribe } from "../../util/event.ts";
+import { any, isDefined } from "../util/collection.ts";
+import { startAsyncScheduler } from "../util/async_scheduler.ts";
+import { subscribe } from "../util/event.ts";
 import {
   buildLayout,
   Layout,
   LayoutParams,
-} from "../layout/prompt_top_preview_right.ts";
-import { PromptComponent } from "../component/prompt.ts";
-import { SelectorComponent } from "../component/selector.ts";
-import { PreviewComponent } from "../component/preview.ts";
-import { emitPickerEnter, emitPickerLeave } from "../util/emitter.ts";
-import { observePrompt, startPrompt } from "../util/prompt.ts";
-import { ItemCollector } from "../util/item_collector.ts";
-import { ItemProcessor } from "../util/item_processor.ts";
+} from "./layout/prompt_top_preview_right.ts";
+import { PromptComponent } from "./component/prompt.ts";
+import { SelectorComponent } from "./component/selector.ts";
+import { PreviewComponent } from "./component/preview.ts";
+import { emitPickerEnter, emitPickerLeave } from "./util/emitter.ts";
+import { observePrompt, startPrompt } from "./util/prompt.ts";
+import { ItemCollector } from "./util/item_collector.ts";
+import { ItemProcessor } from "./util/item_processor.ts";
 
 export interface SourcePickerOptions {
   layout?: Partial<LayoutParams>;

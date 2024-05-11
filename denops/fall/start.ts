@@ -6,8 +6,8 @@ import { is, maybe } from "jsr:@core/unknownutil@3.18.0";
 
 import { subscribe } from "./util/event.ts";
 import { isDefined } from "./util/collection.ts";
-import { SourcePicker } from "./view/picker/source.ts";
-import { ActionPicker } from "./view/picker/action.ts";
+import { SourcePicker } from "./view/source_picker.ts";
+import { ActionPicker } from "./view/action_picker.ts";
 import {
   getActionPickerConfig,
   getConfigPath,
