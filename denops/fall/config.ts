@@ -12,7 +12,7 @@ import { dirname } from "jsr:@std/path@0.225.0/dirname";
 
 import type { SourcePickerOptions } from "./view/source_picker.ts";
 import type { ActionPickerOptions } from "./view/action_picker.ts";
-import { isLayoutParams } from "./view/layout/prompt_top_preview_right.ts";
+import { isLayoutParams } from "./view/layout/picker_layout.ts";
 
 type Options = Record<string, unknown>;
 

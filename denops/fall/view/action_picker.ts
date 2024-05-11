@@ -18,11 +18,7 @@ import type {
 import { any } from "../util/collection.ts";
 import { startAsyncScheduler } from "../util/async_scheduler.ts";
 import { subscribe } from "../util/event.ts";
-import {
-  buildLayout,
-  Layout,
-  LayoutParams,
-} from "./layout/prompt_top_preview_right.ts";
+import { buildLayout, Layout, LayoutParams } from "./layout/picker_layout.ts";
 import { PromptComponent } from "./component/prompt.ts";
 import { SelectorComponent } from "./component/selector.ts";
 import { PreviewComponent } from "./component/preview.ts";
