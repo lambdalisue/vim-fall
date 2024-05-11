@@ -10,9 +10,14 @@ import { copy } from "jsr:@std/fs@0.229.0/copy";
 import { exists } from "jsr:@std/fs@0.229.0/exists";
 import { dirname } from "jsr:@std/path@0.225.0/dirname";
 
-import type { SourcePickerOptions } from "./view/source_picker.ts";
-import type { ActionPickerOptions } from "./view/action_picker.ts";
-import { isLayoutParams } from "./view/layout/picker_layout.ts";
+import {
+  isSourcePickerOptions,
+  type SourcePickerOptions,
+} from "./view/source_picker.ts";
+import {
+  type ActionPickerOptions,
+  isActionPickerOptions,
+} from "./view/action_picker.ts";
 
 type Options = Record<string, unknown>;
 
@@ -52,35 +57,6 @@ export type Config = Partial<{
 const isOptions = is.RecordOf(is.Unknown, is.String) satisfies Predicate<
   Options
 >;
-
-const isSourcePickerOptions = is.PartialOf(is.ObjectOf({
-  layout: is.PartialOf(isLayoutParams),
-  itemCollector: is.PartialOf(is.ObjectOf({
-    chunkSize: is.Number,
-  })),
-  prompt: is.PartialOf(is.ObjectOf({
-    spinner: is.ArrayOf(is.String),
-    headSymbol: is.String,
-    failSymbol: is.String,
-  })),
-  preview: is.PartialOf(is.ObjectOf({
-    debounceWait: is.Number,
-  })),
-  updateInterval: is.Number,
-})) satisfies Predicate<SourcePickerOptions>;
-
-const isActionPickerOptions = is.PartialOf(is.ObjectOf({
-  layout: is.PartialOf(isLayoutParams),
-  prompt: is.PartialOf(is.ObjectOf({
-    spinner: is.ArrayOf(is.String),
-    headSymbol: is.String,
-    failSymbol: is.String,
-  })),
-  preview: is.PartialOf(is.ObjectOf({
-    debounceWait: is.Number,
-  })),
-  updateInterval: is.Number,
-})) satisfies Predicate<ActionPickerOptions>;
 
 const isSourcePickerConfig = is.PartialOf(is.ObjectOf({
   transformers: is.ArrayOf(is.String),

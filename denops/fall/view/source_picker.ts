@@ -14,11 +14,17 @@ import type {
   Source,
   Transformer,
 } from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
+import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
 import { any, isDefined } from "../util/collection.ts";
 import { startAsyncScheduler } from "../util/async_scheduler.ts";
 import { subscribe } from "../util/event.ts";
-import { buildLayout, Layout, LayoutParams } from "./layout/picker_layout.ts";
+import {
+  buildLayout,
+  isLayoutParams,
+  Layout,
+  LayoutParams,
+} from "./layout/picker_layout.ts";
 import { PromptComponent } from "./component/prompt.ts";
 import { SelectorComponent } from "./component/selector.ts";
 import { PreviewComponent } from "./component/preview.ts";
@@ -42,6 +48,22 @@ export interface SourcePickerOptions {
   };
   updateInterval?: number;
 }
+
+export const isSourcePickerOptions = is.PartialOf(is.ObjectOf({
+  layout: is.PartialOf(isLayoutParams),
+  itemCollector: is.PartialOf(is.ObjectOf({
+    chunkSize: is.Number,
+  })),
+  prompt: is.PartialOf(is.ObjectOf({
+    spinner: is.ArrayOf(is.String),
+    headSymbol: is.String,
+    failSymbol: is.String,
+  })),
+  preview: is.PartialOf(is.ObjectOf({
+    debounceWait: is.Number,
+  })),
+  updateInterval: is.Number,
+})) satisfies Predicate<SourcePickerOptions>;
 
 export class SourcePicker implements AsyncDisposable {
   #query = "";
