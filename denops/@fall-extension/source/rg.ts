@@ -3,8 +3,9 @@ import type {
   SourceItem,
 } from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
 import { TextLineStream } from "https://deno.land/std@0.224.0/streams/mod.ts";
-import { input } from "https://deno.land/x/denops_std@v6.4.0/helper/input.ts";
 import { assert, is, maybe } from "jsr:@core/unknownutil@3.18.0";
+
+import { input } from "../../@fall-util/input.ts";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
   args: is.ArrayOf(is.String),
@@ -92,7 +93,10 @@ export const getSource: GetSource = (denops, options) => {
   return {
     async stream({ cmdline }) {
       if (!cmdline) {
-        cmdline = await input(denops, { prompt: "> " }) ?? "";
+        cmdline = await input(denops, {
+          title: " rg ",
+          prompt: "Pattern: ",
+        }) ?? "";
       }
       if (!cmdline) return; // Cancel this source
 
