@@ -70,7 +70,7 @@ export class ItemProcessor implements Disposable {
       );
       if (signal.aborted) return;
 
-      let projectedItems = [...transformedItems];
+      let projectedItems = transformedItems;
       for (const projector of this.#projectors) {
         projectedItems = await projector.project({
           query,
