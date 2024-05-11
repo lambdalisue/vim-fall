@@ -1,8 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
-import { batch } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v6.4.0/variable/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
-import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 import { ensure, is } from "jsr:@core/unknownutil@3.18.0";
 import { parse as parseJsonc } from "jsr:@std/jsonc@0.224.0";
 import { ensureDir } from "jsr:@std/fs@0.229.0/ensure-dir";
@@ -68,10 +66,6 @@ export async function editConfig(
 ): Promise<void> {
   await ensureConfig(configPath);
   await buffer.open(denops, configPath);
-  await batch(denops, async (denops) => {
-    await opt.autochdir.set(denops, false);
-    await opt.bufhidden.set(denops, "wipe");
-  });
 }
 
 export async function loadConfig(configPath: string): Promise<Config> {
