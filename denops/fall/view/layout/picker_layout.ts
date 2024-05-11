@@ -66,20 +66,20 @@ export const isLayoutParams = is.ObjectOf({
 }) satisfies Predicate<LayoutParams>;
 
 export interface Layout extends AsyncDisposable {
-  prompt: popup.PopupWindow;
+  query: popup.PopupWindow;
   selector: popup.PopupWindow;
   preview: popup.PopupWindow;
 }
 
 /**
- * Prompt head / Preview right layout
+ * Query head / Preview right layout
  *
  * ```
  *                 width
  * ┌─────────────────────────────────────┐
  *
  * ╭──────────────────────╮╭─────────────╮  ┐
- * │        Prompt        ││             │  │
+ * │        Query         ││             │  │
  * │----------------------││             │  │
  * │                      ││   Preview   │  │height
  * │        Result        ││             │  │
@@ -136,7 +136,7 @@ export async function buildLayout(
     ? getDivider(params.divider)
     : await getDefaultDivider(denops);
 
-  const prompt = stack.use(
+  const query = stack.use(
     await popup.open(denops, {
       title: params.title,
       relative: "editor",
@@ -169,8 +169,8 @@ export async function buildLayout(
       relative: "editor",
       anchor: "NW",
       width: mainWidth - 2, // -2 for border
-      height: height - 1 - 3, // -1 for prompt, -3 for border
-      row: y + 3, // +3 for prompt and border
+      height: height - 1 - 3, // -1 for query, -3 for border
+      row: y + 3, // +3 for query and border
       col: x,
       border: [
         "",
@@ -222,11 +222,11 @@ export async function buildLayout(
   // Using `setbufvar` on popup window doesn't work well on Vim.
   // That's why we use win_execute instead even for buffer-local settings.
   await batch(denops, async (denops) => {
-    await fn.bufload(denops, prompt.bufnr);
+    await fn.bufload(denops, query.bufnr);
     await fn.win_execute(
       denops,
-      prompt.winid,
-      "setlocal filetype=fall-prompt",
+      query.winid,
+      "setlocal filetype=fall-query",
     );
 
     await fn.bufload(denops, selector.bufnr);
@@ -248,7 +248,7 @@ export async function buildLayout(
 
   const successStack = stack.move();
   return {
-    prompt,
+    query,
     selector,
     preview,
     [Symbol.asyncDispose]: () => successStack.disposeAsync(),

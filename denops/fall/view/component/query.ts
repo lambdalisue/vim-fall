@@ -7,22 +7,22 @@ import { getByteLength } from "../../util/text.ts";
 const DEFAULT_HEAD_SYMBOL = ">";
 const DEFAULT_FAIL_SYMBOL = "☓";
 
-export interface PromptComponentParams {
+export interface QueryComponentParams {
   winwidth: number;
   spinner?: string[];
   headSymbol?: string;
   failSymbol?: string;
 }
 
-export interface PromptComponentCounter {
+export interface QueryComponentCounter {
   collected: number;
   processed: number;
 }
 
 /**
- * A component that renders a prompt buffer.
+ * A component that renders a query buffer.
  */
-export class PromptComponent {
+export class QueryComponent {
   #bufnr: number;
   #winwidth: number;
   #spinner: Spinner;
@@ -34,9 +34,9 @@ export class PromptComponent {
   #cmdpos: number = 0;
   #collecting: boolean | "failed" = false;
   #processing: boolean | "failed" = false;
-  #counter: PromptComponentCounter | undefined;
+  #counter: QueryComponentCounter | undefined;
 
-  constructor(bufnr: number, _winid: number, params: PromptComponentParams) {
+  constructor(bufnr: number, _winid: number, params: QueryComponentParams) {
     this.#bufnr = bufnr;
     this.#winwidth = params.winwidth;
     this.#spinner = new Spinner(params.spinner);
@@ -81,16 +81,16 @@ export class PromptComponent {
   /**
    * Set the counter to be rendered.
    */
-  set counter(value: PromptComponentCounter) {
+  set counter(value: QueryComponentCounter) {
     const changed = this.#counter !== value;
     this.#changed = this.#changed || changed;
     this.#counter = value;
   }
 
   /**
-   * Render the prompt buffer.
+   * Render the query buffer.
    *
-   * It returns true if the prompt buffer is rendered.
+   * It returns true if the query buffer is rendered.
    */
   async render(
     denops: Denops,
@@ -151,7 +151,7 @@ export class PromptComponent {
     } catch (err) {
       // Fail silently
       console.debug(
-        `[fall] Failed to render content to the prompt buffer: ${err}`,
+        `[fall] Failed to render content to the query buffer: ${err}`,
       );
     }
     return true;

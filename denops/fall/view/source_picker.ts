@@ -25,7 +25,7 @@ import {
   Layout,
   LayoutParams,
 } from "./layout/picker_layout.ts";
-import { PromptComponent } from "./component/prompt.ts";
+import { QueryComponent } from "./component/query.ts";
 import { SelectorComponent } from "./component/selector.ts";
 import { PreviewComponent } from "./component/preview.ts";
 import { emitPickerEnter, emitPickerLeave } from "./util/emitter.ts";
@@ -38,7 +38,7 @@ export interface SourcePickerOptions {
   itemCollector?: {
     chunkSize?: number;
   };
-  prompt?: {
+  query?: {
     spinner?: string[];
     headSymbol?: string;
     failSymbol?: string;
@@ -54,7 +54,7 @@ export const isSourcePickerOptions = is.PartialOf(is.ObjectOf({
   itemCollector: is.PartialOf(is.ObjectOf({
     chunkSize: is.Number,
   })),
-  prompt: is.PartialOf(is.ObjectOf({
+  query: is.PartialOf(is.ObjectOf({
     spinner: is.ArrayOf(is.String),
     headSymbol: is.String,
     failSymbol: is.String,
@@ -191,8 +191,8 @@ export class SourcePicker implements AsyncDisposable {
     await batch(denops, async (denops) => {
       await g.set(
         denops,
-        "_fall_layout_prompt_winid",
-        this.#layout.prompt.winid,
+        "_fall_layout_query_winid",
+        this.#layout.query.winid,
       );
       await g.set(
         denops,
@@ -207,26 +207,26 @@ export class SourcePicker implements AsyncDisposable {
     });
 
     // Collect informations
-    const [scrolloff, promptWinwidth, selectorWinwidth, selectorWinheight] =
+    const [scrolloff, queryWinwidth, selectorWinwidth, selectorWinheight] =
       await collect(
         denops,
         (denops) => [
           opt.scrolloff.get(denops),
-          fn.winwidth(denops, this.#layout.prompt.winid),
+          fn.winwidth(denops, this.#layout.query.winid),
           fn.winwidth(denops, this.#layout.selector.winid),
           fn.winheight(denops, this.#layout.selector.winid),
         ],
       );
 
     // Bind components to the layout
-    const prompt = new PromptComponent(
-      this.#layout.prompt.bufnr,
-      this.#layout.prompt.winid,
+    const query = new QueryComponent(
+      this.#layout.query.bufnr,
+      this.#layout.query.winid,
       {
-        winwidth: promptWinwidth,
-        spinner: this.#options.prompt?.spinner,
-        headSymbol: this.#options.prompt?.headSymbol,
-        failSymbol: this.#options.prompt?.failSymbol,
+        winwidth: queryWinwidth,
+        spinner: this.#options.query?.spinner,
+        headSymbol: this.#options.query?.headSymbol,
+        failSymbol: this.#options.query?.failSymbol,
       },
     );
     const selector = new SelectorComponent(
@@ -251,23 +251,23 @@ export class SourcePicker implements AsyncDisposable {
 
     // Subscribe custom events
     stack.use(subscribe("item-collector-changed", () => {
-      prompt.collecting = true;
-      prompt.counter = {
+      query.collecting = true;
+      query.counter = {
         processed: this.availableItems.length,
         collected: this.collectedItems.length,
       };
-      prompt.processing = true;
+      query.processing = true;
       this.#itemProcessor.start(this.collectedItems, this.#query);
     }));
     stack.use(subscribe("item-collector-succeeded", () => {
-      prompt.collecting = false;
+      query.collecting = false;
     }));
     stack.use(subscribe("item-collector-failed", () => {
-      prompt.collecting = "failed";
+      query.collecting = "failed";
     }));
     stack.use(subscribe("item-processor-succeeded", () => {
-      prompt.processing = false;
-      prompt.counter = {
+      query.processing = false;
+      query.counter = {
         processed: this.availableItems.length,
         collected: this.collectedItems.length,
       };
@@ -276,15 +276,15 @@ export class SourcePicker implements AsyncDisposable {
       preview.item = this.cursorItem;
     }));
     stack.use(subscribe("item-processor-failed", () => {
-      prompt.processing = "failed";
+      query.processing = "failed";
     }));
     stack.use(subscribe("cmdline-changed", (cmdline) => {
       this.#query = cmdline;
       this.#itemProcessor.start(this.collectedItems, this.#query);
-      prompt.cmdline = this.#query;
+      query.cmdline = this.#query;
     }));
     stack.use(subscribe("cmdpos-changed", (cmdpos) => {
-      prompt.cmdpos = cmdpos;
+      query.cmdpos = cmdpos;
     }));
     stack.use(subscribe("selector-cursor-move", (offset) => {
       const nextIndex = Math.max(
@@ -334,7 +334,7 @@ export class SourcePicker implements AsyncDisposable {
     stack.use(startAsyncScheduler(
       async () => {
         const isUpdated = any([
-          await prompt.render(denops, { signal }),
+          await query.render(denops, { signal }),
           await selector.render(denops, { signal }),
         ]);
         preview.render(denops, { signal })
