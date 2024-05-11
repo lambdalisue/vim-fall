@@ -31,9 +31,11 @@ export function observeInput(
       }
       if (cmdline !== prevCmdline) {
         dispatch("cmdline-changed", cmdline);
+        prevCmdline = cmdline;
       }
       if (cmdpos !== prevCmdpos) {
         dispatch("cmdpos-changed", cmdpos);
+        prevCmdpos = cmdpos;
       }
     },
     OBSERVER_INTERVAL,
