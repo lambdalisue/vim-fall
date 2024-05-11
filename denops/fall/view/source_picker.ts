@@ -33,6 +33,12 @@ import { observeInput, startInput } from "./util/input.ts";
 import { ItemCollector } from "./util/item_collector.ts";
 import { ItemProcessor } from "./util/item_processor.ts";
 
+export interface SourcePickerContext {
+  query: string;
+  cursor: number;
+  selected: Set<unknown>;
+}
+
 export interface SourcePickerOptions {
   layout?: Partial<LayoutParams>;
   itemCollector?: {
@@ -66,13 +72,11 @@ export const isSourcePickerOptions = is.PartialOf(is.ObjectOf({
 })) satisfies Predicate<SourcePickerOptions>;
 
 export class SourcePicker implements AsyncDisposable {
-  #query = "";
-  #index = 0;
-  #selected: Set<unknown> = new Set();
-
   #renderers: Renderer[];
   #previewers: Previewer[];
   #options: SourcePickerOptions;
+  #context: SourcePickerContext;
+
   #layout: Layout;
   #itemCollector: ItemCollector;
   #itemProcessor: ItemProcessor;
@@ -82,6 +86,7 @@ export class SourcePicker implements AsyncDisposable {
     renderers: Renderer[],
     previewers: Previewer[],
     options: SourcePickerOptions,
+    context: SourcePickerContext,
     layout: Layout,
     itemCollector: ItemCollector,
     itemProcessor: ItemProcessor,
@@ -90,6 +95,7 @@ export class SourcePicker implements AsyncDisposable {
     this.#renderers = renderers;
     this.#previewers = previewers;
     this.#options = options;
+    this.#context = context;
     this.#layout = layout;
     this.#itemCollector = itemCollector;
     this.#itemProcessor = itemProcessor;
@@ -100,11 +106,16 @@ export class SourcePicker implements AsyncDisposable {
     denops: Denops,
     cmdline: string,
     source: Source,
-    filters: Transformer[],
-    sorters: Projector[],
+    transformers: Transformer[],
+    projectors: Projector[],
     renderers: Renderer[],
     previewers: Previewer[],
-    pickerOptions: SourcePickerOptions,
+    options: SourcePickerOptions,
+    context: SourcePickerContext = {
+      query: "",
+      cursor: 0,
+      selected: new Set(),
+    },
   ): Promise<SourcePicker | undefined> {
     const stack = new AsyncDisposableStack();
     const sourceStream = await source.stream({ cmdline });
@@ -116,38 +127,41 @@ export class SourcePicker implements AsyncDisposable {
     // Start collecting source items
     const itemCollector = stack.use(
       new ItemCollector(sourceStream, {
-        chunkSize: pickerOptions.itemCollector?.chunkSize ??
+        chunkSize: options.itemCollector?.chunkSize ??
           SOURCE_ITEM_CHUNK_SIZE,
       }),
     );
     itemCollector.start();
 
-    const itemProcessor = stack.use(new ItemProcessor(filters, sorters));
+    const itemProcessor = stack.use(
+      new ItemProcessor(transformers, projectors),
+    );
 
     // Build layout
     const title = `${source.name} ${cmdline}`.trim();
     const layout = stack.use(
       await buildLayout(denops, {
-        title,
-        width: pickerOptions.layout?.width,
-        widthRatio: pickerOptions.layout?.widthRatio ?? WIDTH_RATION,
-        widthMin: pickerOptions.layout?.widthMin ?? WIDTH_MIN,
-        widthMax: pickerOptions.layout?.widthMax ?? WIDTH_MAX,
-        height: pickerOptions.layout?.height,
-        heightRatio: pickerOptions.layout?.heightRatio ?? HEIGHT_RATION,
-        heightMin: pickerOptions.layout?.heightMin ?? HEIGHT_MIN,
-        heightMax: pickerOptions.layout?.heightMax ?? HEIGHT_MAX,
-        previewRatio: pickerOptions.layout?.previewRatio ?? PREVIEW_RATION,
-        border: pickerOptions.layout?.border,
-        divider: pickerOptions.layout?.divider,
-        zindex: pickerOptions.layout?.zindex ?? 50,
+        title: ` ${title} `,
+        width: options.layout?.width,
+        widthRatio: options.layout?.widthRatio ?? WIDTH_RATION,
+        widthMin: options.layout?.widthMin ?? WIDTH_MIN,
+        widthMax: options.layout?.widthMax ?? WIDTH_MAX,
+        height: options.layout?.height,
+        heightRatio: options.layout?.heightRatio ?? HEIGHT_RATION,
+        heightMin: options.layout?.heightMin ?? HEIGHT_MIN,
+        heightMax: options.layout?.heightMax ?? HEIGHT_MAX,
+        previewRatio: options.layout?.previewRatio ?? PREVIEW_RATION,
+        border: options.layout?.border,
+        divider: options.layout?.divider,
+        zindex: options.layout?.zindex ?? 50,
       }),
     );
 
     return new SourcePicker(
       renderers,
       previewers,
-      pickerOptions,
+      options,
+      context,
       layout,
       itemCollector,
       itemProcessor,
@@ -165,11 +179,11 @@ export class SourcePicker implements AsyncDisposable {
 
   get selectedItems(): Item[] {
     const m = new Map(this.availableItems.map((v) => [v.id, v]));
-    return [...this.#selected].map((v) => m.get(v)).filter(isDefined);
+    return [...this.#context.selected].map((v) => m.get(v)).filter(isDefined);
   }
 
   get cursorItem(): Item | undefined {
-    return this.availableItems.at(this.#index);
+    return this.availableItems.at(this.#context.cursor);
   }
 
   async start(
@@ -257,7 +271,7 @@ export class SourcePicker implements AsyncDisposable {
         collected: this.collectedItems.length,
       };
       query.processing = true;
-      this.#itemProcessor.start(this.collectedItems, this.#query);
+      this.#itemProcessor.start(this.collectedItems, this.#context.query);
     }));
     stack.use(subscribe("item-collector-succeeded", () => {
       query.collecting = false;
@@ -272,16 +286,16 @@ export class SourcePicker implements AsyncDisposable {
         collected: this.collectedItems.length,
       };
       selector.items = this.availableItems;
-      selector.index = this.#index;
+      selector.index = this.#context.cursor;
       preview.item = this.cursorItem;
     }));
     stack.use(subscribe("item-processor-failed", () => {
       query.processing = "failed";
     }));
     stack.use(subscribe("cmdline-changed", (cmdline) => {
-      this.#query = cmdline;
-      this.#itemProcessor.start(this.collectedItems, this.#query);
-      query.cmdline = this.#query;
+      this.#context.query = cmdline;
+      this.#itemProcessor.start(this.collectedItems, cmdline);
+      query.cmdline = cmdline;
     }));
     stack.use(subscribe("cmdpos-changed", (cmdpos) => {
       query.cmdpos = cmdpos;
@@ -289,39 +303,39 @@ export class SourcePicker implements AsyncDisposable {
     stack.use(subscribe("selector-cursor-move", (offset) => {
       const nextIndex = Math.max(
         0,
-        Math.min(this.availableItems.length - 1, this.#index + offset),
+        Math.min(this.availableItems.length - 1, this.#context.cursor + offset),
       );
-      this.#index = nextIndex;
-      selector.index = this.#index;
+      this.#context.cursor = nextIndex;
+      selector.index = nextIndex;
     }));
     stack.use(subscribe("selector-cursor-move-at", (line) => {
       if (line === "$") {
-        this.#index = this.availableItems.length - 1;
+        this.#context.cursor = this.availableItems.length - 1;
       } else {
-        this.#index = Math.max(
+        this.#context.cursor = Math.max(
           0,
           Math.min(this.availableItems.length - 1, line - 1),
         );
       }
-      selector.index = this.#index;
+      selector.index = this.#context.cursor;
     }));
     stack.use(subscribe("selector-select", () => {
       const item = this.cursorItem;
       if (!item) return;
-      if (this.#selected.has(item.id)) {
-        this.#selected.delete(item.id);
+      if (this.#context.selected.has(item.id)) {
+        this.#context.selected.delete(item.id);
       } else {
-        this.#selected.add(item.id);
+        this.#context.selected.add(item.id);
       }
-      selector.selected = new Set(this.#selected);
+      selector.selected = new Set(this.#context.selected);
     }));
     stack.use(subscribe("selector-select-all", () => {
-      if (this.#selected.size === this.availableItems.length) {
-        this.#selected.clear();
+      if (this.#context.selected.size === this.availableItems.length) {
+        this.#context.selected.clear();
       } else {
-        this.#selected = new Set(this.availableItems.map((v) => v.id));
+        this.#context.selected = new Set(this.availableItems.map((v) => v.id));
       }
-      selector.selected = new Set(this.#selected);
+      selector.selected = new Set(this.#context.selected);
     }));
     stack.use(subscribe("preview-cursor-move", (offset) => {
       preview.moveCursor(denops, offset, { signal: options.signal });
@@ -360,7 +374,9 @@ export class SourcePicker implements AsyncDisposable {
     // Wait for user input
     try {
       await emitPickerEnter(denops, `source:${name}`);
-      return await startInput(denops, { text: this.#query }, { signal });
+      return await startInput(denops, { text: this.#context.query }, {
+        signal,
+      });
     } finally {
       await emitPickerLeave(denops, `source:${name}`);
     }

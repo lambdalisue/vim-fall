@@ -32,6 +32,11 @@ import { emitPickerEnter, emitPickerLeave } from "./util/emitter.ts";
 import { observeInput, startInput } from "./util/input.ts";
 import { ItemProcessor } from "./util/item_processor.ts";
 
+export interface ActionPickerContext {
+  query: string;
+  cursor: number;
+}
+
 export interface ActionPickerOptions {
   layout?: Partial<LayoutParams>;
   query?: {
@@ -59,13 +64,12 @@ export const isActionPickerOptions = is.PartialOf(is.ObjectOf({
 })) satisfies Predicate<ActionPickerOptions>;
 
 export class ActionPicker implements AsyncDisposable {
-  #query = "";
-  #index = 0;
-
   #actions: Action[];
   #renderers: Renderer[];
   #previewers: Previewer[];
   #options: ActionPickerOptions;
+  #context: ActionPickerContext;
+
   #layout: Layout;
   #itemProcessor: ItemProcessor;
   #disposable: AsyncDisposableStack;
@@ -75,6 +79,7 @@ export class ActionPicker implements AsyncDisposable {
     renderers: Renderer[],
     previewers: Previewer[],
     options: ActionPickerOptions,
+    context: ActionPickerContext,
     layout: Layout,
     itemProcessor: ItemProcessor,
     disposable: AsyncDisposableStack,
@@ -83,6 +88,7 @@ export class ActionPicker implements AsyncDisposable {
     this.#renderers = renderers;
     this.#previewers = previewers;
     this.#options = options;
+    this.#context = context;
     this.#layout = layout;
     this.#itemProcessor = itemProcessor;
     this.#disposable = disposable;
@@ -91,15 +97,21 @@ export class ActionPicker implements AsyncDisposable {
   static async create(
     denops: Denops,
     actions: Action[],
-    filters: Transformer[],
-    sorters: Projector[],
+    transformers: Transformer[],
+    projectors: Projector[],
     renderers: Renderer[],
     previewers: Previewer[],
     options: ActionPickerOptions,
+    context: ActionPickerContext = {
+      query: "",
+      cursor: 0,
+    },
   ): Promise<ActionPicker> {
     const stack = new AsyncDisposableStack();
 
-    const itemProcessor = stack.use(new ItemProcessor(filters, sorters));
+    const itemProcessor = stack.use(
+      new ItemProcessor(transformers, projectors),
+    );
 
     // Build layout
     const layout = stack.use(
@@ -124,6 +136,7 @@ export class ActionPicker implements AsyncDisposable {
       renderers,
       previewers,
       options,
+      context,
       layout,
       itemProcessor,
       stack.move(),
@@ -146,7 +159,7 @@ export class ActionPicker implements AsyncDisposable {
   }
 
   get cursorItem(): Item | undefined {
-    return this.processedItems.at(this.#index);
+    return this.processedItems.at(this.#context.cursor);
   }
 
   async start(
@@ -234,16 +247,16 @@ export class ActionPicker implements AsyncDisposable {
         collected: this.collectedItems.length,
       };
       selector.items = this.processedItems;
-      selector.index = this.#index;
+      selector.index = this.#context.cursor;
       preview.item = this.cursorItem;
     }));
     stack.use(subscribe("item-processor-failed", () => {
       query.processing = "failed";
     }));
     stack.use(subscribe("cmdline-changed", (cmdline) => {
-      this.#query = cmdline;
-      this.#itemProcessor.start(this.collectedItems, this.#query);
-      query.cmdline = this.#query;
+      this.#context.query = cmdline;
+      this.#itemProcessor.start(this.collectedItems, cmdline);
+      query.cmdline = cmdline;
     }));
     stack.use(subscribe("cmdpos-changed", (cmdpos) => {
       query.cmdpos = cmdpos;
@@ -251,21 +264,21 @@ export class ActionPicker implements AsyncDisposable {
     stack.use(subscribe("selector-cursor-move", (offset) => {
       const nextIndex = Math.max(
         0,
-        Math.min(this.processedItems.length - 1, this.#index + offset),
+        Math.min(this.processedItems.length - 1, this.#context.cursor + offset),
       );
-      this.#index = nextIndex;
-      selector.index = this.#index;
+      this.#context.cursor = nextIndex;
+      selector.index = nextIndex;
     }));
     stack.use(subscribe("selector-cursor-move-at", (line) => {
       if (line === "$") {
-        this.#index = this.processedItems.length - 1;
+        this.#context.cursor = this.processedItems.length - 1;
       } else {
-        this.#index = Math.max(
+        this.#context.cursor = Math.max(
           0,
           Math.min(this.processedItems.length - 1, line - 1),
         );
       }
-      selector.index = this.#index;
+      selector.index = this.#context.cursor;
     }));
     stack.use(subscribe("preview-cursor-move", (offset) => {
       preview.moveCursor(denops, offset, { signal: options.signal });
@@ -304,7 +317,9 @@ export class ActionPicker implements AsyncDisposable {
     // Wait for user input
     try {
       await emitPickerEnter(denops, `action`);
-      return await startInput(denops, { text: this.#query }, { signal });
+      return await startInput(denops, { text: this.#context.query }, {
+        signal,
+      });
     } finally {
       await emitPickerLeave(denops, `action`);
     }
