@@ -5,7 +5,8 @@ import type {
 import { collect } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
-import { getByteLength } from "../utils.ts";
+
+import { getByteLength } from "../util.ts";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
   smartCase: is.Boolean,

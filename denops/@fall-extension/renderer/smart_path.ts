@@ -1,6 +1,7 @@
 import type { GetRenderer } from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 import { SEPARATOR } from "jsr:@std/path@0.225.0/constants";
-import { getByteLength } from "../utils.ts";
+
+import { getByteLength } from "../util.ts";
 
 export const getRenderer: GetRenderer = (_denops, _options) => {
   return {

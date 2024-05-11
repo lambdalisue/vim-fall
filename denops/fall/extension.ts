@@ -227,7 +227,7 @@ export async function discover(runtimepath: string): Promise<void> {
     match: [/.*\.ts/],
   };
   const roots = runtimepath.split(",").map((v) =>
-    join(v, "denops", "@fall-extensions")
+    join(v, "denops", "@fall-extension")
   );
   const promises: Promise<void>[] = [];
   for (const root of roots) {

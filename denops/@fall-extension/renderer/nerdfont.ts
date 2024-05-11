@@ -2,7 +2,9 @@ import type { GetRenderer } from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 import { collect } from "https://deno.land/x/denops_std@v6.3.0/batch/mod.ts";
 import { zip } from "jsr:@std/collections@0.224.1/zip";
 import { is } from "jsr:@core/unknownutil@3.18.0";
-import { getByteLength } from "../utils.ts";
+
+import { getByteLength } from "../util.ts";
+
 const isPathDetail = is.ObjectOf({
   path: is.String,
 });

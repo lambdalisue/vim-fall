@@ -1,9 +1,10 @@
 import type { GetRenderer } from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
 import { collect } from "https://deno.land/x/denops_std@v6.3.0/batch/mod.ts";
 import { zip } from "jsr:@std/collections@0.224.1/zip";
-import { extname } from "jsr:@std/path@0.225.0/extname";
 import { is } from "jsr:@core/unknownutil@3.18.0";
-import { getByteLength } from "../utils.ts";
+
+import { getByteLength } from "../util.ts";
+
 const isPathDetail = is.ObjectOf({
   path: is.String,
 });
@@ -22,13 +23,9 @@ export const getRenderer: GetRenderer = (denops, _options) => {
       const icons = await collect(
         denops,
         (denops) =>
-          paths.map((v) => {
-            const ext = extname(v).substring(1);
-            return denops.call(
-              "luaeval",
-              `require'nvim-web-devicons'.get_icon("${v}", "${ext}", { default = true })`,
-            ) as Promise<string>;
-          }),
+          paths.map((v) =>
+            denops.call("WebDevIconsGetFileTypeSymbol", v, 0) as Promise<string>
+          ),
       );
       if (signal?.aborted) return items;
 
