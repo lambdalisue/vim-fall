@@ -3,7 +3,7 @@ import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 import { ensure, is } from "jsr:@core/unknownutil@3.18.0";
 
 import { dispatch, isFallEventName } from "./util/event.ts";
-import { start } from "./start.ts";
+import { start } from "./picker.ts";
 import { input, isInputParams } from "./input.ts";
 import { editConfig, getConfigPath, loadConfig } from "./config/util.ts";
 import { isExtensionType } from "./extension/type.ts";
@@ -27,11 +27,7 @@ export async function main(denops: Denops): Promise<void> {
       dispatch(ensure(name, isFallEventName), data);
     },
     "picker:start": async (name, cmdline) => {
-      await start(
-        denops,
-        ensure(name, is.String),
-        ensure(cmdline, is.String),
-      );
+      await start(denops, ensure(name, is.String), ensure(cmdline, is.String));
     },
     "config:edit": async () => {
       const configPath = await getConfigPath(denops);

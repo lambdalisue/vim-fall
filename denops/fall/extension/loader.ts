@@ -42,25 +42,24 @@ export async function getExtension<
 >(
   denops: Denops,
   type: T,
-  expr: string,
+  name: string,
   config: Config,
 ): Promise<R | undefined> {
   try {
-    const [name] = expr.split(":", 1);
-    const loader = registry[type].get(name);
+    const [root] = name.split(":", 1);
+    const loader = registry[type].get(root);
     if (!loader) {
-      throw new Error(`No ${type} extension '${name}' is registered`);
+      throw new Error(`No ${type} extension '${root}' is registered`);
     }
     const ext = await loader.load(
       denops,
-      getExtensionOptions(type, expr, config),
+      getExtensionOptions(type, name, config),
     );
     if (!ext) return;
     return {
       ...ext,
-      name: loader.name,
       script: loader.script,
-      expr,
+      name,
     } as R;
   } catch (err) {
     console.error(`[fall] ${err.message ?? err}`);
@@ -73,11 +72,11 @@ export async function getExtensions<
 >(
   denops: Denops,
   type: T,
-  exprs: string[],
+  names: string[],
   config: Config,
 ): Promise<R[]> {
   const vs = await Promise.all(
-    exprs.map((v) => getExtension(denops, type, v, config)),
+    names.map((v) => getExtension(denops, type, v, config)),
   );
   return vs.filter(isDefined) as R[];
 }

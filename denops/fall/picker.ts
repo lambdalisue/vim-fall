@@ -18,7 +18,7 @@ import { getExtension, getExtensions } from "./extension/loader.ts";
 
 export async function start(
   denops: Denops,
-  expr: string,
+  name: string,
   cmdline: string,
   options: { signal?: AbortSignal } = {},
 ): Promise<void> {
@@ -37,12 +37,12 @@ export async function start(
 
   const configPath = await getConfigPath(denops);
   const config = await loadConfig(configPath);
-  const source = await getExtension(denops, "source", expr, config);
+  const source = await getExtension(denops, "source", name, config);
   if (!source) {
     return;
   }
-  const spc = getSourcePickerConfig(expr, config);
-  const apc = getActionPickerConfig(expr, config);
+  const spc = getSourcePickerConfig(name, config);
+  const apc = getActionPickerConfig(name, config);
   const actions = await getExtensions(
     denops,
     "action",

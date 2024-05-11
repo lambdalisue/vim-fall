@@ -19,39 +19,39 @@ import {
 import { type ExtensionType } from "../extension/type.ts";
 
 export function getSourcePickerConfig(
-  expr: string,
+  name: string,
   config: Config,
 ): SourcePickerConfig {
-  const [name] = expr.split(":", 1);
+  const [root] = name.split(":", 1);
   return {
     ...(config.picker?.source?.[""] ?? {}),
+    ...(config.picker?.source?.[root] ?? {}),
     ...(config.picker?.source?.[name] ?? {}),
-    ...(config.picker?.source?.[expr] ?? {}),
   };
 }
 
 export function getActionPickerConfig(
-  expr: string,
+  name: string,
   config: Config,
 ): ActionPickerConfig {
-  const [name] = expr.split(":", 1);
+  const [root] = name.split(":", 1);
   return {
     ...(config.picker?.action?.[""] ?? {}),
+    ...(config.picker?.action?.[root] ?? {}),
     ...(config.picker?.action?.[name] ?? {}),
-    ...(config.picker?.action?.[expr] ?? {}),
   };
 }
 
 export function getExtensionOptions<T extends ExtensionType>(
   type: T,
-  expr: string,
+  name: string,
   config: Config,
 ): Record<string, unknown> {
-  const [name] = expr.split(":", 1);
+  const [root] = name.split(":", 1);
   return {
     ...(config[type]?.[""] ?? {}),
+    ...(config[type]?.[root] ?? {}),
     ...(config[type]?.[name] ?? {}),
-    ...(config[type]?.[expr] ?? {}),
   };
 }
 
