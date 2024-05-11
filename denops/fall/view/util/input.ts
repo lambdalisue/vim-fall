@@ -1,7 +1,10 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import { collect } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
-import { input } from "https://deno.land/x/denops_std@v6.4.0/helper/input.ts";
+import {
+  input,
+  type InputOptions,
+} from "https://deno.land/x/denops_std@v6.4.0/helper/input.ts";
 import { send } from "https://deno.land/x/denops_std@v6.4.0/helper/keymap.ts";
 import { exprQuote as q } from "https://deno.land/x/denops_std@v6.4.0/helper/expr_string.ts";
 
@@ -10,7 +13,7 @@ import { dispatch } from "../../util/event.ts";
 
 const OBSERVER_INTERVAL = 10;
 
-export function observePrompt(
+export function observeInput(
   denops: Denops,
   { signal }: { signal?: AbortSignal } = {},
 ): Disposable {
@@ -38,9 +41,9 @@ export function observePrompt(
   );
 }
 
-export async function startPrompt(
+export async function startInput(
   denops: Denops,
-  text: string,
+  options: InputOptions,
   { signal }: { signal?: AbortSignal },
 ): Promise<boolean> {
   const closeInput = async () => {
@@ -55,5 +58,5 @@ export async function startPrompt(
   using _eventListeners = {
     [Symbol.dispose]: () => signal?.removeEventListener("abort", closeInput),
   };
-  return await input(denops, { text }) == null;
+  return await input(denops, options) == null;
 }

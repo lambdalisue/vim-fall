@@ -29,7 +29,7 @@ import { QueryComponent } from "./component/query.ts";
 import { SelectorComponent } from "./component/selector.ts";
 import { PreviewComponent } from "./component/preview.ts";
 import { emitPickerEnter, emitPickerLeave } from "./util/emitter.ts";
-import { observePrompt, startPrompt } from "./util/prompt.ts";
+import { observeInput, startInput } from "./util/input.ts";
 import { ItemCollector } from "./util/item_collector.ts";
 import { ItemProcessor } from "./util/item_processor.ts";
 
@@ -355,12 +355,12 @@ export class SourcePicker implements AsyncDisposable {
     ));
 
     // Observe Vim's prompt
-    stack.use(observePrompt(denops, { signal }));
+    stack.use(observeInput(denops, { signal }));
 
     // Wait for user input
     try {
       await emitPickerEnter(denops, `source:${name}`);
-      return await startPrompt(denops, this.#query, { signal });
+      return await startInput(denops, { text: this.#query }, { signal });
     } finally {
       await emitPickerLeave(denops, `source:${name}`);
     }
