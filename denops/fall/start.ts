@@ -98,8 +98,7 @@ export async function start(
     config,
   );
 
-  await using itemsPicker = await SourcePicker.create(
-    denops,
+  await using sourcePicker = await SourcePicker.create(
     cmdline,
     source,
     transformers,
@@ -108,9 +107,17 @@ export async function start(
     previewers,
     spc.options ?? {},
   );
-  if (!itemsPicker) {
+  if (!sourcePicker) {
     return;
   }
+  await using actionPicker = ActionPicker.create(
+    actions,
+    actionTransformers,
+    actionProjectors,
+    actionRenderers,
+    actionPreviewers,
+    apc.options ?? {},
+  );
 
   // Listen cursor movement events
   let nextAction: "@select" | "@default" | string = "@select";
@@ -124,9 +131,12 @@ export async function start(
     });
   }));
 
+  // Open source picker
+  await using _sourcePickerOpenGuard = await sourcePicker.open(denops);
+
   while (true) {
     // Pick items
-    if (await itemsPicker.start(denops, { signal })) {
+    if (await sourcePicker.start(denops, { signal })) {
       // Cancel
       await denops.redraw();
       return;
@@ -134,15 +144,7 @@ export async function start(
 
     let action: Action | undefined;
     if (nextAction == "@select") {
-      await using actionPicker = await ActionPicker.create(
-        denops,
-        actions,
-        actionTransformers,
-        actionProjectors,
-        actionRenderers,
-        actionPreviewers,
-        apc.options ?? {},
-      );
+      await using _actionPickerOpenGuard = await actionPicker.open(denops);
       if (await actionPicker.start(denops, { signal })) {
         // Continue
         await denops.redraw();
@@ -163,9 +165,9 @@ export async function start(
     if (action) {
       if (
         await action.trigger({
-          cursorItem: itemsPicker.cursorItem,
-          selectedItems: itemsPicker.selectedItems,
-          availableItems: itemsPicker.availableItems,
+          cursorItem: sourcePicker.cursorItem,
+          selectedItems: sourcePicker.selectedItems,
+          availableItems: sourcePicker.availableItems,
         }, { signal })
       ) {
         // Continue

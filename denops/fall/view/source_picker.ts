@@ -72,38 +72,38 @@ export const isSourcePickerOptions = is.PartialOf(is.ObjectOf({
 })) satisfies Predicate<SourcePickerOptions>;
 
 export class SourcePicker implements AsyncDisposable {
+  #title: string;
   #renderers: Renderer[];
   #previewers: Previewer[];
   #options: SourcePickerOptions;
   #context: SourcePickerContext;
 
-  #layout: Layout;
+  #layout?: Layout;
   #itemCollector: ItemCollector;
   #itemProcessor: ItemProcessor;
   #disposable: AsyncDisposableStack;
 
   private constructor(
+    title: string,
     renderers: Renderer[],
     previewers: Previewer[],
     options: SourcePickerOptions,
     context: SourcePickerContext,
-    layout: Layout,
     itemCollector: ItemCollector,
     itemProcessor: ItemProcessor,
     disposable: AsyncDisposableStack,
   ) {
+    this.#title = title;
     this.#renderers = renderers;
     this.#previewers = previewers;
     this.#options = options;
     this.#context = context;
-    this.#layout = layout;
     this.#itemCollector = itemCollector;
     this.#itemProcessor = itemProcessor;
     this.#disposable = disposable;
   }
 
   static async create(
-    denops: Denops,
     cmdline: string,
     source: Source,
     transformers: Transformer[],
@@ -137,32 +137,12 @@ export class SourcePicker implements AsyncDisposable {
       new ItemProcessor(transformers, projectors),
     );
 
-    // Build layout
-    const title = `${source.name} ${cmdline}`.trim();
-    const layout = stack.use(
-      await buildLayout(denops, {
-        title: ` ${title} `,
-        width: options.layout?.width,
-        widthRatio: options.layout?.widthRatio ?? WIDTH_RATION,
-        widthMin: options.layout?.widthMin ?? WIDTH_MIN,
-        widthMax: options.layout?.widthMax ?? WIDTH_MAX,
-        height: options.layout?.height,
-        heightRatio: options.layout?.heightRatio ?? HEIGHT_RATION,
-        heightMin: options.layout?.heightMin ?? HEIGHT_MIN,
-        heightMax: options.layout?.heightMax ?? HEIGHT_MAX,
-        previewRatio: options.layout?.previewRatio ?? PREVIEW_RATION,
-        border: options.layout?.border,
-        divider: options.layout?.divider,
-        zindex: options.layout?.zindex ?? 50,
-      }),
-    );
-
     return new SourcePicker(
+      `${source.name} ${cmdline}`.trim(),
       renderers,
       previewers,
       options,
       context,
-      layout,
       itemCollector,
       itemProcessor,
       stack.move(),
@@ -186,10 +166,44 @@ export class SourcePicker implements AsyncDisposable {
     return this.availableItems.at(this.#context.cursor);
   }
 
+  async open(denops: Denops): Promise<AsyncDisposable> {
+    if (this.#layout) {
+      throw new Error("The source picker is already opened");
+    }
+    this.#layout = await buildLayout(denops, {
+      title: ` ${this.#title} `,
+      width: this.#options.layout?.width,
+      widthRatio: this.#options.layout?.widthRatio ?? WIDTH_RATION,
+      widthMin: this.#options.layout?.widthMin ?? WIDTH_MIN,
+      widthMax: this.#options.layout?.widthMax ?? WIDTH_MAX,
+      height: this.#options.layout?.height,
+      heightRatio: this.#options.layout?.heightRatio ?? HEIGHT_RATION,
+      heightMin: this.#options.layout?.heightMin ?? HEIGHT_MIN,
+      heightMax: this.#options.layout?.heightMax ?? HEIGHT_MAX,
+      previewRatio: this.#options.layout?.previewRatio ?? PREVIEW_RATION,
+      border: this.#options.layout?.border,
+      divider: this.#options.layout?.divider,
+      zindex: this.#options.layout?.zindex ?? 50,
+    });
+    return {
+      [Symbol.asyncDispose]: async () => {
+        if (this.#layout) {
+          await this.#layout[Symbol.asyncDispose]();
+          this.#layout = undefined;
+        }
+      },
+    };
+  }
+
   async start(
     denops: Denops,
     options: { signal: AbortSignal },
   ): Promise<boolean> {
+    if (!this.#layout) {
+      throw new Error("The source picker is not opnend");
+    }
+    const layout = this.#layout;
+
     await using stack = new AsyncDisposableStack();
     const controller = new AbortController();
     const signal = AbortSignal.any([options.signal, controller.signal]);
@@ -206,17 +220,17 @@ export class SourcePicker implements AsyncDisposable {
       await g.set(
         denops,
         "_fall_layout_query_winid",
-        this.#layout.query.winid,
+        layout.query.winid,
       );
       await g.set(
         denops,
         "_fall_layout_selector_winid",
-        this.#layout.selector.winid,
+        layout.selector.winid,
       );
       await g.set(
         denops,
         "_fall_layout_preview_winid",
-        this.#layout.preview.winid,
+        layout.preview.winid,
       );
     });
 
@@ -226,16 +240,16 @@ export class SourcePicker implements AsyncDisposable {
         denops,
         (denops) => [
           opt.scrolloff.get(denops),
-          fn.winwidth(denops, this.#layout.query.winid),
-          fn.winwidth(denops, this.#layout.selector.winid),
-          fn.winheight(denops, this.#layout.selector.winid),
+          fn.winwidth(denops, layout.query.winid),
+          fn.winwidth(denops, layout.selector.winid),
+          fn.winheight(denops, layout.selector.winid),
         ],
       );
 
     // Bind components to the layout
     const query = new QueryComponent(
-      this.#layout.query.bufnr,
-      this.#layout.query.winid,
+      layout.query.bufnr,
+      layout.query.winid,
       {
         winwidth: queryWinwidth,
         spinner: this.#options.query?.spinner,
@@ -244,8 +258,8 @@ export class SourcePicker implements AsyncDisposable {
       },
     );
     const selector = new SelectorComponent(
-      this.#layout.selector.bufnr,
-      this.#layout.selector.winid,
+      layout.selector.bufnr,
+      layout.selector.winid,
       {
         scrolloff,
         winwidth: selectorWinwidth,
@@ -254,8 +268,8 @@ export class SourcePicker implements AsyncDisposable {
       },
     );
     const preview = new PreviewComponent(
-      this.#layout.preview.bufnr,
-      this.#layout.preview.winid,
+      layout.preview.bufnr,
+      layout.preview.winid,
       {
         previewers: this.#previewers,
         debounceWait: this.#options.preview?.debounceWait ??
