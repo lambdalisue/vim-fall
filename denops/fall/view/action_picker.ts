@@ -125,6 +125,10 @@ export class ActionPicker implements AsyncDisposable {
     );
   }
 
+  get context(): ActionPickerContext {
+    return this.#context;
+  }
+
   get collectedItems(): Item[] {
     return this.#actions.map((v, idx) => ({
       id: idx,

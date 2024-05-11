@@ -17,7 +17,6 @@ export type {
 
 type ExtensionBase = {
   readonly name: string;
-  readonly script: string;
 };
 
 export type Source = core.Source & ExtensionBase;

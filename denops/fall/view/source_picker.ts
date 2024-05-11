@@ -149,6 +149,10 @@ export class SourcePicker implements AsyncDisposable {
     );
   }
 
+  get context(): SourcePickerContext {
+    return this.#context;
+  }
+
   get collectedItems(): Item[] {
     return this.#itemCollector.items;
   }
