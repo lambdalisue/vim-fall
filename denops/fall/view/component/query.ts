@@ -113,6 +113,7 @@ export class QueryComponent {
     const counter = this.#counter
       ? `${this.#counter.processed}/${this.#counter.collected}`
       : "";
+    // TODO: Support query text longer than the query winwidth.
     const prefixByteLength = getByteLength(prefix);
     const suffixByteLength = getByteLength(suffix);
     const counterByteLength = getByteLength(counter);
@@ -120,7 +121,7 @@ export class QueryComponent {
     const head = prefix + this.#cmdline;
     const tail = counter + suffix;
     const spacer = " ".repeat(
-      this.#winwidth - [head, tail].join("").length,
+      Math.max(0, this.#winwidth - [head, tail].join("").length),
     );
 
     // Render UI
