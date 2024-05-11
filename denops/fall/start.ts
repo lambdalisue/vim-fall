@@ -16,16 +16,6 @@ import {
 } from "./config.ts";
 import * as extension from "./extension.ts";
 
-const defaultActions: string[] = ["open"];
-const defaultTransformers: string[] = ["substring"];
-const defaultProjectors: string[] = ["lexical"];
-const defaultRenderers: string[] = [];
-const defaultPreviewers: string[] = ["text"];
-const defaultActionTransformers: string[] = ["substring"];
-const defaultActionProjectors: string[] = [];
-const defaultActionRenderers: string[] = [];
-const defaultActionPreviewers: string[] = ["text"];
-
 export async function start(
   denops: Denops,
   expr: string,
@@ -56,56 +46,56 @@ export async function start(
   const actions = new Map(
     await extension.getExtensions(
       denops,
-      spc.actions ?? defaultActions,
+      spc.actions ?? [],
       config,
       extension.getAction,
     ),
   );
   const transformers = (await extension.getExtensions(
     denops,
-    spc.transformers ?? defaultTransformers,
+    spc.transformers ?? [],
     config,
     extension.getTransformer,
   )).map(([_, v]) => v);
   const projectors = (await extension.getExtensions(
     denops,
-    spc.projectors ?? defaultProjectors,
+    spc.projectors ?? [],
     config,
     extension.getProjector,
   )).map(([_, v]) => v);
   const renderers = (await extension.getExtensions(
     denops,
-    spc.renderers ?? defaultRenderers,
+    spc.renderers ?? [],
     config,
     extension.getRenderer,
   )).map(([_, v]) => v);
   const previewers = (await extension.getExtensions(
     denops,
-    spc.previewers ?? defaultPreviewers,
+    spc.previewers ?? [],
     config,
     extension.getPreviewer,
   )).map(([_, v]) => v);
   const actionTransformers = (await extension.getExtensions(
     denops,
-    apc.transformers ?? defaultActionTransformers,
+    apc.transformers ?? [],
     config,
     extension.getTransformer,
   )).map(([_, v]) => v);
   const actionProjectors = (await extension.getExtensions(
     denops,
-    apc.projectors ?? defaultActionProjectors,
+    apc.projectors ?? [],
     config,
     extension.getProjector,
   )).map(([_, v]) => v);
   const actionRenderers = (await extension.getExtensions(
     denops,
-    apc.renderers ?? defaultActionRenderers,
+    apc.renderers ?? [],
     config,
     extension.getRenderer,
   )).map(([_, v]) => v);
   const actionPreviewers = (await extension.getExtensions(
     denops,
-    apc.previewers ?? defaultActionPreviewers,
+    apc.previewers ?? [],
     config,
     extension.getPreviewer,
   )).map(([_, v]) => v);
