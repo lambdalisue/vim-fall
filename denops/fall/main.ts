@@ -5,17 +5,22 @@ import { ensure, is } from "jsr:@core/unknownutil@3.18.0";
 import { dispatch, isFallEventName } from "./util/event.ts";
 import { start } from "./start.ts";
 import { input, isInputParams } from "./input.ts";
-import { editConfig, getConfigPath } from "./config.ts";
-import { discover, list, register } from "./extension.ts";
+import { editConfig, getConfigPath, loadConfig } from "./config/util.ts";
+import { isExtensionType } from "./extension/type.ts";
+import {
+  discoverExtensionLoaders,
+  listExtensionNames,
+  registerExtensionLoader,
+} from "./extension/loader.ts";
 
 import "./polyfill.ts";
 
 const isDefs = is.RecordOf(is.String, is.String);
 
 export async function main(denops: Denops): Promise<void> {
-  const discoverExtensions = async () => {
+  const discover = async () => {
     const runtimepath = await opt.runtimepath.get(denops);
-    await discover(runtimepath);
+    await discoverExtensionLoaders(runtimepath);
   };
   denops.dispatcher = {
     "event:dispatch": (name, data) => {
@@ -34,18 +39,22 @@ export async function main(denops: Denops): Promise<void> {
     },
     "extension:register": async (defs) => {
       await Promise.allSettled(
-        Object.entries(ensure(defs, isDefs)).map(([k, v]) => register(k, v)),
+        Object.entries(ensure(defs, isDefs)).map(([k, v]) =>
+          registerExtensionLoader(k, v)
+        ),
       );
     },
     "extension:discover": async () => {
-      await discoverExtensions();
+      await discover();
     },
-    "extension:list": (type) => {
-      return list(ensure(type, is.String));
+    "extension:list": async (type) => {
+      const configPath = await getConfigPath(denops);
+      const config = await loadConfig(configPath);
+      return listExtensionNames(ensure(type, isExtensionType), config);
     },
     "util:input": async (params) => {
       return await input(denops, ensure(params, isInputParams));
     },
   };
-  await discoverExtensions();
+  await discover();
 }

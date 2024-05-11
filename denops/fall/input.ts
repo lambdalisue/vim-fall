@@ -3,7 +3,7 @@ import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
 import { isDefined } from "./util/collection.ts";
 import { Input } from "./view/input.ts";
-import { getConfigPath, loadConfig } from "./config.ts";
+import { getConfigPath, loadConfig } from "./config/util.ts";
 
 export interface InputParams {
   prompt: string;

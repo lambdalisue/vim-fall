@@ -13,8 +13,8 @@ import {
   getConfigPath,
   getSourcePickerConfig,
   loadConfig,
-} from "./config.ts";
-import * as extension from "./extension.ts";
+} from "./config/util.ts";
+import { getExtension, getExtensions } from "./extension/loader.ts";
 
 export async function start(
   denops: Denops,
@@ -37,67 +37,67 @@ export async function start(
 
   const configPath = await getConfigPath(denops);
   const config = await loadConfig(configPath);
-  const source = await extension.getSource(denops, expr, config);
+  const source = await getExtension(denops, "source", expr, config);
   if (!source) {
     return;
   }
   const spc = getSourcePickerConfig(expr, config);
   const apc = getActionPickerConfig(expr, config);
   const actions = new Map(
-    await extension.getExtensions(
+    await getExtensions(
       denops,
+      "action",
       spc.actions ?? [],
       config,
-      extension.getAction,
     ),
   );
-  const transformers = (await extension.getExtensions(
+  const transformers = (await getExtensions(
     denops,
+    "transformer",
     spc.transformers ?? [],
     config,
-    extension.getTransformer,
   )).map(([_, v]) => v);
-  const projectors = (await extension.getExtensions(
+  const projectors = (await getExtensions(
     denops,
+    "projector",
     spc.projectors ?? [],
     config,
-    extension.getProjector,
   )).map(([_, v]) => v);
-  const renderers = (await extension.getExtensions(
+  const renderers = (await getExtensions(
     denops,
+    "renderer",
     spc.renderers ?? [],
     config,
-    extension.getRenderer,
   )).map(([_, v]) => v);
-  const previewers = (await extension.getExtensions(
+  const previewers = (await getExtensions(
     denops,
+    "previewer",
     spc.previewers ?? [],
     config,
-    extension.getPreviewer,
   )).map(([_, v]) => v);
-  const actionTransformers = (await extension.getExtensions(
+  const actionTransformers = (await getExtensions(
     denops,
+    "transformer",
     apc.transformers ?? [],
     config,
-    extension.getTransformer,
   )).map(([_, v]) => v);
-  const actionProjectors = (await extension.getExtensions(
+  const actionProjectors = (await getExtensions(
     denops,
+    "projector",
     apc.projectors ?? [],
     config,
-    extension.getProjector,
   )).map(([_, v]) => v);
-  const actionRenderers = (await extension.getExtensions(
+  const actionRenderers = (await getExtensions(
     denops,
+    "renderer",
     apc.renderers ?? [],
     config,
-    extension.getRenderer,
   )).map(([_, v]) => v);
-  const actionPreviewers = (await extension.getExtensions(
+  const actionPreviewers = (await getExtensions(
     denops,
+    "previewer",
     apc.previewers ?? [],
     config,
-    extension.getPreviewer,
   )).map(([_, v]) => v);
 
   await using itemsPicker = await SourcePicker.create(
