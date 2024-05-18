@@ -41,9 +41,6 @@ export interface SourcePickerContext {
 
 export interface SourcePickerOptions {
   layout?: Partial<LayoutParams>;
-  itemCollector?: {
-    chunkSize?: number;
-  };
   query?: {
     spinner?: string[];
     headSymbol?: string;
@@ -57,9 +54,6 @@ export interface SourcePickerOptions {
 
 export const isSourcePickerOptions = is.PartialOf(is.ObjectOf({
   layout: is.PartialOf(isLayoutParams),
-  itemCollector: is.PartialOf(is.ObjectOf({
-    chunkSize: is.Number,
-  })),
   query: is.PartialOf(is.ObjectOf({
     spinner: is.ArrayOf(is.String),
     headSymbol: is.String,
@@ -126,10 +120,7 @@ export class SourcePicker implements AsyncDisposable {
 
     // Start collecting source items
     const itemCollector = stack.use(
-      new ItemCollector(sourceStream, {
-        chunkSize: options.itemCollector?.chunkSize ??
-          SOURCE_ITEM_CHUNK_SIZE,
-      }),
+      new ItemCollector(sourceStream),
     );
     itemCollector.start();
 
@@ -414,4 +405,3 @@ const HEIGHT_MAX = 40;
 const PREVIEW_RATION = 0.45;
 const UPDATE_INTERVAL = 20;
 const PREVIEW_DEBOUNCE_WAIT = 100;
-const SOURCE_ITEM_CHUNK_SIZE = 100;

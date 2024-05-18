@@ -6,7 +6,7 @@ Deno.test("ItemCollector", async (t) => {
   await t.step("collect items from empty stream", async () => {
     const { promise, resolve } = Promise.withResolvers<void>();
     using _ = subscribe("item-collector-completed", () => resolve());
-    await using collector = new ItemCollector(ReadableStream.from([]), {});
+    await using collector = new ItemCollector(ReadableStream.from([]));
     collector.start();
     await promise;
     assertEquals(collector.items, []);
@@ -21,7 +21,6 @@ Deno.test("ItemCollector", async (t) => {
         { value: "2" },
         { value: "3" },
       ]),
-      {},
     );
     collector.start();
     await promise;
@@ -43,7 +42,6 @@ Deno.test("ItemCollector", async (t) => {
         { value: "2" },
         { value: "3" },
       ]),
-      {},
     );
     collector.start();
     await promise;
@@ -63,7 +61,6 @@ Deno.test("ItemCollector", async (t) => {
           controller.error(new Error("test"));
         },
       }),
-      {},
     );
     collector.start();
     await promise;
@@ -86,7 +83,6 @@ Deno.test("ItemCollector", async (t) => {
               // Wait forever
             },
           }),
-          {},
         );
         collector.start();
         // Disposable will abort the internal stream

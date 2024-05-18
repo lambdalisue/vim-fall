@@ -6,23 +6,17 @@ import type {
 import { ChunkStream } from "../../util/stream.ts";
 import { dispatch } from "../../util/event.ts";
 
-export interface ItemCollectorParams {
-  chunkSize?: number;
-}
-
 /**
  * Collect items from the given stream and store them in the internal state.
  */
 export class ItemCollector implements Disposable {
   #stream: ReadableStream<SourceItem>;
-  #chunkSize: number;
 
   #controller?: AbortController;
   #items: Item[] = [];
 
-  constructor(stream: ReadableStream<SourceItem>, params: ItemCollectorParams) {
+  constructor(stream: ReadableStream<SourceItem>) {
     this.#stream = stream;
-    this.#chunkSize = params.chunkSize ?? DEFAULT_CHUNK_SIZE;
   }
 
   /**
@@ -49,31 +43,42 @@ export class ItemCollector implements Disposable {
     if (this.#controller) {
       throw new Error("ItemCollector is already started");
     }
+    this.#start().catch((err) => {
+      console.warn(
+        `[fall] Error in reading source steam: ${err.message ?? err}`,
+      );
+    });
+  }
+
+  async #start(): Promise<void> {
     this.#controller = new AbortController();
     const { signal } = this.#controller;
-    this.#stream
-      .pipeThrough(new ChunkStream(this.#chunkSize), { signal })
-      .pipeTo(
-        new WritableStream({
-          write: (chunk) => {
-            const offset = this.#items.length;
-            this.#items.push(...toItems(chunk, offset));
-            dispatch("item-collector-changed", undefined);
+    try {
+      await this.#stream
+        .pipeThrough(
+          new ChunkStream(calcChunkSize(this.#items.length)),
+          {
+            signal,
           },
-        }),
-        { signal },
-      )
-      .then(() => {
-        dispatch("item-collector-succeeded", undefined);
-      })
-      .catch((err) => {
-        if (err instanceof DOMException && err.name === "AbortError") return;
-        console.warn(`[fall] Error in reading source steam: ${err}`);
-        dispatch("item-collector-failed", undefined);
-      })
-      .finally(() => {
-        dispatch("item-collector-completed", undefined);
-      });
+        )
+        .pipeTo(
+          new WritableStream({
+            write: (chunk) => {
+              const offset = this.#items.length;
+              this.#items.push(...toItems(chunk, offset));
+              dispatch("item-collector-changed", undefined);
+            },
+          }),
+          { signal },
+        );
+      dispatch("item-collector-succeeded", undefined);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      dispatch("item-collector-failed", undefined);
+      throw err;
+    } finally {
+      dispatch("item-collector-completed", undefined);
+    }
   }
 
   [Symbol.dispose]() {
@@ -97,4 +102,11 @@ function toItems(
   }));
 }
 
-const DEFAULT_CHUNK_SIZE = 200;
+function calcChunkSize(length: number): number {
+  if (length > 10000) {
+    return 1000;
+  } else if (length > 1000) {
+    return 100;
+  }
+  return 10;
+}
