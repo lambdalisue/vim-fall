@@ -7,17 +7,17 @@ import { getByteLength } from "../../util/text.ts";
 const DEFAULT_HEAD_SYMBOL = ">";
 const DEFAULT_FAIL_SYMBOL = "☓";
 
-export interface QueryComponentParams {
+export type QueryComponentParams = Readonly<{
   winwidth: number;
-  spinner?: string[];
+  spinner?: readonly string[];
   headSymbol?: string;
   failSymbol?: string;
-}
+}>;
 
-export interface QueryComponentCounter {
+export type QueryComponentCounter = Readonly<{
   collected: number;
   processed: number;
-}
+}>;
 
 /**
  * A component that renders a query buffer.

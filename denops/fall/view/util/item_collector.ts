@@ -18,7 +18,7 @@ export class ItemCollector implements Disposable {
   /**
    * Collected items
    */
-  get items(): Item[] {
+  get items(): readonly Item[] {
     return this.#items;
   }
 
@@ -87,9 +87,9 @@ export class ItemCollector implements Disposable {
 }
 
 function toItems(
-  items: SourceItem[],
+  items: readonly SourceItem[],
   offset: number,
-): Item[] {
+): readonly Item[] {
   return items.map((v, i) => ({
     detail: {},
     decorations: [],

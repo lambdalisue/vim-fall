@@ -32,25 +32,25 @@ import { observeInput, startInput } from "./util/input.ts";
 import { ItemCollector } from "./util/item_collector.ts";
 import { ItemProcessor } from "./util/item_processor.ts";
 
-export interface PickerContext {
+export type PickerContext = {
   query: string;
   cursor: number;
   selected: Set<unknown>;
-}
+};
 
-export interface PickerOptions {
+export type PickerOptions = Readonly<{
   selectable?: boolean;
   layout?: Partial<LayoutParams>;
-  query?: {
-    spinner?: string[];
+  query?: Readonly<{
+    spinner?: readonly string[];
     headSymbol?: string;
     failSymbol?: string;
-  };
-  preview?: {
+  }>;
+  preview?: Readonly<{
     debounceWait?: number;
-  };
+  }>;
   updateInterval?: number;
-}
+}>;
 
 export const isPickerOptions = is.PartialOf(is.ObjectOf({
   layout: is.PartialOf(isLayoutParams),
@@ -67,8 +67,8 @@ export const isPickerOptions = is.PartialOf(is.ObjectOf({
 
 export class Picker implements AsyncDisposable {
   #title: string;
-  #renderers: Renderer[];
-  #previewers: Previewer[];
+  #renderers: readonly Renderer[];
+  #previewers: readonly Previewer[];
   #options: PickerOptions;
   #context: PickerContext;
 
@@ -80,10 +80,10 @@ export class Picker implements AsyncDisposable {
   constructor(
     title: string,
     stream: ReadableStream<SourceItem>,
-    transformers: Transformer[],
-    projectors: Projector[],
-    renderers: Renderer[],
-    previewers: Previewer[],
+    transformers: readonly Transformer[],
+    projectors: readonly Projector[],
+    renderers: readonly Renderer[],
+    previewers: readonly Previewer[],
     options: PickerOptions,
     context?: PickerContext,
   ) {
@@ -114,15 +114,15 @@ export class Picker implements AsyncDisposable {
     return this.#context;
   }
 
-  get collectedItems(): Item[] {
+  get collectedItems(): readonly Item[] {
     return this.#itemCollector.items;
   }
 
-  get processedItems(): Item[] {
+  get processedItems(): readonly Item[] {
     return this.#itemProcessor.items;
   }
 
-  get selectedItems(): Item[] {
+  get selectedItems(): readonly Item[] {
     const m = new Map(this.processedItems.map((v) => [v.id, v]));
     return [...this.#context.selected].map((v) => m.get(v)).filter(isDefined);
   }

@@ -5,7 +5,7 @@ import type { Item } from "./item.ts";
 
 export type { Item };
 
-export interface ProjectorParams {
+export type ProjectorParams = Readonly<{
   /**
    * The query that user has input.
    */
@@ -14,8 +14,8 @@ export interface ProjectorParams {
   /**
    * The transformed/projected items.
    */
-  items: Item[];
-}
+  items: readonly Item[];
+}>;
 
 /**
  * Projector is responsible for projection of the items.
@@ -24,7 +24,7 @@ export interface ProjectorParams {
  * prior to perform the operation. Use `Transformer` instead when you want to apply the operation
  * on the stream rather than the entire items.
  */
-export interface Projector {
+export type Projector = {
   /**
    * Description of the extension.
    */
@@ -38,11 +38,11 @@ export interface Projector {
    * @param params The sorter parameters.
    * @param options.signal The signal to abort the projection.
    */
-  project: (
+  readonly project: (
     params: ProjectorParams,
     options: { signal?: AbortSignal },
-  ) => Promish<Item[]>;
-}
+  ) => Promish<readonly Item[]>;
+};
 
 /**
  * Get the projector instance.
@@ -54,5 +54,5 @@ export interface Projector {
  */
 export type GetProjector = (
   denops: Denops,
-  options: Record<string, unknown>,
+  options: Readonly<Record<string, unknown>>,
 ) => Promish<Projector>;

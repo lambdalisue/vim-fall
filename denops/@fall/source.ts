@@ -8,7 +8,7 @@ export type SourceItem = FlatType<
   & Partial<Pick<Item, "detail" | "decorations">>
 >;
 
-export interface SourceParams {
+export type SourceParams = Readonly<{
   /**
    * The cmdline argument passed to the picker.
    *
@@ -16,14 +16,14 @@ export interface SourceParams {
    * will be invoked with the cmdline `-v ./README.md`.
    */
   cmdline: string;
-}
+}>;
 
 /**
  * Source is a provider of items for the picker.
  *
  * The source is invoked when the picker is started.
  */
-export interface Source {
+export type Source = {
   /**
    * Description of the extension.
    */
@@ -38,7 +38,7 @@ export interface Source {
    *
    * @param params The source parameters.
    */
-  stream: (
+  readonly stream: (
     params: SourceParams,
   ) => Promish<ReadableStream<SourceItem> | undefined>;
 
@@ -51,12 +51,12 @@ export interface Source {
    * @param cmdline The whole command line.
    * @param cursorpos The cursor position in the command line.
    */
-  complete?: (
+  readonly complete?: (
     arglead: string,
     cmdline: string,
     cursorpos: number,
-  ) => Promish<string[]>;
-}
+  ) => Promish<readonly string[]>;
+};
 
 /**
  * Get the source instance.
@@ -68,5 +68,5 @@ export interface Source {
  */
 export type GetSource = (
   denops: Denops,
-  options: Record<string, unknown>,
+  options: Readonly<Record<string, unknown>>,
 ) => Promish<Source>;

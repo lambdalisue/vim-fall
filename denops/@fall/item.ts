@@ -4,7 +4,7 @@ export type ItemDecoration =
   & Omit<Decoration, "line" | "highlight">
   & Partial<Pick<Decoration, "highlight">>;
 
-export interface Item {
+export type Item = Readonly<{
   /**
    * Unique identifier of the item provided by the picker.
    *
@@ -44,5 +44,5 @@ export interface Item {
    * Note: If `highlight` is not specified, the picker will use the default highlight group
    * for highlighting the matched part.
    */
-  decorations: ItemDecoration[];
-}
+  decorations: readonly ItemDecoration[];
+}>;

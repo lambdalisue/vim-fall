@@ -8,9 +8,12 @@ export class Spinner implements Disposable {
   #locked = false;
   #lockTimer?: number;
   #interval: number;
-  #spinner: string[];
+  #spinner: readonly string[];
 
-  constructor(spinner: string[] = UNICODE_SPINNER, interval = UPDATE_INTERVAL) {
+  constructor(
+    spinner: readonly string[] = UNICODE_SPINNER,
+    interval = UPDATE_INTERVAL,
+  ) {
     this.#spinner = spinner;
     this.#interval = interval;
     globalThis.addEventListener("unload", () => {

@@ -25,7 +25,7 @@ const testProjectors: Projector[] = [
   {
     name: "textProjector",
     project({ items }) {
-      return items.sort((a, b) => -1 * a.value.localeCompare(b.value));
+      return items.toSorted((a, b) => -1 * a.value.localeCompare(b.value));
     },
   },
 ];

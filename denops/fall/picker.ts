@@ -17,13 +17,13 @@ import {
 import type { Action, Item, Source } from "./extension/type.ts";
 import { getExtension, getExtensions } from "./extension/loader.ts";
 
-interface Context {
+type Context = {
   name: string;
   cmdline: string;
-  collectedItems: Item[];
+  collectedItems: readonly Item[];
   sourcePickerContext: PickerContext;
   actionPickerContext: PickerContext;
-}
+};
 
 export async function start(
   denops: Denops,

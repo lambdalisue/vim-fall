@@ -9,12 +9,12 @@ import type { Item, Renderer, RendererItem } from "../../extension/type.ts";
 import { calcScrollOffset } from "../util/scrolloffset.ts";
 import { isDefined } from "../../util/collection.ts";
 
-export interface SelectorComponentParams {
+export type SelectorComponentParams = Readonly<{
   scrolloff: number;
   winwidth: number;
   winheight: number;
-  renderers: Renderer[];
-}
+  renderers: readonly Renderer[];
+}>;
 
 /**
  * A component that renders a selector buffer.
@@ -24,14 +24,14 @@ export class SelectorComponent {
   #scrolloff: number;
   #winwidth: number;
   #winheight: number;
-  #renderers: Renderer[];
+  #renderers: readonly Renderer[];
 
   #offset: number = 0;
 
   #changed: boolean = false;
   #index: number = 0;
   #selected: Set<unknown> = new Set();
-  #items: Item[] = [];
+  #items: readonly Item[] = [];
 
   constructor(
     bufnr: number,
@@ -71,7 +71,7 @@ export class SelectorComponent {
   /**
    * Set the items to be rendered.
    */
-  set items(value: Item[]) {
+  set items(value: readonly Item[]) {
     const changed = !equal(this.#items, value);
     this.#changed = this.#changed || changed;
     this.#items = value;
@@ -187,11 +187,11 @@ export class SelectorComponent {
  * It ignore the result of the renderer if the renderer returns different size of items.
  */
 async function applyRenderers(
-  items: RendererItem[],
-  renderers: Renderer[],
+  items: readonly RendererItem[],
+  renderers: readonly Renderer[],
   params: { width: number },
   { signal }: { signal: AbortSignal },
-): Promise<RendererItem[]> {
+): Promise<readonly RendererItem[]> {
   const size = items.length;
   if (size === 0) return [];
   for (

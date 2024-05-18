@@ -5,7 +5,7 @@ import type { Item } from "./item.ts";
 
 export type PreviewerItem = Pick<Item, "value" | "detail">;
 
-export interface PreviewerParams {
+export type PreviewerParams = Readonly<{
   /**
    * The item going to be previewd.
    */
@@ -20,7 +20,7 @@ export interface PreviewerParams {
    * The window ID for previewing the item.
    */
   winid: number;
-}
+}>;
 
 /**
  * Previewer is responsible for previewing items within the picker.
@@ -29,7 +29,7 @@ export interface PreviewerParams {
  * The previewer must rewrite the buffer content of the given `bufnr` or `winid` because
  * Vim's popup window does not support opening original buffers.
  */
-export interface Previewer {
+export type Previewer = {
   /**
    * Description of the extension.
    */
@@ -47,11 +47,11 @@ export interface Previewer {
    * @param options.signal The signal to abort the preview.
    * @return `true` if the picker needs to try next previewer.
    */
-  preview: (
+  readonly preview: (
     params: PreviewerParams,
     options: { signal?: AbortSignal },
   ) => Promish<void | boolean>;
-}
+};
 
 /**
  * Get the previewer instance.
@@ -63,5 +63,5 @@ export interface Previewer {
  */
 export type GetPreviewer = (
   denops: Denops,
-  options: Record<string, unknown>,
+  options: Readonly<Record<string, unknown>>,
 ) => Promish<Previewer>;

@@ -6,12 +6,15 @@ import { dispatch } from "../../util/event.ts";
  */
 export class ItemProcessor implements Disposable {
   #controller: AbortController = new AbortController();
-  #transformers: Transformer[];
-  #projectors: Projector[];
+  #transformers: readonly Transformer[];
+  #projectors: readonly Projector[];
 
-  #items: Item[] = [];
+  #items: readonly Item[] = [];
 
-  constructor(transformers: Transformer[], projectors: Projector[]) {
+  constructor(
+    transformers: readonly Transformer[],
+    projectors: readonly Projector[],
+  ) {
     this.#transformers = transformers;
     this.#projectors = projectors;
   }
@@ -19,7 +22,7 @@ export class ItemProcessor implements Disposable {
   /**
    * Processed items
    */
-  get items(): Item[] {
+  get items(): readonly Item[] {
     return this.#items;
   }
 
@@ -36,7 +39,7 @@ export class ItemProcessor implements Disposable {
    * To check if the processing is completed, you should use `item-processor-completed`.
    */
   start(
-    items: Item[],
+    items: readonly Item[],
     query: string,
   ): void {
     this.#abort(); // Cancel previous processing
@@ -65,7 +68,7 @@ export class ItemProcessor implements Disposable {
       );
       if (signal.aborted) return;
 
-      let projectedItems = transformedItems;
+      let projectedItems: readonly Item[] = transformedItems;
       for (const projector of this.#projectors) {
         projectedItems = await projector.project({
           query,

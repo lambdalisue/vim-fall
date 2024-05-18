@@ -11,10 +11,10 @@ import type { Previewer, PreviewerItem } from "../../extension/type.ts";
 
 const DEFAULT_DEBOUNCE_WAIT = 100;
 
-export interface PreviewComponentParams {
-  previewers?: Previewer[];
+export type PreviewComponentParams = Readonly<{
+  previewers?: readonly Previewer[];
   debounceWait?: number;
-}
+}>;
 
 /**
  * A component that renders a preview window.
@@ -22,7 +22,7 @@ export interface PreviewComponentParams {
 export class PreviewComponent {
   #bufnr: number;
   #winid: number;
-  #previewers: Previewer[];
+  #previewers: readonly Previewer[];
   #debounceWait: number;
 
   #changedAt: number | undefined;

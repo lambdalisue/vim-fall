@@ -8,24 +8,24 @@ export type RendererItem = Pick<
   "value" | "label" | "detail" | "decorations"
 >;
 
-export interface RendererParams {
+export type RendererParams = Readonly<{
   /**
    * The items to be displayed.
    */
-  items: RendererItem[];
+  items: readonly RendererItem[];
 
   /**
    * The selector window display width.
    */
   width: number;
-}
+}>;
 
 /**
  * Renderer is responsible for rendering the items in the selector window of the picker.
  *
  * The renderer is only applied to the visible items on the selector for performance reasons.
  */
-export interface Renderer {
+export type Renderer = {
   /**
    * Description of the extension.
    */
@@ -43,8 +43,8 @@ export interface Renderer {
   render: (
     params: RendererParams,
     options: { signal?: AbortSignal },
-  ) => Promish<RendererItem[]>;
-}
+  ) => Promish<readonly RendererItem[]>;
+};
 
 /**
  * Get the renderer instance.
@@ -56,5 +56,5 @@ export interface Renderer {
  */
 export type GetRenderer = (
   denops: Denops,
-  options: Record<string, unknown>,
+  options: Readonly<Record<string, unknown>>,
 ) => Promish<Renderer>;
