@@ -19,7 +19,7 @@ export interface ActionParams {
   /**
    * The items that are available (not filtered).
    */
-  availableItems: ActionItem[];
+  processedItems: ActionItem[];
 }
 
 /**

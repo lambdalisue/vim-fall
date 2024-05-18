@@ -43,14 +43,14 @@ export const getAction: GetAction = (denops, options) => {
   return {
     description,
 
-    async trigger({ cursorItem, selectedItems, availableItems }, { signal }) {
+    async trigger({ cursorItem, selectedItems, processedItems }, { signal }) {
       if (signal?.aborted) return;
 
       const source = selectedItems.length > 0
         ? selectedItems
         : target === "selected-or-cursor"
         ? cursorItem ? [cursorItem] : []
-        : availableItems;
+        : processedItems;
       const items = source
         .map((item) => {
           if (isPathDetail(item.detail)) {

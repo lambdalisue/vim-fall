@@ -275,7 +275,7 @@ async function internalStart(
           await action.trigger({
             cursorItem: sourcePicker.cursorItem,
             selectedItems: sourcePicker.selectedItems,
-            availableItems: sourcePicker.processedItems,
+            processedItems: sourcePicker.processedItems,
           }, { signal })
         ) {
           // Continue
