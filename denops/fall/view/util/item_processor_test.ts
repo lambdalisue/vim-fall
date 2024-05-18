@@ -1,14 +1,12 @@
 import { assertEquals } from "jsr:@std/assert@0.225.1";
-import type {
-  Item,
-  Projector,
-  Transformer,
-} from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
+
+import type { Item, Projector, Transformer } from "../../extension/type.ts";
 import { subscribe } from "../../util/event.ts";
 import { ItemProcessor } from "./item_processor.ts";
 
 const testTransformers: Transformer[] = [
   {
+    name: "testTransformer",
     transform({ query }) {
       return new TransformStream({
         transform(chunk, controller) {
@@ -25,6 +23,7 @@ const testTransformers: Transformer[] = [
 
 const testProjectors: Projector[] = [
   {
+    name: "textProjector",
     project({ items }) {
       return items.sort((a, b) => -1 * a.value.localeCompare(b.value));
     },

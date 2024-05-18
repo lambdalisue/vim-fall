@@ -1,4 +1,4 @@
-import type { GetPreviewer } from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
+import type { GetPreviewer } from "../../@fall/previewer.ts";
 import { batch } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import { basename } from "jsr:@std/path@0.225.0/basename";

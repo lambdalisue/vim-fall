@@ -1,4 +1,4 @@
-import type { GetSource } from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
+import type { GetSource } from "../../@fall/source.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import { fromFileUrl } from "https://deno.land/std@0.217.0/path/from_file_url.ts";
 import { TextLineStream } from "jsr:@std/streams@0.224.0/text-line-stream";

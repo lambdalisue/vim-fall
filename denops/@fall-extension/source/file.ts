@@ -1,4 +1,4 @@
-import type { GetSource } from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
+import type { GetSource } from "../../@fall/source.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import { walk } from "jsr:@std/fs@0.229.0/walk";
 import { relative } from "jsr:@std/path@0.225.0/relative";

@@ -1,4 +1,4 @@
-import type { GetProjector } from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
+import type { GetProjector } from "../../@fall/projector.ts";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({

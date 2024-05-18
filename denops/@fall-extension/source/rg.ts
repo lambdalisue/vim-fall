@@ -1,7 +1,4 @@
-import type {
-  GetSource,
-  SourceItem,
-} from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
+import type { GetSource, SourceItem } from "../../@fall/source.ts";
 import { TextLineStream } from "https://deno.land/std@0.224.0/streams/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.2/function/mod.ts";
 import { assert, is, maybe } from "jsr:@core/unknownutil@3.18.0";

@@ -1,4 +1,4 @@
-import type { GetRenderer } from "https://deno.land/x/fall_core@v0.9.0/mod.ts";
+import type { GetRenderer } from "../../@fall/renderer.ts";
 import { SEPARATOR } from "jsr:@std/path@0.225.0/constants";
 
 import { getByteLength } from "../util.ts";

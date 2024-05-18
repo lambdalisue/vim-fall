@@ -1,8 +1,4 @@
-import type {
-  Item,
-  SourceItem,
-} from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
-
+import type { Item, SourceItem } from "../../extension/type.ts";
 import { ChunkStream } from "../../util/stream.ts";
 import { dispatch } from "../../util/event.ts";
 

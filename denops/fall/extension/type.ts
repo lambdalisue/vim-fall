@@ -1,5 +1,5 @@
 import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
-import type * as core from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
+import type * as core from "../../@fall/mod.ts";
 
 export type {
   ActionItem,
@@ -13,7 +13,7 @@ export type {
   SourceItem,
   SourceParams,
   TransformerParams,
-} from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
+} from "../../@fall/mod.ts";
 
 type ExtensionBase = {
   readonly name: string;

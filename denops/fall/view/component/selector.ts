@@ -3,13 +3,9 @@ import type { Decoration as Decoration } from "https://deno.land/x/denops_std@v6
 import { batch } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
-import type {
-  Item,
-  Renderer,
-  RendererItem,
-} from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
 import { equal } from "jsr:@std/assert@0.225.1/equal";
 
+import type { Item, Renderer, RendererItem } from "../../extension/type.ts";
 import { calcScrollOffset } from "../util/scrolloffset.ts";
 import { isDefined } from "../../util/collection.ts";
 

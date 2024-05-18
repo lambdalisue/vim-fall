@@ -1,4 +1,4 @@
-import type { GetSource } from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
+import type { GetSource } from "../../@fall/source.ts";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 
 const isSourceItem = is.ObjectOf({

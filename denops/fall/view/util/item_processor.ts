@@ -1,9 +1,4 @@
-import type {
-  Item,
-  Projector,
-  Transformer,
-} from "https://deno.land/x/fall_core@v0.11.0/mod.ts";
-
+import type { Item, Projector, Transformer } from "../../extension/type.ts";
 import { dispatch } from "../../util/event.ts";
 
 /**
