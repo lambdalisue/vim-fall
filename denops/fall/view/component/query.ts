@@ -29,12 +29,9 @@ export class QueryComponent {
   #headSymbol: string;
   #failSymbol: string;
 
-  #changed: boolean = false;
-  #cmdline: string = "";
-  #cmdpos: number = 0;
-  #collecting: boolean | "failed" = false;
-  #processing: boolean | "failed" = false;
-  #counter: QueryComponentCounter | undefined;
+  collecting: boolean | "failed" = false;
+  processing: boolean | "failed" = false;
+  counter: QueryComponentCounter | undefined;
 
   constructor(bufnr: number, _winid: number, params: QueryComponentParams) {
     this.#bufnr = bufnr;
@@ -45,116 +42,81 @@ export class QueryComponent {
   }
 
   /**
-   * Set the command line to be rendered.
-   */
-  set cmdline(value: string) {
-    const changed = this.#cmdline !== value;
-    this.#changed = this.#changed || changed;
-    this.#cmdline = value;
-  }
-
-  /**
-   * Set the position of the cursor in the command line.
-   */
-  set cmdpos(value: number) {
-    const changed = this.#cmdpos !== value;
-    this.#changed = this.#changed || changed;
-    this.#cmdpos = value;
-  }
-
-  /**
-   * Set the collecting state.
-   */
-  set collecting(value: boolean | "failed") {
-    this.#changed = this.#changed || value === true;
-    this.#collecting = value;
-  }
-
-  /**
-   * Set the processing state.
-   */
-  set processing(value: boolean | "failed") {
-    this.#changed = this.#changed || value === true;
-    this.#processing = value;
-  }
-
-  /**
-   * Set the counter to be rendered.
-   */
-  set counter(value: QueryComponentCounter) {
-    const changed = this.#counter !== value;
-    this.#changed = this.#changed || changed;
-    this.#counter = value;
-  }
-
-  /**
    * Render the query buffer.
    *
    * It returns true if the query buffer is rendered.
    */
   async render(
     denops: Denops,
-    { signal }: { signal: AbortSignal },
-  ): Promise<boolean> {
-    if (!this.#changed) return false;
-    this.#changed = this.#processing === true || this.#collecting === true;
+    cmdline: string,
+    cmdpos: number,
+    options: { signal: AbortSignal },
+  ): Promise<void> {
+    try {
+      await this.#render(denops, cmdline, cmdpos, options);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      const m = err.message ?? err;
+      console.warn(
+        `[fall] Failed to render the query component: ${m}`,
+      );
+    }
+  }
 
+  async #render(
+    denops: Denops,
+    cmdline: string,
+    cmdpos: number,
+    { signal }: { signal: AbortSignal },
+  ): Promise<void> {
     const spinner = this.#spinner.next();
-    const prefix = this.#processing === "failed"
+    const prefix = this.processing === "failed"
       ? `${this.#failSymbol} `
-      : this.#processing
+      : this.processing
       ? `${spinner} `
       : `${this.#headSymbol} `;
-    const suffix = this.#collecting === "failed"
+    const suffix = this.collecting === "failed"
       ? ` ${this.#failSymbol}`
-      : this.#collecting
+      : this.collecting
       ? ` ${spinner}`
       : "";
-    const counter = this.#counter
-      ? `${this.#counter.processed}/${this.#counter.collected}`
+    const counter = this.counter
+      ? `${this.counter.processed}/${this.counter.collected}`
       : "";
     // TODO: Support query text longer than the query winwidth.
     const prefixByteLength = getByteLength(prefix);
     const suffixByteLength = getByteLength(suffix);
     const counterByteLength = getByteLength(counter);
-    const cmdlineByteLength = getByteLength(this.#cmdline);
-    const head = prefix + this.#cmdline;
+    const cmdlineByteLength = getByteLength(cmdline);
+    const head = prefix + cmdline;
     const tail = counter + suffix;
     const spacer = " ".repeat(
       Math.max(0, this.#winwidth - [head, tail].join("").length),
     );
 
     // Render UI
-    try {
-      await buffer.replace(denops, this.#bufnr, [head + spacer + tail]);
-      if (signal.aborted) return true;
+    await buffer.replace(denops, this.#bufnr, [head + spacer + tail]);
+    signal.throwIfAborted();
 
-      await buffer.decorate(denops, this.#bufnr, [
-        {
-          line: 1,
-          column: 1,
-          length: prefixByteLength,
-          highlight: "FallPromptHeader",
-        },
-        {
-          line: 1,
-          column: Math.max(1, prefixByteLength + this.#cmdpos),
-          length: 1,
-          highlight: "FallPromptCursor",
-        },
-        {
-          line: 1,
-          column: prefixByteLength + cmdlineByteLength + spacer.length + 1,
-          length: counterByteLength + suffixByteLength,
-          highlight: "FallPromptCounter",
-        },
-      ]);
-    } catch (err) {
-      // Fail silently
-      console.debug(
-        `[fall] Failed to render content to the query buffer: ${err}`,
-      );
-    }
-    return true;
+    await buffer.decorate(denops, this.#bufnr, [
+      {
+        line: 1,
+        column: 1,
+        length: prefixByteLength,
+        highlight: "FallPromptHeader",
+      },
+      {
+        line: 1,
+        column: Math.max(1, prefixByteLength + cmdpos),
+        length: 1,
+        highlight: "FallPromptCursor",
+      },
+      {
+        line: 1,
+        column: prefixByteLength + cmdlineByteLength + spacer.length + 1,
+        length: counterByteLength + suffixByteLength,
+        highlight: "FallPromptCounter",
+      },
+    ]);
   }
 }

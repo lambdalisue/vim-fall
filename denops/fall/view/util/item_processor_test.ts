@@ -31,6 +31,9 @@ const testProjectors: Projector[] = [
 ];
 
 Deno.test("ItemProcessor", async (t) => {
+  const controller = new AbortController();
+  const { signal } = controller;
+
   await t.step("process items with given query", async () => {
     const { promise, resolve } = Promise.withResolvers<void>();
     using _ = subscribe("item-processor-completed", () => resolve());
@@ -46,7 +49,7 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
     await using processor = new ItemProcessor(testTransformers, testProjectors);
-    processor.start(items, "2");
+    processor.start(items, "2", { signal });
     await promise;
     assertEquals(processor.items, [
       { id: "8", value: "32", detail: {}, decorations: [] },
@@ -74,7 +77,7 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
     await using processor = new ItemProcessor(testTransformers, testProjectors);
-    processor.start(items, "2");
+    processor.start(items, "2", { signal });
     await promise;
     assertEquals(called, true);
   });
@@ -101,7 +104,7 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
     await using processor = new ItemProcessor(testTransformers, testProjectors);
-    processor.start(items, "2");
+    processor.start(items, "2", { signal });
     await promise;
     assertEquals(called, true);
   });

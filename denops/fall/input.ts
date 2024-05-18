@@ -40,7 +40,7 @@ export async function input(
   const configPath = await getConfigPath(denops);
   const config = await loadConfig(configPath);
 
-  await using inputDialog = await Input.create(denops, {
+  await using inputDialog = new Input({
     ...(config.input ?? {}),
     layout: {
       ...(config.input?.layout ?? {}),
@@ -48,5 +48,6 @@ export async function input(
     },
     input: params,
   });
+  await inputDialog.open(denops);
   return await inputDialog.start(denops, { signal });
 }

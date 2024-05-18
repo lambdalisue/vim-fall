@@ -3,11 +3,13 @@ import { subscribe } from "../../util/event.ts";
 import { ItemCollector } from "./item_collector.ts";
 
 Deno.test("ItemCollector", async (t) => {
+  const controller = new AbortController();
+  const { signal } = controller;
   await t.step("collect items from empty stream", async () => {
     const { promise, resolve } = Promise.withResolvers<void>();
     using _ = subscribe("item-collector-completed", () => resolve());
     await using collector = new ItemCollector(ReadableStream.from([]));
-    collector.start();
+    collector.start({ signal });
     await promise;
     assertEquals(collector.items, []);
   });
@@ -22,7 +24,7 @@ Deno.test("ItemCollector", async (t) => {
         { value: "3" },
       ]),
     );
-    collector.start();
+    collector.start({ signal });
     await promise;
     assertEquals(collector.items, [
       { id: "0", value: "1", detail: {}, decorations: [] },
@@ -43,7 +45,7 @@ Deno.test("ItemCollector", async (t) => {
         { value: "3" },
       ]),
     );
-    collector.start();
+    collector.start({ signal });
     await promise;
     assertEquals(called, true);
   });
@@ -62,7 +64,7 @@ Deno.test("ItemCollector", async (t) => {
         },
       }),
     );
-    collector.start();
+    collector.start({ signal });
     await promise;
     assertEquals(called, true);
   });
@@ -84,7 +86,7 @@ Deno.test("ItemCollector", async (t) => {
             },
           }),
         );
-        collector.start();
+        collector.start({ signal });
         // Disposable will abort the internal stream
       }
       await promise;

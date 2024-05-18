@@ -6,7 +6,6 @@ import {
   batch,
   collect,
 } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
-import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
 import type {
   Item,
@@ -16,15 +15,11 @@ import type {
   SourceItem,
   Transformer,
 } from "../extension/type.ts";
-import { any, isDefined } from "../util/collection.ts";
-import { startAsyncScheduler } from "../util/async_scheduler.ts";
+import { isDefined } from "../util/collection.ts";
 import { subscribe } from "../util/event.ts";
-import {
-  buildLayout,
-  isLayoutParams,
-  Layout,
-  LayoutParams,
-} from "./layout/picker_layout.ts";
+import { throttle } from "../util/throttle.ts";
+import { debounce } from "../util/debounce.ts";
+import { buildLayout, Layout, LayoutParams } from "./layout/picker_layout.ts";
 import { QueryComponent } from "./component/query.ts";
 import { SelectorComponent } from "./component/selector.ts";
 import { PreviewComponent } from "./component/preview.ts";
@@ -33,42 +28,41 @@ import { ItemCollector } from "./util/item_collector.ts";
 import { ItemProcessor } from "./util/item_processor.ts";
 
 export type PickerContext = {
-  query: string;
+  cmdline: string;
+  cmdpos: number;
   cursor: number;
   selected: Set<unknown>;
 };
 
 export type PickerOptions = Readonly<{
-  selectable?: boolean;
   layout?: Partial<LayoutParams>;
+  redraw?: Readonly<{
+    throttleWait?: number;
+  }>;
   query?: Readonly<{
     spinner?: readonly string[];
     headSymbol?: string;
     failSymbol?: string;
+    throttleWait?: number;
+  }>;
+  selector?: Readonly<{
+    throttleWait?: number;
   }>;
   preview?: Readonly<{
+    throttleWait?: number;
     debounceWait?: number;
   }>;
-  updateInterval?: number;
+  itemProcessor?: Readonly<{
+    throttleWait?: number;
+    debounceWait?: number;
+  }>;
 }>;
-
-export const isPickerOptions = is.PartialOf(is.ObjectOf({
-  layout: is.PartialOf(isLayoutParams),
-  query: is.PartialOf(is.ObjectOf({
-    spinner: is.ArrayOf(is.String),
-    headSymbol: is.String,
-    failSymbol: is.String,
-  })),
-  preview: is.PartialOf(is.ObjectOf({
-    debounceWait: is.Number,
-  })),
-  updateInterval: is.Number,
-})) satisfies Predicate<PickerOptions>;
 
 export class Picker implements AsyncDisposable {
   #title: string;
   #renderers: readonly Renderer[];
   #previewers: readonly Previewer[];
+  #selectable: boolean;
   #options: PickerOptions;
   #context: PickerContext;
 
@@ -84,14 +78,12 @@ export class Picker implements AsyncDisposable {
     projectors: readonly Projector[],
     renderers: readonly Renderer[],
     previewers: readonly Previewer[],
-    options: PickerOptions,
+    options: PickerOptions & { selectable?: boolean },
     context?: PickerContext,
   ) {
     const stack = new AsyncDisposableStack();
     // Start collecting source items
     const itemCollector = stack.use(new ItemCollector(stream));
-    itemCollector.start();
-
     const itemProcessor = stack.use(
       new ItemProcessor(transformers, projectors),
     );
@@ -99,9 +91,11 @@ export class Picker implements AsyncDisposable {
     this.#title = title;
     this.#renderers = renderers;
     this.#previewers = previewers;
+    this.#selectable = options.selectable ?? false;
     this.#options = options;
     this.#context = context ?? {
-      query: "",
+      cmdline: "",
+      cmdpos: 0,
       cursor: 0,
       selected: new Set(),
     };
@@ -131,6 +125,11 @@ export class Picker implements AsyncDisposable {
     return this.processedItems.at(this.#context.cursor);
   }
 
+  #correctCursor(cursor: number): number {
+    const max = this.processedItems.length - 1;
+    return Math.max(0, Math.min(max, cursor));
+  }
+
   async open(denops: Denops): Promise<AsyncDisposable> {
     if (this.#layout) {
       throw new Error("The picker is already opened");
@@ -150,6 +149,7 @@ export class Picker implements AsyncDisposable {
       divider: this.#options.layout?.divider,
       zindex: this.#options.layout?.zindex ?? 50,
     });
+    this.#disposable.use(this.#layout);
     return {
       [Symbol.asyncDispose]: async () => {
         if (this.#layout) {
@@ -179,6 +179,9 @@ export class Picker implements AsyncDisposable {
         // Fail silently
       }
     });
+
+    // Start collecting
+    this.#itemCollector.start({ signal });
 
     // Set internal variables
     await batch(denops, async (denops) => {
@@ -237,74 +240,128 @@ export class Picker implements AsyncDisposable {
       layout.preview.winid,
       {
         previewers: this.#previewers,
-        debounceWait: this.#options.preview?.debounceWait ??
-          PREVIEW_DEBOUNCE_WAIT,
       },
+    );
+
+    const redraw = throttle(() => {
+      denops.cmd("redraw").catch((err) => {
+        const m = err.message ?? err;
+        console.debug(`Failed to execute 'redraw': ${m}`);
+      });
+    }, this.#options.redraw?.throttleWait ?? REDRAW_THROTTLE_WAIT);
+    const updateQueryComponent = throttle(() => {
+      query.render(
+        denops,
+        this.#context.cmdline,
+        this.#context.cmdpos,
+        { signal },
+      ).then(() => redraw());
+    }, this.#options.query?.throttleWait ?? QUERY_THROTTLE_WAIT);
+    const updateSelectorComponent = throttle(() => {
+      selector.render(
+        denops,
+        this.processedItems,
+        this.#context.cursor,
+        this.#context.selected,
+        { signal },
+      ).then(() => redraw());
+    }, this.#options.selector?.throttleWait ?? SELECTOR_THROTTLE_WAIT);
+    const updatePreviewComponent = throttle(() => {
+      preview.render(
+        denops,
+        this.cursorItem,
+        { signal },
+      ).then(() => redraw());
+    }, this.#options.preview?.throttleWait ?? PREVIEW_THROTTLE_WAIT);
+    const updatePreviewComponentDebounce = debounce(() => {
+      updatePreviewComponent();
+    }, this.#options.preview?.debounceWait ?? PREVIEW_DEBOUNCE_WAIT);
+    const startItemProcessor = throttle(
+      () => {
+        this.#itemProcessor.start(
+          this.collectedItems,
+          this.#context.cmdline,
+          { signal },
+        );
+      },
+      this.#options.itemProcessor?.throttleWait ??
+        INPUT_PROCESSOR_THROTTLE_WAIT,
+    );
+    const startItemProcessorDebounce = debounce(
+      () => {
+        startItemProcessor();
+      },
+      this.#options.itemProcessor?.debounceWait ??
+        INPUT_PROCESSOR_DEBOUNCE_WAIT,
     );
 
     // Subscribe custom events
     stack.use(subscribe("item-collector-changed", () => {
+      query.processing = true;
       query.collecting = true;
       query.counter = {
         processed: this.processedItems.length,
         collected: this.collectedItems.length,
       };
-      query.processing = true;
-      this.#itemProcessor.start(this.collectedItems, this.#context.query);
+      updateQueryComponent();
+      startItemProcessor();
     }));
     stack.use(subscribe("item-collector-succeeded", () => {
       query.collecting = false;
+      updateQueryComponent();
     }));
     stack.use(subscribe("item-collector-failed", () => {
       query.collecting = "failed";
+      updateQueryComponent();
     }));
     stack.use(subscribe("item-processor-succeeded", () => {
-      query.processing = false;
+      this.#context.cursor = this.#correctCursor(this.#context.cursor);
+      query.processing = query.collecting;
       query.counter = {
         processed: this.processedItems.length,
         collected: this.collectedItems.length,
       };
-      selector.items = this.processedItems;
-      selector.index = this.#context.cursor;
-      preview.item = this.cursorItem;
+      updateQueryComponent();
+      updateSelectorComponent();
+      updatePreviewComponent();
     }));
     stack.use(subscribe("item-processor-failed", () => {
       query.processing = "failed";
+      updateQueryComponent();
     }));
     stack.use(subscribe("cmdline-changed", (cmdline) => {
-      this.#context.query = cmdline;
-      this.#itemProcessor.start(this.collectedItems, cmdline);
-      query.cmdline = cmdline;
+      this.#context.cmdline = cmdline;
+      updateQueryComponent();
+      if (query.collecting) {
+        startItemProcessorDebounce();
+      } else {
+        startItemProcessor();
+      }
     }));
     stack.use(subscribe("cmdpos-changed", (cmdpos) => {
-      query.cmdpos = cmdpos;
+      this.#context.cmdpos = cmdpos;
+      updateQueryComponent();
     }));
     stack.use(subscribe("selector-cursor-move", (offset) => {
-      const nextIndex = Math.max(
-        0,
-        Math.min(this.processedItems.length - 1, this.#context.cursor + offset),
-      );
-      this.#context.cursor = nextIndex;
-      selector.index = nextIndex;
+      this.#context.cursor = this.#correctCursor(this.#context.cursor + offset);
+      updateSelectorComponent();
+      updatePreviewComponentDebounce();
     }));
     stack.use(subscribe("selector-cursor-move-at", (line) => {
-      if (line === "$") {
-        this.#context.cursor = this.processedItems.length - 1;
-      } else {
-        this.#context.cursor = Math.max(
-          0,
-          Math.min(this.processedItems.length - 1, line - 1),
-        );
-      }
-      selector.index = this.#context.cursor;
+      const cursor = line === "$" ? this.processedItems.length - 1 : line - 1;
+      this.#context.cursor = this.#correctCursor(cursor);
+      updateSelectorComponent();
+      updatePreviewComponentDebounce();
     }));
     stack.use(subscribe("preview-cursor-move", (offset) => {
       preview.moveCursor(denops, offset, { signal: options.signal });
+      redraw();
     }));
     stack.use(subscribe("preview-cursor-move-at", (line) => {
       preview.moveCursorAt(denops, line, { signal: options.signal });
+      redraw();
     }));
-    if (this.#options.selectable) {
+    if (this.#selectable) {
       stack.use(subscribe("selector-select", () => {
         const item = this.cursorItem;
         if (!item) return;
@@ -313,7 +370,7 @@ export class Picker implements AsyncDisposable {
         } else {
           this.#context.selected.add(item.id);
         }
-        selector.selected = new Set(this.#context.selected);
+        updateSelectorComponent();
       }));
       stack.use(subscribe("selector-select-all", () => {
         if (this.#context.selected.size === this.processedItems.length) {
@@ -323,39 +380,15 @@ export class Picker implements AsyncDisposable {
             this.processedItems.map((v) => v.id),
           );
         }
-        selector.selected = new Set(this.#context.selected);
+        updateSelectorComponent();
       }));
     }
-
-    // Update UI in background
-    stack.use(startAsyncScheduler(
-      async () => {
-        const isUpdated = any([
-          await query.render(denops, { signal }),
-          await selector.render(denops, { signal }),
-        ]);
-        preview.render(denops, { signal })
-          .then((isUpdated) => {
-            if (isUpdated) {
-              return denops.cmd(`redraw`);
-            }
-          })
-          .catch((err) => {
-            console.warn(`[fall] Failed to render preview: ${err}`);
-          });
-        if (isUpdated) {
-          await denops.cmd(`redraw`);
-        }
-      },
-      this.#options.updateInterval ?? UPDATE_INTERVAL,
-      { signal },
-    ));
 
     // Observe Vim's prompt
     stack.use(observeInput(denops, { signal }));
 
     // Wait for user input
-    return await startInput(denops, { text: this.#context.query }, {
+    return await startInput(denops, { text: this.#context.cmdline }, {
       signal,
     });
   }
@@ -372,5 +405,10 @@ const HEIGHT_RATION = 0.9;
 const HEIGHT_MIN = 5;
 const HEIGHT_MAX = 40;
 const PREVIEW_RATION = 0.45;
-const UPDATE_INTERVAL = 20;
-const PREVIEW_DEBOUNCE_WAIT = 100;
+const REDRAW_THROTTLE_WAIT = 30;
+const QUERY_THROTTLE_WAIT = 20;
+const SELECTOR_THROTTLE_WAIT = 20;
+const PREVIEW_THROTTLE_WAIT = 200;
+const PREVIEW_DEBOUNCE_WAIT = 300;
+const INPUT_PROCESSOR_THROTTLE_WAIT = 200;
+const INPUT_PROCESSOR_DEBOUNCE_WAIT = 300;

@@ -53,7 +53,8 @@ export async function startInput(
       await send(denops, q`\<Esc>`);
     } catch (err) {
       // Fail silently
-      console.debug("[fall] Failed to close input", err);
+      const m = err.message ?? err;
+      console.debug(`[fall] Failed to close input: ${m}`);
     }
   };
   signal?.addEventListener("abort", closeInput, { once: true });

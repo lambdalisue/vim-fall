@@ -205,9 +205,9 @@ async function internalStart(
     nextAction = action;
     send(denops, q`\<CR>`).catch((err) => {
       // Fail silently
-      const msg = err.message ?? err;
+      const m = err.message ?? err;
       console.debug(
-        `[fall] Failed to send <CR> in 'action-invoke' event: ${msg}`,
+        `[fall] Failed to send <CR> in 'action-invoke' event: ${m}`,
       );
     });
   }));
@@ -256,7 +256,7 @@ async function internalStart(
           await denops.redraw();
           continue;
         }
-        const actionName = maybe(actionPicker.cursorItem?.id, is.String);
+        const actionName = maybe(actionPicker.cursorItem?.value, is.String);
         if (!actionName) {
           // Cancel
           return;

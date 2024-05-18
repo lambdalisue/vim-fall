@@ -5,15 +5,11 @@ import {
 } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
-import { equal } from "jsr:@std/assert@0.225.1/equal";
 
 import type { Previewer, PreviewerItem } from "../../extension/type.ts";
 
-const DEFAULT_DEBOUNCE_WAIT = 100;
-
 export type PreviewComponentParams = Readonly<{
   previewers?: readonly Previewer[];
-  debounceWait?: number;
 }>;
 
 /**
@@ -23,11 +19,6 @@ export class PreviewComponent {
   #bufnr: number;
   #winid: number;
   #previewers: readonly Previewer[];
-  #debounceWait: number;
-
-  #changedAt: number | undefined;
-  #changed: boolean = false;
-  #item?: PreviewerItem;
 
   constructor(
     bufnr: number,
@@ -37,19 +28,6 @@ export class PreviewComponent {
     this.#bufnr = bufnr;
     this.#winid = winid;
     this.#previewers = params.previewers ?? [];
-    this.#debounceWait = params.debounceWait ?? DEFAULT_DEBOUNCE_WAIT;
-  }
-
-  /**
-   * Set the previewer item to be rendered.
-   */
-  set item(value: PreviewerItem | undefined) {
-    const changed = !equal(this.#item, value);
-    this.#changed = this.#changed || changed;
-    this.#item = value;
-    if (changed) {
-      this.#changedAt = performance.now();
-    }
   }
 
   /**
@@ -59,58 +37,64 @@ export class PreviewComponent {
    */
   async render(
     denops: Denops,
-    { signal }: { signal: AbortSignal },
-  ): Promise<boolean> {
-    if (!this.#changed) return false;
-    if (
-      !this.#changedAt ||
-      performance.now() - this.#changedAt < this.#debounceWait
-    ) {
-      return false;
-    }
-    this.#changed = false;
-    this.#changedAt = undefined;
-
-    // Render UI
+    item: PreviewerItem | undefined,
+    options: { signal: AbortSignal },
+  ): Promise<void> {
     try {
-      if (this.#item) {
-        const target = {
-          bufnr: this.#bufnr,
-          winid: this.#winid,
-        };
-        // Overwrite buffer local options may configured by ftplugin
-        await fn.win_execute(
-          denops,
-          this.#winid,
-          `setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile cursorline nomodifiable nowrap`,
-        );
-        for (const previewer of this.#previewers) {
-          if (
-            await previewer.preview({ item: this.#item, ...target }, { signal })
-          ) {
-            continue;
-          }
-          break;
-        }
-        await fn.win_execute(
-          denops,
-          this.#winid,
-          `silent! filetype detect`,
-        );
-      } else if (!this.#item) {
-        await buffer.replace(denops, this.#bufnr, ["No preview is available"]);
-      } else {
-        await buffer.replace(denops, this.#bufnr, [
-          "Previewer is not available",
-        ]);
-      }
+      await this.#render(denops, item, options);
     } catch (err) {
-      // Fail silently
-      console.debug(
-        `[fall] Failed to render content to the preview window: ${err}`,
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      const m = err.message ?? err;
+      console.warn(
+        `[fall] Failed to render the preview component: ${m}`,
       );
     }
-    return true;
+  }
+
+  async #render(
+    denops: Denops,
+    item: PreviewerItem | undefined,
+    { signal }: { signal: AbortSignal },
+  ): Promise<void> {
+    // Overwrite buffer local options may configured by ftplugin
+    await fn.win_execute(
+      denops,
+      this.#winid,
+      `setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile cursorline nomodifiable nowrap`,
+    );
+    signal.throwIfAborted();
+
+    if (!item) {
+      await buffer.replace(denops, this.#bufnr, [
+        "No preview item is available",
+      ]);
+      return;
+    }
+
+    const params = {
+      item,
+      bufnr: this.#bufnr,
+      winid: this.#winid,
+    };
+    let previewed = false;
+    for (const previewer of this.#previewers) {
+      if (await previewer.preview(params, { signal })) {
+        continue;
+      }
+      previewed = true;
+      break;
+    }
+    if (previewed) {
+      await fn.win_execute(
+        denops,
+        this.#winid,
+        `silent! filetype detect`,
+      );
+    } else {
+      await buffer.replace(denops, this.#bufnr, [
+        "No preview is available",
+      ]);
+    }
   }
 
   /**
@@ -129,18 +113,16 @@ export class PreviewComponent {
       if (signal.aborted) return;
 
       const newLine = Math.max(1, Math.min(line + offset, linecount));
-      await batch(denops, async (denops) => {
-        await fn.win_execute(
-          denops,
-          this.#winid,
-          `normal! ${newLine}G`,
-        );
-        await denops.cmd("redraw");
-      });
+      await fn.win_execute(
+        denops,
+        this.#winid,
+        `normal! ${newLine}G`,
+      );
     } catch (err) {
       // Fail silently
+      const m = err.message ?? err;
       console.debug(
-        `[fall] Failed to move cursor on the preview window: ${err}`,
+        `[fall] Failed to move cursor on the preview window: ${m}`,
       );
     }
   }
@@ -168,8 +150,9 @@ export class PreviewComponent {
       });
     } catch (err) {
       // Fail silently
+      const m = err.message ?? err;
       console.debug(
-        `[fall] Failed to move cursor on the preview window: ${err}`,
+        `[fall] Failed to move cursor on the preview window: ${m}`,
       );
     }
   }
