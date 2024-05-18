@@ -1,14 +1,7 @@
 import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
 import { type InputOptions, isInputOptions } from "../view/input.ts";
-import {
-  isSourcePickerOptions,
-  type SourcePickerOptions,
-} from "../view/source_picker.ts";
-import {
-  type ActionPickerOptions,
-  isActionPickerOptions,
-} from "../view/action_picker.ts";
+import { isPickerOptions, type PickerOptions } from "../view/picker.ts";
 
 export type SourcePickerConfig = Partial<{
   transformers: string[];
@@ -17,7 +10,7 @@ export type SourcePickerConfig = Partial<{
   previewers: string[];
   actions: string[];
   defaultAction: string;
-  options: SourcePickerOptions;
+  options: PickerOptions;
 }>;
 
 export type ActionPickerConfig = Partial<{
@@ -25,7 +18,7 @@ export type ActionPickerConfig = Partial<{
   projectors: string[];
   renderers: string[];
   previewers: string[];
-  options: ActionPickerOptions;
+  options: PickerOptions;
 }>;
 
 export type Config = Partial<{
@@ -51,7 +44,7 @@ const isSourcePickerConfig = is.PartialOf(is.ObjectOf({
   previewers: is.ArrayOf(is.String),
   actions: is.ArrayOf(is.String),
   defaultAction: is.String,
-  options: isSourcePickerOptions,
+  options: isPickerOptions,
 })) satisfies Predicate<SourcePickerConfig>;
 
 const isActionPickerConfig = is.PartialOf(is.ObjectOf({
@@ -59,7 +52,7 @@ const isActionPickerConfig = is.PartialOf(is.ObjectOf({
   projectors: is.ArrayOf(is.String),
   renderers: is.ArrayOf(is.String),
   previewers: is.ArrayOf(is.String),
-  options: isActionPickerOptions,
+  options: isPickerOptions,
 })) satisfies Predicate<ActionPickerConfig>;
 
 export const isConfig = is.PartialOf(is.ObjectOf({

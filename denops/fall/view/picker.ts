@@ -9,14 +9,14 @@ import {
 import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
 import type {
-  Action,
   Item,
   Previewer,
   Projector,
   Renderer,
+  SourceItem,
   Transformer,
 } from "../extension/type.ts";
-import { any } from "../util/collection.ts";
+import { any, isDefined } from "../util/collection.ts";
 import { startAsyncScheduler } from "../util/async_scheduler.ts";
 import { subscribe } from "../util/event.ts";
 import {
@@ -28,16 +28,18 @@ import {
 import { QueryComponent } from "./component/query.ts";
 import { SelectorComponent } from "./component/selector.ts";
 import { PreviewComponent } from "./component/preview.ts";
-import { emitPickerEnter, emitPickerLeave } from "./util/emitter.ts";
 import { observeInput, startInput } from "./util/input.ts";
+import { ItemCollector } from "./util/item_collector.ts";
 import { ItemProcessor } from "./util/item_processor.ts";
 
-export interface ActionPickerContext {
+export interface PickerContext {
   query: string;
   cursor: number;
+  selected: Set<unknown>;
 }
 
-export interface ActionPickerOptions {
+export interface PickerOptions {
+  selectable?: boolean;
   layout?: Partial<LayoutParams>;
   query?: {
     spinner?: string[];
@@ -50,7 +52,7 @@ export interface ActionPickerOptions {
   updateInterval?: number;
 }
 
-export const isActionPickerOptions = is.PartialOf(is.ObjectOf({
+export const isPickerOptions = is.PartialOf(is.ObjectOf({
   layout: is.PartialOf(isLayoutParams),
   query: is.PartialOf(is.ObjectOf({
     spinner: is.ArrayOf(is.String),
@@ -61,87 +63,68 @@ export const isActionPickerOptions = is.PartialOf(is.ObjectOf({
     debounceWait: is.Number,
   })),
   updateInterval: is.Number,
-})) satisfies Predicate<ActionPickerOptions>;
+})) satisfies Predicate<PickerOptions>;
 
-export class ActionPicker implements AsyncDisposable {
+export class Picker implements AsyncDisposable {
   #title: string;
-  #actions: Action[];
   #renderers: Renderer[];
   #previewers: Previewer[];
-  #options: ActionPickerOptions;
-  #context: ActionPickerContext;
+  #options: PickerOptions;
+  #context: PickerContext;
 
   #layout?: Layout;
+  #itemCollector: ItemCollector;
   #itemProcessor: ItemProcessor;
   #disposable: AsyncDisposableStack;
 
-  private constructor(
+  constructor(
     title: string,
-    actions: Action[],
-    renderers: Renderer[],
-    previewers: Previewer[],
-    options: ActionPickerOptions,
-    context: ActionPickerContext,
-    itemProcessor: ItemProcessor,
-    disposable: AsyncDisposableStack,
-  ) {
-    this.#title = title;
-    this.#actions = actions;
-    this.#renderers = renderers;
-    this.#previewers = previewers;
-    this.#options = options;
-    this.#context = context;
-    this.#itemProcessor = itemProcessor;
-    this.#disposable = disposable;
-  }
-
-  static create(
-    actions: Action[],
+    stream: ReadableStream<SourceItem>,
     transformers: Transformer[],
     projectors: Projector[],
     renderers: Renderer[],
     previewers: Previewer[],
-    options: ActionPickerOptions,
-    context: ActionPickerContext = {
-      query: "",
-      cursor: 0,
-    },
-  ): ActionPicker {
+    options: PickerOptions,
+    context?: PickerContext,
+  ) {
     const stack = new AsyncDisposableStack();
+    // Start collecting source items
+    const itemCollector = stack.use(new ItemCollector(stream));
+    itemCollector.start();
 
     const itemProcessor = stack.use(
       new ItemProcessor(transformers, projectors),
     );
 
-    return new ActionPicker(
-      "action",
-      actions,
-      renderers,
-      previewers,
-      options,
-      context,
-      itemProcessor,
-      stack.move(),
-    );
+    this.#title = title;
+    this.#renderers = renderers;
+    this.#previewers = previewers;
+    this.#options = options;
+    this.#context = context ?? {
+      query: "",
+      cursor: 0,
+      selected: new Set(),
+    };
+    this.#itemCollector = itemCollector;
+    this.#itemProcessor = itemProcessor;
+    this.#disposable = stack;
   }
 
-  get context(): ActionPickerContext {
+  get context(): PickerContext {
     return this.#context;
   }
 
   get collectedItems(): Item[] {
-    return this.#actions.map((v, idx) => ({
-      id: idx,
-      value: v.name,
-      detail: {
-        content: v.description,
-      },
-      decorations: [],
-    }));
+    return this.#itemCollector.items;
   }
 
   get processedItems(): Item[] {
     return this.#itemProcessor.items;
+  }
+
+  get selectedItems(): Item[] {
+    const m = new Map(this.processedItems.map((v) => [v.id, v]));
+    return [...this.#context.selected].map((v) => m.get(v)).filter(isDefined);
   }
 
   get cursorItem(): Item | undefined {
@@ -150,7 +133,7 @@ export class ActionPicker implements AsyncDisposable {
 
   async open(denops: Denops): Promise<AsyncDisposable> {
     if (this.#layout) {
-      throw new Error("The action picker is already opened");
+      throw new Error("The picker is already opened");
     }
     this.#layout = await buildLayout(denops, {
       title: ` ${this.#title} `,
@@ -165,7 +148,7 @@ export class ActionPicker implements AsyncDisposable {
       previewRatio: this.#options.layout?.previewRatio ?? PREVIEW_RATION,
       border: this.#options.layout?.border,
       divider: this.#options.layout?.divider,
-      zindex: this.#options.layout?.zindex ?? 51,
+      zindex: this.#options.layout?.zindex ?? 50,
     });
     return {
       [Symbol.asyncDispose]: async () => {
@@ -182,7 +165,7 @@ export class ActionPicker implements AsyncDisposable {
     options: { signal: AbortSignal },
   ): Promise<boolean> {
     if (!this.#layout) {
-      throw new Error("The action picker is not opnend");
+      throw new Error("The picker is not opnend");
     }
     const layout = this.#layout;
 
@@ -234,9 +217,9 @@ export class ActionPicker implements AsyncDisposable {
       layout.query.winid,
       {
         winwidth: queryWinwidth,
+        spinner: this.#options.query?.spinner,
         headSymbol: this.#options.query?.headSymbol,
         failSymbol: this.#options.query?.failSymbol,
-        spinner: this.#options.query?.spinner,
       },
     );
     const selector = new SelectorComponent(
@@ -260,6 +243,21 @@ export class ActionPicker implements AsyncDisposable {
     );
 
     // Subscribe custom events
+    stack.use(subscribe("item-collector-changed", () => {
+      query.collecting = true;
+      query.counter = {
+        processed: this.processedItems.length,
+        collected: this.collectedItems.length,
+      };
+      query.processing = true;
+      this.#itemProcessor.start(this.collectedItems, this.#context.query);
+    }));
+    stack.use(subscribe("item-collector-succeeded", () => {
+      query.collecting = false;
+    }));
+    stack.use(subscribe("item-collector-failed", () => {
+      query.collecting = "failed";
+    }));
     stack.use(subscribe("item-processor-succeeded", () => {
       query.processing = false;
       query.counter = {
@@ -306,6 +304,28 @@ export class ActionPicker implements AsyncDisposable {
     stack.use(subscribe("preview-cursor-move-at", (line) => {
       preview.moveCursorAt(denops, line, { signal: options.signal });
     }));
+    if (this.#options.selectable) {
+      stack.use(subscribe("selector-select", () => {
+        const item = this.cursorItem;
+        if (!item) return;
+        if (this.#context.selected.has(item.id)) {
+          this.#context.selected.delete(item.id);
+        } else {
+          this.#context.selected.add(item.id);
+        }
+        selector.selected = new Set(this.#context.selected);
+      }));
+      stack.use(subscribe("selector-select-all", () => {
+        if (this.#context.selected.size === this.processedItems.length) {
+          this.#context.selected.clear();
+        } else {
+          this.#context.selected = new Set(
+            this.processedItems.map((v) => v.id),
+          );
+        }
+        selector.selected = new Set(this.#context.selected);
+      }));
+    }
 
     // Update UI in background
     stack.use(startAsyncScheduler(
@@ -335,14 +355,9 @@ export class ActionPicker implements AsyncDisposable {
     stack.use(observeInput(denops, { signal }));
 
     // Wait for user input
-    try {
-      await emitPickerEnter(denops, `action`);
-      return await startInput(denops, { text: this.#context.query }, {
-        signal,
-      });
-    } finally {
-      await emitPickerLeave(denops, `action`);
-    }
+    return await startInput(denops, { text: this.#context.query }, {
+      signal,
+    });
   }
 
   async [Symbol.asyncDispose](): Promise<void> {
@@ -350,12 +365,12 @@ export class ActionPicker implements AsyncDisposable {
   }
 }
 
-const WIDTH_RATION = 0.6;
-const WIDTH_MIN = 70;
-const WIDTH_MAX = 300;
-const HEIGHT_RATION = 0.8;
-const HEIGHT_MIN = 4;
-const HEIGHT_MAX = 30;
-const PREVIEW_RATION = 0.7;
+const WIDTH_RATION = 0.8;
+const WIDTH_MIN = 80;
+const WIDTH_MAX = 400;
+const HEIGHT_RATION = 0.9;
+const HEIGHT_MIN = 5;
+const HEIGHT_MAX = 40;
+const PREVIEW_RATION = 0.45;
 const UPDATE_INTERVAL = 20;
 const PREVIEW_DEBOUNCE_WAIT = 100;

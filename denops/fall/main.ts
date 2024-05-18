@@ -26,8 +26,12 @@ export async function main(denops: Denops): Promise<void> {
     "event:dispatch": (name, data) => {
       dispatch(ensure(name, isFallEventName), data);
     },
-    "picker:start": async (name, cmdline) => {
-      await start(denops, ensure(name, is.String), ensure(cmdline, is.String));
+    "picker:start": async (sourceName, cmdline) => {
+      await start(
+        denops,
+        ensure(cmdline, is.String),
+        ensure(sourceName, is.String),
+      );
     },
     "picker:restore": async () => {
       await restore(denops);
