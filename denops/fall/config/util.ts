@@ -93,7 +93,7 @@ async function ensureConfig(configPath: string): Promise<void> {
   if (!await exists(configPath)) {
     await ensureDir(dirname(configPath));
     await copy(
-      new URL("./config/config.default.jsonc", import.meta.url),
+      new URL("./config.default.jsonc", import.meta.url),
       configPath,
     );
   }
