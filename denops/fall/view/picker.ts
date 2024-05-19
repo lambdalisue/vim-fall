@@ -30,7 +30,7 @@ import { ItemProcessor } from "./util/item_processor.ts";
 export type PickerContext = {
   cmdline: string;
   cmdpos: number;
-  cursor: number;
+  index: number;
   selected: Set<unknown>;
 };
 
@@ -96,7 +96,7 @@ export class Picker implements AsyncDisposable {
     this.#context = context ?? {
       cmdline: "",
       cmdpos: 0,
-      cursor: 0,
+      index: 0,
       selected: new Set(),
     };
     this.#itemCollector = itemCollector;
@@ -122,12 +122,12 @@ export class Picker implements AsyncDisposable {
   }
 
   get cursorItem(): Item | undefined {
-    return this.processedItems.at(this.#context.cursor);
+    return this.processedItems.at(this.#context.index);
   }
 
-  #correctCursor(cursor: number): number {
+  #correctIndex(index: number): number {
     const max = this.processedItems.length - 1;
-    return Math.max(0, Math.min(max, cursor));
+    return Math.max(0, Math.min(max, index));
   }
 
   async open(denops: Denops): Promise<AsyncDisposable> {
@@ -269,9 +269,11 @@ export class Picker implements AsyncDisposable {
     const updateSelectorComponent = throttle(() => {
       selector.render(
         denops,
-        this.processedItems,
-        this.#context.cursor,
-        this.#context.selected,
+        {
+          items: this.processedItems,
+          index: this.#context.index,
+          selected: this.#context.selected,
+        },
         { signal },
       ).then(() => redraw());
     }, this.#options.selector?.throttleWait ?? SELECTOR_THROTTLE_WAIT);
@@ -316,7 +318,7 @@ export class Picker implements AsyncDisposable {
       updateQueryComponent();
     }));
     stack.use(subscribe("item-processor-succeeded", () => {
-      this.#context.cursor = this.#correctCursor(this.#context.cursor);
+      this.#context.index = this.#correctIndex(this.#context.index);
       updateQueryComponent();
       updateSelectorComponent();
       updatePreviewComponent();
@@ -334,13 +336,13 @@ export class Picker implements AsyncDisposable {
       updateQueryComponent();
     }));
     stack.use(subscribe("selector-cursor-move", (offset) => {
-      this.#context.cursor = this.#correctCursor(this.#context.cursor + offset);
+      this.#context.index = this.#correctIndex(this.#context.index + offset);
       updateSelectorComponent();
       updatePreviewComponentDebounce();
     }));
     stack.use(subscribe("selector-cursor-move-at", (line) => {
       const cursor = line === "$" ? this.processedItems.length - 1 : line - 1;
-      this.#context.cursor = this.#correctCursor(cursor);
+      this.#context.index = this.#correctIndex(cursor);
       updateSelectorComponent();
       updatePreviewComponentDebounce();
     }));
