@@ -416,12 +416,12 @@ export class Picker implements AsyncDisposable {
   }
 }
 
-const WIDTH_RATION = 0.8;
+const WIDTH_RATION = 0.9;
 const WIDTH_MIN = 80;
-const WIDTH_MAX = 400;
+const WIDTH_MAX = 800;
 const HEIGHT_RATION = 0.9;
 const HEIGHT_MIN = 5;
-const HEIGHT_MAX = 40;
-const PREVIEW_RATION = 0.45;
+const HEIGHT_MAX = 300;
+const PREVIEW_RATION = 0.65;
 const REDRAW_INTERVAL = 0;
 const ITEM_COLLECTOR_THRESHOLD = 20000;
