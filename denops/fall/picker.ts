@@ -106,8 +106,8 @@ async function internalStart(
     return;
   }
 
-  const sourcePickerConfig = getSourcePickerConfig(name, config);
-  const actionPickerConfig = getActionPickerConfig(name, config);
+  const sourcePickerConfig = getSourcePickerConfig(source.name, config);
+  const actionPickerConfig = getActionPickerConfig(source.name, config);
   const actions = await getExtensions(
     denops,
     "action",
