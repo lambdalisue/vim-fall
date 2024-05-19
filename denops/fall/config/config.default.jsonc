@@ -18,12 +18,12 @@
     "source": {
       "": {
         "transformers": [
-          // "substring_filter"
+          // "substring-filter"
         ],
         "projectors": [
           "fzf"
-          // "lexical_sorter",
-          // "substring_filter",
+          // "lexical-sorter",
+          // "substring-filter",
         ],
         "renderers": [
           // "smart-path",
@@ -56,10 +56,10 @@
         }
       },
       "file": {
-        "renderers": ["smart_path"]
+        "renderers": ["smart-path"]
       },
       "file_process": {
-        "renderers": ["smart_path"]
+        "renderers": ["smart-path"]
       },
       "line": {
         "previewers": ["buffer"]
@@ -67,8 +67,8 @@
     },
     "action": {
       "": {
-        "transformers": ["substring_filter"],
-        "projectors": ["lexical_sorter"],
+        "transformers": ["substring-filter"],
+        "projectors": ["lexical-sorter"],
         "renderers": [],
         "previewers": ["attribute"],
         "options": {
@@ -98,7 +98,7 @@
         ".*/target/.*"
       ]
     },
-    "file_process": {
+    "file-process": {
       "excludes": [
         ".*/\\.DS_Store",
         ".*/\\.git/.*",
