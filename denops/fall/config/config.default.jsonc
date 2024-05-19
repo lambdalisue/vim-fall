@@ -8,14 +8,18 @@
   "input": {
     "layout": {
       "border": "rounded",
-      "divider": "dashed"
+      "divider": "dashed",
+      "widthRatio": 0.3,
+      "widthMin": 10,
+      "widthMax": 80
     }
   },
   "picker": {
     "source": {
       "": {
         "transformers": ["substring_filter"],
-        "projectors": ["lexical_sorter"],
+        "projectors": [],
+        "renderers": [],
         "previewers": ["attribute", "buffer", "file"],
         "actions": [
           "open",
@@ -29,16 +33,24 @@
         "options": {
           "layout": {
             "border": "rounded",
-            "divider": "dashed"
+            "divider": "dashed",
+            "widthRatio": 0.9,
+            "widthMin": 80,
+            "widthMax": 800,
+            "heightRatio": 0.9,
+            "heightMin": 10,
+            "heightMax": 300,
+            "previewRatio": 0.45
           }
         }
       },
       "file": {
         "renderers": ["smart_path"]
       },
+      "file_process": {
+        "renderers": ["smart_path"]
+      },
       "line": {
-        "projectors": [],
-        "renderers": [],
         "previewers": ["buffer"]
       }
     },
@@ -51,7 +63,14 @@
         "options": {
           "layout": {
             "border": "rounded",
-            "divider": "dashed"
+            "divider": "dashed",
+            "widthRatio": 0.5,
+            "widthMin": 70,
+            "widthMax": 700,
+            "heightRatio": 0.5,
+            "heightMin": 5,
+            "heightMax": 200,
+            "previewRatio": 0.65
           }
         }
       }
@@ -59,7 +78,24 @@
   },
   "source": {
     "file": {
-      "excludes": [".*/\\.DS_Store", ".*/\\.git/.*", ".*/node_modules/.*"]
+      "excludes": [
+        ".*/\\.DS_Store",
+        ".*/\\.git/.*",
+        ".*/\\.cache/.*",
+        ".*/\\.Trash/.*",
+        ".*/node_modules/.*",
+        ".*/target/.*"
+      ]
+    },
+    "file_process": {
+      "excludes": [
+        ".*/\\.DS_Store",
+        ".*/\\.git/.*",
+        ".*/\\.cache/.*",
+        ".*/\\.Trash/.*",
+        ".*/node_modules/.*",
+        ".*/target/.*"
+      ]
     }
   },
   "transformer": {},
