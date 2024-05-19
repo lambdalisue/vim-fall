@@ -1,5 +1,8 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
-import { collect } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
+import {
+  batch,
+  collect,
+} from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 
@@ -33,14 +36,6 @@ export class PreviewComponent {
     { signal }: { signal: AbortSignal },
   ): Promise<void> {
     try {
-      // Overwrite buffer local options may configured by ftplugin
-      await fn.win_execute(
-        denops,
-        this.#winid,
-        `setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile cursorline nomodifiable nowrap`,
-      );
-      signal.throwIfAborted();
-
       if (!item) {
         await buffer.replace(denops, this.#bufnr, [
           "No preview item is available",
@@ -65,11 +60,19 @@ export class PreviewComponent {
       signal.throwIfAborted();
 
       if (previewed) {
-        await fn.win_execute(
-          denops,
-          this.#winid,
-          `silent! call fall#internal#preview#highlight()`,
-        );
+        await batch(denops, async (denops) => {
+          await fn.win_execute(
+            denops,
+            this.#winid,
+            `silent! call fall#internal#preview#highlight()`,
+          );
+          // Overwrite buffer local options may configured by ftplugin
+          await fn.win_execute(
+            denops,
+            this.#winid,
+            `setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile cursorline nomodifiable nowrap`,
+          );
+        });
       } else {
         await buffer.replace(denops, this.#bufnr, [
           "No preview is available",
