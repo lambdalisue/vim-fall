@@ -48,16 +48,16 @@ const isPickerOptions = is.PartialOf(is.ObjectOf({
     headSymbol: is.String,
     failSymbol: is.String,
   })),
+  itemCollector: is.PartialOf(is.ObjectOf({
+    threshold: is.Number,
+  })),
 })) satisfies Predicate<PickerOptions>;
 
 const isInputOptions = is.PartialOf(is.ObjectOf({
   layout: is.PartialOf(isLayoutParams),
-  input: is.PartialOf(is.ObjectOf({
-    prompt: is.String,
-    text: is.String,
-    completion: is.String,
+  redraw: is.PartialOf(is.ObjectOf({
+    interval: is.Number,
   })),
-  updateInterval: is.Number,
 })) satisfies Predicate<InputOptions>;
 
 const isSourcePickerConfig = is.PartialOf(is.ObjectOf({
@@ -79,7 +79,7 @@ const isActionPickerConfig = is.PartialOf(is.ObjectOf({
 })) satisfies Predicate<ActionPickerConfig>;
 
 export const isConfig = is.PartialOf(is.ObjectOf({
-  input: is.OmitOf(isInputOptions, ["input"]),
+  input: isInputOptions,
   picker: is.PartialOf(is.ObjectOf({
     source: is.RecordOf(isSourcePickerConfig, is.String),
     action: is.RecordOf(isActionPickerConfig, is.String),
