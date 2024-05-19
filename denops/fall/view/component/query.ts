@@ -10,8 +10,9 @@ export type Context = {
   collecting: boolean | "failed";
   processing: boolean | "failed";
   counter: {
-    collected: number;
     processed: number;
+    collected: number;
+    truncated: boolean;
   };
 };
 
@@ -57,9 +58,12 @@ export class QueryComponent {
         : collecting === "failed"
         ? this.#failSymbol
         : spinner;
+      const collected = counter.truncated
+        ? `${counter.collected}+`
+        : `${counter.collected}`;
 
       const prefix = `${headSymbol} `;
-      const suffix = ` ${counter.processed}/${counter.collected} ${tailSymbol}`;
+      const suffix = ` ${counter.processed}/${collected} ${tailSymbol}`;
       const spacer = " ".repeat(
         Math.max(
           0,

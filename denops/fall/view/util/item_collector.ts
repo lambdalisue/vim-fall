@@ -2,18 +2,31 @@ import type { Item, SourceItem } from "../../extension/type.ts";
 import { dispatch } from "../../util/event.ts";
 import { DynamicChunkStream } from "../../util/dynamic_chunk_stream.ts";
 
+const truncate = Symbol("truncate");
+
+export type Options = {
+  threshold?: number;
+};
+
 /**
  * Item collector that collects items from the stream and stores in the `items` attribute.
  */
 export class ItemCollector implements Disposable {
   #controller = new AbortController();
   #stream: ReadableStream<SourceItem>;
+  #threshold: number;
 
+  #truncated = false;
   #collecting = false;
   #items: Item[] = [];
 
-  constructor(stream: ReadableStream<SourceItem>) {
+  constructor(stream: ReadableStream<SourceItem>, options: Options) {
     this.#stream = stream;
+    this.#threshold = options.threshold ?? THRESHOLD;
+  }
+
+  get truncated(): boolean {
+    return this.#truncated;
   }
 
   get collecting(): boolean {
@@ -55,9 +68,12 @@ export class ItemCollector implements Disposable {
         )
         .pipeTo(
           new WritableStream({
-            write: (chunk) => {
+            write: (chunk, controller) => {
               this.#items.push(...toItems(chunk, this.#items.length));
               dispatch("item-collector-changed", undefined);
+              if (this.#items.length >= this.#threshold) {
+                controller.error(truncate);
+              }
             },
           }),
           { signal },
@@ -65,6 +81,12 @@ export class ItemCollector implements Disposable {
       this.#collecting = false;
       dispatch("item-collector-succeeded", undefined);
     } catch (err) {
+      if (err === truncate) {
+        this.#collecting = false;
+        this.#truncated = true;
+        dispatch("item-collector-succeeded", undefined);
+        return;
+      }
       this.#collecting = false;
       if (err instanceof DOMException && err.name === "AbortError") return;
       dispatch("item-collector-failed", undefined);
@@ -109,3 +131,5 @@ function calcChunkSize(length: number): number {
   }
   return 1000;
 }
+
+const THRESHOLD = 20000;

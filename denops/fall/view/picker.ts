@@ -43,6 +43,9 @@ export type PickerOptions = Readonly<{
     headSymbol?: string;
     failSymbol?: string;
   }>;
+  itemCollector?: Readonly<{
+    threshold?: number;
+  }>;
 }>;
 
 export class Picker implements AsyncDisposable {
@@ -69,7 +72,11 @@ export class Picker implements AsyncDisposable {
     context?: PickerContext,
   ) {
     const stack = new AsyncDisposableStack();
-    const itemCollector = stack.use(new ItemCollector(stream));
+    const itemCollector = stack.use(
+      new ItemCollector(stream, {
+        threshold: options.itemCollector?.threshold ?? ITEM_COLLECTOR_THRESHOLD,
+      }),
+    );
     const itemProcessor = stack.use(
       new ItemProcessor(transformers, projectors),
     );
@@ -355,6 +362,7 @@ export class Picker implements AsyncDisposable {
               counter: {
                 processed: this.processedItems.length,
                 collected: this.collectedItems.length,
+                truncated: this.#itemCollector.truncated,
               },
             },
             { signal },
@@ -416,3 +424,4 @@ const HEIGHT_MIN = 5;
 const HEIGHT_MAX = 40;
 const PREVIEW_RATION = 0.45;
 const REDRAW_INTERVAL = 0;
+const ITEM_COLLECTOR_THRESHOLD = 20000;
