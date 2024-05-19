@@ -1,14 +1,17 @@
+import { collect } from "jsr:@lambdalisue/streamtools@1.0.0";
+
 import type { Item, Projector, Transformer } from "../../extension/type.ts";
 import { dispatch } from "../../util/event.ts";
 
 /**
- * Process items with a filter and a sorter and store them in the internal state.
+ * Item processor that processes the given items and stores in the `items` attribute.
  */
 export class ItemProcessor implements Disposable {
-  #controller: AbortController = new AbortController();
+  #controller = new AbortController();
   #transformers: readonly Transformer[];
   #projectors: readonly Projector[];
 
+  #processing = false;
   #items: readonly Item[] = [];
 
   constructor(
@@ -19,9 +22,10 @@ export class ItemProcessor implements Disposable {
     this.#projectors = projectors;
   }
 
-  /**
-   * Processed items
-   */
+  get processing(): boolean {
+    return this.#processing;
+  }
+
   get items(): readonly Item[] {
     return this.#items;
   }
@@ -40,25 +44,7 @@ export class ItemProcessor implements Disposable {
    */
   async start(
     items: readonly Item[],
-    query: string,
-    options: { signal: AbortSignal },
-  ): Promise<void> {
-    try {
-      await this.#start(items, query, options);
-      dispatch("item-processor-succeeded", undefined);
-    } catch (err) {
-      if (err instanceof DOMException && err.name === "AbortError") return;
-      const m = err.message ?? err;
-      console.warn(`[fall] Failed to process items: ${m}`);
-      dispatch("item-processor-failed", undefined);
-    } finally {
-      dispatch("item-processor-completed", undefined);
-    }
-  }
-
-  async #start(
-    items: readonly Item[],
-    query: string,
+    { query }: { query: string },
     options: { signal: AbortSignal },
   ): Promise<void> {
     this.#abort(); // Cancel previous processing
@@ -66,37 +52,43 @@ export class ItemProcessor implements Disposable {
       this.#controller.signal,
       options.signal,
     ]);
-    let stream = ReadableStream.from(items);
-    for (const transformer of this.#transformers) {
-      const transform = await transformer.transform({ query }, { signal });
-      signal.throwIfAborted();
-      if (transform) {
-        stream = stream.pipeThrough(transform, { signal });
+    try {
+      this.#processing = true;
+      let stream = ReadableStream.from(items);
+      for (const transformer of this.#transformers) {
+        const transform = await transformer.transform({ query }, { signal });
+        signal.throwIfAborted();
+        if (transform) {
+          stream = stream.pipeThrough(transform, { signal });
+        }
       }
-    }
-
-    const transformedItems: Item[] = [];
-    await stream.pipeTo(
-      new WritableStream({
-        write: (chunk) => {
-          transformedItems.push(chunk);
-        },
-      }),
-      { signal },
-    );
-    signal.throwIfAborted();
-
-    let projectedItems: readonly Item[] = transformedItems;
-    for (const projector of this.#projectors) {
-      projectedItems = await projector.project({
-        query,
-        items: projectedItems,
-      }, {
-        signal,
-      });
+      const transformedItems = await collect(stream, { signal });
       signal.throwIfAborted();
+
+      let projectedItems: readonly Item[] = transformedItems;
+      for (const projector of this.#projectors) {
+        projectedItems = await projector.project({
+          query,
+          items: projectedItems,
+        }, {
+          signal,
+        });
+        signal.throwIfAborted();
+      }
+      this.#processing = false;
+      this.#items = projectedItems;
+      dispatch("item-processor-succeeded", undefined);
+    } catch (err) {
+      this.#processing = false;
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      dispatch("item-processor-failed", undefined);
+      const m = err.message ?? err;
+      console.warn(
+        `[fall] Failed to process items with the query '${query}': ${m}`,
+      );
+    } finally {
+      dispatch("item-processor-completed", undefined);
     }
-    this.#items = projectedItems;
   }
 
   #abort(): void {

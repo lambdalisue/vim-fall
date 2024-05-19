@@ -280,7 +280,7 @@ export class Picker implements AsyncDisposable {
       () => {
         this.#itemProcessor.start(
           this.collectedItems,
-          this.#context.cmdline,
+          { query: this.#context.cmdline },
           { signal },
         );
       },

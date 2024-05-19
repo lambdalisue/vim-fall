@@ -49,7 +49,7 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
     await using processor = new ItemProcessor(testTransformers, testProjectors);
-    processor.start(items, "2", { signal });
+    processor.start(items, { query: "2" }, { signal });
     await promise;
     assertEquals(processor.items, [
       { id: "8", value: "32", detail: {}, decorations: [] },
@@ -77,7 +77,7 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
     await using processor = new ItemProcessor(testTransformers, testProjectors);
-    processor.start(items, "2", { signal });
+    processor.start(items, { query: "2" }, { signal });
     await promise;
     assertEquals(called, true);
   });
@@ -104,7 +104,7 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
     await using processor = new ItemProcessor(testTransformers, testProjectors);
-    processor.start(items, "2", { signal });
+    processor.start(items, { query: "2" }, { signal });
     await promise;
     assertEquals(called, true);
   });
