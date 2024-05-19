@@ -27,12 +27,12 @@ export async function main(denops: Denops): Promise<void> {
     "event:dispatch": (name, data) => {
       dispatch(ensure(name, isFallEventName), data);
     },
-    "picker:start": async (sourceName, cmdline) => {
+    "picker:start": async (name, cmdline) => {
       await using _guard = await hideMsgArea(denops);
       await start(
         denops,
+        ensure(name, is.String),
         ensure(cmdline, is.String),
-        ensure(sourceName, is.String),
       );
     },
     "picker:restore": async () => {

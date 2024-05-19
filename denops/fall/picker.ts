@@ -27,13 +27,13 @@ type Context = {
 
 export async function start(
   denops: Denops,
+  name: string,
   cmdline: string,
-  sourceName: string,
   options: { signal?: AbortSignal } = {},
 ): Promise<void> {
   const configPath = await getConfigPath(denops);
   const config = await loadConfig(configPath);
-  const source = await getExtension(denops, "source", sourceName, config);
+  const source = await getExtension(denops, "source", name, config);
   if (!source) {
     return;
   }
