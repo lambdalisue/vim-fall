@@ -1,12 +1,12 @@
 function! fall#internal#msgarea#hide() abort
-  call s:hide_msgarea()
   call s:hide_cursor()
+  call s:hide_msgarea()
   redraw
 endfunction
 
 function! fall#internal#msgarea#show() abort
-  call s:show_msgarea()
   call s:show_cursor()
+  call s:show_msgarea()
   redraw
 endfunction
 
@@ -61,8 +61,8 @@ if has('nvim')
       return
     endif
     set guicursor+=a:Cursor/lCursor
-    let &guicursor = s:guicursor_saved
-    unlet s:guicursor_saved
+    silent! let &guicursor = s:guicursor_saved
+    silent! unlet! s:guicursor_saved
   endfunction
 elseif has('gui_running')
   function! s:hide_cursor() abort
