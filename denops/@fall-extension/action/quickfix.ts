@@ -39,7 +39,7 @@ export const getAction: GetAction = (denops, options) => {
   assert(options, isOptions);
   const what = options.what ?? {};
   const action = options.action ?? " ";
-  const target = options.target ?? "selected-or-cursor";
+  const target = options.target ?? "selected-or-processed";
   return {
     description,
 
