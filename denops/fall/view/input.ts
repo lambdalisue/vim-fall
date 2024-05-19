@@ -87,12 +87,14 @@ export class Input implements AsyncDisposable {
     );
 
     // Bind components to the layout
-    const input = new InputComponent(
-      this.#layout.input.bufnr,
-      this.#layout.input.winid,
-      {
-        prompt: this.#options.input?.prompt,
-      },
+    const input = stack.use(
+      new InputComponent(
+        this.#layout.input.bufnr,
+        this.#layout.input.winid,
+        {
+          prompt: this.#options.input?.prompt,
+        },
+      ),
     );
 
     let renderInput = true;

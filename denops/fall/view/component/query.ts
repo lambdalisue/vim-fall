@@ -26,7 +26,7 @@ export type Params = Readonly<{
 /**
  * Query component that shows user's input and status of item collector/processor
  */
-export class QueryComponent {
+export class QueryComponent implements Disposable {
   #bufnr: number;
   #winwidth: number;
   #spinner: Spinner;
@@ -104,6 +104,10 @@ export class QueryComponent {
       const m = err.message ?? err;
       console.warn(`[fall] Failed to render the query component: ${m}`);
     }
+  }
+
+  [Symbol.dispose]() {
+    this.#spinner[Symbol.dispose]();
   }
 }
 

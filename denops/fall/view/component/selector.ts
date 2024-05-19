@@ -24,7 +24,7 @@ export type Params = Readonly<{
 /**
  * Selector component that shows processed items to select
  */
-export class SelectorComponent {
+export class SelectorComponent implements Disposable {
   #bufnr: number;
   #scrolloff: number;
   #winwidth: number;
@@ -133,6 +133,10 @@ export class SelectorComponent {
       const m = err.message ?? err;
       console.warn(`Failed to render the selector component: ${m}`);
     }
+  }
+
+  [Symbol.dispose]() {
+    // Do nothing
   }
 }
 

@@ -205,32 +205,38 @@ export class Picker implements AsyncDisposable {
       );
 
     // Bind components to the layout
-    const query = new QueryComponent(
-      layout.query.bufnr,
-      layout.query.winid,
-      {
-        winwidth: queryWinwidth,
-        spinner: this.#options.query?.spinner,
-        headSymbol: this.#options.query?.headSymbol,
-        failSymbol: this.#options.query?.failSymbol,
-      },
+    const query = stack.use(
+      new QueryComponent(
+        layout.query.bufnr,
+        layout.query.winid,
+        {
+          winwidth: queryWinwidth,
+          spinner: this.#options.query?.spinner,
+          headSymbol: this.#options.query?.headSymbol,
+          failSymbol: this.#options.query?.failSymbol,
+        },
+      ),
     );
-    const selector = new SelectorComponent(
-      layout.selector.bufnr,
-      layout.selector.winid,
-      {
-        scrolloff,
-        winwidth: selectorWinwidth,
-        winheight: selectorWinheight,
-        renderers: this.#renderers,
-      },
+    const selector = stack.use(
+      new SelectorComponent(
+        layout.selector.bufnr,
+        layout.selector.winid,
+        {
+          scrolloff,
+          winwidth: selectorWinwidth,
+          winheight: selectorWinheight,
+          renderers: this.#renderers,
+        },
+      ),
     );
-    const preview = new PreviewComponent(
-      layout.preview.bufnr,
-      layout.preview.winid,
-      {
-        previewers: this.#previewers,
-      },
+    const preview = stack.use(
+      new PreviewComponent(
+        layout.preview.bufnr,
+        layout.preview.winid,
+        {
+          previewers: this.#previewers,
+        },
+      ),
     );
 
     let renderQuery = true;

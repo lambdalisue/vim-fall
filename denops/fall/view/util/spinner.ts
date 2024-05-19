@@ -16,9 +16,6 @@ export class Spinner implements Disposable {
   ) {
     this.#spinner = spinner;
     this.#interval = interval;
-    globalThis.addEventListener("unload", () => {
-      this[Symbol.dispose]();
-    });
   }
 
   next(): string {

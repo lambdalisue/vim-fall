@@ -16,7 +16,7 @@ export type Params = Readonly<{
 /**
  * Preview component that shows preview content of the cursor item
  */
-export class PreviewComponent {
+export class PreviewComponent implements Disposable {
   #bufnr: number;
   #winid: number;
   #previewers: readonly Previewer[];
@@ -149,5 +149,9 @@ export class PreviewComponent {
         `[fall] Failed to move cursor on the preview window: ${m}`,
       );
     }
+  }
+
+  [Symbol.dispose]() {
+    // Do nothing
   }
 }

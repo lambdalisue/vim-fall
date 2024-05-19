@@ -15,7 +15,7 @@ export type Params = Readonly<{
 /**
  * Input component that shows user's input
  */
-export class InputComponent {
+export class InputComponent implements Disposable {
   #bufnr: number;
   #prompt: string;
   #promptByteLength: number;
@@ -59,5 +59,9 @@ export class InputComponent {
         `[fall] Failed to render the input component: ${m}`,
       );
     }
+  }
+
+  [Symbol.dispose]() {
+    // Do nothing
   }
 }
