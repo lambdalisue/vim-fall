@@ -252,8 +252,17 @@ export class Picker implements AsyncDisposable {
     const updateQueryComponent = throttle(() => {
       query.render(
         denops,
-        this.#context.cmdline,
-        this.#context.cmdpos,
+        {
+          cmdline: this.#context.cmdline,
+          cmdpos: this.#context.cmdpos,
+          collecting: this.#itemCollector.collecting,
+          processing: this.#itemProcessor.processing ||
+            this.#itemCollector.collecting,
+          counter: {
+            collected: this.collectedItems.length,
+            processed: this.processedItems.length,
+          },
+        },
         { signal },
       ).then(() => redraw());
     }, this.#options.query?.throttleWait ?? QUERY_THROTTLE_WAIT);
@@ -297,46 +306,28 @@ export class Picker implements AsyncDisposable {
 
     // Subscribe custom events
     stack.use(subscribe("item-collector-changed", () => {
-      query.processing = true;
-      query.collecting = true;
-      query.counter = {
-        processed: this.processedItems.length,
-        collected: this.collectedItems.length,
-      };
       updateQueryComponent();
       startItemProcessor();
     }));
     stack.use(subscribe("item-collector-succeeded", () => {
-      query.collecting = false;
       updateQueryComponent();
     }));
     stack.use(subscribe("item-collector-failed", () => {
-      query.collecting = "failed";
       updateQueryComponent();
     }));
     stack.use(subscribe("item-processor-succeeded", () => {
       this.#context.cursor = this.#correctCursor(this.#context.cursor);
-      query.processing = query.collecting;
-      query.counter = {
-        processed: this.processedItems.length,
-        collected: this.collectedItems.length,
-      };
       updateQueryComponent();
       updateSelectorComponent();
       updatePreviewComponent();
     }));
     stack.use(subscribe("item-processor-failed", () => {
-      query.processing = "failed";
       updateQueryComponent();
     }));
     stack.use(subscribe("cmdline-changed", (cmdline) => {
       this.#context.cmdline = cmdline;
       updateQueryComponent();
-      if (query.collecting) {
-        startItemProcessorDebounce();
-      } else {
-        startItemProcessor();
-      }
+      startItemProcessorDebounce();
     }));
     stack.use(subscribe("cmdpos-changed", (cmdpos) => {
       this.#context.cmdpos = cmdpos;
