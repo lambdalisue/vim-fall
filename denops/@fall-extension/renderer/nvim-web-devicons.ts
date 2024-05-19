@@ -13,8 +13,6 @@ const isPathDetail = is.ObjectOf({
 export const getRenderer: GetRenderer = (denops, _options) => {
   return {
     async render({ items }, { signal }) {
-      if (signal?.aborted) return items;
-
       const paths = items.map((v) => {
         if (isPathDetail(v.detail)) {
           return v.detail.path;
@@ -32,7 +30,7 @@ export const getRenderer: GetRenderer = (denops, _options) => {
             ) as Promise<string>;
           }),
       );
-      if (signal?.aborted) return items;
+      signal?.throwIfAborted();
 
       return zip(items, icons).map(([item, icon]) => {
         const prefix = `${icon}  `;

@@ -5,9 +5,7 @@ import { getByteLength } from "../util.ts";
 
 export const getRenderer: GetRenderer = (_denops, _options) => {
   return {
-    render({ items }, { signal }) {
-      if (signal?.aborted) return items;
-
+    render({ items }) {
       return items.map((v) => {
         const label = v.label ?? v.value;
         const index = label.lastIndexOf(SEPARATOR);
