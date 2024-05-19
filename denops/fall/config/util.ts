@@ -3,6 +3,7 @@ import * as vars from "https://deno.land/x/denops_std@v6.4.0/variable/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import { ensure, is } from "jsr:@core/unknownutil@3.18.0";
 import { parse as parseJsonc } from "jsr:@std/jsonc@0.224.0";
+import { deepMerge } from "jsr:@std/collections@0.224.2/deep-merge";
 import { ensureDir } from "jsr:@std/fs@0.229.0/ensure-dir";
 import { copy } from "jsr:@std/fs@0.229.0/copy";
 import { exists } from "jsr:@std/fs@0.229.0/exists";
@@ -16,16 +17,20 @@ import {
 } from "./type.ts";
 import { type ExtensionType } from "../extension/type.ts";
 
+function merge<T extends Record<PropertyKey, unknown>>(...records: T[]): T {
+  return records.reduce((a, b) => deepMerge<T>(a, b, { arrays: "replace" }));
+}
+
 export function getSourcePickerConfig(
   name: string,
   config: Config,
 ): SourcePickerConfig {
   const [root] = name.split(":", 1);
-  return {
-    ...(config.picker?.source?.[""] ?? {}),
-    ...(config.picker?.source?.[root] ?? {}),
-    ...(config.picker?.source?.[name] ?? {}),
-  };
+  return merge(
+    config.picker?.source?.[""] ?? {},
+    config.picker?.source?.[root] ?? {},
+    config.picker?.source?.[name] ?? {},
+  );
 }
 
 export function getActionPickerConfig(
@@ -33,11 +38,11 @@ export function getActionPickerConfig(
   config: Config,
 ): ActionPickerConfig {
   const [root] = name.split(":", 1);
-  return {
-    ...(config.picker?.action?.[""] ?? {}),
-    ...(config.picker?.action?.[root] ?? {}),
-    ...(config.picker?.action?.[name] ?? {}),
-  };
+  return merge(
+    config.picker?.action?.[""] ?? {},
+    config.picker?.action?.[root] ?? {},
+    config.picker?.action?.[name] ?? {},
+  );
 }
 
 export function getExtensionOptions<T extends ExtensionType>(
@@ -46,11 +51,11 @@ export function getExtensionOptions<T extends ExtensionType>(
   config: Config,
 ): Record<string, unknown> {
   const [root] = name.split(":", 1);
-  return {
-    ...(config[type]?.[""] ?? {}),
-    ...(config[type]?.[root] ?? {}),
-    ...(config[type]?.[name] ?? {}),
-  };
+  return merge(
+    config[type]?.[""] ?? {},
+    config[type]?.[root] ?? {},
+    config[type]?.[name] ?? {},
+  );
 }
 
 export async function getConfigPath(denops: Denops): Promise<string> {
