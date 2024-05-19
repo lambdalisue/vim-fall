@@ -68,7 +68,7 @@ export class PreviewComponent {
         await fn.win_execute(
           denops,
           this.#winid,
-          `silent! filetype detect`,
+          `silent! call fall#internal#preview#highlight()`,
         );
       } else {
         await buffer.replace(denops, this.#bufnr, [
