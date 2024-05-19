@@ -5,7 +5,6 @@ import { ensure, is } from "jsr:@core/unknownutil@3.18.0";
 import { parse as parseJsonc } from "jsr:@std/jsonc@0.224.0";
 import { deepMerge } from "jsr:@std/collections@0.224.2/deep-merge";
 import { ensureDir } from "jsr:@std/fs@0.229.0/ensure-dir";
-import { copy } from "jsr:@std/fs@0.229.0/copy";
 import { exists } from "jsr:@std/fs@0.229.0/exists";
 import { dirname } from "jsr:@std/path@0.225.0/dirname";
 
@@ -92,7 +91,7 @@ export async function loadConfig(configPath: string): Promise<Config> {
 async function ensureConfig(configPath: string): Promise<void> {
   if (!await exists(configPath)) {
     await ensureDir(dirname(configPath));
-    await copy(
+    await Deno.copyFile(
       new URL("./config.default.jsonc", import.meta.url),
       configPath,
     );
