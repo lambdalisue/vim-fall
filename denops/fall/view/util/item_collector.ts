@@ -1,30 +1,33 @@
 import type { Item, SourceItem } from "../../extension/type.ts";
 import { dispatch } from "../../util/event.ts";
+import { DynamicChunkStream } from "../../util/dynamic_chunk_stream.ts";
 
 /**
- * Collect items from the given stream and store them in the internal state.
+ * Item collector that collects items from the stream and stores in the `items` attribute.
  */
 export class ItemCollector implements Disposable {
+  #controller = new AbortController();
   #stream: ReadableStream<SourceItem>;
 
-  #controller?: AbortController;
+  #collecting = false;
   #items: Item[] = [];
 
   constructor(stream: ReadableStream<SourceItem>) {
     this.#stream = stream;
   }
 
-  /**
-   * Collected items
-   */
+  get collecting(): boolean {
+    return this.#collecting;
+  }
+
   get items(): readonly Item[] {
     return this.#items;
   }
 
   /**
-   * Start collecting items from the source stream.
+   * Start collecting items from the stream.
    *
-   * It dispatch the following events:
+   * It dispatches the following events:
    *
    * - `item-collector-changed`: When new items are collected.
    * - `item-collector-succeeded`: When collecting items is succeeded.
@@ -34,70 +37,55 @@ export class ItemCollector implements Disposable {
    * Note that when case of aborting, `item-collector-failed` is not dispatched.
    * To check if the collecting is completed, you should use `item-collector-completed`.
    */
-  start(options: { signal: AbortSignal }): void {
-    if (this.#controller) {
-      return;
-    }
-    this.#start(options).catch((err) => {
-      console.warn(
-        `[fall] Error in reading source steam: ${err.message ?? err}`,
-      );
-    });
-  }
-
-  async #start(options: { signal: AbortSignal }): Promise<void> {
-    this.#controller = new AbortController();
+  async start(options: { signal: AbortSignal }): Promise<void> {
+    this.#abort(); // Cancel previous processing
     const signal = AbortSignal.any([
       this.#controller.signal,
       options.signal,
     ]);
     try {
-      let chunks: SourceItem[] = [];
-      let chunkSize = calcChunkSize(0);
+      this.#collecting = true;
       await this.#stream
         .pipeThrough(
-          new TransformStream({
-            transform: (chunk, controller) => {
-              chunks.push(chunk);
-              if (chunks.length >= chunkSize) {
-                controller.enqueue(chunks);
-                chunks = [];
-              }
-            },
-            flush(controller) {
-              controller.enqueue(chunks);
-              chunks = [];
-            },
+          new DynamicChunkStream((chunks) => {
+            const chunkSize = calcChunkSize(this.#items.length);
+            return chunkSize <= chunks.length;
           }),
           { signal },
         )
         .pipeTo(
           new WritableStream({
             write: (chunk) => {
-              const offset = this.#items.length;
-              this.#items.push(...toItems(chunk, offset));
-              chunkSize = calcChunkSize(this.#items.length);
+              this.#items.push(...toItems(chunk, this.#items.length));
               dispatch("item-collector-changed", undefined);
             },
           }),
           { signal },
         );
+      this.#collecting = false;
       dispatch("item-collector-succeeded", undefined);
     } catch (err) {
+      this.#collecting = false;
       if (err instanceof DOMException && err.name === "AbortError") return;
       dispatch("item-collector-failed", undefined);
-      throw err;
+      const m = err.message ?? err;
+      console.warn(`[fall] Failed to collect items from the stream: ${m}`);
     } finally {
       dispatch("item-collector-completed", undefined);
     }
   }
 
-  [Symbol.dispose]() {
+  #abort(): void {
     try {
-      this.#controller?.abort();
+      this.#controller.abort();
     } catch {
       // Fail silently
     }
+    this.#controller = new AbortController();
+  }
+
+  [Symbol.dispose]() {
+    this.#abort();
   }
 }
 
