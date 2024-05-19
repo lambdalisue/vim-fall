@@ -4,7 +4,7 @@
  * This is JSONC file so that comment or trailing comma is available.
  */
 {
-  "$schema": "https://vim-fall.github.io/jsonschema/v1alpha/config.schema.json",
+  "$schema": "https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/config.schema.json",
   "input": {
     "layout": {
       "border": "rounded",
@@ -17,10 +17,16 @@
   "picker": {
     "source": {
       "": {
-        "transformers": ["substring_filter"],
+        "transformers": [
+          "substring_filter"
+        ],
         "projectors": [],
         "renderers": [],
-        "previewers": ["attribute", "buffer", "file"],
+        "previewers": [
+          "attribute",
+          "buffer",
+          "file"
+        ],
         "actions": [
           "open",
           "open:split",
@@ -45,21 +51,33 @@
         }
       },
       "file": {
-        "renderers": ["smart_path"]
+        "renderers": [
+          "smart_path"
+        ]
       },
       "file_process": {
-        "renderers": ["smart_path"]
+        "renderers": [
+          "smart_path"
+        ]
       },
       "line": {
-        "previewers": ["buffer"]
+        "previewers": [
+          "buffer"
+        ]
       }
     },
     "action": {
       "": {
-        "transformers": ["substring_filter"],
-        "projectors": ["lexical_sorter"],
+        "transformers": [
+          "substring_filter"
+        ],
+        "projectors": [
+          "lexical_sorter"
+        ],
         "renderers": [],
-        "previewers": ["attribute"],
+        "previewers": [
+          "attribute"
+        ],
         "options": {
           "layout": {
             "border": "rounded",

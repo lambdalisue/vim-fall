@@ -24,7 +24,7 @@ To install [Denops] and this plugin using your preferred plugin manager, such as
 
 ```vim
 Plug 'vim-denops/denops.vim'
-Plug 'vim-fall/fall.vim'
+Plug 'lambdalisue/vim-fall'
 ```
 
 [vim-plug]: https://github.com/junegunn/vim-plug
