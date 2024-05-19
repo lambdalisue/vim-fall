@@ -18,15 +18,20 @@
     "source": {
       "": {
         "transformers": [
-          "substring_filter"
+          // "substring_filter"
         ],
-        "projectors": [],
-        "renderers": [],
-        "previewers": [
-          "attribute",
-          "buffer",
-          "file"
+        "projectors": [
+          "fzf"
+          // "lexical_sorter",
+          // "substring_filter",
         ],
+        "renderers": [
+          // "smart-path",
+          // "nerdfont",
+          // "devicons",
+          // "nvim-web-devicons",
+        ],
+        "previewers": ["attribute", "buffer", "file"],
         "actions": [
           "open",
           "open:split",
@@ -51,33 +56,21 @@
         }
       },
       "file": {
-        "renderers": [
-          "smart_path"
-        ]
+        "renderers": ["smart_path"]
       },
       "file_process": {
-        "renderers": [
-          "smart_path"
-        ]
+        "renderers": ["smart_path"]
       },
       "line": {
-        "previewers": [
-          "buffer"
-        ]
+        "previewers": ["buffer"]
       }
     },
     "action": {
       "": {
-        "transformers": [
-          "substring_filter"
-        ],
-        "projectors": [
-          "lexical_sorter"
-        ],
+        "transformers": ["substring_filter"],
+        "projectors": ["lexical_sorter"],
         "renderers": [],
-        "previewers": [
-          "attribute"
-        ],
+        "previewers": ["attribute"],
         "options": {
           "layout": {
             "border": "rounded",
