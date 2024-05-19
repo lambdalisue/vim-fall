@@ -12,6 +12,7 @@ import {
   listExtensionNames,
   registerExtensionLoader,
 } from "./extension/loader.ts";
+import { hideMsgArea } from "./util/hide_msg_area.ts";
 
 import "./polyfill.ts";
 
@@ -27,6 +28,7 @@ export async function main(denops: Denops): Promise<void> {
       dispatch(ensure(name, isFallEventName), data);
     },
     "picker:start": async (sourceName, cmdline) => {
+      await using _guard = await hideMsgArea(denops);
       await start(
         denops,
         ensure(cmdline, is.String),
@@ -56,6 +58,7 @@ export async function main(denops: Denops): Promise<void> {
       return listExtensionNames(ensure(type, isExtensionType), config);
     },
     "util:input": async (params) => {
+      await using _guard = await hideMsgArea(denops);
       return await input(denops, ensure(params, isInputParams));
     },
   };
