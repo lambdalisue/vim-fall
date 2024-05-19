@@ -41,24 +41,12 @@ const isOptions = is.RecordOf(is.Unknown, is.String);
 const isPickerOptions = is.PartialOf(is.ObjectOf({
   layout: is.PartialOf(isLayoutParams),
   redraw: is.PartialOf(is.ObjectOf({
-    throttleWait: is.Number,
+    interval: is.Number,
   })),
   query: is.PartialOf(is.ObjectOf({
     spinner: is.ArrayOf(is.String),
     headSymbol: is.String,
     failSymbol: is.String,
-    throttleWait: is.Number,
-  })),
-  selector: is.PartialOf(is.ObjectOf({
-    throttleWait: is.Number,
-  })),
-  preview: is.PartialOf(is.ObjectOf({
-    throttleWait: is.Number,
-    debounceWait: is.Number,
-  })),
-  itemProcessor: is.PartialOf(is.ObjectOf({
-    throttleWait: is.Number,
-    debounceWait: is.Number,
   })),
 })) satisfies Predicate<PickerOptions>;
 

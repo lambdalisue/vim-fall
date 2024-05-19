@@ -17,8 +17,7 @@ import type {
 } from "../extension/type.ts";
 import { isDefined } from "../util/collection.ts";
 import { subscribe } from "../util/event.ts";
-import { throttle } from "../util/throttle.ts";
-import { debounce } from "../util/debounce.ts";
+import { startAsyncScheduler } from "../util/async_scheduler.ts";
 import { buildLayout, Layout, LayoutParams } from "./layout/picker_layout.ts";
 import { QueryComponent } from "./component/query.ts";
 import { SelectorComponent } from "./component/selector.ts";
@@ -37,24 +36,12 @@ export type PickerContext = {
 export type PickerOptions = Readonly<{
   layout?: Partial<LayoutParams>;
   redraw?: Readonly<{
-    throttleWait?: number;
+    interval?: number;
   }>;
   query?: Readonly<{
     spinner?: readonly string[];
     headSymbol?: string;
     failSymbol?: string;
-    throttleWait?: number;
-  }>;
-  selector?: Readonly<{
-    throttleWait?: number;
-  }>;
-  preview?: Readonly<{
-    throttleWait?: number;
-    debounceWait?: number;
-  }>;
-  itemProcessor?: Readonly<{
-    throttleWait?: number;
-    debounceWait?: number;
   }>;
 }>;
 
@@ -82,7 +69,6 @@ export class Picker implements AsyncDisposable {
     context?: PickerContext,
   ) {
     const stack = new AsyncDisposableStack();
-    // Start collecting source items
     const itemCollector = stack.use(new ItemCollector(stream));
     const itemProcessor = stack.use(
       new ItemProcessor(transformers, projectors),
@@ -180,9 +166,6 @@ export class Picker implements AsyncDisposable {
       }
     });
 
-    // Start collecting
-    this.#itemCollector.start({ signal });
-
     // Set internal variables
     await batch(denops, async (denops) => {
       await g.set(
@@ -243,116 +226,88 @@ export class Picker implements AsyncDisposable {
       },
     );
 
-    const redraw = throttle(() => {
-      denops.cmd("redraw").catch((err) => {
-        const m = err.message ?? err;
-        console.debug(`Failed to execute 'redraw': ${m}`);
-      });
-    }, this.#options.redraw?.throttleWait ?? REDRAW_THROTTLE_WAIT);
-    const updateQueryComponent = throttle(() => {
-      query.render(
-        denops,
-        {
-          cmdline: this.#context.cmdline,
-          cmdpos: this.#context.cmdpos,
-          collecting: this.#itemCollector.collecting,
-          processing: this.#itemProcessor.processing ||
-            this.#itemCollector.collecting,
-          counter: {
-            collected: this.collectedItems.length,
-            processed: this.processedItems.length,
-          },
-        },
+    let renderQuery = true;
+    let renderSelector = true;
+    let renderPreview = true;
+    const emitQueryUpdate = () => {
+      renderQuery = true;
+    };
+    const emitSelectorUpdate = () => {
+      renderSelector = true;
+    };
+    const emitPreviewUpdate = () => {
+      renderPreview = true;
+    };
+    const emitItemProcessor = () => {
+      this.#itemProcessor.start(
+        this.collectedItems,
+        { query: this.#context.cmdline },
         { signal },
-      ).then(() => redraw());
-    }, this.#options.query?.throttleWait ?? QUERY_THROTTLE_WAIT);
-    const updateSelectorComponent = throttle(() => {
-      selector.render(
-        denops,
-        {
-          items: this.processedItems,
-          index: this.#context.index,
-          selected: this.#context.selected,
-        },
-        { signal },
-      ).then(() => redraw());
-    }, this.#options.selector?.throttleWait ?? SELECTOR_THROTTLE_WAIT);
-    const updatePreviewComponent = throttle(() => {
-      preview.render(
-        denops,
-        this.cursorItem,
-        { signal },
-      ).then(() => redraw());
-    }, this.#options.preview?.throttleWait ?? PREVIEW_THROTTLE_WAIT);
-    const updatePreviewComponentDebounce = debounce(() => {
-      updatePreviewComponent();
-    }, this.#options.preview?.debounceWait ?? PREVIEW_DEBOUNCE_WAIT);
-    const startItemProcessor = throttle(
-      () => {
-        this.#itemProcessor.start(
-          this.collectedItems,
-          { query: this.#context.cmdline },
-          { signal },
-        );
-      },
-      this.#options.itemProcessor?.throttleWait ??
-        INPUT_PROCESSOR_THROTTLE_WAIT,
-    );
-    const startItemProcessorDebounce = debounce(
-      () => {
-        startItemProcessor();
-      },
-      this.#options.itemProcessor?.debounceWait ??
-        INPUT_PROCESSOR_DEBOUNCE_WAIT,
-    );
+      );
+    };
 
-    // Subscribe custom events
     stack.use(subscribe("item-collector-changed", () => {
-      updateQueryComponent();
-      startItemProcessor();
+      emitQueryUpdate();
+      emitItemProcessor();
     }));
     stack.use(subscribe("item-collector-succeeded", () => {
-      updateQueryComponent();
+      emitQueryUpdate();
+      emitItemProcessor();
     }));
     stack.use(subscribe("item-collector-failed", () => {
-      updateQueryComponent();
+      emitQueryUpdate();
     }));
     stack.use(subscribe("item-processor-succeeded", () => {
       this.#context.index = this.#correctIndex(this.#context.index);
-      updateQueryComponent();
-      updateSelectorComponent();
-      updatePreviewComponent();
+      emitQueryUpdate();
+      emitSelectorUpdate();
+      emitPreviewUpdate();
     }));
     stack.use(subscribe("item-processor-failed", () => {
-      updateQueryComponent();
+      emitQueryUpdate();
     }));
     stack.use(subscribe("cmdline-changed", (cmdline) => {
+      if (this.#context.cmdline === cmdline) {
+        return;
+      }
       this.#context.cmdline = cmdline;
-      updateQueryComponent();
-      startItemProcessorDebounce();
+      emitQueryUpdate();
+      emitItemProcessor();
     }));
     stack.use(subscribe("cmdpos-changed", (cmdpos) => {
+      if (this.#context.cmdpos === cmdpos) {
+        return;
+      }
       this.#context.cmdpos = cmdpos;
-      updateQueryComponent();
+      emitQueryUpdate();
     }));
     stack.use(subscribe("selector-cursor-move", (offset) => {
-      this.#context.index = this.#correctIndex(this.#context.index + offset);
-      updateSelectorComponent();
-      updatePreviewComponentDebounce();
+      const newIndex = this.#correctIndex(this.#context.index + offset);
+      if (this.#context.index === newIndex) {
+        return;
+      }
+      this.#context.index = newIndex;
+      emitSelectorUpdate();
+      emitPreviewUpdate();
     }));
     stack.use(subscribe("selector-cursor-move-at", (line) => {
-      const cursor = line === "$" ? this.processedItems.length - 1 : line - 1;
-      this.#context.index = this.#correctIndex(cursor);
-      updateSelectorComponent();
-      updatePreviewComponentDebounce();
+      const newIndex = this.#correctIndex(
+        line === "$" ? this.processedItems.length - 1 : line - 1,
+      );
+      if (this.#context.index === newIndex) {
+        return;
+      }
+      this.#context.index = newIndex;
+      emitSelectorUpdate();
+      emitPreviewUpdate();
     }));
     stack.use(subscribe("preview-cursor-move", (offset) => {
-      preview.moveCursor(denops, offset, { signal: options.signal });
-      redraw();
+      preview.moveCursor(denops, offset, { signal });
+      emitPreviewUpdate();
     }));
     stack.use(subscribe("preview-cursor-move-at", (line) => {
-      preview.moveCursorAt(denops, line, { signal: options.signal });
-      redraw();
+      preview.moveCursorAt(denops, line, { signal });
+      emitPreviewUpdate();
     }));
     if (this.#selectable) {
       stack.use(subscribe("selector-select", () => {
@@ -363,7 +318,7 @@ export class Picker implements AsyncDisposable {
         } else {
           this.#context.selected.add(item.id);
         }
-        updateSelectorComponent();
+        emitSelectorUpdate();
       }));
       stack.use(subscribe("selector-select-all", () => {
         if (this.#context.selected.size === this.processedItems.length) {
@@ -373,17 +328,79 @@ export class Picker implements AsyncDisposable {
             this.processedItems.map((v) => v.id),
           );
         }
-        updateSelectorComponent();
+        emitSelectorUpdate();
       }));
     }
+
+    startAsyncScheduler(
+      async () => {
+        const collecting = this.#itemCollector.collecting;
+        const processing = this.#itemProcessor.processing;
+        renderQuery ||= collecting || processing;
+
+        if (!renderQuery && !renderSelector && !renderPreview) {
+          // No need to render & redraw
+          return;
+        }
+
+        if (renderQuery) {
+          renderQuery = false;
+          await query.render(
+            denops,
+            {
+              cmdline: this.#context.cmdline,
+              cmdpos: this.#context.cmdpos,
+              collecting,
+              processing,
+              counter: {
+                processed: this.processedItems.length,
+                collected: this.collectedItems.length,
+              },
+            },
+            { signal },
+          );
+        }
+
+        if (renderSelector) {
+          renderSelector = false;
+          await selector.render(
+            denops,
+            {
+              items: this.processedItems,
+              index: this.#context.index,
+              selected: this.#context.selected,
+            },
+            { signal },
+          );
+        }
+
+        if (renderPreview) {
+          renderPreview = false;
+          await preview.render(
+            denops,
+            this.cursorItem,
+            { signal },
+          );
+        }
+
+        await denops.cmd("redraw");
+      },
+      this.#options.redraw?.interval ?? REDRAW_INTERVAL,
+      { signal },
+    );
 
     // Observe Vim's prompt
     stack.use(observeInput(denops, { signal }));
 
+    // Start collecting
+    this.#itemCollector.start({ signal });
+
     // Wait for user input
-    return await startInput(denops, { text: this.#context.cmdline }, {
-      signal,
-    });
+    return await startInput(
+      denops,
+      { text: this.#context.cmdline },
+      { signal },
+    );
   }
 
   async [Symbol.asyncDispose](): Promise<void> {
@@ -398,10 +415,4 @@ const HEIGHT_RATION = 0.9;
 const HEIGHT_MIN = 5;
 const HEIGHT_MAX = 40;
 const PREVIEW_RATION = 0.45;
-const REDRAW_THROTTLE_WAIT = 30;
-const QUERY_THROTTLE_WAIT = 20;
-const SELECTOR_THROTTLE_WAIT = 20;
-const PREVIEW_THROTTLE_WAIT = 200;
-const PREVIEW_DEBOUNCE_WAIT = 300;
-const INPUT_PROCESSOR_THROTTLE_WAIT = 200;
-const INPUT_PROCESSOR_DEBOUNCE_WAIT = 300;
+const REDRAW_INTERVAL = 0;
