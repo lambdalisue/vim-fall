@@ -2,7 +2,7 @@ import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import { g } from "https://deno.land/x/denops_std@v6.4.0/variable/mod.ts";
 
 import { subscribe } from "../util/event.ts";
-import { throttle } from "../util/throttle.ts";
+import { startAsyncScheduler } from "../util/async_scheduler.ts";
 import { buildLayout, Layout, LayoutParams } from "./layout/input_layout.ts";
 import { InputComponent } from "./component/input.ts";
 import { observeInput, startInput } from "./util/input.ts";
@@ -10,13 +10,12 @@ import { observeInput, startInput } from "./util/input.ts";
 export interface InputOptions {
   layout?: Partial<LayoutParams>;
   redraw?: Readonly<{
-    throttleWait?: number;
+    interval?: number;
   }>;
   input?: {
     prompt?: string;
     text?: string;
     completion?: string;
-    throttleWait?: number;
   };
 }
 
@@ -96,31 +95,51 @@ export class Input implements AsyncDisposable {
       },
     );
 
-    const redraw = throttle(() => {
-      denops.cmd("redraw").catch((err) => {
-        const m = err.message ?? err;
-        console.debug(`Failed to execute 'redraw': ${m}`);
-      });
-    }, this.#options.redraw?.throttleWait ?? REDRAW_THROTTLE_WAIT);
-    const updateInputComponent = throttle(() => {
-      input.render(
-        denops,
-        this.#cmdline,
-        this.#cmdpos,
-        { signal },
-      ).then(() => redraw());
-    }, this.#options.input?.throttleWait ?? INPUT_THROTTLE_WAIT);
+    let renderInput = true;
+    const emitInputUpdate = () => {
+      renderInput = true;
+    };
 
     // Subscribe custom events
     stack.use(subscribe("cmdline-changed", (cmdline) => {
+      if (this.#cmdline === cmdline) {
+        return;
+      }
       this.#cmdline = cmdline;
-      updateInputComponent();
+      emitInputUpdate();
     }));
     stack.use(subscribe("cmdpos-changed", (cmdpos) => {
+      if (this.#cmdpos === cmdpos) {
+        return;
+      }
       this.#cmdpos = cmdpos;
-      updateInputComponent();
+      emitInputUpdate();
     }));
 
+    startAsyncScheduler(
+      async () => {
+        if (!renderInput) {
+          // No need to render & redraw
+          return;
+        }
+
+        if (renderInput) {
+          renderInput = false;
+          await input.render(
+            denops,
+            {
+              cmdline: this.#cmdline,
+              cmdpos: this.#cmdpos,
+            },
+            { signal },
+          );
+        }
+
+        await denops.cmd("redraw");
+      },
+      this.#options.redraw?.interval ?? REDRAW_INTERVAL,
+      { signal },
+    );
     // Observe Vim's prompt
     stack.use(observeInput(denops, { signal }));
 
@@ -144,5 +163,4 @@ export class Input implements AsyncDisposable {
 const WIDTH_RATION = 0.3;
 const WIDTH_MIN = 10;
 const WIDTH_MAX = 80;
-const REDRAW_THROTTLE_WAIT = 30;
-const INPUT_THROTTLE_WAIT = 20;
+const REDRAW_INTERVAL = 0;
