@@ -5,6 +5,7 @@ import {
 } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
+import { equal } from "jsr:@std/assert@0.225.2/equal";
 
 import type { Previewer, PreviewerItem } from "../../extension/type.ts";
 
@@ -19,6 +20,7 @@ export class PreviewComponent {
   #bufnr: number;
   #winid: number;
   #previewers: readonly Previewer[];
+  #previousItem?: PreviewerItem;
 
   constructor(
     bufnr: number,
@@ -35,6 +37,11 @@ export class PreviewComponent {
     item: PreviewerItem | undefined,
     { signal }: { signal: AbortSignal },
   ): Promise<void> {
+    if (equal(item, this.#previousItem)) {
+      return;
+    }
+    this.#previousItem = item;
+
     try {
       if (!item) {
         await buffer.replace(denops, this.#bufnr, [
