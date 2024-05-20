@@ -14,6 +14,7 @@ export const getProjector: GetProjector = (_denops, options) => {
       });
       const found = await fzf.find(query);
       signal?.throwIfAborted();
+
       return found
         .map((v) => {
           const decorations: ItemDecoration[] = [{

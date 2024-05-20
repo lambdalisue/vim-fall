@@ -5,22 +5,22 @@ import type { Item } from "./item.ts";
 
 export type PreviewerItem = Pick<Item, "value" | "detail">;
 
-export type PreviewerParams = Readonly<{
+export type PreviewerParams = {
   /**
    * The item going to be previewd.
    */
-  item: PreviewerItem;
+  readonly item: PreviewerItem;
 
   /**
    * The buffer number for previewing the item.
    */
-  bufnr: number;
+  readonly bufnr: number;
 
   /**
    * The window ID for previewing the item.
    */
-  winid: number;
-}>;
+  readonly winid: number;
+};
 
 /**
  * Previewer is responsible for previewing items within the picker.

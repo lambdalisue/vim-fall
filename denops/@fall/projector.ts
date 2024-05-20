@@ -5,17 +5,17 @@ import type { Item } from "./item.ts";
 
 export type { Item };
 
-export type ProjectorParams = Readonly<{
+export type ProjectorParams = {
   /**
    * The query that user has input.
    */
-  query: string;
+  readonly query: string;
 
   /**
    * The transformed/projected items.
    */
-  items: readonly Item[];
-}>;
+  readonly items: readonly Item[];
+};
 
 /**
  * Projector is responsible for projection of the items.

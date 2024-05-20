@@ -8,17 +8,17 @@ export type RendererItem = Pick<
   "value" | "label" | "detail" | "decorations"
 >;
 
-export type RendererParams = Readonly<{
+export type RendererParams = {
   /**
    * The items to be displayed.
    */
-  items: readonly RendererItem[];
+  readonly items: readonly RendererItem[];
 
   /**
    * The selector window display width.
    */
-  width: number;
-}>;
+  readonly width: number;
+};
 
 /**
  * Renderer is responsible for rendering the items in the selector window of the picker.

@@ -5,12 +5,12 @@ import type { Item } from "./item.ts";
 
 export type { Item };
 
-export type TransformerParams = Readonly<{
+export type TransformerParams = {
   /**
    * The query that user has input.
    */
-  query: string;
-}>;
+  readonly query: string;
+};
 
 /**
  * Transformer is responsible for transforming the stream of the items.
@@ -19,7 +19,7 @@ export type TransformerParams = Readonly<{
  * prior to perform operation. Use `Projector` instead when you want to apply the operation on
  * the entire items rather than the stream.
  */
-export type Transformer = Readonly<{
+export type Transformer = {
   /**
    * Description of the extension.
    */
@@ -38,7 +38,7 @@ export type Transformer = Readonly<{
     params: TransformerParams,
     options: { signal?: AbortSignal },
   ) => Promish<TransformStream<Item, Item> | undefined>;
-}>;
+};
 
 /**
  * Get the transformer instance.

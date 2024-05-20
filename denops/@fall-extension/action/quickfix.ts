@@ -43,9 +43,7 @@ export const getAction: GetAction = (denops, options) => {
   return {
     description,
 
-    async trigger({ cursorItem, selectedItems, processedItems }, { signal }) {
-      if (signal?.aborted) return;
-
+    async invoke({ cursorItem, selectedItems, processedItems }) {
       const source = selectedItems.length > 0
         ? selectedItems
         : target === "selected-or-cursor"
@@ -69,11 +67,8 @@ export const getAction: GetAction = (denops, options) => {
           items,
         });
       } catch (err) {
-        // Fail silently
-        console.debug(
-          `[fall] (action/quickfix) Failed to set quickfix list:`,
-          err,
-        );
+        const m = err.message ?? err;
+        console.warn(`[fall] Failed to set quickfix list: ${m}`);
       }
       return false;
     },

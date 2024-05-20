@@ -28,9 +28,7 @@ export const getProjector: GetProjector = async (denops, options) => {
     flag = s ? "smart" : i ? "ignore" : "none";
   }
   return {
-    project({ query, items }, { signal }) {
-      if (signal?.aborted) return items;
-
+    project({ query, items }) {
       const ignoreCase = flag === "ignore" ||
         (flag === "smart" && query.toLowerCase() === query);
       const norm = (v: string): string => ignoreCase ? v.toLowerCase() : v;

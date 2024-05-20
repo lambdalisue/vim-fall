@@ -8,15 +8,15 @@ export type SourceItem = FlatType<
   & Partial<Pick<Item, "detail" | "decorations">>
 >;
 
-export type SourceParams = Readonly<{
+export type SourceParams = {
   /**
    * The cmdline argument passed to the picker.
    *
    * For example, if user starts a picker with `Fall line -v ./README.md`, the `line` source
    * will be invoked with the cmdline `-v ./README.md`.
    */
-  cmdline: string;
-}>;
+  readonly cmdline: string;
+};
 
 /**
  * Source is a provider of items for the picker.

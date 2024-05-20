@@ -5,36 +5,36 @@ import type { Item } from "./item.ts";
 
 export type ActionItem = Pick<Item, "value" | "detail">;
 
-export type ActionParams = Readonly<{
+export type ActionParams = {
   /**
    * The item under the cursor.
    */
-  cursorItem?: ActionItem;
+  readonly cursorItem?: ActionItem;
 
   /**
    * The items that are selected.
    */
-  selectedItems: readonly ActionItem[];
+  readonly selectedItems: readonly ActionItem[];
 
   /**
    * The items that are available (not filtered).
    */
-  processedItems: readonly ActionItem[];
-}>;
+  readonly processedItems: readonly ActionItem[];
+};
 
 /**
  * Action is responsible for processing specified items within the picker.
  *
  * The action is applied to cursor item, selected items, or available items.
  */
-export type Action = Readonly<{
+export type Action = {
   /**
    * Description of the extension.
    */
   readonly description?: string;
 
   /**
-   * Trigger the action on specified items.
+   * Invoke the action on specified items.
    *
    * This method is called when the user triggers the action.
    *
@@ -44,11 +44,11 @@ export type Action = Readonly<{
    * @param options.signal The signal to abort the action.
    * @returns `true` if the picker needs to continue running.
    */
-  readonly trigger: (
+  readonly invoke: (
     params: ActionParams,
     options: { signal?: AbortSignal },
   ) => Promish<void | boolean>;
-}>;
+};
 
 /**
  * Get the action instance.

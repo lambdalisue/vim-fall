@@ -22,15 +22,14 @@ export const getTransformer: GetTransformer = (denops, options) => {
     : "none";
   return {
     async transform({ query }, { signal }) {
-      if (signal?.aborted) return;
-
       if (flag === "auto") {
         const [s, i] = await collect(denops, (denops) => [
           opt.smartcase.get(denops),
           opt.ignorecase.get(denops),
         ]);
+        signal?.throwIfAborted();
+
         flag = s ? "smart" : i ? "ignore" : "none";
-        if (signal?.aborted) return;
       }
       const ignoreCase = flag === "ignore" ||
         (flag === "smart" && query.toLowerCase() === query);

@@ -33,9 +33,7 @@ export const getAction: GetAction = (denops, options) => {
   return {
     description,
 
-    async trigger({ cursorItem, selectedItems }, { signal }) {
-      if (signal?.aborted) return;
-
+    async invoke({ cursorItem, selectedItems }, { signal }) {
       const items = selectedItems.length > 0
         ? selectedItems
         : cursorItem
@@ -53,7 +51,7 @@ export const getAction: GetAction = (denops, options) => {
             cmdarg,
             opener,
           });
-          if (signal?.aborted) return;
+          signal?.throwIfAborted();
 
           opener = splitter;
           if (item.detail.line || item.detail.column) {
@@ -65,13 +63,9 @@ export const getAction: GetAction = (denops, options) => {
               `silent! call cursor(${line}, ${column})`,
             );
           }
-          if (signal?.aborted) return;
         } catch (err) {
-          // Fail silently
-          console.debug(
-            `[fall] (action/open) Failed to open ${item.detail.path}:`,
-            err,
-          );
+          const m = err.message ?? err;
+          console.warn(`[fall] Failed to open ${item.detail.path}: ${m}`);
         }
       }
       return false;

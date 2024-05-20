@@ -17,8 +17,6 @@ export const getPreviewer: GetPreviewer = (denops, options) => {
   const columnAttribute = options.columnAttribute ?? "column";
   return {
     async preview({ item, bufnr, winid }, { signal }) {
-      if (signal?.aborted) return;
-
       const content = maybe(item.detail[contentAttribute], is.String);
       if (!content) {
         // Try next previewer
@@ -28,12 +26,16 @@ export const getPreviewer: GetPreviewer = (denops, options) => {
       const line = maybe(item.detail[lineAttribute], is.Number) ?? 1;
       const column = maybe(item.detail[columnAttribute], is.Number) ?? 1;
       const width = await fn.winwidth(denops, winid);
+      signal?.throwIfAborted();
+
       const wrap = (s: string) =>
         s.replace(
           new RegExp(`(?![^\\n]{1,${width}}$)([^\\n]{1,${width}})\\s`, "g"),
           "$1\n",
         );
       await buffer.replace(denops, bufnr, wrap(content).split("\n"));
+      signal?.throwIfAborted();
+
       await batch(denops, async (denops) => {
         await fn.win_execute(
           denops,
@@ -50,7 +52,11 @@ export const getPreviewer: GetPreviewer = (denops, options) => {
           winid,
           `silent! file fall://preview/${name}`,
         );
-        await fn.win_execute(denops, winid, `normal! ${line}G${column}|`);
+        await fn.win_execute(
+          denops,
+          winid,
+          `silent! normal! ${line}G${column}|`,
+        );
       });
     },
   };
