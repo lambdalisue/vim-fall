@@ -57,14 +57,18 @@ export async function loadExtension<
       denops,
       getExtensionOptions(conf, type, name),
     );
-    if (!opt) return;
+    if (!opt) {
+      console.warn(`[fall] No ${type} extension '${root}' exist. Skip`);
+      return;
+    }
     return {
       ...opt,
       script: loader.script,
       name,
     } as R;
   } catch (err) {
-    console.error(`[fall] ${err.message ?? err}`);
+    const m = err.message ?? err;
+    console.error(`[fall] Failed to load ${type} extension '${name}': ${m}`);
   }
 }
 
