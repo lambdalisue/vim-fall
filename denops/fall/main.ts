@@ -36,6 +36,7 @@ export async function main(denops: Denops): Promise<void> {
       );
     },
     "picker:restore": async () => {
+      await using _guard = await hideMsgArea(denops);
       await restore(denops);
     },
     "config:edit": async () => {
