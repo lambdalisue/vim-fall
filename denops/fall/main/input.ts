@@ -1,9 +1,9 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
-import { isDefined } from "./util/collection.ts";
-import { Input } from "./view/input.ts";
-import { getConfigPath, loadConfig } from "./config/util.ts";
+import { isDefined } from "../util/collection.ts";
+import { Input } from "../view/input.ts";
+import { getConfigPath, loadConfig } from "../config/util.ts";
 
 export interface InputParams {
   prompt: string;

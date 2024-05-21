@@ -3,19 +3,19 @@ import { send } from "https://deno.land/x/denops_std@v6.4.0/helper/keymap.ts";
 import { exprQuote as q } from "https://deno.land/x/denops_std@v6.4.0/helper/expr_string.ts";
 import { is, maybe } from "jsr:@core/unknownutil@3.18.0";
 
-import { subscribe } from "./util/event.ts";
-import { isDefined } from "./util/collection.ts";
-import { Picker, type PickerContext } from "./view/picker.ts";
-import { emitPickerEnter, emitPickerLeave } from "./view/util/emitter.ts";
-import type { Config } from "./config/type.ts";
+import { subscribe } from "../util/event.ts";
+import { isDefined } from "../util/collection.ts";
+import { Picker, type PickerContext } from "../view/picker.ts";
+import { emitPickerEnter, emitPickerLeave } from "../view/util/emitter.ts";
+import type { Config } from "../config/type.ts";
 import {
   getActionPickerConfig,
   getConfigPath,
   getSourcePickerConfig,
   loadConfig,
-} from "./config/util.ts";
-import type { Action, Item, Source } from "./extension/type.ts";
-import { getExtension, getExtensions } from "./extension/loader.ts";
+} from "../config/util.ts";
+import type { Action, Item, Source } from "../extension/type.ts";
+import { getExtension, getExtensions } from "../extension/loader.ts";
 
 type Context = {
   name: string;
