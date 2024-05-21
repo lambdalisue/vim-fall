@@ -9,6 +9,8 @@ const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
   args: is.ArrayOf(is.String),
   highlight: is.String,
   itemPerColumn: is.Boolean,
+  includes: is.ArrayOf(is.String),
+  excludes: is.ArrayOf(is.String),
 })));
 
 const isMatchResult = is.ObjectOf({
@@ -88,6 +90,8 @@ export const getSource: GetSource = (denops, options) => {
   const args = options.args ?? [];
   const highlight = options.highlight ?? "IncSearch";
   const itemPerColumn = options.itemPerColumn ?? false;
+  const includes = options.includes?.map((v) => new RegExp(v));
+  const excludes = options.excludes?.map((v) => new RegExp(v));
   return {
     async stream({ cmdline }) {
       if (!cmdline) {
@@ -115,9 +119,15 @@ export const getSource: GetSource = (denops, options) => {
         .pipeThrough(
           new TransformStream({
             transform(chunk, controller) {
-              parse(chunk, highlight, itemPerColumn).forEach((item) =>
-                controller.enqueue(item)
-              );
+              parse(chunk, highlight, itemPerColumn).forEach((item) => {
+                if (includes && includes.every((p) => !p.test(item.value))) {
+                  return;
+                }
+                if (excludes && excludes.some((p) => p.test(item.value))) {
+                  return;
+                }
+                controller.enqueue(item);
+              });
             },
           }),
         );

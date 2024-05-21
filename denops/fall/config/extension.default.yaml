@@ -9,6 +9,15 @@ source:
       - ".*/node_modules/.*"
       - ".*/target/.*"
 
+  rg:
+    excludes:
+      - ".*/\\.DS_Store"
+      - ".*/\\.git/.*"
+      - ".*/\\.cache/.*"
+      - ".*/\\.Trash/.*"
+      - ".*/node_modules/.*"
+      - ".*/target/.*"
+
 transformer: {}
 
 projector: {}
