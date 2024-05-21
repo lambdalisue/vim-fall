@@ -96,7 +96,9 @@ export const getSource: GetSource = (denops, options) => {
           prompt: "Pattern: ",
         }) ?? "";
       }
-      if (!cmdline) return; // Cancel this source
+      if (!cmdline) {
+        throw new DOMException("Cancelled", "AbortError");
+      }
 
       const cwd = await fn.getcwd(denops);
       const cmd = new Deno.Command("rg", {

@@ -125,9 +125,6 @@ async function internalStart(
   });
 
   const stream = await source.stream({ cmdline });
-  if (!stream) {
-    return;
-  }
 
   const pickerOptions = getPickerOptions(pickerConf, source.name);
   const actions = await loadExtensions(

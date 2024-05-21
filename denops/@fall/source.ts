@@ -34,13 +34,12 @@ export type Source = {
    *
    * This method is called when the picker is started.
    * The returned stream is used to retrieve items in the background.
-   * If the method returns `undefined`, the picker is canceled.
    *
    * @param params The source parameters.
    */
   readonly stream: (
     params: SourceParams,
-  ) => Promish<ReadableStream<SourceItem> | undefined>;
+  ) => Promish<ReadableStream<SourceItem>>;
 
   /**
    * Get the completion candidates.
