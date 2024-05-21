@@ -17,13 +17,16 @@ export const getProjector: GetProjector = (_denops, options) => {
 
       return found
         .map((v) => {
-          const decorations: ItemDecoration[] = [{
-            column: v.start + 1,
-            length: v.end - v.start,
-          }];
+          const column = Math.max(0, v.start + 1);
+          const length = Math.max(0, v.end - v.start);
+          if (length === 0) return v.item;
+          const decoration: ItemDecoration = {
+            column,
+            length,
+          };
           return {
             ...v.item,
-            decorations: [...v.item.decorations, ...decorations],
+            decorations: [...v.item.decorations, decoration],
           };
         });
     },
