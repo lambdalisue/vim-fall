@@ -35,7 +35,7 @@ type Context = {
   readonly name: string;
   readonly cmdline: string;
   readonly collectedItems: readonly Item[];
-  readonly context: PickerContext;
+  readonly restoreContext: PickerContext;
 };
 
 let previousContext: Context | undefined;
@@ -73,6 +73,7 @@ async function restore(
     name,
     cmdline,
     collectedItems,
+    restoreContext,
   } = previousContext;
   const source: Source = {
     name,
@@ -81,7 +82,10 @@ async function restore(
     },
   };
   try {
-    return await internalStart(denops, source, cmdline, conf, options);
+    return await internalStart(denops, source, cmdline, conf, {
+      ...options,
+      restoreContext,
+    });
   } catch (err) {
     if (err instanceof DOMException && err.name === "AbortError") return;
     const m = err.message ?? err;
@@ -298,7 +302,7 @@ async function internalStart(
       name: source.name,
       cmdline,
       collectedItems: sourcePicker.collectedItems,
-      context: sourcePicker.context,
+      restoreContext: sourcePicker.context,
     };
   }
 }
