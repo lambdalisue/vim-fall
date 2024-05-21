@@ -24,12 +24,18 @@ import {
 import type { Action, Item, Source } from "../extension/type.ts";
 import { loadExtension, loadExtensions } from "../extension/loader.ts";
 
+type Config = {
+  readonly extension: ExtensionConfig;
+  readonly picker: PickerConfig;
+  readonly style: StyleConfig;
+};
+
 type Context = {
-  name: string;
-  cmdline: string;
-  collectedItems: readonly Item[];
-  sourcePickerContext: PickerContext;
-  actionPickerContext: PickerContext;
+  readonly conf: Config;
+  readonly name: string;
+  readonly cmdline: string;
+  readonly collectedItems: readonly Item[];
+  readonly context: PickerContext;
 };
 
 let previousContext: Context | undefined;
@@ -40,25 +46,18 @@ async function start(
   cmdline: string,
   options: { signal?: AbortSignal } = {},
 ): Promise<void> {
-  const configDir = await getConfigDir(denops);
-  const [extensionConf, pickerConf, styleConf] = await Promise.all([
-    loadExtensionConfig(configDir),
-    loadPickerConfig(configDir),
-    loadStyleConfig(configDir),
-  ]);
-  const source = await loadExtension(denops, extensionConf, "source", name);
+  const conf = await getConfig(denops);
+  const source = await loadExtension(denops, conf.extension, "source", name);
   if (!source) {
     return;
   }
-  return internalStart(
-    denops,
-    cmdline,
-    source,
-    extensionConf,
-    pickerConf,
-    styleConf,
-    options,
-  );
+  try {
+    return await internalStart(denops, source, cmdline, conf, options);
+  } catch (err) {
+    if (err instanceof DOMException && err.name === "AbortError") return;
+    const m = err.message ?? err;
+    setTimeout(() => console.error(`[fall] ${m}`), 50);
+  }
 }
 
 async function restore(
@@ -66,49 +65,38 @@ async function restore(
   options: { signal?: AbortSignal } = {},
 ): Promise<void> {
   if (!previousContext) {
+    console.log(`[fall] No previous context exist`);
     return;
   }
   const {
+    conf,
     name,
     cmdline,
     collectedItems,
-    sourcePickerContext,
-    actionPickerContext,
   } = previousContext;
-  const configDir = await getConfigDir(denops);
-  const [extensionConf, pickerConf, styleConf] = await Promise.all([
-    loadExtensionConfig(configDir),
-    loadPickerConfig(configDir),
-    loadStyleConfig(configDir),
-  ]);
   const source: Source = {
     name,
     stream: (_params) => {
       return ReadableStream.from(collectedItems);
     },
   };
-  return internalStart(
-    denops,
-    cmdline,
-    source,
-    extensionConf,
-    pickerConf,
-    styleConf,
-    { ...options, sourcePickerContext, actionPickerContext },
-  );
+  try {
+    return await internalStart(denops, source, cmdline, conf, options);
+  } catch (err) {
+    if (err instanceof DOMException && err.name === "AbortError") return;
+    const m = err.message ?? err;
+    setTimeout(() => console.error(`[fall] ${m}`), 50);
+  }
 }
 
 async function internalStart(
   denops: Denops,
-  cmdline: string,
   source: Source,
-  extensionConf: ExtensionConfig,
-  pickerConf: PickerConfig,
-  styleConf: StyleConfig,
+  cmdline: string,
+  conf: Config,
   options: {
     signal?: AbortSignal;
-    sourcePickerContext?: PickerContext;
-    actionPickerContext?: PickerContext;
+    restoreContext?: PickerContext;
   } = {},
 ): Promise<void> {
   await using stack = new AsyncDisposableStack();
@@ -124,93 +112,90 @@ async function internalStart(
     }
   });
 
-  const stream = await source.stream({ cmdline });
-
-  const pickerOptions = getPickerOptions(pickerConf, source.name);
+  const pickerOptions = getPickerOptions(conf.picker, source.name);
   const actions = await loadExtensions(
     denops,
-    extensionConf,
+    conf.extension,
     "action",
     pickerOptions.actions ?? [],
   );
   const transformers = await loadExtensions(
     denops,
-    extensionConf,
+    conf.extension,
     "transformer",
     pickerOptions.transformers ?? [],
   );
   const projectors = await loadExtensions(
     denops,
-    extensionConf,
+    conf.extension,
     "projector",
     pickerOptions.projectors ?? [],
   );
   const renderers = await loadExtensions(
     denops,
-    extensionConf,
+    conf.extension,
     "renderer",
     pickerOptions.renderers ?? [],
   );
   const previewers = await loadExtensions(
     denops,
-    extensionConf,
+    conf.extension,
     "previewer",
     pickerOptions.previewers ?? [],
   );
   const actionTransformers = await loadExtensions(
     denops,
-    extensionConf,
+    conf.extension,
     "transformer",
     pickerOptions.transformers ?? [],
   );
   const actionProjectors = await loadExtensions(
     denops,
-    extensionConf,
+    conf.extension,
     "projector",
     pickerOptions.actionProjectors ?? [],
   );
   const actionRenderers = await loadExtensions(
     denops,
-    extensionConf,
+    conf.extension,
     "renderer",
     pickerOptions.actionRenderers ?? [],
   );
   const actionPreviewers = await loadExtensions(
     denops,
-    extensionConf,
+    conf.extension,
     "previewer",
     pickerOptions.actionPreviewers ?? [],
   );
+  const sourcePickerStyle = getSourcePickerStyleConfig(conf.style);
+  const actionPickerStyle = getActionPickerStylConfig(conf.style);
 
-  const sourcePickerStyle = getSourcePickerStyleConfig(styleConf);
-  const actionPickerStyle = getActionPickerStylConfig(styleConf);
-
-  await using sourcePicker = new Picker(
-    `${source.name} ${cmdline}`.trim(),
-    stream,
+  const sourceStream = await source.stream({ cmdline });
+  await using sourcePicker = await Picker.fromStream(
+    sourceStream,
     transformers,
     projectors,
     renderers,
     previewers,
     {
       ...(pickerOptions.options ?? {}),
+      title: " " + `${source.name} ${cmdline}`.trim() + " ",
+      selectable: true,
+      restoreContext: options.restoreContext,
       layout: sourcePickerStyle.layout,
       query: sourcePickerStyle.query,
-      selectable: true,
     },
-    options.sourcePickerContext,
   );
 
   const actionStream = ReadableStream.from(actions.map((v, id) => ({
     id,
     value: v.name,
     detail: {
-      content: v.description,
+      description: v.description,
     },
     decorations: [],
   })));
-  await using actionPicker = new Picker(
-    "actions",
+  await using actionPicker = await Picker.fromStream(
     actionStream,
     actionTransformers,
     actionProjectors,
@@ -220,9 +205,7 @@ async function internalStart(
       ...(pickerOptions.options ?? {}),
       layout: actionPickerStyle.layout,
       query: actionPickerStyle.query,
-      selectable: false,
     },
-    options.actionPickerContext,
   );
 
   // Listen cursor movement events
@@ -311,13 +294,23 @@ async function internalStart(
     }
   } finally {
     previousContext = {
+      conf,
       name: source.name,
       cmdline,
       collectedItems: sourcePicker.collectedItems,
-      sourcePickerContext: sourcePicker.context,
-      actionPickerContext: actionPicker.context,
+      context: sourcePicker.context,
     };
   }
+}
+
+async function getConfig(denops: Denops): Promise<Config> {
+  const configDir = await getConfigDir(denops);
+  const [extension, picker, style] = await Promise.all([
+    loadExtensionConfig(configDir),
+    loadPickerConfig(configDir),
+    loadStyleConfig(configDir),
+  ]);
+  return { extension, picker, style };
 }
 
 export function main(denops: Denops): void {

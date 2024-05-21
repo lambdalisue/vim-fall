@@ -8,6 +8,7 @@ import {
 } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 
 import type {
+  Action,
   Item,
   Previewer,
   Projector,
@@ -27,13 +28,15 @@ import { ItemCollector } from "./util/item_collector.ts";
 import { ItemProcessor } from "./util/item_processor.ts";
 
 export type PickerContext = {
-  cmdline: string;
-  cmdpos: number;
-  index: number;
-  selected: Set<unknown>;
+  readonly query: string;
+  readonly index: number;
+  readonly selected: Set<unknown>;
 };
 
 export type PickerOptions = Readonly<{
+  title?: string;
+  selectable?: boolean;
+  restoreContext?: PickerContext;
   layout?: Partial<LayoutParams>;
   redraw?: Readonly<{
     interval?: number;
@@ -49,56 +52,74 @@ export type PickerOptions = Readonly<{
 }>;
 
 export class Picker implements AsyncDisposable {
-  #title: string;
-  #renderers: readonly Renderer[];
-  #previewers: readonly Previewer[];
-  #selectable: boolean;
-  #options: PickerOptions;
-  #context: PickerContext;
+  readonly #renderers: readonly Renderer[];
+  readonly #previewers: readonly Previewer[];
+  readonly #options: PickerOptions;
+  readonly #itemCollector: ItemCollector;
+  readonly #itemProcessor: ItemProcessor;
+  readonly #disposable: AsyncDisposableStack;
 
   #layout?: Layout;
-  #itemCollector: ItemCollector;
-  #itemProcessor: ItemProcessor;
-  #disposable: AsyncDisposableStack;
+  #cmdpos = 0;
+  #query = "";
+  #index = 0;
+  #selected = new Set<unknown>();
 
-  constructor(
-    title: string,
-    stream: ReadableStream<SourceItem>,
-    transformers: readonly Transformer[],
-    projectors: readonly Projector[],
+  private constructor(
+    itemCollector: ItemCollector,
+    itemProcessor: ItemProcessor,
     renderers: readonly Renderer[],
     previewers: readonly Previewer[],
-    options: PickerOptions & { selectable?: boolean },
-    context?: PickerContext,
+    options: PickerOptions,
+    stack: AsyncDisposableStack,
   ) {
-    const stack = new AsyncDisposableStack();
-    const itemCollector = stack.use(
-      new ItemCollector(stream, {
-        threshold: options.itemCollector?.threshold ?? ITEM_COLLECTOR_THRESHOLD,
-      }),
-    );
-    const itemProcessor = stack.use(
-      new ItemProcessor(transformers, projectors),
-    );
-
-    this.#title = title;
     this.#renderers = renderers;
     this.#previewers = previewers;
-    this.#selectable = options.selectable ?? false;
     this.#options = options;
-    this.#context = context ?? {
-      cmdline: "",
-      cmdpos: 0,
-      index: 0,
-      selected: new Set(),
-    };
     this.#itemCollector = itemCollector;
     this.#itemProcessor = itemProcessor;
     this.#disposable = stack;
   }
 
+  static async fromStream(
+    stream: ReadableStream<SourceItem>,
+    transformers: readonly Transformer[],
+    projectors: readonly Projector[],
+    renderers: readonly Renderer[],
+    previewers: readonly Previewer[],
+    options: PickerOptions,
+  ): Promise<Picker> {
+    await using stack = new AsyncDisposableStack();
+    const itemCollector = stack.use(
+      new ItemCollector(stream, {
+        threshold: options.itemCollector?.threshold,
+      }),
+    );
+    const itemProcessor = stack.use(
+      new ItemProcessor(transformers, projectors),
+    );
+    const picker = new Picker(
+      itemCollector,
+      itemProcessor,
+      renderers,
+      previewers,
+      options,
+      stack.move(),
+    );
+    if (options.restoreContext) {
+      picker.#query = options.restoreContext.query;
+      picker.#index = options.restoreContext.index;
+      picker.#selected = options.restoreContext.selected;
+    }
+    return picker;
+  }
+
   get context(): PickerContext {
-    return this.#context;
+    return {
+      query: this.#query,
+      index: this.#index,
+      selected: this.#selected,
+    };
   }
 
   get collectedItems(): readonly Item[] {
@@ -111,11 +132,11 @@ export class Picker implements AsyncDisposable {
 
   get selectedItems(): readonly Item[] {
     const m = new Map(this.processedItems.map((v) => [v.id, v]));
-    return [...this.#context.selected].map((v) => m.get(v)).filter(isDefined);
+    return [...this.#selected].map((v) => m.get(v)).filter(isDefined);
   }
 
   get cursorItem(): Item | undefined {
-    return this.processedItems.at(this.#context.index);
+    return this.processedItems.at(this.#index);
   }
 
   #correctIndex(index: number): number {
@@ -128,7 +149,7 @@ export class Picker implements AsyncDisposable {
       throw new Error("The picker is already opened");
     }
     this.#layout = await buildLayout(denops, {
-      title: ` ${this.#title} `,
+      title: this.#options.title,
       width: this.#options.layout?.width,
       widthRatio: this.#options.layout?.widthRatio ?? WIDTH_RATION,
       widthMin: this.#options.layout?.widthMin ?? WIDTH_MIN,
@@ -254,7 +275,7 @@ export class Picker implements AsyncDisposable {
     const emitItemProcessor = () => {
       this.#itemProcessor.start(
         this.collectedItems,
-        { query: this.#context.cmdline },
+        { query: this.#query },
         { signal },
       );
     };
@@ -271,7 +292,7 @@ export class Picker implements AsyncDisposable {
       emitQueryUpdate();
     }));
     stack.use(subscribe("item-processor-succeeded", () => {
-      this.#context.index = this.#correctIndex(this.#context.index);
+      this.#index = this.#correctIndex(this.#index);
       emitQueryUpdate();
       emitSelectorUpdate();
       emitPreviewUpdate();
@@ -280,26 +301,26 @@ export class Picker implements AsyncDisposable {
       emitQueryUpdate();
     }));
     stack.use(subscribe("cmdline-changed", (cmdline) => {
-      if (this.#context.cmdline === cmdline) {
+      if (this.#query === cmdline) {
         return;
       }
-      this.#context.cmdline = cmdline;
+      this.#query = cmdline;
       emitQueryUpdate();
       emitItemProcessor();
     }));
     stack.use(subscribe("cmdpos-changed", (cmdpos) => {
-      if (this.#context.cmdpos === cmdpos) {
+      if (this.#cmdpos === cmdpos) {
         return;
       }
-      this.#context.cmdpos = cmdpos;
+      this.#cmdpos = cmdpos;
       emitQueryUpdate();
     }));
     stack.use(subscribe("selector-cursor-move", (offset) => {
-      const newIndex = this.#correctIndex(this.#context.index + offset);
-      if (this.#context.index === newIndex) {
+      const newIndex = this.#correctIndex(this.#index + offset);
+      if (this.#index === newIndex) {
         return;
       }
-      this.#context.index = newIndex;
+      this.#index = newIndex;
       emitSelectorUpdate();
       emitPreviewUpdate();
     }));
@@ -307,10 +328,10 @@ export class Picker implements AsyncDisposable {
       const newIndex = this.#correctIndex(
         line === "$" ? this.processedItems.length - 1 : line - 1,
       );
-      if (this.#context.index === newIndex) {
+      if (this.#index === newIndex) {
         return;
       }
-      this.#context.index = newIndex;
+      this.#index = newIndex;
       emitSelectorUpdate();
       emitPreviewUpdate();
     }));
@@ -322,22 +343,22 @@ export class Picker implements AsyncDisposable {
       preview.moveCursorAt(denops, line, { signal });
       emitPreviewUpdate();
     }));
-    if (this.#selectable) {
+    if (this.#options.selectable) {
       stack.use(subscribe("selector-select", () => {
         const item = this.cursorItem;
         if (!item) return;
-        if (this.#context.selected.has(item.id)) {
-          this.#context.selected.delete(item.id);
+        if (this.#selected.has(item.id)) {
+          this.#selected.delete(item.id);
         } else {
-          this.#context.selected.add(item.id);
+          this.#selected.add(item.id);
         }
         emitSelectorUpdate();
       }));
       stack.use(subscribe("selector-select-all", () => {
-        if (this.#context.selected.size === this.processedItems.length) {
-          this.#context.selected.clear();
+        if (this.#selected.size === this.processedItems.length) {
+          this.#selected.clear();
         } else {
-          this.#context.selected = new Set(
+          this.#selected = new Set(
             this.processedItems.map((v) => v.id),
           );
         }
@@ -361,8 +382,8 @@ export class Picker implements AsyncDisposable {
           await query.render(
             denops,
             {
-              cmdline: this.#context.cmdline,
-              cmdpos: this.#context.cmdpos,
+              cmdline: this.#query,
+              cmdpos: this.#cmdpos,
               collecting,
               processing,
               counter: {
@@ -381,8 +402,8 @@ export class Picker implements AsyncDisposable {
             denops,
             {
               items: this.processedItems,
-              index: this.#context.index,
-              selected: this.#context.selected,
+              index: this.#index,
+              selected: this.#selected,
             },
             { signal },
           );
@@ -412,7 +433,7 @@ export class Picker implements AsyncDisposable {
     // Wait for user input
     return await startInput(
       denops,
-      { text: this.#context.cmdline },
+      { text: this.#query },
       { signal },
     );
   }
@@ -430,4 +451,3 @@ const HEIGHT_MIN = 5;
 const HEIGHT_MAX = 300;
 const PREVIEW_RATION = 0.65;
 const REDRAW_INTERVAL = 0;
-const ITEM_COLLECTOR_THRESHOLD = 20000;
