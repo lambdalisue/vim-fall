@@ -11,3 +11,9 @@ let g:fall_config_path = get(
       \ 'fall_config_path',
       \ join([s:dir, 'fall', 'config.yaml'], s:sep),
       \)
+
+let g:fall_config_dir = get(
+      \ g:,
+      \ 'fall_config_dir',
+      \ join([s:dir, 'fall'], s:sep),
+      \)

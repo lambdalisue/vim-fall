@@ -10,5 +10,6 @@ command! -nargs=*
 command! -nargs=0
       \ FallRestore call fall#command#FallRestore#call()
 
-command! -nargs=0
-      \ FallConfig call fall#command#FallConfig#call()
+command! -nargs=1
+      \ -complete=customlist,fall#command#FallConfig#complete
+      \ FallConfig call fall#command#FallConfig#call(<q-args>)

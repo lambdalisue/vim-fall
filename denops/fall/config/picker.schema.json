@@ -1,0 +1,115 @@
+{
+  "type": "object",
+  "required": [
+    "$schema"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    }
+  },
+  "patternProperties": {
+    "^[a-zA-Z0-9_\\-:]*$": {
+      "type": "object",
+      "description": "Picker options of the source.\n",
+      "properties": {
+        "defaultAction": {
+          "description": "The default action to perform.\n",
+          "type": "string"
+        },
+        "actions": {
+          "description": "The list of actions available to invoke.\n",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "transformers": {
+          "description": "The list of transformers available in the source picker.\n",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "projectors": {
+          "description": "The list of projectors available in the source picker.\n",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "renderers": {
+          "description": "The list of renderers available in the source picker.\n",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "previewers": {
+          "description": "The list of previewers available in the source picker.\n",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "actionTransformers": {
+          "description": "The list of transformers available in the action picker.\n",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "actionProjectors": {
+          "description": "The list of projectors available in the action picker.\n",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "actionRenderers": {
+          "description": "The list of renderers available in the action picker.\n",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "actionPreviewers": {
+          "description": "The list of previewers available in the action picker.\n",
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "options": {
+          "description": "Picker options.\n",
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "redraw": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "interval": {
+                  "description": "Interval in millisecond to redraw screen.\n",
+                  "type": "number"
+                }
+              }
+            },
+            "itemCollector": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "threshold": {
+                  "description": "The maximum number of the items to collect.\n",
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema"
+}

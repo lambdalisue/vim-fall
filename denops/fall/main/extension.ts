@@ -1,8 +1,8 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
-import { ensure, is } from "jsr:@core/unknownutil@3.18.0";
+import { assert, ensure, is } from "jsr:@core/unknownutil@3.18.0";
 
-import { getConfigPath, loadConfig } from "../config/util.ts";
+import { getConfigDir, loadExtensionConfig } from "../config/loader.ts";
 import { isExtensionType } from "../extension/type.ts";
 import {
   discoverExtensionLoaders,
@@ -27,9 +27,13 @@ export function main(denops: Denops): void {
       );
     },
     "extension:list": async (type) => {
-      const configPath = await getConfigPath(denops);
-      const config = await loadConfig(configPath);
-      return listExtensionNames(ensure(type, isExtensionType), config);
+      assert(type, isExtensionType);
+      const configDir = await getConfigDir(denops);
+      const conf = await loadExtensionConfig(configDir);
+      return [
+        ...listExtensionNames(type),
+        ...Object.keys(conf[type] ?? {}),
+      ];
     },
   };
 }

@@ -1,0 +1,51 @@
+# Use 'smart-path' renderer for the source
+file:
+  renderers:
+    - smart-path
+
+# Use 'smart-path' renderer for the source
+file-process:
+  renderers:
+    - smart-path
+
+# Use 'buffer' previewer for the source
+line:
+  previewers:
+    - buffer
+
+# Fallback setting
+"":
+  # Use 'open' as a default action (invoked by <Return>)
+  defaultAction: open
+
+  # Allow the following actions
+  actions:
+    - debug
+    - open
+    - open:split
+    - open:vsplit
+    - open:tabedit
+    - quickfix
+
+  # Use 'fzf' projector to filter/sort items
+  projectors:
+    - fzf
+
+  # Try several previewers to preview the content of the item
+  previewers:
+    - attribute
+    - buffer
+    - file
+
+  # Use 'fzf' projector to filter/sort actions
+  actionProjectors:
+    - fzf
+
+  # Use 'attribute:description' previewer to preview actions
+  actionPreviewers:
+    - attribute:description
+
+
+# JSON schema of this file
+# yaml-language-server: $schema=https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/picker.schema.json
+$schema: https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/picker.schema.json

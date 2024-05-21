@@ -1,0 +1,44 @@
+source:
+  # Exclude some files from the result
+  file:
+    excludes:
+      - ".*/\\.DS_Store"
+      - ".*/\\.git/.*"
+      - ".*/\\.cache/.*"
+      - ".*/\\.Trash/.*"
+      - ".*/node_modules/.*"
+      - ".*/target/.*"
+
+  # Exclude some files from the result
+  file-process:
+    excludes:
+      - ".*/\\.DS_Store"
+      - ".*/\\.git/.*"
+      - ".*/\\.cache/.*"
+      - ".*/\\.Trash/.*"
+      - ".*/node_modules/.*"
+      - ".*/target/.*"
+
+transformer: {}
+
+projector: {}
+
+renderer: {}
+
+previewer:
+  # Preview the content in 'item.detail.description'
+  attribute:description:
+    contentAttribute: description
+
+action:
+  # Define variants of 'open' action
+  open:split:
+    opener: split
+  open:vsplit:
+    opener: vsplit
+  open:tabedit:
+    opener: tabedit
+
+# JSON schema of this file
+# yaml-language-server: $schema=https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/extension.schema.json
+$schema: https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/extension.schema.json

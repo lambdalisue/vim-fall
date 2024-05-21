@@ -8,15 +8,21 @@ import { isDefined } from "../util/collection.ts";
 import { hideMsgArea } from "../util/hide_msg_area.ts";
 import { Picker, type PickerContext } from "../view/picker.ts";
 import { emitPickerEnter, emitPickerLeave } from "../view/util/emitter.ts";
-import type { Config } from "../config/type.ts";
+import { type ExtensionConfig } from "../config/extension.ts";
+import { getPickerOptions, type PickerConfig } from "../config/picker.ts";
 import {
-  getActionPickerConfig,
-  getConfigPath,
-  getSourcePickerConfig,
-  loadConfig,
-} from "../config/util.ts";
+  getActionPickerStylConfig,
+  getSourcePickerStyleConfig,
+  type StyleConfig,
+} from "../config/style.ts";
+import {
+  getConfigDir,
+  loadExtensionConfig,
+  loadPickerConfig,
+  loadStyleConfig,
+} from "../config/loader.ts";
 import type { Action, Item, Source } from "../extension/type.ts";
-import { getExtension, getExtensions } from "../extension/loader.ts";
+import { loadExtension, loadExtensions } from "../extension/loader.ts";
 
 type Context = {
   name: string;
@@ -34,9 +40,13 @@ async function start(
   cmdline: string,
   options: { signal?: AbortSignal } = {},
 ): Promise<void> {
-  const configPath = await getConfigPath(denops);
-  const config = await loadConfig(configPath);
-  const source = await getExtension(denops, "source", name, config);
+  const configDir = await getConfigDir(denops);
+  const [extensionConf, pickerConf, styleConf] = await Promise.all([
+    loadExtensionConfig(configDir),
+    loadPickerConfig(configDir),
+    loadStyleConfig(configDir),
+  ]);
+  const source = await loadExtension(denops, extensionConf, "source", name);
   if (!source) {
     return;
   }
@@ -44,7 +54,9 @@ async function start(
     denops,
     cmdline,
     source,
-    config,
+    extensionConf,
+    pickerConf,
+    styleConf,
     options,
   );
 }
@@ -63,8 +75,12 @@ async function restore(
     sourcePickerContext,
     actionPickerContext,
   } = previousContext;
-  const configPath = await getConfigPath(denops);
-  const config = await loadConfig(configPath);
+  const configDir = await getConfigDir(denops);
+  const [extensionConf, pickerConf, styleConf] = await Promise.all([
+    loadExtensionConfig(configDir),
+    loadPickerConfig(configDir),
+    loadStyleConfig(configDir),
+  ]);
   const source: Source = {
     name,
     stream: (_params) => {
@@ -75,7 +91,9 @@ async function restore(
     denops,
     cmdline,
     source,
-    config,
+    extensionConf,
+    pickerConf,
+    styleConf,
     { ...options, sourcePickerContext, actionPickerContext },
   );
 }
@@ -84,7 +102,9 @@ async function internalStart(
   denops: Denops,
   cmdline: string,
   source: Source,
-  config: Config,
+  extensionConf: ExtensionConfig,
+  pickerConf: PickerConfig,
+  styleConf: StyleConfig,
   options: {
     signal?: AbortSignal;
     sourcePickerContext?: PickerContext;
@@ -109,62 +129,64 @@ async function internalStart(
     return;
   }
 
-  const sourcePickerConfig = getSourcePickerConfig(source.name, config);
-  const actionPickerConfig = getActionPickerConfig(source.name, config);
-  const actions = await getExtensions(
+  const pickerOptions = getPickerOptions(pickerConf, source.name);
+  const actions = await loadExtensions(
     denops,
+    extensionConf,
     "action",
-    sourcePickerConfig.actions ?? [],
-    config,
+    pickerOptions.actions ?? [],
   );
-  const transformers = await getExtensions(
+  const transformers = await loadExtensions(
     denops,
+    extensionConf,
     "transformer",
-    sourcePickerConfig.transformers ?? [],
-    config,
+    pickerOptions.transformers ?? [],
   );
-  const projectors = await getExtensions(
+  const projectors = await loadExtensions(
     denops,
+    extensionConf,
     "projector",
-    sourcePickerConfig.projectors ?? [],
-    config,
+    pickerOptions.projectors ?? [],
   );
-  const renderers = await getExtensions(
+  const renderers = await loadExtensions(
     denops,
+    extensionConf,
     "renderer",
-    sourcePickerConfig.renderers ?? [],
-    config,
+    pickerOptions.renderers ?? [],
   );
-  const previewers = await getExtensions(
+  const previewers = await loadExtensions(
     denops,
+    extensionConf,
     "previewer",
-    sourcePickerConfig.previewers ?? [],
-    config,
+    pickerOptions.previewers ?? [],
   );
-  const actionTransformers = await getExtensions(
+  const actionTransformers = await loadExtensions(
     denops,
+    extensionConf,
     "transformer",
-    actionPickerConfig.transformers ?? [],
-    config,
+    pickerOptions.transformers ?? [],
   );
-  const actionProjectors = await getExtensions(
+  const actionProjectors = await loadExtensions(
     denops,
+    extensionConf,
     "projector",
-    actionPickerConfig.projectors ?? [],
-    config,
+    pickerOptions.actionProjectors ?? [],
   );
-  const actionRenderers = await getExtensions(
+  const actionRenderers = await loadExtensions(
     denops,
+    extensionConf,
     "renderer",
-    actionPickerConfig.renderers ?? [],
-    config,
+    pickerOptions.actionRenderers ?? [],
   );
-  const actionPreviewers = await getExtensions(
+  const actionPreviewers = await loadExtensions(
     denops,
+    extensionConf,
     "previewer",
-    actionPickerConfig.previewers ?? [],
-    config,
+    pickerOptions.actionPreviewers ?? [],
   );
+
+  const sourcePickerStyle = getSourcePickerStyleConfig(styleConf);
+  const actionPickerStyle = getActionPickerStylConfig(styleConf);
 
   await using sourcePicker = new Picker(
     `${source.name} ${cmdline}`.trim(),
@@ -174,7 +196,9 @@ async function internalStart(
     renderers,
     previewers,
     {
-      ...(sourcePickerConfig.options ?? {}),
+      ...(pickerOptions.options ?? {}),
+      layout: sourcePickerStyle.layout,
+      query: sourcePickerStyle.query,
       selectable: true,
     },
     options.sourcePickerContext,
@@ -196,7 +220,9 @@ async function internalStart(
     actionRenderers,
     actionPreviewers,
     {
-      ...(actionPickerConfig.options ?? {}),
+      ...(pickerOptions.options ?? {}),
+      layout: actionPickerStyle.layout,
+      query: actionPickerStyle.query,
       selectable: false,
     },
     options.actionPickerContext,
@@ -266,16 +292,14 @@ async function internalStart(
         }
         action = actions.find((v) => v.name === actionName);
       } else if (nextAction == "@default") {
-        action = actions.find((v) =>
-          v.name === sourcePickerConfig.defaultAction
-        );
+        action = actions.find((v) => v.name === pickerOptions.defaultAction);
       } else {
         action = actions.find((v) => v.name === nextAction);
       }
       // Execute action
       if (action) {
         if (
-          await action.trigger({
+          await action.invoke({
             cursorItem: sourcePicker.cursorItem,
             selectedItems: sourcePicker.selectedItems,
             processedItems: sourcePicker.processedItems,

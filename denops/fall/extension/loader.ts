@@ -4,8 +4,10 @@ import { join } from "jsr:@std/path@0.225.0/join";
 import { basename } from "jsr:@std/path@0.225.0/basename";
 
 import { isDefined } from "../util/collection.ts";
-import { type Config } from "../config/type.ts";
-import { getExtensionOptions } from "../config/util.ts";
+import {
+  type ExtensionConfig,
+  getExtensionOptions,
+} from "../config/extension.ts";
 import {
   type Action,
   type Extension,
@@ -36,14 +38,14 @@ const registry = {
   action: new Map<string, Loader<Action>>(),
 } satisfies Record<ExtensionType, Map<string, Loader<Extension>>>;
 
-export async function getExtension<
+export async function loadExtension<
   T extends ExtensionType,
   R = GetExtension<T>,
 >(
   denops: Denops,
+  conf: ExtensionConfig,
   type: T,
   name: string,
-  config: Config,
 ): Promise<R | undefined> {
   try {
     const [root] = name.split(":", 1);
@@ -51,13 +53,13 @@ export async function getExtension<
     if (!loader) {
       throw new Error(`No ${type} extension '${root}' is registered`);
     }
-    const ext = await loader.load(
+    const opt = await loader.load(
       denops,
-      getExtensionOptions(type, name, config),
+      getExtensionOptions(conf, type, name),
     );
-    if (!ext) return;
+    if (!opt) return;
     return {
-      ...ext,
+      ...opt,
       script: loader.script,
       name,
     } as R;
@@ -66,29 +68,25 @@ export async function getExtension<
   }
 }
 
-export async function getExtensions<
+export async function loadExtensions<
   T extends ExtensionType,
   R = GetExtension<T>,
 >(
   denops: Denops,
+  conf: ExtensionConfig,
   type: T,
-  names: string[],
-  config: Config,
-): Promise<R[]> {
+  names: readonly string[],
+): Promise<readonly R[]> {
   const vs = await Promise.all(
-    names.map((v) => getExtension(denops, type, v, config)),
+    names.map((v) => loadExtension(denops, conf, type, v)),
   );
   return vs.filter(isDefined) as R[];
 }
 
 export function listExtensionNames<T extends ExtensionType>(
   type: T,
-  config: Config,
-): string[] {
-  const exprs = new Set(registry[type].keys());
-  const options = config[type as keyof Config] ?? {};
-  Object.keys(options).forEach((v) => exprs.add(v));
-  return [...exprs.values()];
+): readonly string[] {
+  return [...registry[type].keys()];
 }
 
 export async function registerExtensionLoader(

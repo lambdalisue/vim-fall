@@ -4,7 +4,8 @@ import { ensure, is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 import { isDefined } from "../util/collection.ts";
 import { hideMsgArea } from "../util/hide_msg_area.ts";
 import { Input } from "../view/input.ts";
-import { getConfigPath, loadConfig } from "../config/util.ts";
+import { getInputStyleConfig } from "../config/style.ts";
+import { getConfigDir, loadStyleConfig } from "../config/loader.ts";
 
 interface InputParams {
   prompt: string;
@@ -25,6 +26,10 @@ async function input(
   params: InputParams,
   options: { signal?: AbortSignal } = {},
 ): Promise<string | null> {
+  const configDir = await getConfigDir(denops);
+  const styleConf = await loadStyleConfig(configDir);
+  const inputStyle = getInputStyleConfig(styleConf);
+
   await using stack = new AsyncDisposableStack();
   const controller = new AbortController();
   const signal = AbortSignal.any(
@@ -38,13 +43,9 @@ async function input(
     }
   });
 
-  const configPath = await getConfigPath(denops);
-  const config = await loadConfig(configPath);
-
   await using inputDialog = new Input({
-    ...(config.input ?? {}),
     layout: {
-      ...(config.input?.layout ?? {}),
+      ...(inputStyle.layout ?? {}),
       title: params.title,
     },
     input: params,

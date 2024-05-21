@@ -1,0 +1,270 @@
+{
+  "description": "Configuration of Fall (https://github.com/lambdalisue/vim-fall)",
+  "type": "object",
+  "required": [
+    "$schema"
+  ],
+  "additionalProperties": false,
+  "properties": {
+    "$schema": {
+      "type": "string"
+    },
+    "picker": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "": {
+          "$ref": "#/$defs/pickerStyle"
+        },
+        "source": {
+          "$ref": "#/$defs/pickerStyle"
+        },
+        "action": {
+          "$ref": "#/$defs/pickerStyle"
+        }
+      }
+    },
+    "input": {
+      "$ref": "#/$defs/inputStyle"
+    }
+  },
+  "$defs": {
+    "pickerStyle": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "layout": {
+          "$ref": "#/$defs/pickerLayoutParams"
+        },
+        "query": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "spinner": {
+              "description": "The spinner symbols to use in the query.\n",
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "headSymbol": {
+              "description": "The head symbol in the query.\n",
+              "type": "string"
+            },
+            "failSymbol": {
+              "description": "The symbol to show for failures in the query.\n",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "inputStyle": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "layout": {
+          "$ref": "#/$defs/pickerLayoutParams"
+        }
+      }
+    },
+    "pickerLayoutParams": {
+      "description": "The layout settings for the picker window.\n",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "width": {
+          "description": "The fixed width of the entire picker window (including preview window).\nIf not set, the width is calculated based on the widthRatio and the screen width.\n",
+          "type": "number"
+        },
+        "widthRatio": {
+          "description": "The ratio of the entire picker window width (including preview window) relative to the screen width.\n",
+          "type": "number"
+        },
+        "widthMin": {
+          "description": "The minimum width for the entire picker window when widthRatio is set.\n",
+          "type": "number"
+        },
+        "widthMax": {
+          "description": "The maximum width for the entire picker window when widthRatio is set.\n",
+          "type": "number"
+        },
+        "height": {
+          "description": "The fixed height of the entire picker window. \nIf not set, the height is calculated based on the heightRatio and the screen height.\n",
+          "type": "number"
+        },
+        "heightRatio": {
+          "description": "The ratio of the entire picker window height relative to the screen height.\n",
+          "type": "number"
+        },
+        "heightMin": {
+          "description": "The minimum height for the entire picker window when heightRatio is set.\n",
+          "type": "number"
+        },
+        "heightMax": {
+          "description": "The maximum height for the entire picker window when heightRatio is set.\n",
+          "type": "number"
+        },
+        "previewRatio": {
+          "description": "The ratio of the preview window size relative to the entire picker window.\n",
+          "type": "number"
+        },
+        "border": {
+          "description": "The border style for the picker window.\n",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/stringBorder"
+            },
+            {
+              "$ref": "#/$defs/layoutBorder"
+            }
+          ]
+        },
+        "divider": {
+          "description": "The divider style for the picker window.\n",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/stringDivider"
+            },
+            {
+              "$ref": "#/$defs/layoutDivider"
+            }
+          ]
+        },
+        "zindex": {
+          "description": "The z-index value for the picker window.\n",
+          "type": "number"
+        }
+      }
+    },
+    "inputLayoutParams": {
+      "description": "The layout settings for the input window.\n",
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "width": {
+          "description": "The fixed width of the input window.\nIf not set, the width is calculated based on the widthRatio and the screen width.\n",
+          "type": "number"
+        },
+        "widthRatio": {
+          "description": "The ratio of the input window width relative to the screen width.\n",
+          "type": "number"
+        },
+        "widthMin": {
+          "description": "The minimum width for the input window when widthRatio is set.\n",
+          "type": "number"
+        },
+        "widthMax": {
+          "description": "The maximum width for the input window when widthRatio is set.\n",
+          "type": "number"
+        },
+        "border": {
+          "description": "The border style for the input window.\n",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/stringBorder"
+            },
+            {
+              "$ref": "#/$defs/layoutBorder"
+            }
+          ]
+        },
+        "zindex": {
+          "description": "The z-index value for the input window.\n",
+          "type": "number"
+        }
+      }
+    },
+    "stringBorder": {
+      "type": "string",
+      "enum": [
+        "none",
+        "ascii",
+        "single",
+        "double",
+        "rounded"
+      ]
+    },
+    "stringDivider": {
+      "type": "string",
+      "enum": [
+        "none",
+        "ascii",
+        "single",
+        "double",
+        "dashed"
+      ]
+    },
+    "layoutBorder": {
+      "type": "array",
+      "items": [
+        {
+          "description": "topleft",
+          "type": "string"
+        },
+        {
+          "description": "top",
+          "type": "string"
+        },
+        {
+          "description": "topright",
+          "type": "string"
+        },
+        {
+          "description": "right",
+          "type": "string"
+        },
+        {
+          "description": "botright",
+          "type": "string"
+        },
+        {
+          "description": "bottom",
+          "type": "string"
+        },
+        {
+          "description": "botleft",
+          "type": "string"
+        },
+        {
+          "description": "left",
+          "type": "string"
+        }
+      ],
+      "minItems": 8,
+      "maxItems": 8
+    },
+    "layoutDivider": {
+      "type": "array",
+      "items": [
+        {
+          "description": "left",
+          "type": "string"
+        },
+        {
+          "description": "horizontal",
+          "type": "string"
+        },
+        {
+          "description": "right",
+          "type": "string"
+        },
+        {
+          "description": "top",
+          "type": "string"
+        },
+        {
+          "description": "vertical",
+          "type": "string"
+        },
+        {
+          "description": "bottom",
+          "type": "string"
+        }
+      ],
+      "minItems": 6,
+      "maxItems": 6
+    }
+  },
+  "$schema": "http://json-schema.org/draft-07/schema"
+}
