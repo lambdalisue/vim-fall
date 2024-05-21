@@ -2,7 +2,7 @@ import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import * as vars from "https://deno.land/x/denops_std@v6.4.0/variable/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import { ensure, is } from "jsr:@core/unknownutil@3.18.0";
-import { parse as parseJsonc } from "jsr:@std/jsonc@0.224.0";
+import { parse as parseYaml } from "jsr:@std/yaml@0.224.0/parse";
 import { deepMerge } from "jsr:@std/collections@0.224.2/deep-merge";
 import { ensureDir } from "jsr:@std/fs@0.229.0/ensure-dir";
 import { exists } from "jsr:@std/fs@0.229.0/exists";
@@ -76,7 +76,7 @@ export async function loadConfig(configPath: string): Promise<Config> {
   try {
     await ensureConfig(configPath);
     const text = await Deno.readTextFile(configPath);
-    const data = parseJsonc(text);
+    const data = parseYaml(text);
     return ensure(data, isConfig);
   } catch (err) {
     if (err instanceof Deno.errors.NotFound) {
@@ -92,7 +92,7 @@ async function ensureConfig(configPath: string): Promise<void> {
   if (!await exists(configPath)) {
     await ensureDir(dirname(configPath));
     await Deno.copyFile(
-      new URL("./config.default.jsonc", import.meta.url),
+      new URL("./config.default.yaml", import.meta.url),
       configPath,
     );
   }

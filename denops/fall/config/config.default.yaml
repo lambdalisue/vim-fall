@@ -1,0 +1,101 @@
+# ================================================================================================================================
+#
+# vim-fall configuration
+#
+# yaml-language-server: $schema=https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/config.schema.json
+# ================================================================================================================================
+input:
+  layout:
+    border: rounded
+    divider: dashed
+    widthRatio: 0.3
+    widthMin: 10
+    widthMax: 80
+picker:
+  source:
+    "":
+      transformers: []
+      projectors:
+        - fzf
+      renderers: []
+      previewers:
+        - attribute
+        - buffer
+        - file
+      actions:
+        - open
+        - open:split
+        - open:vsplit
+        - open:tabedit
+        - debug
+        - quickfix
+      defaultAction: open
+      options:
+        layout:
+          border: rounded
+          divider: dashed
+          widthRatio: 0.9
+          widthMin: 80
+          widthMax: 800
+          heightRatio: 0.9
+          heightMin: 10
+          heightMax: 300
+          previewRatio: 0.45
+    file:
+      renderers:
+        - smart-path
+    file_process:
+      renderers:
+        - smart-path
+    line:
+      previewers:
+        - buffer
+  action:
+    "":
+      transformers:
+        - substring-filter
+      projectors:
+        - lexical-sorter
+      renderers: []
+      previewers:
+        - attribute
+      options:
+        layout:
+          border: rounded
+          divider: dashed
+          widthRatio: 0.5
+          widthMin: 70
+          widthMax: 700
+          heightRatio: 0.5
+          heightMin: 5
+          heightMax: 200
+          previewRatio: 0.65
+source:
+  file:
+    excludes:
+      - ".*/\\.DS_Store"
+      - ".*/\\.git/.*"
+      - ".*/\\.cache/.*"
+      - ".*/\\.Trash/.*"
+      - ".*/node_modules/.*"
+      - ".*/target/.*"
+  file-process:
+    excludes:
+      - ".*/\\.DS_Store"
+      - ".*/\\.git/.*"
+      - ".*/\\.cache/.*"
+      - ".*/\\.Trash/.*"
+      - ".*/node_modules/.*"
+      - ".*/target/.*"
+transformer: {}
+projector: {}
+renderer: {}
+previewer: {}
+action:
+  open:split:
+    opener: split
+  open:vsplit:
+    opener: vsplit
+  open:tabedit:
+    opener: tabedit
+$schema: https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/config.schema.json

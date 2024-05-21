@@ -9,5 +9,5 @@ const s:dir = has('nvim') ? stdpath('config') : $HOME .. s:sep .. '.vim'
 let g:fall_config_path = get(
       \ g:,
       \ 'fall_config_path',
-      \ join([s:dir, 'fall', 'config.jsonc'], s:sep),
+      \ join([s:dir, 'fall', 'config.yaml'], s:sep),
       \)
