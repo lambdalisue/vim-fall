@@ -3,11 +3,6 @@ file:
   renderers:
     - smart-path
 
-# Use 'smart-path' renderer for the source
-file-process:
-  renderers:
-    - smart-path
-
 # Use 'buffer' previewer for the source
 line:
   previewers:
@@ -44,7 +39,6 @@ line:
   # Use 'attribute:description' previewer to preview actions
   actionPreviewers:
     - attribute:description
-
 
 # JSON schema of this file
 # yaml-language-server: $schema=https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/picker.schema.json

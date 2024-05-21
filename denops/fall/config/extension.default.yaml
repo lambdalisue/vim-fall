@@ -9,16 +9,6 @@ source:
       - ".*/node_modules/.*"
       - ".*/target/.*"
 
-  # Exclude some files from the result
-  file-process:
-    excludes:
-      - ".*/\\.DS_Store"
-      - ".*/\\.git/.*"
-      - ".*/\\.cache/.*"
-      - ".*/\\.Trash/.*"
-      - ".*/node_modules/.*"
-      - ".*/target/.*"
-
 transformer: {}
 
 projector: {}
