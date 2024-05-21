@@ -1,10 +1,11 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import { send } from "https://deno.land/x/denops_std@v6.4.0/helper/keymap.ts";
 import { exprQuote as q } from "https://deno.land/x/denops_std@v6.4.0/helper/expr_string.ts";
-import { is, maybe } from "jsr:@core/unknownutil@3.18.0";
+import { ensure, is, maybe } from "jsr:@core/unknownutil@3.18.0";
 
 import { subscribe } from "../util/event.ts";
 import { isDefined } from "../util/collection.ts";
+import { hideMsgArea } from "../util/hide_msg_area.ts";
 import { Picker, type PickerContext } from "../view/picker.ts";
 import { emitPickerEnter, emitPickerLeave } from "../view/util/emitter.ts";
 import type { Config } from "../config/type.ts";
@@ -25,7 +26,9 @@ type Context = {
   actionPickerContext: PickerContext;
 };
 
-export async function start(
+let previousContext: Context | undefined;
+
+async function start(
   denops: Denops,
   name: string,
   cmdline: string,
@@ -46,7 +49,7 @@ export async function start(
   );
 }
 
-export async function restore(
+async function restore(
   denops: Denops,
   options: { signal?: AbortSignal } = {},
 ): Promise<void> {
@@ -296,4 +299,20 @@ async function internalStart(
   }
 }
 
-let previousContext: Context | undefined;
+export function main(denops: Denops): void {
+  denops.dispatcher = {
+    ...denops.dispatcher,
+    "picker:start": async (name, cmdline) => {
+      await using _guard = await hideMsgArea(denops);
+      await start(
+        denops,
+        ensure(name, is.String),
+        ensure(cmdline, is.String),
+      );
+    },
+    "picker:restore": async () => {
+      await using _guard = await hideMsgArea(denops);
+      await restore(denops);
+    },
+  };
+}
