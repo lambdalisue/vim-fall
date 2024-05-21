@@ -174,6 +174,10 @@ async function internalStart(
   const sourcePickerStyle = getSourcePickerStyleConfig(conf.style);
   const actionPickerStyle = getActionPickerStylConfig(conf.style);
 
+  const sourcePickerZindex = sourcePickerStyle.layout?.zindex ?? 50;
+  const actionPickerZindex = actionPickerStyle.layout?.zindex ??
+    (sourcePickerZindex + 1);
+
   const sourceStream = await source.stream({ cmdline });
   await using sourcePicker = await Picker.fromStream(
     sourceStream,
@@ -186,7 +190,10 @@ async function internalStart(
       title: " " + `${source.name} ${cmdline}`.trim() + " ",
       selectable: true,
       restoreContext: options.restoreContext,
-      layout: sourcePickerStyle.layout,
+      layout: {
+        ...sourcePickerStyle.layout,
+        zindex: sourcePickerZindex,
+      },
       query: sourcePickerStyle.query,
     },
   );
@@ -207,7 +214,10 @@ async function internalStart(
     actionPreviewers,
     {
       ...(pickerOptions.options ?? {}),
-      layout: actionPickerStyle.layout,
+      layout: {
+        ...actionPickerStyle.layout,
+        zindex: actionPickerZindex,
+      },
       query: actionPickerStyle.query,
     },
   );
