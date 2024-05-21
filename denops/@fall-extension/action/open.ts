@@ -62,6 +62,11 @@ export const getAction: GetAction = (denops, options) => {
               info.winid,
               `silent! call cursor(${line}, ${column})`,
             );
+            await fn.win_execute(
+              denops,
+              info.winid,
+              `silent! normal! zv`,
+            );
           }
         } catch (err) {
           const m = err.message ?? err;
