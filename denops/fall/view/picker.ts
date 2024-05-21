@@ -8,7 +8,6 @@ import {
 } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 
 import type {
-  Action,
   Item,
   Previewer,
   Projector,
