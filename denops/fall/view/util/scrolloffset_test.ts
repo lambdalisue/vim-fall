@@ -86,7 +86,7 @@ Deno.test("calcScrollOffset", async (t) => {
    * └^────────┘
    * ```
    */
-  await t.step("scrolling to right", () => {
+  await t.step("scrolling to left", () => {
     assertEquals(calcScrollOffset(5, 9, count, win, off), 5);
     assertEquals(calcScrollOffset(5, 8, count, win, off), 5);
     assertEquals(calcScrollOffset(5, 7, count, win, off), 5);
@@ -97,5 +97,31 @@ Deno.test("calcScrollOffset", async (t) => {
     assertEquals(calcScrollOffset(5, 2, count, win, off), 1);
     assertEquals(calcScrollOffset(5, 1, count, win, off), 0);
     assertEquals(calcScrollOffset(5, 0, count, win, off), 0);
+  });
+
+  /**
+   * ```
+   * ┌v────────┐
+   * │0 1 2 3  │
+   * └^────────┘
+   * ┌──v──────┐
+   * │0 1 2 3  │
+   * └──^──────┘
+   * ┌────v────┐
+   * │0 1 2 3  │
+   * └────^────┘
+   * ┌──────v──┐
+   * │0 1 2 3  │
+   * └──────^──┘
+   * ```
+   */
+  await t.step("scrolling to right (count < win)", () => {
+    const count = 4;
+    const win = 5;
+    const off = 5;
+    assertEquals(calcScrollOffset(0, 0, count, win, off), 0);
+    assertEquals(calcScrollOffset(0, 1, count, win, off), 0);
+    assertEquals(calcScrollOffset(0, 2, count, win, off), 0);
+    assertEquals(calcScrollOffset(0, 3, count, win, off), 0);
   });
 });

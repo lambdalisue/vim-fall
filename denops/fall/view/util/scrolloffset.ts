@@ -79,7 +79,9 @@ export function calcScrollOffset(
   const windowOffset = index - offset;
   const maxWindowOffset = window - scrolloff;
   const minWindowOffset = scrolloff;
-  if (windowOffset > maxWindowOffset) {
+  if (count < window) {
+    return 0;
+  } else if (windowOffset > maxWindowOffset) {
     return Math.min(count - window, index - maxWindowOffset);
   } else if (windowOffset < minWindowOffset) {
     return Math.max(0, index - minWindowOffset + 1);
