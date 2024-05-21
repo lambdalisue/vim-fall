@@ -1,31 +1,24 @@
 import type { GetAction } from "../../@fall/action.ts";
-import { batch } from "https://deno.land/x/denops_std@v6.3.0/batch/mod.ts";
 
 const description = `
-Echo the string representation of the item.
-
-Note that users explicitly need to show messages
-with ':messages' command after the picker is closed.
-
-TODO: Better description.
+Print JSON representation of cursor or selected item(s).
 `.trim();
 
-export const getAction: GetAction = (denops, _options) => {
+export const getAction: GetAction = (_denops, _options) => {
   return {
     description,
 
-    async invoke({ cursorItem, selectedItems }) {
+    invoke({ cursorItem, selectedItems }) {
       const items = selectedItems.length > 0
         ? selectedItems
         : cursorItem
         ? [cursorItem]
         : [];
-      const content = items.map((item) => JSON.stringify(item));
-      await batch(denops, async (denops) => {
-        for (const line of content) {
-          await denops.cmd(`echomsg ${line}`);
-        }
-      });
+      const content = items
+        .map((item) => JSON.stringify(item, null, 2))
+        .join("\n");
+      // Print AFTER the picker is closed otherwise the message won't be showen.
+      setTimeout(() => console.log(`[fall] ${content}`), 50);
     },
   };
 };
