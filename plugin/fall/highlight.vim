@@ -12,10 +12,10 @@ function! s:init() abort
     highlight default link FallBorder EndOfBuffer
   endif
 
-  " Prompt
-  highlight default link FallPromptHeader FallBorder
-  highlight default link FallPromptCounter FallBorder
-  highlight default link FallPromptCursor Cursor
+  " Query
+  highlight default link FallQueryHeader FallBorder
+  highlight default link FallQueryCounter FallBorder
+  highlight default link FallQueryCursor Cursor
 
   " Selector
   highlight default link FallSelectorCursor CursorLine

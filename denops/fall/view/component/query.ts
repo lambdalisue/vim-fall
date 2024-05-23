@@ -84,19 +84,19 @@ export class QueryComponent implements Disposable {
           line: 1,
           column: 1,
           length: prefixByteLength,
-          highlight: "FallPromptHeader",
+          highlight: "FallQueryHeader",
         },
         {
           line: 1,
           column: Math.max(1, prefixByteLength + cmdpos),
           length: 1,
-          highlight: "FallPromptCursor",
+          highlight: "FallQueryCursor",
         },
         {
           line: 1,
           column: 1 + prefixByteLength + middleByteLength,
           length: suffixByteLength,
-          highlight: "FallPromptCounter",
+          highlight: "FallQueryCounter",
         },
       ]);
     } catch (err) {
