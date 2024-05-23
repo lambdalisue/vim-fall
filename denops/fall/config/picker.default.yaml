@@ -1,7 +1,9 @@
-# Use 'smart-path' renderer for the source
+# Use 'relative-path/smart-path' renderer for the source
 file:
   renderers:
+    - relative-path
     - smart-path
+
 
 # Use 'buffer' previewer for the source
 line:
@@ -28,9 +30,9 @@ line:
 
   # Try several previewers to preview the content of the item
   previewers:
-    - attribute
-    - buffer
     - file
+    - buffer
+    - attribute
 
   # Use 'fzf' projector to filter/sort actions
   actionProjectors:

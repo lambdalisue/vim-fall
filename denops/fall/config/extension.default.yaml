@@ -27,7 +27,7 @@ renderer: {}
 previewer:
   # Preview the content in 'item.detail.description'
   attribute:description:
-    contentAttribute: description
+    attribute: description
 
 action:
   # Define variants of 'open' action
@@ -37,6 +37,11 @@ action:
     opener: vsplit
   open:tabedit:
     opener: tabedit
+
+  # Open quickfix window after `quickfix` action
+  quickfix:
+    after: copen
+
 
 # JSON schema of this file
 # yaml-language-server: $schema=https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/extension.schema.json
