@@ -5,7 +5,7 @@ import type { Item } from "./item.ts";
 
 export type RendererItem = Pick<
   Item,
-  "value" | "label" | "detail" | "decorations"
+  "id" | "value" | "label" | "detail" | "decorations"
 >;
 
 export type RendererParams = {

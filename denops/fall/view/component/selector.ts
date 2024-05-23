@@ -4,80 +4,39 @@ import { batch } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 
-import type { Item, Renderer, RendererItem } from "../../extension/type.ts";
-import { calcScrollOffset } from "../util/scrolloffset.ts";
+import type { RendererItem } from "../../extension/type.ts";
 import { isDefined } from "../../util/collection.ts";
-
-export type Context = Readonly<{
-  items: readonly Item[];
-  index: number;
-  selected: Set<unknown>;
-}>;
-
-export type Params = Readonly<{
-  scrolloff: number;
-  winwidth: number;
-  winheight: number;
-  renderers: readonly Renderer[];
-}>;
 
 /**
  * Selector component that shows processed items to select
  */
 export class SelectorComponent implements Disposable {
-  #bufnr: number;
-  #scrolloff: number;
-  #winwidth: number;
-  #winheight: number;
-  #renderers: readonly Renderer[];
-
-  #offset: number = 0;
+  readonly #bufnr: number;
 
   constructor(
     bufnr: number,
     _winid: number,
-    params: Params,
   ) {
     this.#bufnr = bufnr;
-    this.#scrolloff = params.scrolloff;
-    this.#winwidth = params.winwidth;
-    this.#winheight = params.winheight;
-    this.#renderers = params.renderers;
   }
 
   async render(
     denops: Denops,
-    { items, index, selected }: Context,
-    { signal }: { signal: AbortSignal },
+    { items, line, selected }: {
+      readonly items: readonly RendererItem[];
+      readonly line: number;
+      readonly selected: Set<unknown>;
+    },
+    { signal }: { readonly signal: AbortSignal },
   ): Promise<void> {
     try {
-      this.#offset = calcScrollOffset(
-        this.#offset,
-        index,
-        items.length,
-        this.#winheight,
-        this.#scrolloff,
-      );
-
-      const visibleItems = items.slice(
-        this.#offset,
-        this.#offset + this.#winheight,
-      );
-      const indexMap = new Map(visibleItems.map((v, i) => [v.id, i]));
+      const indexMap = new Map(items.map((v, i) => [v.id, i]));
       const selectedIndices = [...selected.values()]
         .map((id) => indexMap.get(id))
         .filter(isDefined);
 
-      const rendererItems = await applyRenderers(
-        visibleItems,
-        this.#renderers,
-        { width: this.#winwidth },
-        { signal },
-      );
-      signal.throwIfAborted();
-
-      const content = rendererItems.map((v) => v.label ?? v.value);
-      const decorations = rendererItems.reduce((acc, v, i) => {
+      const content = items.map((v) => v.label ?? v.value);
+      const decorations = items.reduce((acc, v, i) => {
         if (!v.decorations) {
           return acc;
         }
@@ -119,9 +78,7 @@ export class SelectorComponent implements Disposable {
             "PopUpFallSelector",
             "FallSelectorCursor",
             this.#bufnr,
-            {
-              lnum: Math.max(0, index - this.#offset) + 1,
-            },
+            { lnum: line },
           );
         });
         signal.throwIfAborted();
@@ -138,32 +95,4 @@ export class SelectorComponent implements Disposable {
   [Symbol.dispose]() {
     // Do nothing
   }
-}
-
-async function applyRenderers(
-  items: readonly RendererItem[],
-  renderers: readonly Renderer[],
-  params: { width: number },
-  { signal }: { signal: AbortSignal },
-): Promise<readonly RendererItem[]> {
-  const size = items.length;
-  if (size === 0) return [];
-  for (const renderer of renderers) {
-    try {
-      const newItems = await renderer.render({ items, ...params }, { signal });
-      signal.throwIfAborted();
-
-      if (newItems.length !== size) {
-        console.warn(
-          `[fall] Renderer ${renderer.name} returned different size of items. Ignore.`,
-        );
-        continue;
-      }
-      items = newItems;
-    } catch (err) {
-      const m = err.message ?? err;
-      console.warn(`[fall] Failed to apply renderer ${renderer.name}: ${m}`);
-    }
-  }
-  return items;
 }

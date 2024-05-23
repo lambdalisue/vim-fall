@@ -180,6 +180,7 @@ async function internalStart(
 
   const sourceStream = await source.stream({ cmdline });
   await using sourcePicker = await Picker.fromStream(
+    denops,
     sourceStream,
     transformers,
     projectors,
@@ -207,6 +208,7 @@ async function internalStart(
     decorations: [],
   })));
   await using actionPicker = await Picker.fromStream(
+    denops,
     actionStream,
     actionTransformers,
     actionProjectors,

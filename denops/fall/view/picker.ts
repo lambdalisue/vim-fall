@@ -12,6 +12,7 @@ import type {
   Previewer,
   Projector,
   Renderer,
+  RendererItem,
   SourceItem,
   Transformer,
 } from "../extension/type.ts";
@@ -25,6 +26,7 @@ import { PreviewComponent } from "./component/preview.ts";
 import { observeInput, startInput } from "./util/input.ts";
 import { ItemCollector } from "../service/item_collector.ts";
 import { ItemProcessor } from "../service/item_processor.ts";
+import { ItemFormatter } from "../service/item_formatter.ts";
 
 export type PickerContext = {
   readonly query: string;
@@ -51,11 +53,11 @@ export type PickerOptions = Readonly<{
 }>;
 
 export class Picker implements AsyncDisposable {
-  readonly #renderers: readonly Renderer[];
   readonly #previewers: readonly Previewer[];
   readonly #options: PickerOptions;
   readonly #itemCollector: ItemCollector;
   readonly #itemProcessor: ItemProcessor;
+  readonly #itemFormatter: ItemFormatter;
   readonly #disposable: AsyncDisposableStack;
 
   #layout?: Layout;
@@ -67,20 +69,21 @@ export class Picker implements AsyncDisposable {
   private constructor(
     itemCollector: ItemCollector,
     itemProcessor: ItemProcessor,
-    renderers: readonly Renderer[],
+    itemFormatter: ItemFormatter,
     previewers: readonly Previewer[],
     options: PickerOptions,
     stack: AsyncDisposableStack,
   ) {
-    this.#renderers = renderers;
-    this.#previewers = previewers;
-    this.#options = options;
     this.#itemCollector = itemCollector;
     this.#itemProcessor = itemProcessor;
+    this.#itemFormatter = itemFormatter;
+    this.#previewers = previewers;
+    this.#options = options;
     this.#disposable = stack;
   }
 
   static async fromStream(
+    denops: Denops,
     stream: ReadableStream<SourceItem>,
     transformers: readonly Transformer[],
     projectors: readonly Projector[],
@@ -88,6 +91,8 @@ export class Picker implements AsyncDisposable {
     previewers: readonly Previewer[],
     options: PickerOptions,
   ): Promise<Picker> {
+    const scrolloff = await opt.scrolloff.get(denops);
+
     await using stack = new AsyncDisposableStack();
     const itemCollector = stack.use(
       new ItemCollector({
@@ -98,10 +103,16 @@ export class Picker implements AsyncDisposable {
     const itemProcessor = stack.use(
       new ItemProcessor({ transformers, projectors }),
     );
+    const itemFormatter = stack.use(
+      new ItemFormatter({
+        renderers,
+        scrolloff,
+      }),
+    );
     const picker = new Picker(
       itemCollector,
       itemProcessor,
-      renderers,
+      itemFormatter,
       previewers,
       options,
       stack.move(),
@@ -128,6 +139,10 @@ export class Picker implements AsyncDisposable {
 
   get processedItems(): readonly Item[] {
     return this.#itemProcessor.items;
+  }
+
+  get formattedItems(): readonly RendererItem[] {
+    return this.#itemFormatter.items;
   }
 
   get selectedItems(): readonly Item[] {
@@ -214,16 +229,14 @@ export class Picker implements AsyncDisposable {
     });
 
     // Collect informations
-    const [scrolloff, queryWinwidth, selectorWinwidth, selectorWinheight] =
-      await collect(
-        denops,
-        (denops) => [
-          opt.scrolloff.get(denops),
-          fn.winwidth(denops, layout.query.winid),
-          fn.winwidth(denops, layout.selector.winid),
-          fn.winheight(denops, layout.selector.winid),
-        ],
-      );
+    const [queryWinwidth, selectorWinwidth, selectorWinheight] = await collect(
+      denops,
+      (denops) => [
+        fn.winwidth(denops, layout.query.winid),
+        fn.winwidth(denops, layout.selector.winid),
+        fn.winheight(denops, layout.selector.winid),
+      ],
+    );
 
     // Bind components to the layout
     const query = stack.use(
@@ -242,12 +255,6 @@ export class Picker implements AsyncDisposable {
       new SelectorComponent(
         layout.selector.bufnr,
         layout.selector.winid,
-        {
-          scrolloff,
-          winwidth: selectorWinwidth,
-          winheight: selectorWinheight,
-          renderers: this.#renderers,
-        },
       ),
     );
     const preview = stack.use(
@@ -280,6 +287,16 @@ export class Picker implements AsyncDisposable {
         signal,
       });
     };
+    const emitItemFormatter = () => {
+      this.#itemFormatter.start({
+        items: this.processedItems,
+        index: this.#index,
+        width: selectorWinwidth,
+        height: selectorWinheight,
+      }, {
+        signal,
+      });
+    };
 
     stack.use(subscribe("item-collector-changed", () => {
       emitQueryUpdate();
@@ -294,12 +311,19 @@ export class Picker implements AsyncDisposable {
     }));
     stack.use(subscribe("item-processor-succeeded", () => {
       this.#index = this.#correctIndex(this.#index);
+      emitItemFormatter();
       emitQueryUpdate();
-      emitSelectorUpdate();
-      emitPreviewUpdate();
     }));
     stack.use(subscribe("item-processor-failed", () => {
       emitQueryUpdate();
+    }));
+    stack.use(subscribe("item-formatter-succeeded", () => {
+      emitSelectorUpdate();
+      emitPreviewUpdate();
+    }));
+    stack.use(subscribe("item-formatter-failed", () => {
+      emitSelectorUpdate();
+      emitPreviewUpdate();
     }));
     stack.use(subscribe("cmdline-changed", (cmdline) => {
       if (this.#query === cmdline) {
@@ -322,8 +346,7 @@ export class Picker implements AsyncDisposable {
         return;
       }
       this.#index = newIndex;
-      emitSelectorUpdate();
-      emitPreviewUpdate();
+      emitItemFormatter();
     }));
     stack.use(subscribe("selector-cursor-move-at", (line) => {
       const newIndex = this.#correctIndex(
@@ -333,8 +356,7 @@ export class Picker implements AsyncDisposable {
         return;
       }
       this.#index = newIndex;
-      emitSelectorUpdate();
-      emitPreviewUpdate();
+      emitItemFormatter();
     }));
     stack.use(subscribe("preview-cursor-move", (offset) => {
       preview.moveCursor(denops, offset, { signal });
@@ -402,8 +424,8 @@ export class Picker implements AsyncDisposable {
           await selector.render(
             denops,
             {
-              items: this.processedItems,
-              index: this.#index,
+              items: this.formattedItems,
+              line: Math.max(0, this.#index - this.#itemFormatter.offset) + 1,
               selected: this.#selected,
             },
             { signal },
