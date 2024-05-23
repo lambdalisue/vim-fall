@@ -8,7 +8,6 @@ import { input } from "../../@fall/util/input.ts";
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
   args: is.ArrayOf(is.String),
   highlight: is.String,
-  itemPerColumn: is.Boolean,
   includes: is.ArrayOf(is.String),
   excludes: is.ArrayOf(is.String),
 })));
@@ -36,60 +35,38 @@ const isMatchResult = is.ObjectOf({
 function parse(
   s: string,
   highlight: string,
-  itemPerColumn: boolean,
 ): SourceItem[] {
   const m = maybe(JSON.parse(s), isMatchResult);
   if (!m) return [];
   const path = m.data.path.text;
   const line = m.data.line_number;
-  const context = m.data.lines.text.trimEnd();
-  if (itemPerColumn) {
-    // Return all submatches as items
-    return m.data.submatches.map((m) => {
-      const prefix = `${path}:${line}:${m.start}:`;
-      const decoration = {
-        line,
-        column: prefix.length + m.start + 1,
-        length: m.end - m.start,
-        highlight,
-      };
-      return {
-        value: `${prefix}${context}`,
-        detail: {
-          path,
-          line,
-          column: m.start,
-          context,
-        },
-        decorations: [decoration],
-      };
-    });
-  } else {
-    // Accumulate submatches into a single item
-    const prefix = `${path}:${line}:`;
-    const decorations = m.data.submatches.map((m) => ({
+  const content = m.data.lines.text.trimEnd();
+  return m.data.submatches.map((m) => {
+    const prefix = `${path}:${line}:${m.start}:`;
+    const decoration = {
       line,
       column: prefix.length + m.start + 1,
       length: m.end - m.start,
       highlight,
-    }));
-    return [{
-      value: `${prefix}${context}`,
+    };
+    return {
+      value: `${prefix}${content}`,
       detail: {
         path,
         line,
-        context,
+        column: m.start,
+        length: m.end - m.start,
+        content,
       },
-      decorations,
-    }];
-  }
+      decorations: [decoration],
+    };
+  });
 }
 
 export const getSource: GetSource = (denops, options) => {
   assert(options, isOptions);
   const args = options.args ?? [];
   const highlight = options.highlight ?? "IncSearch";
-  const itemPerColumn = options.itemPerColumn ?? false;
   const includes = options.includes?.map((v) => new RegExp(v));
   const excludes = options.excludes?.map((v) => new RegExp(v));
   return {
@@ -119,7 +96,7 @@ export const getSource: GetSource = (denops, options) => {
         .pipeThrough(
           new TransformStream({
             transform(chunk, controller) {
-              parse(chunk, highlight, itemPerColumn).forEach((item) => {
+              parse(chunk, highlight).forEach((item) => {
                 if (includes && includes.every((p) => !p.test(item.value))) {
                   return;
                 }
