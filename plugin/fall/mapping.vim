@@ -88,15 +88,15 @@ function! s:unmap_action_picker() abort
 endfunction
 
 " Cursor
-cnoremap <silent> <Plug>(fall-cursor-first) <Cmd>call <SID>dispatch('selector-cursor-move-at', 1)<CR>
-cnoremap <silent> <Plug>(fall-cursor-last) <Cmd>call <SID>dispatch('selector-cursor-move-at', '$')<CR>
-cnoremap <silent> <Plug>(fall-cursor-next) <Cmd>call <SID>dispatch('selector-cursor-move', 1)<CR>
-cnoremap <silent> <Plug>(fall-cursor-prev) <Cmd>call <SID>dispatch('selector-cursor-move', -1)<CR>
-cnoremap <silent> <Plug>(fall-cursor-next-scroll) <Cmd>call <SID>dispatch('selector-cursor-move', <SID>selector_scroll())<CR>
-cnoremap <silent> <Plug>(fall-cursor-prev-scroll) <Cmd>call <SID>dispatch('selector-cursor-move', -1 * <SID>selector_scroll())<CR>
+cnoremap <silent> <Plug>(fall-cursor-first) <Cmd>call <SID>dispatch('select-cursor-move-at', 1)<CR>
+cnoremap <silent> <Plug>(fall-cursor-last) <Cmd>call <SID>dispatch('select-cursor-move-at', '$')<CR>
+cnoremap <silent> <Plug>(fall-cursor-next) <Cmd>call <SID>dispatch('select-cursor-move', 1)<CR>
+cnoremap <silent> <Plug>(fall-cursor-prev) <Cmd>call <SID>dispatch('select-cursor-move', -1)<CR>
+cnoremap <silent> <Plug>(fall-cursor-next-scroll) <Cmd>call <SID>dispatch('select-cursor-move', <SID>select_scroll())<CR>
+cnoremap <silent> <Plug>(fall-cursor-prev-scroll) <Cmd>call <SID>dispatch('select-cursor-move', -1 * <SID>select_scroll())<CR>
 " Select
-cnoremap <silent> <Plug>(fall-select) <Cmd>call <SID>dispatch('selector-select')<CR>
-cnoremap <silent> <Plug>(fall-select-all) <Cmd>call <SID>dispatch('selector-select-all')<CR>
+cnoremap <silent> <Plug>(fall-select) <Cmd>call <SID>dispatch('select-select')<CR>
+cnoremap <silent> <Plug>(fall-select-all) <Cmd>call <SID>dispatch('select-select-all')<CR>
 " Action
 cnoremap <silent> <Plug>(fall-action-select) <Cmd>call <SID>dispatch('action-invoke', '@select')<CR>
 cnoremap <silent> <Plug>(fall-action-default) <Cmd>call <SID>dispatch('action-invoke', '@default')<CR>
@@ -113,8 +113,8 @@ function! s:dispatch(name, ...) abort
   call denops#notify('fall', 'event:dispatch', l:args)
 endfunction
 
-function! s:selector_scroll() abort
-  let l:winid = get(g:, '_fall_layout_selector_winid')
+function! s:select_scroll() abort
+  let l:winid = get(g:, '_fall_layout_select_winid')
   if !l:winid
     return &scroll
   endif

@@ -21,7 +21,7 @@ import { subscribe } from "../util/event.ts";
 import { startAsyncScheduler } from "../util/async_scheduler.ts";
 import { buildLayout, Layout, LayoutParams } from "./layout/picker_layout.ts";
 import { QueryComponent } from "./component/query.ts";
-import { SelectorComponent } from "./component/selector.ts";
+import { SelectComponent } from "./component/select.ts";
 import { PreviewComponent } from "./component/preview.ts";
 import { observeInput, startInput } from "./util/input.ts";
 import { ItemCollector } from "../service/item_collector.ts";
@@ -218,8 +218,8 @@ export class Picker implements AsyncDisposable {
       );
       await g.set(
         denops,
-        "_fall_layout_selector_winid",
-        layout.selector.winid,
+        "_fall_layout_select_winid",
+        layout.select.winid,
       );
       await g.set(
         denops,
@@ -229,12 +229,12 @@ export class Picker implements AsyncDisposable {
     });
 
     // Collect informations
-    const [queryWinwidth, selectorWinwidth, selectorWinheight] = await collect(
+    const [queryWinwidth, selectWinwidth, selectWinheight] = await collect(
       denops,
       (denops) => [
         fn.winwidth(denops, layout.query.winid),
-        fn.winwidth(denops, layout.selector.winid),
-        fn.winheight(denops, layout.selector.winid),
+        fn.winwidth(denops, layout.select.winid),
+        fn.winheight(denops, layout.select.winid),
       ],
     );
 
@@ -251,10 +251,10 @@ export class Picker implements AsyncDisposable {
         },
       ),
     );
-    const selector = stack.use(
-      new SelectorComponent(
-        layout.selector.bufnr,
-        layout.selector.winid,
+    const select = stack.use(
+      new SelectComponent(
+        layout.select.bufnr,
+        layout.select.winid,
       ),
     );
     const preview = stack.use(
@@ -268,13 +268,13 @@ export class Picker implements AsyncDisposable {
     );
 
     let renderQuery = true;
-    let renderSelector = true;
+    let renderSelect = true;
     let renderPreview = true;
     const emitQueryUpdate = () => {
       renderQuery = true;
     };
-    const emitSelectorUpdate = () => {
-      renderSelector = true;
+    const emitSelectUpdate = () => {
+      renderSelect = true;
     };
     const emitPreviewUpdate = () => {
       renderPreview = true;
@@ -291,8 +291,8 @@ export class Picker implements AsyncDisposable {
       this.#itemFormatter.start({
         items: this.processedItems,
         index: this.#index,
-        width: selectorWinwidth,
-        height: selectorWinheight,
+        width: selectWinwidth,
+        height: selectWinheight,
       }, {
         signal,
       });
@@ -318,11 +318,11 @@ export class Picker implements AsyncDisposable {
       emitQueryUpdate();
     }));
     stack.use(subscribe("item-formatter-succeeded", () => {
-      emitSelectorUpdate();
+      emitSelectUpdate();
       emitPreviewUpdate();
     }));
     stack.use(subscribe("item-formatter-failed", () => {
-      emitSelectorUpdate();
+      emitSelectUpdate();
       emitPreviewUpdate();
     }));
     stack.use(subscribe("cmdline-changed", (cmdline) => {
@@ -340,7 +340,7 @@ export class Picker implements AsyncDisposable {
       this.#cmdpos = cmdpos;
       emitQueryUpdate();
     }));
-    stack.use(subscribe("selector-cursor-move", (offset) => {
+    stack.use(subscribe("select-cursor-move", (offset) => {
       const newIndex = this.#correctIndex(this.#index + offset);
       if (this.#index === newIndex) {
         return;
@@ -348,7 +348,7 @@ export class Picker implements AsyncDisposable {
       this.#index = newIndex;
       emitItemFormatter();
     }));
-    stack.use(subscribe("selector-cursor-move-at", (line) => {
+    stack.use(subscribe("select-cursor-move-at", (line) => {
       const newIndex = this.#correctIndex(
         line === "$" ? this.processedItems.length - 1 : line - 1,
       );
@@ -367,7 +367,7 @@ export class Picker implements AsyncDisposable {
       emitPreviewUpdate();
     }));
     if (this.#options.selectable) {
-      stack.use(subscribe("selector-select", () => {
+      stack.use(subscribe("select-select", () => {
         const item = this.cursorItem;
         if (!item) return;
         if (this.#selected.has(item.id)) {
@@ -375,9 +375,9 @@ export class Picker implements AsyncDisposable {
         } else {
           this.#selected.add(item.id);
         }
-        emitSelectorUpdate();
+        emitSelectUpdate();
       }));
-      stack.use(subscribe("selector-select-all", () => {
+      stack.use(subscribe("select-select-all", () => {
         if (this.#selected.size === this.processedItems.length) {
           this.#selected.clear();
         } else {
@@ -385,7 +385,7 @@ export class Picker implements AsyncDisposable {
             this.processedItems.map((v) => v.id),
           );
         }
-        emitSelectorUpdate();
+        emitSelectUpdate();
       }));
     }
 
@@ -395,7 +395,7 @@ export class Picker implements AsyncDisposable {
         const processing = this.#itemProcessor.processing;
         renderQuery ||= collecting || processing;
 
-        if (!renderQuery && !renderSelector && !renderPreview) {
+        if (!renderQuery && !renderSelect && !renderPreview) {
           // No need to render & redraw
           return;
         }
@@ -419,9 +419,9 @@ export class Picker implements AsyncDisposable {
           );
         }
 
-        if (renderSelector) {
-          renderSelector = false;
-          await selector.render(
+        if (renderSelect) {
+          renderSelect = false;
+          await select.render(
             denops,
             {
               items: this.formattedItems,

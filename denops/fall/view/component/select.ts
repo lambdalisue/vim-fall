@@ -8,9 +8,9 @@ import type { RendererItem } from "../../extension/type.ts";
 import { isDefined } from "../../util/collection.ts";
 
 /**
- * Selector component that shows processed items to select
+ * Select component that shows processed items to select
  */
-export class SelectorComponent implements Disposable {
+export class SelectComponent implements Disposable {
   readonly #bufnr: number;
 
   constructor(
@@ -57,15 +57,15 @@ export class SelectorComponent implements Disposable {
         await batch(denops, async (denops) => {
           // NOTE:
           // Vim require 'PopUp' prefix for sign group name in popup window
-          await fn.sign_unplace(denops, "PopUpFallSelector", {
+          await fn.sign_unplace(denops, "PopUpFallSelect", {
             buffer: this.#bufnr,
           });
           for (const index of selectedIndices) {
             await fn.sign_place(
               denops,
               0,
-              "PopUpFallSelector",
-              "FallSelectorSelected",
+              "PopUpFallSelect",
+              "FallSelectSelected",
               this.#bufnr,
               {
                 lnum: Math.max(0, index) + 1,
@@ -75,8 +75,8 @@ export class SelectorComponent implements Disposable {
           await fn.sign_place(
             denops,
             0,
-            "PopUpFallSelector",
-            "FallSelectorCursor",
+            "PopUpFallSelect",
+            "FallSelectCursor",
             this.#bufnr,
             { lnum: line },
           );
@@ -88,7 +88,7 @@ export class SelectorComponent implements Disposable {
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
       const m = err.message ?? err;
-      console.warn(`Failed to render the selector component: ${m}`);
+      console.warn(`Failed to render the select component: ${m}`);
     }
   }
 

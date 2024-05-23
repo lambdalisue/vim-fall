@@ -67,7 +67,7 @@ export const isLayoutParams = is.ObjectOf({
 
 export interface Layout extends AsyncDisposable {
   query: popup.PopupWindow;
-  selector: popup.PopupWindow;
+  select: popup.PopupWindow;
   preview: popup.PopupWindow;
 }
 
@@ -82,7 +82,7 @@ export interface Layout extends AsyncDisposable {
  * │        Query         ││             │  │
  * │----------------------││             │  │
  * │                      ││   Preview   │  │height
- * │        Result        ││             │  │
+ * │        Select        ││             │  │
  * │                      ││             │  │
  * ╰──────────────────────╯╰─────────────╯  ┘
  *
@@ -164,7 +164,7 @@ export async function buildLayout(
     }),
   );
 
-  const selector = stack.use(
+  const select = stack.use(
     await popup.open(denops, {
       relative: "editor",
       anchor: "NW",
@@ -229,11 +229,11 @@ export async function buildLayout(
       "setlocal filetype=fall-query",
     );
 
-    await fn.bufload(denops, selector.bufnr);
+    await fn.bufload(denops, select.bufnr);
     await fn.win_execute(
       denops,
-      selector.winid,
-      "setlocal filetype=fall-selector",
+      select.winid,
+      "setlocal filetype=fall-select",
     );
 
     await fn.bufload(denops, preview.bufnr);
@@ -249,7 +249,7 @@ export async function buildLayout(
   const successStack = stack.move();
   return {
     query,
-    selector,
+    select,
     preview,
     [Symbol.asyncDispose]: () => successStack.disposeAsync(),
   };

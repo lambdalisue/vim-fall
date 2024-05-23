@@ -17,11 +17,11 @@ function! s:init() abort
   highlight default link FallQueryCounter FallBorder
   highlight default link FallQueryCursor Cursor
 
-  " Selector
-  highlight default link FallSelectorCursor CursorLine
-  highlight default link FallSelectorSelected CurSearch
-  sign define FallSelectorCursor linehl=FallSelectorCursor texthl=FallSelectorCursor
-  sign define FallSelectorSelected text=≫
+  " Select
+  highlight default link FallSelectCursor CursorLine
+  highlight default link FallSelectSelected CurSearch
+  sign define FallSelectCursor linehl=FallSelectCursor texthl=FallSelectCursor
+  sign define FallSelectSelected text=≫
 
   " Picker
   highlight default link FallPickerMatch Search

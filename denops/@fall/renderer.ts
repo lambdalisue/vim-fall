@@ -15,15 +15,15 @@ export type RendererParams = {
   readonly items: readonly RendererItem[];
 
   /**
-   * The selector window display width.
+   * The select window display width.
    */
   readonly width: number;
 };
 
 /**
- * Renderer is responsible for rendering the items in the selector window of the picker.
+ * Renderer is responsible for rendering the items in the select window of the picker.
  *
- * The renderer is only applied to the visible items on the selector for performance reasons.
+ * The renderer is only applied to the visible items on the select for performance reasons.
  */
 export type Renderer = {
   /**
@@ -34,7 +34,7 @@ export type Renderer = {
   /**
    * Render the items for the picker.
    *
-   * This method is called when the picker displays the items on the selector.
+   * This method is called when the picker displays the items on the select.
    * Note that only visible items are passed to the method.
    *
    * @param params The renderer parameters.
