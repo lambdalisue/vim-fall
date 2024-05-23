@@ -11,7 +11,7 @@ const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
 
 export const getPreviewer: GetPreviewer = (denops, options) => {
   assert(options, isOptions);
-  const attribute = options.attribute ?? "path";
+  const attribute = options.attribute ?? "bufname";
   const lineAttribute = options.lineAttribute ?? "line";
   const columnAttribute = options.columnAttribute ?? "column";
   return {
