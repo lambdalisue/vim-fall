@@ -104,29 +104,33 @@ export async function buildLayout(
       opt.lines.get(denops),
     ],
   );
-  const width = params.width ??
-    calcProperSize(
-      screenWidth,
-      params.widthRatio,
-      params.widthMin,
-      params.widthMax,
-    );
-  const height = params.height ??
-    calcProperSize(
-      screenHeight,
-      params.heightRatio,
-      params.heightMin,
-      params.heightMax,
-    );
+  const width = Math.floor(
+    params.width ??
+      calcProperSize(
+        screenWidth,
+        params.widthRatio,
+        params.widthMin,
+        params.widthMax,
+      ),
+  );
+  const height = Math.floor(
+    params.height ??
+      calcProperSize(
+        screenHeight,
+        params.heightRatio,
+        params.heightMin,
+        params.heightMax,
+      ),
+  );
   const x = Math.floor((screenWidth - width) / 2);
   const y = Math.floor((screenHeight - height) / 2);
 
-  const previewWidth = calcProperSize(
+  const previewWidth = Math.floor(calcProperSize(
     width,
     params.previewRatio,
     params.widthMin * params.previewRatio,
     params.widthMax * params.previewRatio,
-  );
+  ));
   const mainWidth = width - previewWidth;
 
   const border = params.border
