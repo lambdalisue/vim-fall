@@ -1,7 +1,7 @@
 import { collect } from "jsr:@lambdalisue/streamtools@1.0.0";
 
-import type { Item, Projector, Transformer } from "../../extension/type.ts";
-import { dispatch } from "../../util/event.ts";
+import type { Item, Projector, Transformer } from "../extension/type.ts";
+import { dispatch } from "../util/event.ts";
 
 /**
  * Item processor that processes the given items and stores in the `items` attribute.

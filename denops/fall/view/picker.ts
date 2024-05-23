@@ -23,8 +23,8 @@ import { QueryComponent } from "./component/query.ts";
 import { SelectorComponent } from "./component/selector.ts";
 import { PreviewComponent } from "./component/preview.ts";
 import { observeInput, startInput } from "./util/input.ts";
-import { ItemCollector } from "./util/item_collector.ts";
-import { ItemProcessor } from "./util/item_processor.ts";
+import { ItemCollector } from "../service/item_collector.ts";
+import { ItemProcessor } from "../service/item_processor.ts";
 
 export type PickerContext = {
   readonly query: string;
