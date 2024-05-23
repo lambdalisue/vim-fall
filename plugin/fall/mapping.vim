@@ -26,6 +26,8 @@ function! s:map_source_picker() abort
   cnoremap <nowait><buffer> <PageDown> <Plug>(fall-preview-next-scroll)
   cnoremap <nowait><buffer> <Home> <Plug>(fall-preview-first)
   cnoremap <nowait><buffer> <End> <Plug>(fall-preview-last)
+  cnoremap <nowait><buffer> <C-PageUp> <Plug>(fall-preview-previewer-prev)
+  cnoremap <nowait><buffer> <C-PageDown> <Plug>(fall-preview-previewer-next)
 endfunction
 
 function! s:unmap_source_picker() abort
@@ -51,6 +53,8 @@ function! s:unmap_source_picker() abort
   silent cunmap <buffer> <End>
   silent cunmap <buffer> <PageUp>
   silent cunmap <buffer> <PageDown>
+  silent cunmap <buffer> <C-PageUp>
+  silent cunmap <buffer> <C-PageDown>
 endfunction
 
 function! s:map_action_picker() abort
@@ -68,6 +72,8 @@ function! s:map_action_picker() abort
   cnoremap <nowait><buffer> <PageDown> <Plug>(fall-preview-next-scroll)
   cnoremap <nowait><buffer> <Home> <Plug>(fall-preview-first)
   cnoremap <nowait><buffer> <End> <Plug>(fall-preview-last)
+  cnoremap <nowait><buffer> <C-PageUp> <Plug>(fall-preview-previewer-prev)
+  cnoremap <nowait><buffer> <C-PageDown> <Plug>(fall-preview-previewer-next)
 endfunction
 
 function! s:unmap_action_picker() abort
@@ -85,6 +91,8 @@ function! s:unmap_action_picker() abort
   silent cunmap <buffer> <End>
   silent cunmap <buffer> <PageUp>
   silent cunmap <buffer> <PageDown>
+  silent cunmap <buffer> <C-PageUp>
+  silent cunmap <buffer> <C-PageDown>
 endfunction
 
 " Cursor
@@ -107,6 +115,8 @@ cnoremap <silent> <Plug>(fall-preview-next) <Cmd>call <SID>dispatch('preview-cur
 cnoremap <silent> <Plug>(fall-preview-prev) <Cmd>call <SID>dispatch('preview-cursor-move', -1)<CR>
 cnoremap <silent> <Plug>(fall-preview-next-scroll) <Cmd>call <SID>dispatch('preview-cursor-move', <SID>preview_scroll())<CR>
 cnoremap <silent> <Plug>(fall-preview-prev-scroll) <Cmd>call <SID>dispatch('preview-cursor-move', -1 * <SID>preview_scroll())<CR>
+cnoremap <silent> <Plug>(fall-preview-previewer-next) <Cmd>call <SID>dispatch('preview-previewer-rotate', 1)<CR>
+cnoremap <silent> <Plug>(fall-preview-previewer-prev) <Cmd>call <SID>dispatch('preview-previewer-rotate', -1)<CR>
 
 function! s:dispatch(name, ...) abort
   const l:args = a:0 ? [a:name, a:1] : [a:name]

@@ -5,9 +5,14 @@ import {
 } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
+import * as popup from "https://deno.land/x/denops_std@v6.4.0/popup/mod.ts";
 import { equal } from "jsr:@std/assert@0.225.2/equal";
 
-import type { Previewer, PreviewerItem } from "../../extension/type.ts";
+import type {
+  PreviewContent,
+  Previewer,
+  PreviewerItem,
+} from "../../extension/type.ts";
 
 export type Params = Readonly<{
   previewers?: readonly Previewer[];
@@ -17,10 +22,15 @@ export type Params = Readonly<{
  * Preview component that shows preview content of the cursor item
  */
 export class PreviewComponent implements Disposable {
-  #bufnr: number;
-  #winid: number;
-  #previewers: readonly Previewer[];
-  #previousItem?: PreviewerItem;
+  readonly #bufnr: number;
+  readonly #winid: number;
+  readonly #previewers: readonly Previewer[];
+
+  #previous?: {
+    item: PreviewerItem;
+    index: number;
+  };
+  #previewerIndex = 0;
 
   constructor(
     bufnr: number,
@@ -32,17 +42,43 @@ export class PreviewComponent implements Disposable {
     this.#previewers = params.previewers ?? [];
   }
 
+  get #previewer(): Previewer {
+    return this.#previewers[this.#previewerIndex];
+  }
+
+  get previewerIndex(): number {
+    return this.#previewerIndex;
+  }
+
+  set previewerIndex(value: number) {
+    if (value < 0) {
+      this.#previewerIndex = 0;
+    } else if (value >= this.#previewers.length) {
+      this.#previewerIndex = this.#previewers.length - 1;
+    } else {
+      this.#previewerIndex = value;
+    }
+  }
+
   async render(
     denops: Denops,
     item: PreviewerItem | undefined,
     { signal }: { signal: AbortSignal },
   ): Promise<void> {
-    if (equal(item, this.#previousItem)) {
+    if (!item || equal({ item, index: this.#previewerIndex }, this.#previous)) {
       return;
     }
-    this.#previousItem = item;
+    this.#previous = {
+      item,
+      index: this.#previewerIndex,
+    };
 
     try {
+      await popup.config(denops, this.#winid, {
+        title: ` ${this.#previewerIndex + 1}.${this.#previewer.name} `,
+      });
+      signal.throwIfAborted();
+
       if (!item) {
         await buffer.replace(denops, this.#bufnr, [
           "No preview item is available",
@@ -50,41 +86,63 @@ export class PreviewComponent implements Disposable {
         return;
       }
 
-      const params = {
-        item,
-        bufnr: this.#bufnr,
-        winid: this.#winid,
-      };
-      let previewed = false;
-      for (const previewer of this.#previewers) {
-        if (await previewer.preview(params, { signal })) {
-          signal.throwIfAborted();
-          continue;
-        }
-        previewed = true;
-        break;
-      }
+      const [winwidth, winheight] = await collect(denops, (denops) => [
+        fn.winwidth(denops, this.#winid),
+        fn.winheight(denops, this.#winid),
+      ]);
       signal.throwIfAborted();
 
-      if (previewed) {
-        await batch(denops, async (denops) => {
-          await fn.win_execute(
-            denops,
-            this.#winid,
-            `silent! call fall#internal#preview#highlight()`,
-          );
-          // Overwrite buffer local options may configured by ftplugin
-          await fn.win_execute(
-            denops,
-            this.#winid,
-            `setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile cursorline nomodifiable nowrap`,
-          );
-        });
-      } else {
-        await buffer.replace(denops, this.#bufnr, [
-          "No preview is available",
-        ]);
-      }
+      const previewContent = await this.#previewer.preview({
+        item,
+        width: winwidth,
+        height: winheight,
+      }, {
+        signal,
+      });
+      signal.throwIfAborted();
+      const content = previewContent?.content ?? [
+        "No previewer is available for the item.",
+      ];
+      const line = previewContent?.line ?? 1;
+      const column = previewContent?.column ?? 1;
+      const filename = previewContent?.filename;
+
+      await buffer.replace(denops, this.#bufnr, content);
+      signal.throwIfAborted();
+
+      await batch(denops, async (denops) => {
+        await fn.win_execute(
+          denops,
+          this.#winid,
+          `silent! 0file`,
+        );
+        await fn.win_execute(
+          denops,
+          this.#winid,
+          `silent! syntax clear`,
+        );
+        await fn.win_execute(
+          denops,
+          this.#winid,
+          `silent! file fall://preview/${filename ?? ""}`,
+        );
+        await fn.win_execute(
+          denops,
+          this.#winid,
+          `silent! call fall#internal#preview#highlight()`,
+        );
+        // Overwrite buffer local options may configured by ftplugin
+        await fn.win_execute(
+          denops,
+          this.#winid,
+          `silent! setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile cursorline nomodifiable nowrap`,
+        );
+        await fn.win_execute(
+          denops,
+          this.#winid,
+          `silent! normal! ${line ?? 1}G${column ?? 1}|`,
+        );
+      });
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
       const m = err.message ?? err;

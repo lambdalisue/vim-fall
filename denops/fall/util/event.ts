@@ -73,6 +73,7 @@ const fallEventDataMap = {
   "select-select-all": is.Unknown,
   "preview-cursor-move": is.Number,
   "preview-cursor-move-at": is.Number,
+  "preview-previewer-rotate": is.Number,
   "action-invoke": is.String,
   "item-collector-changed": is.Unknown,
   "item-collector-succeeded": is.Unknown,

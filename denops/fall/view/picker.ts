@@ -366,6 +366,10 @@ export class Picker implements AsyncDisposable {
       preview.moveCursorAt(denops, line, { signal });
       emitPreviewUpdate();
     }));
+    stack.use(subscribe("preview-previewer-rotate", (offset) => {
+      preview.previewerIndex += offset;
+      emitPreviewUpdate();
+    }));
     if (this.#options.selectable) {
       stack.use(subscribe("select-select", () => {
         const item = this.cursorItem;

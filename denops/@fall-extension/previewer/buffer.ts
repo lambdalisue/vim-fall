@@ -1,58 +1,37 @@
 import type { GetPreviewer } from "../../@fall/previewer.ts";
-import { batch } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
+import { basename } from "https://deno.land/std@0.224.0/path/basename.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import { assert, is, maybe } from "jsr:@core/unknownutil@3.18.0";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
-  bufnameAttribute: is.String,
+  attribute: is.String,
   lineAttribute: is.String,
   columnAttribute: is.String,
 })));
 
 export const getPreviewer: GetPreviewer = (denops, options) => {
   assert(options, isOptions);
-  const bufnameAttribute = options.bufnameAttribute ?? "bufname";
+  const attribute = options.attribute ?? "path";
   const lineAttribute = options.lineAttribute ?? "line";
   const columnAttribute = options.columnAttribute ?? "column";
   return {
-    async preview({ item, bufnr, winid }, { signal }) {
-      const bufname = maybe(item.detail[bufnameAttribute], is.String);
+    async preview({ item }) {
+      const bufname = maybe(item.detail[attribute], is.String);
       if (!bufname) {
-        // Try next previewer
-        return true;
+        return;
       }
-
-      const line = maybe(item.detail[lineAttribute], is.Number) ?? 1;
-      const column = maybe(item.detail[columnAttribute], is.Number) ?? 1;
+      if (!(await fn.bufloaded(denops, bufname))) {
+        return;
+      }
+      const line = maybe(item.detail[lineAttribute], is.Number);
+      const column = maybe(item.detail[columnAttribute], is.Number);
       const content = await fn.getbufline(denops, bufname, 1, "$");
-      signal?.throwIfAborted();
-
-      await buffer.replace(denops, bufnr, content);
-      signal?.throwIfAborted();
-
-      await batch(denops, async (denops) => {
-        await fn.win_execute(
-          denops,
-          winid,
-          `silent! 0file`,
-        );
-        await fn.win_execute(
-          denops,
-          winid,
-          `silent! syntax clear`,
-        );
-        await fn.win_execute(
-          denops,
-          winid,
-          `silent! file fall://preview/${name}`,
-        );
-        await fn.win_execute(
-          denops,
-          winid,
-          `silent! normal! ${line}G${column}|`,
-        );
-      });
+      return {
+        content,
+        line,
+        column,
+        filename: basename(bufname),
+      };
     },
   };
 };

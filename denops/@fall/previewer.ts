@@ -10,16 +10,15 @@ export type PreviewerParams = {
    * The item going to be previewd.
    */
   readonly item: PreviewerItem;
+  readonly width: number;
+  readonly height: number;
+};
 
-  /**
-   * The buffer number for previewing the item.
-   */
-  readonly bufnr: number;
-
-  /**
-   * The window ID for previewing the item.
-   */
-  readonly winid: number;
+export type PreviewContent = {
+  readonly content: string[];
+  readonly line?: number;
+  readonly column?: number;
+  readonly filename?: string;
 };
 
 /**
@@ -36,21 +35,17 @@ export type Previewer = {
   readonly description?: string;
 
   /**
-   * Preview the item on the specified buffer or window.
+   * Return preview content of the item.
    *
    * This method is called when the picker attempts to preview the item.
    *
-   * Note that the picker invokes this method with debouncing to avoid flickering.
-   * Therefore, the method may not be called for every item.
-   *
    * @param params The previewer parameters.
    * @param options.signal The signal to abort the preview.
-   * @return `true` if the picker needs to try next previewer.
    */
   readonly preview: (
     params: PreviewerParams,
     options: { signal?: AbortSignal },
-  ) => Promish<void | boolean>;
+  ) => Promish<PreviewContent | void>;
 };
 
 /**

@@ -1,80 +1,54 @@
 import type { GetPreviewer } from "../../@fall/previewer.ts";
-import { batch } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
+import { basename } from "https://deno.land/std@0.224.0/path/basename.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
-import { basename } from "jsr:@std/path@0.225.0/basename";
 import { assert, is, maybe } from "jsr:@core/unknownutil@3.18.0";
 
+const decoder = new TextDecoder("utf-8", { fatal: true });
+
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
-  pathAttribute: is.String,
+  attribute: is.String,
   lineAttribute: is.String,
   columnAttribute: is.String,
 })));
 
 export const getPreviewer: GetPreviewer = (denops, options) => {
   assert(options, isOptions);
-  const pathAttribute = options.pathAttribute ?? "path";
+  const attribute = options.attribute ?? "path";
   const lineAttribute = options.lineAttribute ?? "line";
   const columnAttribute = options.columnAttribute ?? "column";
   return {
-    async preview({ item, winid }, { signal }) {
-      const path = maybe(item.detail[pathAttribute], is.String);
+    async preview({ item }, { signal }) {
+      const path = maybe(item.detail[attribute], is.String);
       if (!path) {
-        // Try next previewer
-        return true;
+        return;
       }
 
-      const line = maybe(item.detail[lineAttribute], is.Number) ?? 1;
-      const column = maybe(item.detail[columnAttribute], is.Number) ?? 1;
-      const escapedPath = await fn.fnameescape(denops, path);
+      const line = maybe(item.detail[lineAttribute], is.Number);
+      const column = maybe(item.detail[columnAttribute], is.Number);
+      const abspath = await fn.fnamemodify(denops, path, ":p");
       signal?.throwIfAborted();
 
-      await batch(denops, async (denops) => {
-        await fn.win_execute(
-          denops,
-          winid,
-          `setlocal modifiable`,
-        );
-        await fn.win_execute(
-          denops,
-          winid,
-          `silent! 0,$delete _`,
-        );
-        await fn.win_execute(
-          denops,
-          winid,
-          `silent! 0read ${escapedPath}`,
-        );
-        await fn.win_execute(
-          denops,
-          winid,
-          `silent! $delete _`,
-        );
-        await fn.win_execute(
-          denops,
-          winid,
-          `silent! 0file`,
-        );
-        await fn.win_execute(
-          denops,
-          winid,
-          `silent! syntax clear`,
-        );
-        await fn.win_execute(
-          denops,
-          winid,
-          `silent! file fall://preview/${basename(path)}`,
-        );
-        await fn.win_execute(
-          denops,
-          winid,
-          `setlocal nomodifiable`,
-        );
-        await fn.win_execute(
-          denops,
-          winid,
-          `silent! normal! ${line}G${column}|`,
-        );
+      const data = await Deno.readFile(abspath, {
+        signal,
       });
+      try {
+        const text = decoder.decode(data);
+        return {
+          content: text.split(/\r?\n/g),
+          line,
+          column,
+          filename: basename(abspath),
+        };
+      } catch (err) {
+        if (err instanceof TypeError) {
+          return {
+            content: [
+              "No preview for binary file is available.",
+            ],
+          };
+        }
+        throw err;
+      }
     },
   };
 };
