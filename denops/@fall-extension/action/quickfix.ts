@@ -3,7 +3,7 @@ import * as fn from "https://deno.land/x/denops_std@v6.3.0/function/mod.ts";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 
 const description = `
-Send the cursor item, selected items, or available items to quickfix.
+Send the selected items or processed items to quickfix.
 
 TODO: Better description.
 `.trim();
@@ -17,13 +17,16 @@ const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
     title: is.String,
   })),
   action: is.LiteralOneOf(["a", "r", "f", " "] as const),
-  target: is.LiteralOneOf(
-    [
-      "selected-or-cursor",
-      "selected-or-processed",
-    ] as const,
-  ),
+  after: is.String,
 })));
+
+const isGrepDetail = is.ObjectOf({
+  path: is.String,
+  line: is.OptionalOf(is.Number),
+  column: is.OptionalOf(is.Number),
+  length: is.OptionalOf(is.Number),
+  content: is.OptionalOf(is.String),
+});
 
 const isPathDetail = is.ObjectOf({
   path: is.String,
@@ -39,23 +42,30 @@ export const getAction: GetAction = (denops, options) => {
   assert(options, isOptions);
   const what = options.what ?? {};
   const action = options.action ?? " ";
-  const target = options.target ?? "selected-or-processed";
+  const after = options.after;
   return {
     description,
 
-    async invoke({ cursorItem, selectedItems, processedItems }) {
-      const source = selectedItems.length > 0
-        ? selectedItems
-        : target === "selected-or-cursor"
-        ? cursorItem ? [cursorItem] : []
-        : processedItems;
+    async invoke({ selectedItems, processedItems }) {
+      const source = selectedItems.length > 0 ? selectedItems : processedItems;
       const items = source
         .map((item) => {
-          if (isPathDetail(item.detail)) {
+          if (isGrepDetail(item.detail)) {
             return {
               filename: item.detail.path,
               lnum: item.detail.line,
               col: item.detail.column,
+              end_col: item.detail.column && item.detail.length
+                ? item.detail.column + item.detail.length
+                : undefined,
+              text: item.detail.content,
+            };
+          } else if (isPathDetail(item.detail)) {
+            return {
+              filename: item.detail.path,
+              lnum: item.detail.line,
+              col: item.detail.column,
+              text: (item.detail as { content?: string }).content,
             };
           }
           return undefined;
@@ -66,6 +76,9 @@ export const getAction: GetAction = (denops, options) => {
           ...what,
           items,
         });
+        if (after) {
+          await denops.cmd(after);
+        }
       } catch (err) {
         const m = err.message ?? err;
         console.warn(`[fall] Failed to set quickfix list: ${m}`);
