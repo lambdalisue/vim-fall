@@ -18,6 +18,15 @@ source:
       - ".*/node_modules/.*"
       - ".*/target/.*"
 
+  buffer:
+    mode: "bufloaded"
+
+  buffer:listed:
+    mode: "buflisted"
+
+  buffer:modified:
+    mode: "bufmodified"
+
 transformer: {}
 
 projector: {}

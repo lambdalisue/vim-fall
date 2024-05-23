@@ -4,9 +4,13 @@ file:
     - relative-path
     - smart-path
 
-
 # Use 'buffer' previewer for the source
 line:
+  previewers:
+    - buffer
+
+# Use 'buffer' previewer for the source
+buffer:
   previewers:
     - buffer
 

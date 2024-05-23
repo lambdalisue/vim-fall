@@ -18,7 +18,7 @@ export const getSource: GetSource = (denops, options) => {
           transform(chunk, controller) {
             controller.enqueue({
               value: chunk,
-              detail: { bufname: path, path, line },
+              detail: { bufnr, path, line },
             });
             line += 1;
           },
