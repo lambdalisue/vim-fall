@@ -90,12 +90,13 @@ export class Picker implements AsyncDisposable {
   ): Promise<Picker> {
     await using stack = new AsyncDisposableStack();
     const itemCollector = stack.use(
-      new ItemCollector(stream, {
+      new ItemCollector({
+        stream,
         threshold: options.itemCollector?.threshold,
       }),
     );
     const itemProcessor = stack.use(
-      new ItemProcessor(transformers, projectors),
+      new ItemProcessor({ transformers, projectors }),
     );
     const picker = new Picker(
       itemCollector,
@@ -272,11 +273,12 @@ export class Picker implements AsyncDisposable {
       renderPreview = true;
     };
     const emitItemProcessor = () => {
-      this.#itemProcessor.start(
-        this.collectedItems,
-        { query: this.#query },
-        { signal },
-      );
+      this.#itemProcessor.start({
+        items: this.collectedItems,
+        query: this.#query,
+      }, {
+        signal,
+      });
     };
 
     stack.use(subscribe("item-collector-changed", () => {
@@ -367,7 +369,7 @@ export class Picker implements AsyncDisposable {
 
     startAsyncScheduler(
       async () => {
-        const collecting = this.#itemCollector.collecting;
+        const collecting = this.#itemCollector.processing;
         const processing = this.#itemProcessor.processing;
         renderQuery ||= collecting || processing;
 

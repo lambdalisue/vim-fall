@@ -8,7 +8,9 @@ Deno.test("ItemCollector", async (t) => {
   await t.step("collect items from empty stream", async () => {
     const { promise, resolve } = Promise.withResolvers<void>();
     using _ = subscribe("item-collector-completed", () => resolve());
-    await using collector = new ItemCollector(ReadableStream.from([]), {});
+    await using collector = new ItemCollector({
+      stream: ReadableStream.from([]),
+    });
     collector.start({ signal });
     await promise;
     assertEquals(collector.items, []);
@@ -17,14 +19,13 @@ Deno.test("ItemCollector", async (t) => {
   await t.step("collect items from stream", async () => {
     const { promise, resolve } = Promise.withResolvers<void>();
     using _ = subscribe("item-collector-completed", () => resolve());
-    await using collector = new ItemCollector(
-      ReadableStream.from([
+    await using collector = new ItemCollector({
+      stream: ReadableStream.from([
         { value: "1" },
         { value: "2" },
         { value: "3" },
       ]),
-      {},
-    );
+    });
     collector.start({ signal });
     await promise;
     assertEquals(collector.items, [
@@ -39,14 +40,13 @@ Deno.test("ItemCollector", async (t) => {
     let called = false;
     using _a = subscribe("item-collector-completed", () => resolve());
     using _b = subscribe("item-collector-succeeded", () => called = true);
-    await using collector = new ItemCollector(
-      ReadableStream.from([
+    await using collector = new ItemCollector({
+      stream: ReadableStream.from([
         { value: "1" },
         { value: "2" },
         { value: "3" },
       ]),
-      {},
-    );
+    });
     collector.start({ signal });
     await promise;
     assertEquals(called, true);
@@ -57,16 +57,15 @@ Deno.test("ItemCollector", async (t) => {
     let called = false;
     using _a = subscribe("item-collector-completed", () => resolve());
     using _b = subscribe("item-collector-failed", () => called = true);
-    await using collector = new ItemCollector(
-      new ReadableStream({
+    await using collector = new ItemCollector({
+      stream: new ReadableStream({
         start(controller) {
           controller.enqueue({ value: "1" });
           controller.enqueue({ value: "2" });
           controller.error(new Error("test"));
         },
       }),
-      {},
-    );
+    });
     collector.start({ signal });
     await promise;
     assertEquals(called, true);
@@ -80,16 +79,15 @@ Deno.test("ItemCollector", async (t) => {
       using _a = subscribe("item-collector-completed", () => resolve());
       using _b = subscribe("item-collector-failed", () => called = true);
       {
-        await using collector = new ItemCollector(
-          new ReadableStream({
+        await using collector = new ItemCollector({
+          stream: new ReadableStream({
             start(controller) {
               controller.enqueue({ value: "1" });
               controller.enqueue({ value: "2" });
               // Wait forever
             },
           }),
-          {},
-        );
+        });
         collector.start({ signal });
         // Disposable will abort the internal stream
       }

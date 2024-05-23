@@ -12,25 +12,31 @@ export type Options = {
  * Item collector that collects items from the stream and stores in the `items` attribute.
  */
 export class ItemCollector implements Disposable {
-  #controller = new AbortController();
-  #stream: ReadableStream<SourceItem>;
-  #threshold: number;
+  readonly #stream: ReadableStream<SourceItem>;
+  readonly #threshold: number;
 
+  #controller = new AbortController();
+  #processing = false;
   #truncated = false;
-  #collecting = false;
   #items: Item[] = [];
 
-  constructor(stream: ReadableStream<SourceItem>, options: Options) {
+  constructor({
+    stream,
+    threshold,
+  }: {
+    readonly stream: ReadableStream<SourceItem>;
+    readonly threshold?: number;
+  }) {
     this.#stream = stream;
-    this.#threshold = options.threshold ?? THRESHOLD;
+    this.#threshold = threshold ?? THRESHOLD;
+  }
+
+  get processing(): boolean {
+    return this.#processing;
   }
 
   get truncated(): boolean {
     return this.#truncated;
-  }
-
-  get collecting(): boolean {
-    return this.#collecting;
   }
 
   get items(): readonly Item[] {
@@ -50,14 +56,16 @@ export class ItemCollector implements Disposable {
    * Note that when case of aborting, `item-collector-failed` is not dispatched.
    * To check if the collecting is completed, you should use `item-collector-completed`.
    */
-  async start(options: { signal: AbortSignal }): Promise<void> {
-    this.#abort(); // Cancel previous processing
+  async start(options: {
+    readonly signal: AbortSignal;
+  }): Promise<void> {
+    this.#abort(); // Cancel previous process
     const signal = AbortSignal.any([
       this.#controller.signal,
       options.signal,
     ]);
+    this.#processing = true;
     try {
-      this.#collecting = true;
       await this.#stream
         .pipeThrough(
           new DynamicChunkStream((chunks) => {
@@ -78,16 +86,15 @@ export class ItemCollector implements Disposable {
           }),
           { signal },
         );
-      this.#collecting = false;
+      this.#processing = false;
       dispatch("item-collector-succeeded", undefined);
     } catch (err) {
+      this.#processing = false;
       if (err === truncate) {
-        this.#collecting = false;
         this.#truncated = true;
         dispatch("item-collector-succeeded", undefined);
         return;
       }
-      this.#collecting = false;
       if (err instanceof DOMException && err.name === "AbortError") return;
       dispatch("item-collector-failed", undefined);
       const m = err.message ?? err;

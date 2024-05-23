@@ -7,16 +7,18 @@ import { dispatch } from "../util/event.ts";
  * Item processor that processes the given items and stores in the `items` attribute.
  */
 export class ItemProcessor implements Disposable {
-  #controller = new AbortController();
-  #transformers: readonly Transformer[];
-  #projectors: readonly Projector[];
+  readonly #transformers: readonly Transformer[];
+  readonly #projectors: readonly Projector[];
 
+  #controller = new AbortController();
   #processing = false;
   #items: readonly Item[] = [];
 
   constructor(
-    transformers: readonly Transformer[],
-    projectors: readonly Projector[],
+    { transformers, projectors }: {
+      readonly transformers: readonly Transformer[];
+      readonly projectors: readonly Projector[];
+    },
   ) {
     this.#transformers = transformers;
     this.#projectors = projectors;
@@ -43,17 +45,21 @@ export class ItemProcessor implements Disposable {
    * To check if the processing is completed, you should use `item-processor-completed`.
    */
   async start(
-    items: readonly Item[],
-    { query }: { query: string },
-    options: { signal: AbortSignal },
+    { items, query }: {
+      readonly items: readonly Item[];
+      readonly query: string;
+    },
+    options: {
+      readonly signal: AbortSignal;
+    },
   ): Promise<void> {
-    this.#abort(); // Cancel previous processing
+    this.#abort(); // Cancel previous process
     const signal = AbortSignal.any([
       this.#controller.signal,
       options.signal,
     ]);
+    this.#processing = true;
     try {
-      this.#processing = true;
       let stream = ReadableStream.from(items);
       for (const transformer of this.#transformers) {
         const transform = await transformer.transform({ query }, { signal });
