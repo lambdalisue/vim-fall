@@ -1,7 +1,6 @@
 import type { GetSource } from "../../@fall/source.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import { walk } from "jsr:@std/fs@0.229.0/walk";
-import { relative } from "jsr:@std/path@0.225.0/relative";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
@@ -36,7 +35,7 @@ export const getSource: GetSource = (denops, options) => {
             })
           ) {
             controller.enqueue({
-              value: relative(abspath, path),
+              value: path,
               detail: { path },
             });
           }
