@@ -7,9 +7,17 @@ export const isDivider = is
   .UnionOf([
     is.LiteralOneOf(["none", "ascii", "single", "double", "dashed"] as const),
     is.UniformTupleOf(6, is.String),
-  ]) satisfies Predicate<Parameters<typeof getDivider>[0]>;
+  ]) satisfies Predicate<Divider>;
 
-export type Divider = readonly [
+export type Divider =
+  | "none"
+  | "ascii"
+  | "single"
+  | "double"
+  | "dashed"
+  | RawDivider;
+
+export type RawDivider = readonly [
   left: string,
   horizonal: string,
   right: string,
@@ -25,7 +33,7 @@ export const DIVIDER_T = 3;
 export const DIVIDER_V = 4;
 export const DIVIDER_B = 5;
 
-const DEFAULT_DIVIDER_SINGLE: Divider = [
+const DEFAULT_DIVIDER_SINGLE: RawDivider = [
   "├",
   "─",
   "┤",
@@ -34,7 +42,7 @@ const DEFAULT_DIVIDER_SINGLE: Divider = [
   "┴",
 ] as const;
 
-const DEFAULT_DIVIDER_DOUBLE: Divider = [
+const DEFAULT_DIVIDER_DOUBLE: RawDivider = [
   "╠",
   "═",
   "╣",
@@ -43,7 +51,7 @@ const DEFAULT_DIVIDER_DOUBLE: Divider = [
   "╩",
 ] as const;
 
-const DEFAULT_DIVIDER_DASHED: Divider = [
+const DEFAULT_DIVIDER_DASHED: RawDivider = [
   "│",
   "╌",
   "│",
@@ -52,7 +60,7 @@ const DEFAULT_DIVIDER_DASHED: Divider = [
   "─",
 ] as const;
 
-const DEFAULT_DIVIDER_ASCII: Divider = [
+const DEFAULT_DIVIDER_ASCII: RawDivider = [
   "|",
   "-",
   "|",
@@ -61,7 +69,7 @@ const DEFAULT_DIVIDER_ASCII: Divider = [
   "-",
 ] as const;
 
-const DEFAULT_DIVIDER_NONE: Divider = [
+const DEFAULT_DIVIDER_NONE: RawDivider = [
   "",
   "",
   "",
@@ -75,7 +83,7 @@ const DEFAULT_DIVIDER_NONE: Divider = [
  *
  * Note that the result is cached.
  */
-export async function getDefaultDivider(denops: Denops): Promise<Divider> {
+export async function getDefaultDivider(denops: Denops): Promise<RawDivider> {
   if (getDefaultDividerCache !== undefined) {
     return getDefaultDividerCache;
   }
@@ -100,11 +108,9 @@ export async function getDefaultDivider(denops: Denops): Promise<Divider> {
     return getDefaultDividerCache;
   }
 }
-let getDefaultDividerCache: Divider | undefined;
+let getDefaultDividerCache: RawDivider | undefined;
 
-export function getDivider(
-  divider: "none" | "ascii" | "single" | "double" | "dashed" | Divider,
-): Divider {
+export function getDivider(divider: Divider): RawDivider {
   switch (divider) {
     case "none":
       return DEFAULT_DIVIDER_NONE;

@@ -30,7 +30,7 @@ export type LayoutParams = {
   widthRatio: number;
   widthMin: number;
   widthMax: number;
-  border?: "none" | "ascii" | "single" | "double" | "rounded" | Border;
+  border?: Border;
   zindex?: number;
 };
 

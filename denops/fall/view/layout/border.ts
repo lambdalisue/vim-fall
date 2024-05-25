@@ -6,9 +6,17 @@ import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 export const isBorder = is.UnionOf([
   is.LiteralOneOf(["none", "ascii", "single", "double", "rounded"] as const),
   is.UniformTupleOf(8, is.String),
-]) satisfies Predicate<Parameters<typeof getBorder>[0]>;
+]) satisfies Predicate<Border>;
 
-export type Border = readonly [
+export type Border =
+  | "none"
+  | "ascii"
+  | "single"
+  | "double"
+  | "rounded"
+  | RawBorder;
+
+export type RawBorder = readonly [
   topleft: string,
   top: string,
   topright: string,
@@ -28,7 +36,7 @@ export const BORDER_B = 5;
 export const BORDER_BL = 6;
 export const BORDER_L = 7;
 
-const DEFAULT_BORDER_SINGLE: Border = [
+const DEFAULT_BORDER_SINGLE: RawBorder = [
   "┌",
   "─",
   "┐",
@@ -39,7 +47,7 @@ const DEFAULT_BORDER_SINGLE: Border = [
   "│",
 ] as const;
 
-const DEFAULT_BORDER_DOUBLE: Border = [
+const DEFAULT_BORDER_DOUBLE: RawBorder = [
   "╔",
   "═",
   "╗",
@@ -50,7 +58,7 @@ const DEFAULT_BORDER_DOUBLE: Border = [
   "║",
 ] as const;
 
-const DEFAULT_BORDER_ROUNDED: Border = [
+const DEFAULT_BORDER_ROUNDED: RawBorder = [
   "╭",
   "─",
   "╮",
@@ -61,7 +69,7 @@ const DEFAULT_BORDER_ROUNDED: Border = [
   "│",
 ] as const;
 
-const DEFAULT_BORDER_ASCII: Border = [
+const DEFAULT_BORDER_ASCII: RawBorder = [
   "+",
   "-",
   "+",
@@ -72,7 +80,7 @@ const DEFAULT_BORDER_ASCII: Border = [
   "|",
 ] as const;
 
-const DEFAULT_BORDER_NONE: Border = [
+const DEFAULT_BORDER_NONE: RawBorder = [
   "",
   "",
   "",
@@ -88,7 +96,7 @@ const DEFAULT_BORDER_NONE: Border = [
  *
  * Note that the result is cached.
  */
-export async function getDefaultBorder(denops: Denops): Promise<Border> {
+export async function getDefaultBorder(denops: Denops): Promise<RawBorder> {
   if (getDefaultBorderCache !== undefined) {
     return getDefaultBorderCache;
   }
@@ -113,11 +121,9 @@ export async function getDefaultBorder(denops: Denops): Promise<Border> {
     return getDefaultBorderCache;
   }
 }
-let getDefaultBorderCache: Border | undefined;
+let getDefaultBorderCache: RawBorder | undefined;
 
-export function getBorder(
-  border: "none" | "ascii" | "single" | "double" | "rounded" | Border,
-): Border {
+export function getBorder(border: Border): RawBorder {
   switch (border) {
     case "none":
       return DEFAULT_BORDER_NONE;

@@ -44,8 +44,8 @@ export type LayoutParams = {
   heightMin: number;
   heightMax: number;
   previewRatio: number;
-  border?: "none" | "ascii" | "single" | "double" | "rounded" | Border;
-  divider?: "none" | "ascii" | "single" | "double" | "dashed" | Divider;
+  border?: Border;
+  divider?: Divider;
   zindex?: number;
 };
 
