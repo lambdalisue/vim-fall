@@ -12,7 +12,6 @@ import type {
   Previewer,
   Projector,
   Renderer,
-  RendererItem,
   SourceItem,
   Transformer,
 } from "../extension/type.ts";
@@ -27,6 +26,7 @@ import { observeInput, startInput } from "./util/input.ts";
 import { ItemCollector } from "../service/item_collector.ts";
 import { ItemProcessor } from "../service/item_processor.ts";
 import { ItemRenderer } from "../service/item_renderer.ts";
+import { ItemPreviewer } from "../service/item_previewer.ts";
 
 export type PickerContext = {
   readonly query: string;
@@ -53,11 +53,11 @@ export type PickerOptions = Readonly<{
 }>;
 
 export class Picker implements AsyncDisposable {
-  readonly #previewers: readonly Previewer[];
   readonly #options: PickerOptions;
   readonly #itemCollector: ItemCollector;
   readonly #itemProcessor: ItemProcessor;
   readonly #itemRenderer: ItemRenderer;
+  readonly #itemPreviewer: ItemPreviewer;
   readonly #disposable: AsyncDisposableStack;
 
   #layout?: Layout;
@@ -70,14 +70,14 @@ export class Picker implements AsyncDisposable {
     itemCollector: ItemCollector,
     itemProcessor: ItemProcessor,
     itemRenderer: ItemRenderer,
-    previewers: readonly Previewer[],
+    itemPreviewer: ItemPreviewer,
     options: PickerOptions,
     stack: AsyncDisposableStack,
   ) {
     this.#itemCollector = itemCollector;
     this.#itemProcessor = itemProcessor;
     this.#itemRenderer = itemRenderer;
-    this.#previewers = previewers;
+    this.#itemPreviewer = itemPreviewer;
     this.#options = options;
     this.#disposable = stack;
   }
@@ -109,11 +109,16 @@ export class Picker implements AsyncDisposable {
         scrolloff,
       }),
     );
+    const itemPreviewer = stack.use(
+      new ItemPreviewer({
+        previewers,
+      }),
+    );
     const picker = new Picker(
       itemCollector,
       itemProcessor,
       itemRenderer,
-      previewers,
+      itemPreviewer,
       options,
       stack.move(),
     );
@@ -148,10 +153,6 @@ export class Picker implements AsyncDisposable {
 
   get cursorItem(): Item | undefined {
     return this.processedItems.at(this.#index);
-  }
-
-  get #rendererItems(): readonly RendererItem[] {
-    return this.#itemRenderer.items;
   }
 
   #correctIndex(index: number): number {
@@ -229,12 +230,20 @@ export class Picker implements AsyncDisposable {
     });
 
     // Collect informations
-    const [queryWinwidth, selectWinwidth, selectWinheight] = await collect(
+    const [
+      queryWidth,
+      selectWidth,
+      selectHeight,
+      previewWidth,
+      previewHeight,
+    ] = await collect(
       denops,
       (denops) => [
         fn.winwidth(denops, layout.query.winid),
         fn.winwidth(denops, layout.select.winid),
         fn.winheight(denops, layout.select.winid),
+        fn.winwidth(denops, layout.preview.winid),
+        fn.winheight(denops, layout.preview.winid),
       ],
     );
 
@@ -244,7 +253,7 @@ export class Picker implements AsyncDisposable {
         layout.query.bufnr,
         layout.query.winid,
         {
-          winwidth: queryWinwidth,
+          winwidth: queryWidth,
           spinner: this.#options.query?.spinner,
           headSymbol: this.#options.query?.headSymbol,
           failSymbol: this.#options.query?.failSymbol,
@@ -261,9 +270,6 @@ export class Picker implements AsyncDisposable {
       new PreviewComponent(
         layout.preview.bufnr,
         layout.preview.winid,
-        {
-          previewers: this.#previewers,
-        },
       ),
     );
 
@@ -291,8 +297,17 @@ export class Picker implements AsyncDisposable {
       this.#itemRenderer.start({
         items: this.processedItems,
         index: this.#index,
-        width: selectWinwidth,
-        height: selectWinheight,
+        width: selectWidth,
+        height: selectHeight,
+      }, {
+        signal,
+      });
+    };
+    const emitItemPreviewer = () => {
+      this.#itemPreviewer.start({
+        item: this.cursorItem,
+        width: previewWidth,
+        height: previewHeight,
       }, {
         signal,
       });
@@ -312,6 +327,7 @@ export class Picker implements AsyncDisposable {
     stack.use(subscribe("item-processor-succeeded", () => {
       this.#index = this.#correctIndex(this.#index);
       emitItemRenderer();
+      emitItemPreviewer();
       emitQueryUpdate();
     }));
     stack.use(subscribe("item-processor-failed", () => {
@@ -319,10 +335,14 @@ export class Picker implements AsyncDisposable {
     }));
     stack.use(subscribe("item-renderer-succeeded", () => {
       emitSelectUpdate();
-      emitPreviewUpdate();
     }));
     stack.use(subscribe("item-renderer-failed", () => {
       emitSelectUpdate();
+    }));
+    stack.use(subscribe("item-previewer-succeeded", () => {
+      emitPreviewUpdate();
+    }));
+    stack.use(subscribe("item-previewer-failed", () => {
       emitPreviewUpdate();
     }));
     stack.use(subscribe("cmdline-changed", (cmdline) => {
@@ -347,6 +367,7 @@ export class Picker implements AsyncDisposable {
       }
       this.#index = newIndex;
       emitItemRenderer();
+      emitItemPreviewer();
     }));
     stack.use(subscribe("select-cursor-move-at", (line) => {
       const newIndex = this.#correctIndex(
@@ -357,6 +378,7 @@ export class Picker implements AsyncDisposable {
       }
       this.#index = newIndex;
       emitItemRenderer();
+      emitItemPreviewer();
     }));
     stack.use(subscribe("preview-cursor-move", (offset) => {
       preview.moveCursor(denops, offset, { signal });
@@ -367,8 +389,8 @@ export class Picker implements AsyncDisposable {
       emitPreviewUpdate();
     }));
     stack.use(subscribe("preview-previewer-rotate", (offset) => {
-      preview.previewerIndex += offset;
-      emitPreviewUpdate();
+      this.#itemPreviewer.index += offset;
+      emitItemPreviewer();
     }));
     if (this.#options.selectable) {
       stack.use(subscribe("select-select", () => {
@@ -440,7 +462,12 @@ export class Picker implements AsyncDisposable {
           renderPreview = false;
           await preview.render(
             denops,
-            this.cursorItem,
+            {
+              ...this.#itemPreviewer.preview,
+              name: `${
+                this.#itemPreviewer.index + 1
+              }.${this.#itemPreviewer.name}`,
+            },
             { signal },
           );
         }

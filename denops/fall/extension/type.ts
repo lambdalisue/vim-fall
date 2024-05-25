@@ -5,6 +5,7 @@ export type {
   ActionItem,
   ActionParams,
   Item,
+  Preview,
   PreviewerItem,
   PreviewerParams,
   ProjectorParams,

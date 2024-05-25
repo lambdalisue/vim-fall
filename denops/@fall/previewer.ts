@@ -14,7 +14,7 @@ export type PreviewerParams = {
   readonly height: number;
 };
 
-export type PreviewContent = {
+export type Preview = {
   readonly content: string[];
   readonly line?: number;
   readonly column?: number;
@@ -45,7 +45,7 @@ export type Previewer = {
   readonly preview: (
     params: PreviewerParams,
     options: { signal?: AbortSignal },
-  ) => Promish<PreviewContent | void>;
+  ) => Promish<Preview | void>;
 };
 
 /**
