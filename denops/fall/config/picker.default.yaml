@@ -1,7 +1,6 @@
-# Use 'relative-path/smart-path' renderer for the source
+# Use 'smart-path' renderer for the source
 file:
   renderers:
-    - relative-path
     - smart-path
 
 # Use 'buffer' previewer for the source
@@ -27,6 +26,10 @@ buffer:
     - open:vsplit
     - open:tabedit
     - quickfix
+
+  # Use 'relative-path' transformer to prefer relative path
+  transformers:
+    - relative-path
 
   # Use 'fzf' projector to filter/sort items
   projectors:
