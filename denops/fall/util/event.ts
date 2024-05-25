@@ -82,7 +82,7 @@ const fallEventDataMap = {
   "item-processor-succeeded": is.Unknown,
   "item-processor-failed": is.Unknown,
   "item-processor-completed": is.Unknown,
-  "item-formatter-succeeded": is.Unknown,
-  "item-formatter-failed": is.Unknown,
-  "item-formatter-completed": is.Unknown,
+  "item-renderer-succeeded": is.Unknown,
+  "item-renderer-failed": is.Unknown,
+  "item-renderer-completed": is.Unknown,
 } as const satisfies Record<string, Predicate<unknown>>;

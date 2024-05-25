@@ -26,7 +26,7 @@ import { PreviewComponent } from "./component/preview.ts";
 import { observeInput, startInput } from "./util/input.ts";
 import { ItemCollector } from "../service/item_collector.ts";
 import { ItemProcessor } from "../service/item_processor.ts";
-import { ItemFormatter } from "../service/item_formatter.ts";
+import { ItemRenderer } from "../service/item_renderer.ts";
 
 export type PickerContext = {
   readonly query: string;
@@ -57,7 +57,7 @@ export class Picker implements AsyncDisposable {
   readonly #options: PickerOptions;
   readonly #itemCollector: ItemCollector;
   readonly #itemProcessor: ItemProcessor;
-  readonly #itemFormatter: ItemFormatter;
+  readonly #itemRenderer: ItemRenderer;
   readonly #disposable: AsyncDisposableStack;
 
   #layout?: Layout;
@@ -69,14 +69,14 @@ export class Picker implements AsyncDisposable {
   private constructor(
     itemCollector: ItemCollector,
     itemProcessor: ItemProcessor,
-    itemFormatter: ItemFormatter,
+    itemRenderer: ItemRenderer,
     previewers: readonly Previewer[],
     options: PickerOptions,
     stack: AsyncDisposableStack,
   ) {
     this.#itemCollector = itemCollector;
     this.#itemProcessor = itemProcessor;
-    this.#itemFormatter = itemFormatter;
+    this.#itemRenderer = itemRenderer;
     this.#previewers = previewers;
     this.#options = options;
     this.#disposable = stack;
@@ -103,8 +103,8 @@ export class Picker implements AsyncDisposable {
     const itemProcessor = stack.use(
       new ItemProcessor({ transformers, projectors }),
     );
-    const itemFormatter = stack.use(
-      new ItemFormatter({
+    const itemRenderer = stack.use(
+      new ItemRenderer({
         renderers,
         scrolloff,
       }),
@@ -112,7 +112,7 @@ export class Picker implements AsyncDisposable {
     const picker = new Picker(
       itemCollector,
       itemProcessor,
-      itemFormatter,
+      itemRenderer,
       previewers,
       options,
       stack.move(),
@@ -141,10 +141,6 @@ export class Picker implements AsyncDisposable {
     return this.#itemProcessor.items;
   }
 
-  get formattedItems(): readonly RendererItem[] {
-    return this.#itemFormatter.items;
-  }
-
   get selectedItems(): readonly Item[] {
     const m = new Map(this.processedItems.map((v) => [v.id, v]));
     return [...this.#selected].map((v) => m.get(v)).filter(isDefined);
@@ -152,6 +148,10 @@ export class Picker implements AsyncDisposable {
 
   get cursorItem(): Item | undefined {
     return this.processedItems.at(this.#index);
+  }
+
+  get #rendererItems(): readonly RendererItem[] {
+    return this.#itemRenderer.items;
   }
 
   #correctIndex(index: number): number {
@@ -287,8 +287,8 @@ export class Picker implements AsyncDisposable {
         signal,
       });
     };
-    const emitItemFormatter = () => {
-      this.#itemFormatter.start({
+    const emitItemRenderer = () => {
+      this.#itemRenderer.start({
         items: this.processedItems,
         index: this.#index,
         width: selectWinwidth,
@@ -311,17 +311,17 @@ export class Picker implements AsyncDisposable {
     }));
     stack.use(subscribe("item-processor-succeeded", () => {
       this.#index = this.#correctIndex(this.#index);
-      emitItemFormatter();
+      emitItemRenderer();
       emitQueryUpdate();
     }));
     stack.use(subscribe("item-processor-failed", () => {
       emitQueryUpdate();
     }));
-    stack.use(subscribe("item-formatter-succeeded", () => {
+    stack.use(subscribe("item-renderer-succeeded", () => {
       emitSelectUpdate();
       emitPreviewUpdate();
     }));
-    stack.use(subscribe("item-formatter-failed", () => {
+    stack.use(subscribe("item-renderer-failed", () => {
       emitSelectUpdate();
       emitPreviewUpdate();
     }));
@@ -346,7 +346,7 @@ export class Picker implements AsyncDisposable {
         return;
       }
       this.#index = newIndex;
-      emitItemFormatter();
+      emitItemRenderer();
     }));
     stack.use(subscribe("select-cursor-move-at", (line) => {
       const newIndex = this.#correctIndex(
@@ -356,7 +356,7 @@ export class Picker implements AsyncDisposable {
         return;
       }
       this.#index = newIndex;
-      emitItemFormatter();
+      emitItemRenderer();
     }));
     stack.use(subscribe("preview-cursor-move", (offset) => {
       preview.moveCursor(denops, offset, { signal });
@@ -428,8 +428,8 @@ export class Picker implements AsyncDisposable {
           await select.render(
             denops,
             {
-              items: this.formattedItems,
-              line: Math.max(0, this.#index - this.#itemFormatter.offset) + 1,
+              items: this.#itemRenderer.items,
+              line: Math.max(0, this.#index - this.#itemRenderer.offset) + 1,
               selected: this.#selected,
             },
             { signal },

@@ -7,7 +7,7 @@ export type Params = {
   readonly scrolloff: number;
 };
 
-export class ItemFormatter implements Disposable {
+export class ItemRenderer implements Disposable {
   readonly #renderers: readonly Renderer[];
   readonly #scrolloff: number;
 
@@ -69,17 +69,17 @@ export class ItemFormatter implements Disposable {
       );
       this.#processing = false;
       this.#items = rendererItems;
-      dispatch("item-formatter-succeeded", undefined);
+      dispatch("item-renderer-succeeded", undefined);
     } catch (err) {
       this.#processing = false;
       if (err instanceof DOMException && err.name === "AbortError") return;
-      dispatch("item-formatter-failed", undefined);
+      dispatch("item-renderer-failed", undefined);
       const m = err.message ?? err;
       console.warn(
         `[fall] Failed to format items with the index/offset '${index}/${this.#offset}': ${m}`,
       );
     } finally {
-      dispatch("item-formatter-completed", undefined);
+      dispatch("item-renderer-completed", undefined);
     }
   }
 
