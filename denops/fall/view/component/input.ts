@@ -43,13 +43,13 @@ export class InputComponent implements Disposable {
           line: 1,
           column: 1,
           length: this.#promptByteLength,
-          highlight: "FallPromptHeader",
+          highlight: "FallInputHeader",
         },
         {
           line: 1,
           column: Math.max(1, this.#promptByteLength + cmdpos),
           length: 1,
-          highlight: "FallPromptCursor",
+          highlight: "FallInputCursor",
         },
       ]);
     } catch (err) {

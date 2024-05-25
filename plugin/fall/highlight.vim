@@ -12,6 +12,10 @@ function! s:init() abort
     highlight default link FallBorder EndOfBuffer
   endif
 
+  " Input
+  highlight default link FallInputHeader FallBorder
+  highlight default link FallInputCursor Cursor
+
   " Query
   highlight default link FallQueryHeader FallBorder
   highlight default link FallQueryCounter FallBorder
