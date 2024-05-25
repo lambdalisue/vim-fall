@@ -3,22 +3,19 @@ import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 
 import { getByteLength } from "../../util/text.ts";
 
-export type Context = Readonly<{
-  cmdline: string;
-  cmdpos: number;
-}>;
+export type Context = {
+  readonly cmdline: string;
+  readonly cmdpos: number;
+};
 
-export type Params = Readonly<{
-  prompt?: string;
-}>;
+export type Params = {
+  readonly prompt?: string;
+};
 
-/**
- * Input component that shows user's input
- */
 export class InputComponent implements Disposable {
-  #bufnr: number;
-  #prompt: string;
-  #promptByteLength: number;
+  readonly #bufnr: number;
+  readonly #prompt: string;
+  readonly #promptByteLength: number;
 
   constructor(bufnr: number, _winid: number, params: Params) {
     this.#bufnr = bufnr;
@@ -26,9 +23,6 @@ export class InputComponent implements Disposable {
     this.#promptByteLength = getByteLength(this.#prompt);
   }
 
-  /**
-   * Render the input buffer.
-   */
   async render(
     denops: Denops,
     { cmdline, cmdpos }: Context,

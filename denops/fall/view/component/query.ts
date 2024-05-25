@@ -1,41 +1,38 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
+import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 
 import { Spinner } from "../util/spinner.ts";
 import { getByteLength } from "../../util/text.ts";
 
-export type Context = {
-  cmdline: string;
-  cmdpos: number;
-  collecting: boolean | "failed";
-  processing: boolean | "failed";
-  counter: {
-    processed: number;
-    collected: number;
-    truncated: boolean;
+type Context = {
+  readonly cmdline: string;
+  readonly cmdpos: number;
+  readonly collecting: boolean | "failed";
+  readonly processing: boolean | "failed";
+  readonly counter: {
+    readonly processed: number;
+    readonly collected: number;
+    readonly truncated: boolean;
   };
 };
 
-export type Params = Readonly<{
-  winwidth: number;
-  spinner?: readonly string[];
-  headSymbol?: string;
-  failSymbol?: string;
-}>;
+type Params = {
+  readonly spinner?: readonly string[];
+  readonly headSymbol?: string;
+  readonly failSymbol?: string;
+};
 
-/**
- * Query component that shows user's input and status of item collector/processor
- */
 export class QueryComponent implements Disposable {
-  #bufnr: number;
-  #winwidth: number;
-  #spinner: Spinner;
-  #headSymbol: string;
-  #failSymbol: string;
+  readonly #bufnr: number;
+  readonly #winid: number;
+  readonly #spinner: Spinner;
+  readonly #headSymbol: string;
+  readonly #failSymbol: string;
 
-  constructor(bufnr: number, _winid: number, params: Params) {
+  constructor(bufnr: number, winid: number, params: Params) {
     this.#bufnr = bufnr;
-    this.#winwidth = params.winwidth;
+    this.#winid = winid;
     this.#spinner = new Spinner(params.spinner);
     this.#headSymbol = params.headSymbol ?? HEAD_SYMBOL;
     this.#failSymbol = params.failSymbol ?? FAIL_SYMBOL;
@@ -47,6 +44,9 @@ export class QueryComponent implements Disposable {
     { signal }: { signal: AbortSignal },
   ): Promise<void> {
     try {
+      const winwidth = await fn.winwidth(denops, this.#winid);
+      signal.throwIfAborted();
+
       const spinner = this.#spinner.next();
       const headSymbol = !processing
         ? this.#headSymbol
@@ -62,12 +62,13 @@ export class QueryComponent implements Disposable {
         ? `${counter.collected}+`
         : `${counter.collected}`;
 
+      // TODO: Fix `cmdline` overflow
       const prefix = `${headSymbol} `;
       const suffix = ` ${counter.processed}/${collected} ${tailSymbol}`;
       const spacer = " ".repeat(
         Math.max(
           0,
-          this.#winwidth - Array.from(prefix + cmdline + suffix).length,
+          winwidth - Array.from(prefix + cmdline + suffix).length,
         ),
       );
       const prefixByteLength = getByteLength(prefix);

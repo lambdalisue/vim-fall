@@ -231,7 +231,6 @@ export class Picker implements AsyncDisposable {
 
     // Collect informations
     const [
-      queryWidth,
       selectWidth,
       selectHeight,
       previewWidth,
@@ -239,7 +238,6 @@ export class Picker implements AsyncDisposable {
     ] = await collect(
       denops,
       (denops) => [
-        fn.winwidth(denops, layout.query.winid),
         fn.winwidth(denops, layout.select.winid),
         fn.winheight(denops, layout.select.winid),
         fn.winwidth(denops, layout.preview.winid),
@@ -253,7 +251,6 @@ export class Picker implements AsyncDisposable {
         layout.query.bufnr,
         layout.query.winid,
         {
-          winwidth: queryWidth,
           spinner: this.#options.query?.spinner,
           headSymbol: this.#options.query?.headSymbol,
           failSymbol: this.#options.query?.failSymbol,
@@ -463,10 +460,8 @@ export class Picker implements AsyncDisposable {
           await preview.render(
             denops,
             {
-              ...this.#itemPreviewer.preview,
-              name: `${
-                this.#itemPreviewer.index + 1
-              }.${this.#itemPreviewer.name}`,
+              title: this.#itemPreviewer.name,
+              preview: this.#itemPreviewer.preview,
             },
             { signal },
           );

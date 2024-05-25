@@ -22,13 +22,11 @@ function! s:init() abort
   highlight default link FallQueryCursor Cursor
 
   " Select
+  highlight default link FallSelectMatch Search
   highlight default link FallSelectCursor CursorLine
   highlight default link FallSelectSelected CurSearch
   sign define FallSelectCursor linehl=FallSelectCursor texthl=FallSelectCursor
   sign define FallSelectSelected text=≫
-
-  " Picker
-  highlight default link FallPickerMatch Search
 endfunction
 
 augroup fall_plugin_highlight

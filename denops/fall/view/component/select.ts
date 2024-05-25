@@ -7,27 +7,23 @@ import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import type { RendererItem } from "../../extension/mod.ts";
 import { isDefined } from "../../util/collection.ts";
 
-/**
- * Select component that shows processed items to select
- */
+type Context = {
+  readonly items: readonly RendererItem[];
+  readonly line: number;
+  readonly selected: Set<unknown>;
+};
+
 export class SelectComponent implements Disposable {
   readonly #bufnr: number;
 
-  constructor(
-    bufnr: number,
-    _winid: number,
-  ) {
+  constructor(bufnr: number, _winid: number) {
     this.#bufnr = bufnr;
   }
 
   async render(
     denops: Denops,
-    { items, line, selected }: {
-      readonly items: readonly RendererItem[];
-      readonly line: number;
-      readonly selected: Set<unknown>;
-    },
-    { signal }: { readonly signal: AbortSignal },
+    { items, line, selected }: Context,
+    { signal }: { signal: AbortSignal },
   ): Promise<void> {
     try {
       const indexMap = new Map(items.map((v, i) => [v.id, i]));
@@ -43,7 +39,7 @@ export class SelectComponent implements Disposable {
         const line = i + 1;
         return acc.concat(
           v.decorations.map((d) => ({
-            highlight: "FallPickerMatch",
+            highlight: "FallSelectMatch",
             ...d,
             line,
           })),

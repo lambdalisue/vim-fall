@@ -9,41 +9,39 @@ import * as popup from "https://deno.land/x/denops_std@v6.4.0/popup/mod.ts";
 
 import type { Preview } from "../../extension/mod.ts";
 
-/**
- * Preview component that shows preview content of the cursor item
- */
+type Context = {
+  readonly title: string;
+  readonly preview: Preview;
+};
+
 export class PreviewComponent implements Disposable {
   readonly #bufnr: number;
   readonly #winid: number;
 
-  constructor(
-    bufnr: number,
-    winid: number,
-  ) {
+  constructor(bufnr: number, winid: number) {
     this.#bufnr = bufnr;
     this.#winid = winid;
   }
 
   async render(
     denops: Denops,
-    preview: Preview & { name: string },
+    { preview, title }: Context,
     { signal }: { signal: AbortSignal },
   ): Promise<void> {
     try {
       await popup.config(denops, this.#winid, {
-        title: ` ${preview.name} `,
+        title: ` ${title} `,
       });
       signal.throwIfAborted();
 
-      const content = preview.content;
+      await buffer.replace(denops, this.#bufnr, preview.content);
+      signal.throwIfAborted();
+
       const line = preview?.line ?? 1;
       const column = preview?.column ?? 1;
       const filename = preview?.filename;
-
-      await buffer.replace(denops, this.#bufnr, content);
-      signal.throwIfAborted();
-
       await batch(denops, async (denops) => {
+        // Clear previous buffer context
         await fn.win_execute(
           denops,
           this.#winid,
@@ -54,11 +52,13 @@ export class PreviewComponent implements Disposable {
           this.#winid,
           `silent! syntax clear`,
         );
+        // Change buffer name
         await fn.win_execute(
           denops,
           this.#winid,
           `silent! file fall://preview/${filename ?? ""}`,
         );
+        // Apply highlight
         await fn.win_execute(
           denops,
           this.#winid,
@@ -70,6 +70,7 @@ export class PreviewComponent implements Disposable {
           this.#winid,
           `silent! setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile cursorline nomodifiable nowrap`,
         );
+        // Move cursor
         await fn.win_execute(
           denops,
           this.#winid,
@@ -85,9 +86,6 @@ export class PreviewComponent implements Disposable {
     }
   }
 
-  /**
-   * Move the cursor in the preview window.
-   */
   async moveCursor(
     denops: Denops,
     offset: number,
@@ -115,9 +113,6 @@ export class PreviewComponent implements Disposable {
     }
   }
 
-  /**
-   * Move the cursor at in the preview window.
-   */
   async moveCursorAt(
     denops: Denops,
     line: number,
