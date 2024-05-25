@@ -1,10 +1,10 @@
 import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
-import { isBorder } from "../view/layout/border.ts";
-import { isDivider } from "../view/layout/divider.ts";
-import { type LayoutParams as InputLayoutParams } from "../view/layout/input_layout.ts";
-import { type LayoutParams as PickerLayoutParams } from "../view/layout/picker_layout.ts";
-import { mergeConfigs } from "./util.ts";
+import { isBorder } from "../../view/layout/border.ts";
+import { isDivider } from "../../view/layout/divider.ts";
+import { type LayoutParams as InputLayoutParams } from "../../view/layout/input_layout.ts";
+import { type LayoutParams as PickerLayoutParams } from "../../view/layout/picker_layout.ts";
+import { loadConfig, mergeConfigs } from "../util.ts";
 
 export type PickerStyleConfig = {
   readonly layout?: Partial<Omit<PickerLayoutParams, "title">>;
@@ -61,7 +61,7 @@ const isInputStyleConfig = is.PartialOf(is.ObjectOf({
   })),
 })) satisfies Predicate<InputStyleConfig>;
 
-export const isStyleConfig = is.PartialOf(is.ObjectOf({
+const isStyleConfig = is.PartialOf(is.ObjectOf({
   picker: is.PartialOf(is.ObjectOf({
     "": isPickerStyleConfig,
     source: isPickerStyleConfig,
@@ -90,4 +90,14 @@ export function getActionPickerStylConfig(
 
 export function getInputStyleConfig(style: StyleConfig): InputStyleConfig {
   return style.input ?? {};
+}
+
+export function loadStyleConfig(
+  configDir: string,
+): Promise<StyleConfig & { path: string }> {
+  return loadConfig(
+    "style",
+    isStyleConfig,
+    configDir,
+  );
 }

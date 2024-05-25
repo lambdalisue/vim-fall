@@ -1,6 +1,6 @@
 import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
-import { mergeConfigs } from "./util.ts";
+import { loadConfig, mergeConfigs } from "../util.ts";
 
 export type PickerOptions = {
   readonly defaultAction?: string;
@@ -46,7 +46,7 @@ const isPickerOptions = is.PartialOf(is.ObjectOf({
   })),
 })) satisfies Predicate<PickerOptions>;
 
-export const isPickerConfig = is.RecordOf(
+const isPickerConfig = is.RecordOf(
   isPickerOptions,
   is.String,
 ) satisfies Predicate<PickerConfig>;
@@ -60,5 +60,15 @@ export function getPickerOptions(
     conf[""] ?? {},
     conf[root] ?? {},
     conf[name] ?? {},
+  );
+}
+
+export function loadPickerConfig(
+  configDir: string,
+): Promise<PickerConfig & { path: string }> {
+  return loadConfig(
+    "picker",
+    isPickerConfig,
+    configDir,
   );
 }

@@ -21,9 +21,9 @@ function compileSchemaFile(path: string): void {
 
 function main(): void {
   const schemas = [
-    "../denops/fall/config/extension.schema.yaml",
-    "../denops/fall/config/picker.schema.yaml",
-    "../denops/fall/config/style.schema.yaml",
+    "../denops/fall/config/extension/schema.yaml",
+    "../denops/fall/config/picker/schema.yaml",
+    "../denops/fall/config/style/schema.yaml",
   ];
   schemas.forEach((v) =>
     compileSchemaFile(fromFileUrl(import.meta.resolve(v)))

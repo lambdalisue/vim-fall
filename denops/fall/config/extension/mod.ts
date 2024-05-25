@@ -1,6 +1,6 @@
 import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
-import { mergeConfigs } from "./util.ts";
+import { loadConfig, mergeConfigs } from "../util.ts";
 
 export type ExtensionOptions = Readonly<Record<string, unknown>>;
 
@@ -18,7 +18,7 @@ const isExtensionOptions = is.RecordOf(
   is.String,
 ) satisfies Predicate<ExtensionOptions>;
 
-export const isExtensionConfig = is.PartialOf(is.ObjectOf({
+const isExtensionConfig = is.PartialOf(is.ObjectOf({
   source: is.RecordOf(isExtensionOptions, is.String),
   transformer: is.RecordOf(isExtensionOptions, is.String),
   projector: is.RecordOf(isExtensionOptions, is.String),
@@ -38,5 +38,15 @@ export function getExtensionOptions(
   return mergeConfigs(
     conf[type]?.[root] ?? {},
     conf[type]?.[name] ?? {},
+  );
+}
+
+export function loadExtensionConfig(
+  configDir: string,
+): Promise<ExtensionConfig & { path: string }> {
+  return loadConfig(
+    "extension",
+    isExtensionConfig,
+    configDir,
   );
 }

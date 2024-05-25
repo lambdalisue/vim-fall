@@ -6,7 +6,7 @@ import {
   loadExtensionConfig,
   loadPickerConfig,
   loadStyleConfig,
-} from "../config/loader.ts";
+} from "../config/mod.ts";
 
 async function editConfigFile(
   denops: Denops,

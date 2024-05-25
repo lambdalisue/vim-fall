@@ -4,8 +4,11 @@ import { ensure, is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 import { isDefined } from "../util/collection.ts";
 import { hideMsgArea } from "../util/hide_msg_area.ts";
 import { Input } from "../view/input.ts";
-import { getInputStyleConfig } from "../config/style.ts";
-import { getConfigDir, loadStyleConfig } from "../config/loader.ts";
+import {
+  getConfigDir,
+  getInputStyleConfig,
+  loadStyleConfig,
+} from "../config/mod.ts";
 
 interface InputParams {
   prompt: string;

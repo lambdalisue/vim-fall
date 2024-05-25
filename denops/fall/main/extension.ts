@@ -2,7 +2,7 @@ import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 import { assert, ensure, is } from "jsr:@core/unknownutil@3.18.0";
 
-import { getConfigDir, loadExtensionConfig } from "../config/loader.ts";
+import { getConfigDir, loadExtensionConfig } from "../config/mod.ts";
 import {
   discoverExtensionLoaders,
   listExtensionNames,

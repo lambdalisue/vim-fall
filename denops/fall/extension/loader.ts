@@ -4,10 +4,7 @@ import { join } from "jsr:@std/path@0.225.0/join";
 import { basename } from "jsr:@std/path@0.225.0/basename";
 
 import { isDefined } from "../util/collection.ts";
-import {
-  type ExtensionConfig,
-  getExtensionOptions,
-} from "../config/extension.ts";
+import { type ExtensionConfig, getExtensionOptions } from "../config/mod.ts";
 import {
   type Action,
   type Extension,

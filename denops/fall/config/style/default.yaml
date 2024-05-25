@@ -42,5 +42,5 @@ input:
 
 
 # JSON schema of this file
-# yaml-language-server: $schema=https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/style.schema.json
-$schema: https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/style.schema.json
+# yaml-language-server: $schema=https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/style/schema.json
+$schema: https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/style/schema.json

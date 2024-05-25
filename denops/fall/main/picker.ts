@@ -8,19 +8,18 @@ import { isDefined } from "../util/collection.ts";
 import { hideMsgArea } from "../util/hide_msg_area.ts";
 import { Picker, type PickerContext } from "../view/picker.ts";
 import { emitPickerEnter, emitPickerLeave } from "../view/util/emitter.ts";
-import { type ExtensionConfig } from "../config/extension.ts";
-import { getPickerOptions, type PickerConfig } from "../config/picker.ts";
 import {
+  type ExtensionConfig,
   getActionPickerStylConfig,
-  getSourcePickerStyleConfig,
-  type StyleConfig,
-} from "../config/style.ts";
-import {
   getConfigDir,
+  getPickerOptions,
+  getSourcePickerStyleConfig,
   loadExtensionConfig,
   loadPickerConfig,
   loadStyleConfig,
-} from "../config/loader.ts";
+  type PickerConfig,
+  type StyleConfig,
+} from "../config/mod.ts";
 import type { Action, Item, Source } from "../extension/type.ts";
 import { loadExtension, loadExtensions } from "../extension/loader.ts";
 
