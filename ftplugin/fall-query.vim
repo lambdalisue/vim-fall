@@ -8,3 +8,4 @@ setlocal bufhidden=wipe buftype=nofile nobuflisted noswapfile
 
 " Window local options
 setlocal signcolumn=no nofoldenable nowrap
+setlocal nonumber norelativenumber
