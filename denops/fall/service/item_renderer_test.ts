@@ -1,7 +1,8 @@
 import { assertEquals } from "jsr:@std/assert@0.225.1";
-import { calcScrollOffset } from "./scrolloffset.ts";
+import { _internal } from "./item_renderer.ts";
 
 Deno.test("calcScrollOffset", async (t) => {
+  const { calcScrollOffset } = _internal;
   const count = 10;
   const win = 5;
   const off = 2;
