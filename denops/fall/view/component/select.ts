@@ -4,7 +4,7 @@ import { batch } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 
-import type { RendererItem } from "../../extension/type.ts";
+import type { RendererItem } from "../../extension/mod.ts";
 import { isDefined } from "../../util/collection.ts";
 
 /**

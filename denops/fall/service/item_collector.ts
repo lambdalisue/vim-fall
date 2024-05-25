@@ -1,4 +1,4 @@
-import type { Item, SourceItem } from "../extension/type.ts";
+import type { Item, SourceItem } from "../extension/mod.ts";
 import { dispatch } from "../util/event.ts";
 import { DynamicChunkStream } from "../util/dynamic_chunk_stream.ts";
 

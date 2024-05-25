@@ -1,6 +1,6 @@
 import { collect } from "jsr:@lambdalisue/streamtools@1.0.0";
 
-import type { Item, Projector, Transformer } from "../extension/type.ts";
+import type { Item, Projector, Transformer } from "../extension/mod.ts";
 import { dispatch } from "../util/event.ts";
 
 /**

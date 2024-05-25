@@ -1,6 +1,6 @@
 import { equal } from "jsr:@std/assert@0.225.2/equal";
 
-import type { Preview, Previewer, PreviewerItem } from "../extension/type.ts";
+import type { Preview, Previewer, PreviewerItem } from "../extension/mod.ts";
 import { dispatch } from "../util/event.ts";
 
 export type Params = {

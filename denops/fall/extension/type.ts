@@ -1,3 +1,4 @@
+import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 import type * as core from "../../@fall/mod.ts";
 
@@ -61,3 +62,12 @@ export const isExtensionType = is.LiteralOneOf(
     "action",
   ] as const,
 ) satisfies Predicate<ExtensionType>;
+
+export type ExtensionLoader<T> = {
+  readonly name: string;
+  readonly script: string;
+  readonly load: (
+    denops: Denops,
+    options: Record<string, unknown>,
+  ) => Promise<T | undefined>;
+};

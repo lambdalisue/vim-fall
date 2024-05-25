@@ -5,10 +5,10 @@ import { assert, ensure, is } from "jsr:@core/unknownutil@3.18.0";
 import { getConfigDir, loadExtensionConfig } from "../config/mod.ts";
 import {
   discoverExtensionLoaders,
-  listExtensionNames,
+  listExtensionLoaders,
   loadExtension,
   registerExtensionLoader,
-} from "../extension/loader.ts";
+} from "../extension/mod.ts";
 
 const isDefs = is.RecordOf(is.String, is.String);
 
@@ -36,7 +36,7 @@ export function main(denops: Denops): void {
         const expr = cmdline.replace(/^\S+\s+/, "");
         if (!expr.includes(" ")) {
           const sources = new Set([
-            ...listExtensionNames("source"),
+            ...listExtensionLoaders("source").map((v) => v.name),
             ...Object.keys(conf.source ?? []),
           ]);
           return [...sources].filter((v) => v.startsWith(arglead)).toSorted();

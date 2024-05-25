@@ -20,8 +20,13 @@ import {
   type PickerConfig,
   type StyleConfig,
 } from "../config/mod.ts";
-import type { Action, Item, Source } from "../extension/type.ts";
-import { loadExtension, loadExtensions } from "../extension/loader.ts";
+import {
+  type Action,
+  type Item,
+  loadExtension,
+  loadExtensions,
+  type Source,
+} from "../extension/mod.ts";
 
 type Config = {
   readonly extension: ExtensionConfig;

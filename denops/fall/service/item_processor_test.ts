@@ -1,6 +1,6 @@
 import { assertEquals } from "jsr:@std/assert@0.225.1";
 
-import type { Item, Projector, Transformer } from "../extension/type.ts";
+import type { Item, Projector, Transformer } from "../extension/mod.ts";
 import { subscribe } from "../util/event.ts";
 import { ItemProcessor } from "./item_processor.ts";
 

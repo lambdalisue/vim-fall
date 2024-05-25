@@ -7,7 +7,7 @@ import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import * as popup from "https://deno.land/x/denops_std@v6.4.0/popup/mod.ts";
 
-import type { Preview } from "../../extension/type.ts";
+import type { Preview } from "../../extension/mod.ts";
 
 /**
  * Preview component that shows preview content of the cursor item

@@ -1,4 +1,4 @@
-import type { Item, Renderer, RendererItem } from "../extension/type.ts";
+import type { Item, Renderer, RendererItem } from "../extension/mod.ts";
 import { calcScrollOffset } from "../view/util/scrolloffset.ts";
 import { dispatch } from "../util/event.ts";
 
