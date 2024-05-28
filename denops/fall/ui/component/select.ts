@@ -1,4 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
+import { equal } from "jsr:@std/assert/equal";
 import type { Decoration as Decoration } from "https://deno.land/x/denops_std@v6.4.0/buffer/decoration.ts";
 import { batch } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
@@ -6,33 +7,65 @@ import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 
 import type { RendererItem } from "../../extension/mod.ts";
 import { isDefined } from "../../util/collection.ts";
+import { BaseComponent } from "./base.ts";
 
-type Context = {
-  readonly items: readonly RendererItem[];
-  readonly line: number;
-  readonly selected: Set<unknown>;
-};
+export class SelectComponent extends BaseComponent {
+  protected readonly name = "select";
 
-export class SelectComponent implements Disposable {
-  readonly #bufnr: number;
+  #modified = false;
+  #line = 1;
+  #items: readonly RendererItem[] = [];
+  #selected: Set<unknown> = new Set();
 
-  constructor(bufnr: number, _winid: number) {
-    this.#bufnr = bufnr;
+  get line(): number {
+    return this.#line;
+  }
+
+  set line(value: number) {
+    if (this.#line === value) return;
+    this.#line = value;
+    this.#modified = true;
+  }
+
+  get items(): readonly RendererItem[] {
+    return this.#items;
+  }
+
+  set items(value: readonly RendererItem[]) {
+    this.#items = value;
+    this.#modified = true;
+  }
+
+  get selected(): Set<unknown> {
+    return this.#selected;
+  }
+
+  set selected(value: Set<unknown>) {
+    if (equal(this.#selected, value)) return;
+    this.#selected = value;
+    this.#modified = true;
   }
 
   async render(
     denops: Denops,
-    { items, line, selected }: Context,
     { signal }: { signal: AbortSignal },
-  ): Promise<void> {
+  ): Promise<void | true> {
+    if (!this.window) {
+      throw new Error("The component is not opened");
+    }
+    const { bufnr } = this.window;
+    if (!this.#modified) {
+      return true;
+    }
+    this.#modified = false;
     try {
-      const indexMap = new Map(items.map((v, i) => [v.id, i]));
-      const selectedIndices = [...selected.values()]
+      const indexMap = new Map(this.#items.map((v, i) => [v.id, i]));
+      const selectedIndices = [...this.#selected.values()]
         .map((id) => indexMap.get(id))
         .filter(isDefined);
 
-      const content = items.map((v) => v.label ?? v.value);
-      const decorations = items.reduce((acc, v, i) => {
+      const content = this.#items.map((v) => v.label ?? v.value);
+      const decorations = this.#items.reduce((acc, v, i) => {
         if (!v.decorations) {
           return acc;
         }
@@ -46,7 +79,7 @@ export class SelectComponent implements Disposable {
         );
       }, [] as Decoration[]);
 
-      await buffer.replace(denops, this.#bufnr, content);
+      await buffer.replace(denops, bufnr, content);
       signal.throwIfAborted();
 
       if (content.length > 0) {
@@ -54,7 +87,7 @@ export class SelectComponent implements Disposable {
           // NOTE:
           // Vim require 'PopUp' prefix for sign group name in popup window
           await fn.sign_unplace(denops, "PopUpFallSelect", {
-            buffer: this.#bufnr,
+            buffer: bufnr,
           });
           for (const index of selectedIndices) {
             await fn.sign_place(
@@ -62,7 +95,7 @@ export class SelectComponent implements Disposable {
               0,
               "PopUpFallSelect",
               "FallSelectSelected",
-              this.#bufnr,
+              bufnr,
               {
                 lnum: Math.max(0, index) + 1,
               },
@@ -73,22 +106,18 @@ export class SelectComponent implements Disposable {
             0,
             "PopUpFallSelect",
             "FallSelectCursor",
-            this.#bufnr,
-            { lnum: line },
+            bufnr,
+            { lnum: this.#line },
           );
         });
         signal.throwIfAborted();
 
-        await buffer.decorate(denops, this.#bufnr, decorations);
+        await buffer.decorate(denops, bufnr, decorations);
       }
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
       const m = err.message ?? err;
-      console.warn(`Failed to render the select component: ${m}`);
+      console.warn(`Failed to render the select window: ${m}`);
     }
-  }
-
-  [Symbol.dispose]() {
-    // Do nothing
   }
 }

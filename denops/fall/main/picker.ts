@@ -6,8 +6,8 @@ import { ensure, is, maybe } from "jsr:@core/unknownutil@3.18.0";
 import { subscribe } from "../util/event.ts";
 import { isDefined } from "../util/collection.ts";
 import { hideMsgArea } from "../util/hide_msg_area.ts";
-import { Picker, type PickerContext } from "../view/picker.ts";
-import { emitPickerEnter, emitPickerLeave } from "../view/util/emitter.ts";
+import { type Context as PickerContext, Picker } from "../ui/picker.ts";
+import { emitPickerEnter, emitPickerLeave } from "../ui/util/emitter.ts";
 import {
   type ExtensionConfig,
   getActionPickerStylConfig,
@@ -178,25 +178,26 @@ async function internalStart(
   const sourcePickerStyle = getSourcePickerStyleConfig(conf.style);
   const actionPickerStyle = getActionPickerStylConfig(conf.style);
 
-  const sourcePickerZindex = sourcePickerStyle.layout?.zindex ?? 50;
-  const actionPickerZindex = actionPickerStyle.layout?.zindex ??
+  const sourcePickerZindex = sourcePickerStyle.style?.zindex ?? 50;
+  const actionPickerZindex = actionPickerStyle.style?.zindex ??
     (sourcePickerZindex + 1);
 
   const sourceStream = await source.stream({ cmdline });
-  await using sourcePicker = await Picker.fromStream(
-    denops,
-    sourceStream,
-    transformers,
-    projectors,
-    renderers,
-    previewers,
+  using sourcePicker = new Picker(
+    {
+      title: `${source.name} ${cmdline}`.trim(),
+      stream: sourceStream,
+      transformers,
+      projectors,
+      renderers,
+      previewers,
+      selectable: true,
+      context: options.restoreContext,
+    },
     {
       ...(pickerOptions.options ?? {}),
-      title: " " + `${source.name} ${cmdline}`.trim() + " ",
-      selectable: true,
-      restoreContext: options.restoreContext,
-      layout: {
-        ...sourcePickerStyle.layout,
+      style: {
+        ...sourcePickerStyle.style,
         zindex: sourcePickerZindex,
       },
       query: sourcePickerStyle.query,
@@ -211,17 +212,19 @@ async function internalStart(
     },
     decorations: [],
   })));
-  await using actionPicker = await Picker.fromStream(
-    denops,
-    actionStream,
-    actionTransformers,
-    actionProjectors,
-    actionRenderers,
-    actionPreviewers,
+  using actionPicker = new Picker(
+    {
+      title: "action",
+      stream: actionStream,
+      transformers: actionTransformers,
+      projectors: actionProjectors,
+      renderers: actionRenderers,
+      previewers: actionPreviewers,
+    },
     {
       ...(pickerOptions.options ?? {}),
-      layout: {
-        ...actionPickerStyle.layout,
+      style: {
+        ...actionPickerStyle.style,
         zindex: actionPickerZindex,
       },
       query: actionPickerStyle.query,

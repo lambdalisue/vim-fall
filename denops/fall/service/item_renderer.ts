@@ -3,12 +3,10 @@ import { dispatch } from "../util/event.ts";
 
 export type Params = {
   readonly renderers: readonly Renderer[];
-  readonly scrolloff: number;
 };
 
 export class ItemRenderer implements Disposable {
   readonly #renderers: readonly Renderer[];
-  readonly #scrolloff: number;
 
   #controller = new AbortController();
   #processing = false;
@@ -17,7 +15,6 @@ export class ItemRenderer implements Disposable {
 
   constructor(params: Params) {
     this.#renderers = params.renderers;
-    this.#scrolloff = params.scrolloff;
   }
 
   get processing(): boolean {
@@ -33,11 +30,12 @@ export class ItemRenderer implements Disposable {
   }
 
   async start(
-    { items, index, width, height }: {
+    { items, index, width, height, scrolloff }: {
       readonly items: readonly Item[];
       readonly index: number;
       readonly width: number;
       readonly height: number;
+      readonly scrolloff: number;
     },
     options: { signal: AbortSignal },
   ): Promise<void> {
@@ -53,7 +51,7 @@ export class ItemRenderer implements Disposable {
         index,
         items.length,
         height,
-        this.#scrolloff,
+        scrolloff,
       );
       const visibleItems = items.slice(
         this.#offset,

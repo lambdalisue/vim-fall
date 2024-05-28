@@ -13,3 +13,8 @@ command! -nargs=0
 command! -nargs=1
       \ -complete=customlist,fall#command#FallConfig#complete
       \ FallConfig call fall#command#FallConfig#call(<q-args>)
+
+augroup fall
+  autocmd!
+  autocmd VimResized * call denops#notify('fall', 'event:dispatch', ["vim-resized"])
+augroup END

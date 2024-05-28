@@ -1,13 +1,6 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import { collect } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
-import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
-
-export const isDivider = is
-  .UnionOf([
-    is.LiteralOneOf(["none", "ascii", "single", "double", "dashed"] as const),
-    is.UniformTupleOf(6, is.String),
-  ]) satisfies Predicate<Divider>;
 
 export type Divider =
   | "none"

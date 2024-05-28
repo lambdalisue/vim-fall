@@ -2,7 +2,7 @@
 picker:
   # Style of source picker
   source:
-    layout:
+    style:
       widthRatio: 0.9
       widthMin: 80
       widthMax: 800
@@ -13,7 +13,7 @@ picker:
 
   # Style of action picker
   action:
-    layout:
+    style:
       widthRatio: 0.5
       widthMin: 70
       widthMax: 700
@@ -24,7 +24,7 @@ picker:
 
   # Fallback style of source/action picker
   "":
-    layout:
+    style:
       border: rounded
       divider: dashed
     query:
@@ -33,13 +33,12 @@ picker:
 
 # Style of input UI
 input:
-  layout:
+  style:
     border: rounded
     divider: dashed
     widthRatio: 0.3
     widthMin: 10
     widthMax: 80
-
 
 # JSON schema of this file
 # yaml-language-server: $schema=https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/style/schema.json

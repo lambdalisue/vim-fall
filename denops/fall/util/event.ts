@@ -65,6 +65,7 @@ const subscriberMap: {
 } = {};
 
 const fallEventDataMap = {
+  "vim-resized": is.Unknown,
   "cmdline-changed": is.String,
   "cmdpos-changed": is.Number,
   "select-cursor-move": is.Number,

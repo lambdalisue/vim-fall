@@ -6,83 +6,105 @@ import {
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 import * as popup from "https://deno.land/x/denops_std@v6.4.0/popup/mod.ts";
+import { equal } from "jsr:@std/assert@0.225.1/equal";
 
 import type { Preview } from "../../extension/mod.ts";
+import { BaseComponent } from "./base.ts";
 
-type Context = {
-  readonly title: string;
-  readonly preview: Preview;
-};
+export class PreviewComponent extends BaseComponent {
+  protected readonly name = "preview";
 
-export class PreviewComponent implements Disposable {
-  readonly #bufnr: number;
-  readonly #winid: number;
+  #modified = true;
+  #title = "";
+  #preview: Preview = {
+    content: ["No preview is available"],
+  };
 
-  constructor(bufnr: number, winid: number) {
-    this.#bufnr = bufnr;
-    this.#winid = winid;
+  get title(): string {
+    return this.#title;
+  }
+
+  set title(value: string) {
+    if (this.#title === value) return;
+    this.#title = value;
+    this.#modified = true;
+  }
+
+  get preview(): Preview {
+    return this.#preview;
+  }
+
+  set preview(value: Preview) {
+    if (equal(this.#preview, value)) return;
+    this.#preview = value;
+    this.#modified = true;
   }
 
   async render(
     denops: Denops,
-    { preview, title }: Context,
     { signal }: { signal: AbortSignal },
-  ): Promise<void> {
+  ): Promise<void | true> {
+    if (!this.window) {
+      throw new Error("The component is not opened");
+    }
+    const { winid, bufnr } = this.window;
+    if (!this.#modified) {
+      return true;
+    }
+    this.#modified = false;
     try {
-      await popup.config(denops, this.#winid, {
-        title: ` ${title} `,
+      await popup.config(denops, winid, {
+        title: ` ${this.#title} `,
       });
       signal.throwIfAborted();
 
-      await buffer.replace(denops, this.#bufnr, preview.content);
+      await buffer.replace(denops, bufnr, this.#preview.content);
       signal.throwIfAborted();
 
-      const line = preview?.line ?? 1;
-      const column = preview?.column ?? 1;
-      const filename = preview?.filename;
+      const line = this.#preview?.line ?? 1;
+      const column = this.#preview?.column ?? 1;
+      const filename = this.#preview?.filename;
       await batch(denops, async (denops) => {
         // Clear previous buffer context
         await fn.win_execute(
           denops,
-          this.#winid,
+          winid,
           `silent! 0file`,
         );
         await fn.win_execute(
           denops,
-          this.#winid,
+          winid,
           `silent! syntax clear`,
         );
         // Change buffer name
         await fn.win_execute(
           denops,
-          this.#winid,
+          winid,
           `silent! file fall://preview/${filename ?? ""}`,
         );
         // Apply highlight
         await fn.win_execute(
           denops,
-          this.#winid,
+          winid,
           `silent! call fall#internal#preview#highlight()`,
         );
         // Overwrite buffer local options may configured by ftplugin
         await fn.win_execute(
           denops,
-          this.#winid,
+          winid,
           `silent! setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile cursorline nomodifiable nowrap`,
         );
         // Move cursor
         await fn.win_execute(
           denops,
-          this.#winid,
+          winid,
           `silent! normal! ${line ?? 1}G${column ?? 1}|`,
         );
       });
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
       const m = err.message ?? err;
-      console.warn(
-        `[fall] Failed to render the preview component: ${m}`,
-      );
+      console.warn(`[fall] Failed to render the preview window: ${m}`);
     }
   }
 
@@ -91,25 +113,27 @@ export class PreviewComponent implements Disposable {
     offset: number,
     { signal }: { signal: AbortSignal },
   ): Promise<void> {
+    if (!this.window) {
+      throw new Error("The component is not opened");
+    }
+    const { winid } = this.window;
     try {
       const [line, linecount] = await collect(denops, (denops) => [
-        fn.line(denops, ".", this.#winid),
-        fn.line(denops, "$", this.#winid),
+        fn.line(denops, ".", winid),
+        fn.line(denops, "$", winid),
       ]);
       signal.throwIfAborted();
 
       const newLine = Math.max(1, Math.min(line + offset, linecount));
       await fn.win_execute(
         denops,
-        this.#winid,
-        `normal! ${newLine}G`,
+        winid,
+        `silent! normal! ${newLine}G`,
       );
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
       const m = err.message ?? err;
-      console.warn(
-        `[fall] Failed to move cursor on the preview window: ${m}`,
-      );
+      console.warn(`[fall] Failed to move cursor on the preview window: ${m}`);
     }
   }
 
@@ -118,26 +142,24 @@ export class PreviewComponent implements Disposable {
     line: number,
     { signal }: { signal: AbortSignal },
   ): Promise<void> {
+    if (!this.window) {
+      throw new Error("The component is not opened");
+    }
+    const { winid } = this.window;
     try {
-      const linecount = await fn.line(denops, "$", this.#winid);
+      const linecount = await fn.line(denops, "$", winid);
       signal.throwIfAborted();
 
       const newLine = Math.max(1, Math.min(line, linecount));
       await fn.win_execute(
         denops,
-        this.#winid,
-        `normal! ${newLine}G`,
+        winid,
+        `silent! normal! ${newLine}G`,
       );
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
       const m = err.message ?? err;
-      console.debug(
-        `[fall] Failed to move cursor on the preview window: ${m}`,
-      );
+      console.debug(`[fall] Failed to move cursor on the preview window: ${m}`);
     }
-  }
-
-  [Symbol.dispose]() {
-    // Do nothing
   }
 }

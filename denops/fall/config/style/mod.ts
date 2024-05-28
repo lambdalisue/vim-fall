@@ -1,13 +1,24 @@
 import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
-import { isBorder } from "../../view/layout/border.ts";
-import { isDivider } from "../../view/layout/divider.ts";
-import { type LayoutParams as InputLayoutParams } from "../../view/layout/input_layout.ts";
-import { type LayoutParams as PickerLayoutParams } from "../../view/layout/picker_layout.ts";
+import { type Border } from "../../ui/util/border.ts";
+import { type Divider } from "../../ui/util/divider.ts";
+import { type Options as InputOptions } from "../../ui/input.ts";
+import { type Options as PickerOptions } from "../../ui/picker.ts";
 import { loadConfig, mergeConfigs } from "../util.ts";
 
+export const isBorder = is.UnionOf([
+  is.LiteralOneOf(["none", "ascii", "single", "double", "rounded"] as const),
+  is.UniformTupleOf(8, is.String),
+]) satisfies Predicate<Border>;
+
+export const isDivider = is
+  .UnionOf([
+    is.LiteralOneOf(["none", "ascii", "single", "double", "dashed"] as const),
+    is.UniformTupleOf(6, is.String),
+  ]) satisfies Predicate<Divider>;
+
 export type PickerStyleConfig = {
-  readonly layout?: Partial<Omit<PickerLayoutParams, "title">>;
+  readonly style?: Partial<PickerOptions["style"]>;
   readonly query?: {
     readonly spinner?: readonly string[];
     readonly headSymbol?: string;
@@ -16,7 +27,7 @@ export type PickerStyleConfig = {
 };
 
 export type InputStyleConfig = {
-  readonly layout?: Partial<Omit<InputLayoutParams, "title">>;
+  readonly style?: Partial<InputOptions["style"]>;
 };
 
 export type StyleConfig = {
@@ -29,12 +40,10 @@ export type StyleConfig = {
 };
 
 const isPickerStyleConfig = is.PartialOf(is.ObjectOf({
-  layout: is.PartialOf(is.ObjectOf({
-    width: is.OptionalOf(is.Number),
+  style: is.PartialOf(is.ObjectOf({
     widthRatio: is.Number,
     widthMin: is.Number,
     widthMax: is.Number,
-    height: is.OptionalOf(is.Number),
     heightRatio: is.Number,
     heightMin: is.Number,
     heightMax: is.Number,
@@ -51,8 +60,7 @@ const isPickerStyleConfig = is.PartialOf(is.ObjectOf({
 })) satisfies Predicate<PickerStyleConfig>;
 
 const isInputStyleConfig = is.PartialOf(is.ObjectOf({
-  layout: is.PartialOf(is.ObjectOf({
-    width: is.OptionalOf(is.Number),
+  style: is.PartialOf(is.ObjectOf({
     widthRatio: is.Number,
     widthMin: is.Number,
     widthMax: is.Number,

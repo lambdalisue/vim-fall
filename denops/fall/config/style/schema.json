@@ -34,7 +34,7 @@
       "additionalProperties": false,
       "properties": {
         "layout": {
-          "$ref": "#/$defs/pickerLayoutParams"
+          "$ref": "#/$defs/pickerStyleParams"
         },
         "query": {
           "type": "object",
@@ -64,19 +64,15 @@
       "additionalProperties": false,
       "properties": {
         "layout": {
-          "$ref": "#/$defs/pickerLayoutParams"
+          "$ref": "#/$defs/pickerStyleParams"
         }
       }
     },
-    "pickerLayoutParams": {
-      "description": "The layout settings for the picker window.\n",
+    "pickerStyleParams": {
+      "description": "The style settings for the picker window.\n",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "width": {
-          "description": "The fixed width of the entire picker window (including preview window).\nIf not set, the width is calculated based on the widthRatio and the screen width.\n",
-          "type": "number"
-        },
         "widthRatio": {
           "description": "The ratio of the entire picker window width (including preview window) relative to the screen width.\n",
           "type": "number"
@@ -87,10 +83,6 @@
         },
         "widthMax": {
           "description": "The maximum width for the entire picker window when widthRatio is set.\n",
-          "type": "number"
-        },
-        "height": {
-          "description": "The fixed height of the entire picker window. \nIf not set, the height is calculated based on the heightRatio and the screen height.\n",
           "type": "number"
         },
         "heightRatio": {
@@ -116,7 +108,7 @@
               "$ref": "#/$defs/stringBorder"
             },
             {
-              "$ref": "#/$defs/layoutBorder"
+              "$ref": "#/$defs/rawBorder"
             }
           ]
         },
@@ -127,7 +119,7 @@
               "$ref": "#/$defs/stringDivider"
             },
             {
-              "$ref": "#/$defs/layoutDivider"
+              "$ref": "#/$defs/rawDivider"
             }
           ]
         },
@@ -137,15 +129,11 @@
         }
       }
     },
-    "inputLayoutParams": {
-      "description": "The layout settings for the input window.\n",
+    "inputStyleParams": {
+      "description": "The style settings for the input window.\n",
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "width": {
-          "description": "The fixed width of the input window.\nIf not set, the width is calculated based on the widthRatio and the screen width.\n",
-          "type": "number"
-        },
         "widthRatio": {
           "description": "The ratio of the input window width relative to the screen width.\n",
           "type": "number"
@@ -165,7 +153,7 @@
               "$ref": "#/$defs/stringBorder"
             },
             {
-              "$ref": "#/$defs/layoutBorder"
+              "$ref": "#/$defs/rawBorder"
             }
           ]
         },
@@ -195,7 +183,7 @@
         "dashed"
       ]
     },
-    "layoutBorder": {
+    "rawBorder": {
       "type": "array",
       "items": [
         {
@@ -234,7 +222,7 @@
       "minItems": 8,
       "maxItems": 8
     },
-    "layoutDivider": {
+    "rawDivider": {
       "type": "array",
       "items": [
         {

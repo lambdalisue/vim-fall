@@ -3,7 +3,7 @@ import { ensure, is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
 import { isDefined } from "../util/collection.ts";
 import { hideMsgArea } from "../util/hide_msg_area.ts";
-import { Input } from "../view/input.ts";
+import { Input } from "../ui/input.ts";
 import {
   getConfigDir,
   getInputStyleConfig,
@@ -46,14 +46,14 @@ async function input(
     }
   });
 
-  await using inputDialog = new Input({
-    layout: {
-      ...(inputStyle.layout ?? {}),
-      title: params.title,
+  const inputDialog = new Input({
+    title: params.title,
+    style: {
+      ...(inputStyle.style ?? {}),
     },
     input: params,
   });
-  await inputDialog.open(denops);
+  stack.use(await inputDialog.open(denops));
   return await inputDialog.start(denops, { signal });
 }
 

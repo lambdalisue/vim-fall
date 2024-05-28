@@ -25,7 +25,7 @@ $defs:
     additionalProperties: false
     properties:
       layout:
-        $ref: "#/$defs/pickerLayoutParams"
+        $ref: "#/$defs/pickerStyleParams"
       query:
         type: object
         additionalProperties: false
@@ -50,19 +50,14 @@ $defs:
     additionalProperties: false
     properties:
       layout:
-        $ref: "#/$defs/pickerLayoutParams"
+        $ref: "#/$defs/pickerStyleParams"
 
-  pickerLayoutParams:
+  pickerStyleParams:
     description: |
-      The layout settings for the picker window.
+      The style settings for the picker window.
     type: object
     additionalProperties: false
     properties:
-      width:
-        description: |
-          The fixed width of the entire picker window (including preview window).
-          If not set, the width is calculated based on the widthRatio and the screen width.
-        type: number
       widthRatio:
         description: |
           The ratio of the entire picker window width (including preview window) relative to the screen width.
@@ -74,11 +69,6 @@ $defs:
       widthMax:
         description: |
           The maximum width for the entire picker window when widthRatio is set.
-        type: number
-      height:
-        description: |
-          The fixed height of the entire picker window. 
-          If not set, the height is calculated based on the heightRatio and the screen height.
         type: number
       heightRatio:
         description: |
@@ -101,29 +91,24 @@ $defs:
           The border style for the picker window.
         oneOf:
           - $ref: "#/$defs/stringBorder"
-          - $ref: "#/$defs/layoutBorder"
+          - $ref: "#/$defs/rawBorder"
       divider:
         description: |
           The divider style for the picker window.
         oneOf:
           - $ref: "#/$defs/stringDivider"
-          - $ref: "#/$defs/layoutDivider"
+          - $ref: "#/$defs/rawDivider"
       zindex:
         description: |
           The z-index value for the picker window.
         type: number
 
-  inputLayoutParams:
+  inputStyleParams:
     description: |
-      The layout settings for the input window.
+      The style settings for the input window.
     type: object
     additionalProperties: false
     properties:
-      width:
-        description: |
-          The fixed width of the input window.
-          If not set, the width is calculated based on the widthRatio and the screen width.
-        type: number
       widthRatio:
         description: |
           The ratio of the input window width relative to the screen width.
@@ -141,7 +126,7 @@ $defs:
           The border style for the input window.
         oneOf:
           - $ref: "#/$defs/stringBorder"
-          - $ref: "#/$defs/layoutBorder"
+          - $ref: "#/$defs/rawBorder"
       zindex:
         description: |
           The z-index value for the input window.
@@ -165,7 +150,7 @@ $defs:
       - double
       - dashed
 
-  layoutBorder:
+  rawBorder:
     type: array
     items:
       - description: topleft
@@ -187,7 +172,7 @@ $defs:
     minItems: 8
     maxItems: 8
 
-  layoutDivider:
+  rawDivider:
     type: array
     items:
       - description: left
