@@ -43,9 +43,9 @@ helptag:
   transformers:
     - relative-path
 
-  # Use 'fzf' projector to filter/sort items
+  # Use 'fzf-matcher' projector to filter/sort items
   projectors:
-    - fzf
+    - fzf-matcher
 
   # Try several previewers to preview the content of the item
   previewers:
@@ -55,7 +55,7 @@ helptag:
 
   # Use 'fzf' projector to filter/sort actions
   actionProjectors:
-    - fzf
+    - fzf-matcher
 
   # Use 'attribute:description' previewer to preview actions
   actionPreviewers:
