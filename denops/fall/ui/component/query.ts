@@ -8,7 +8,7 @@ import { Spinner } from "../util/spinner.ts";
 import { BaseComponent } from "./base.ts";
 
 export type Counter = {
-  readonly processed: number;
+  readonly projected: number;
   readonly collected: number;
   readonly truncated: boolean;
 };
@@ -31,7 +31,7 @@ export class QueryComponent extends BaseComponent implements Disposable {
   #cmdpos: number = 0;
   #counter: Counter = {
     collected: 0,
-    processed: 0,
+    projected: 0,
     truncated: false,
   };
   #collecting: boolean | "failed" = false;
@@ -123,7 +123,7 @@ export class QueryComponent extends BaseComponent implements Disposable {
 
       // TODO: Fix `cmdline` overflow
       const prefix = `${headSymbol} `;
-      const suffix = ` ${this.#counter.processed}/${collected} ${tailSymbol}`;
+      const suffix = ` ${this.#counter.projected}/${collected} ${tailSymbol}`;
       const spacer = " ".repeat(
         Math.max(
           0,

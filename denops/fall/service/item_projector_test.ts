@@ -2,7 +2,7 @@ import { assertEquals } from "jsr:@std/assert@0.225.1";
 
 import type { Item, Projector } from "../extension/mod.ts";
 import { subscribe } from "../util/event.ts";
-import { ItemProcessor } from "./item_processor.ts";
+import { ItemProjector } from "./item_projector.ts";
 
 const testProjectors: Projector[] = [
   {
@@ -13,13 +13,13 @@ const testProjectors: Projector[] = [
   },
 ];
 
-Deno.test("ItemProcessor", async (t) => {
+Deno.test("ItemProjector", async (t) => {
   const controller = new AbortController();
   const { signal } = controller;
 
-  await t.step("process items with given query", async () => {
+  await t.step("projects items with given query", async () => {
     const { promise, resolve } = Promise.withResolvers<void>();
-    using _ = subscribe("item-processor-completed", () => resolve());
+    using _ = subscribe("item-projector-completed", () => resolve());
     const items: Item[] = [
       { id: "1", value: "11", detail: {}, decorations: [] },
       { id: "2", value: "12", detail: {}, decorations: [] },
@@ -31,12 +31,12 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "8", value: "32", detail: {}, decorations: [] },
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
-    await using processor = new ItemProcessor({
+    await using projector = new ItemProjector({
       projectors: testProjectors,
     });
-    processor.start({ items, query: "2" }, { signal });
+    projector.start({ items, query: "2" }, { signal });
     await promise;
-    assertEquals(processor.items, [
+    assertEquals(projector.items, [
       { id: "8", value: "32", detail: {}, decorations: [] },
       { id: "6", value: "23", detail: {}, decorations: [] },
       { id: "5", value: "22", detail: {}, decorations: [] },
@@ -45,11 +45,11 @@ Deno.test("ItemProcessor", async (t) => {
     ]);
   });
 
-  await t.step("dispatch 'item-processor-succeeded' on success", async () => {
+  await t.step("dispatch 'item-projector-succeeded' on success", async () => {
     const { promise, resolve } = Promise.withResolvers<void>();
     let called = false;
-    using _a = subscribe("item-processor-completed", () => resolve());
-    using _b = subscribe("item-processor-succeeded", () => called = true);
+    using _a = subscribe("item-projector-completed", () => resolve());
+    using _b = subscribe("item-projector-succeeded", () => called = true);
     const items: Item[] = [
       { id: "1", value: "11", detail: {}, decorations: [] },
       { id: "2", value: "12", detail: {}, decorations: [] },
@@ -61,19 +61,19 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "8", value: "32", detail: {}, decorations: [] },
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
-    await using processor = new ItemProcessor({
+    await using projector = new ItemProjector({
       projectors: testProjectors,
     });
-    processor.start({ items, query: "2" }, { signal });
+    projector.start({ items, query: "2" }, { signal });
     await promise;
     assertEquals(called, true);
   });
 
-  await t.step("dispatch 'item-processor-failed' on failure", async () => {
+  await t.step("dispatch 'item-projector-failed' on failure", async () => {
     const { promise, resolve } = Promise.withResolvers<void>();
     let called = false;
-    using _a = subscribe("item-processor-completed", () => resolve());
-    using _b = subscribe("item-processor-failed", () => called = true);
+    using _a = subscribe("item-projector-completed", () => resolve());
+    using _b = subscribe("item-projector-failed", () => called = true);
     const items: Item[] = [
       { id: "1", value: "11", detail: {}, decorations: [] },
       { id: "2", value: "12", detail: {}, decorations: [] },
@@ -90,10 +90,10 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "8", value: "32", detail: {}, decorations: [] },
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
-    await using processor = new ItemProcessor({
+    await using projector = new ItemProjector({
       projectors: testProjectors,
     });
-    processor.start({ items, query: "2" }, { signal });
+    projector.start({ items, query: "2" }, { signal });
     await promise;
     assertEquals(called, true);
   });

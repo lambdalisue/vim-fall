@@ -291,7 +291,7 @@ async function internalStart(
           await action.invoke({
             cursorItem: sourcePicker.cursorItem,
             selectedItems: sourcePicker.selectedItems,
-            processedItems: sourcePicker.processedItems,
+            projectedItems: sourcePicker.projectedItems,
           }, { signal })
         ) {
           // Continue

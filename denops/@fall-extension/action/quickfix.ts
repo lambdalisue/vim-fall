@@ -3,7 +3,7 @@ import * as fn from "https://deno.land/x/denops_std@v6.3.0/function/mod.ts";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 
 const description = `
-Send the selected items or processed items to quickfix.
+Send the selected items or projected items to quickfix.
 
 TODO: Better description.
 `.trim();
@@ -46,8 +46,8 @@ export const getAction: GetAction = (denops, options) => {
   return {
     description,
 
-    async invoke({ selectedItems, processedItems }) {
-      const source = selectedItems.length > 0 ? selectedItems : processedItems;
+    async invoke({ selectedItems, projectedItems }) {
+      const source = selectedItems.length > 0 ? selectedItems : projectedItems;
       const items = source
         .map((item) => {
           if (isGrepDetail(item.detail)) {

@@ -19,7 +19,7 @@ import { type Divider } from "./util/divider.ts";
 import { type Layout } from "./component/base.ts";
 import { PickerComponent } from "./component/picker.ts";
 import { ItemCollector } from "../service/item_collector.ts";
-import { ItemProcessor } from "../service/item_processor.ts";
+import { ItemProjector } from "../service/item_projector.ts";
 import { ItemRenderer } from "../service/item_renderer.ts";
 import { ItemPreviewer } from "../service/item_previewer.ts";
 
@@ -70,7 +70,7 @@ export class Picker implements Disposable {
   readonly #title: string;
   readonly #selectable: boolean;
   readonly #itemCollector: ItemCollector;
-  readonly #itemProcessor: ItemProcessor;
+  readonly #itemProjector: ItemProjector;
   readonly #itemRenderer: ItemRenderer;
   readonly #itemPreviewer: ItemPreviewer;
   readonly #options: Options;
@@ -97,8 +97,8 @@ export class Picker implements Disposable {
         threshold: options.itemCollector?.threshold,
       }),
     );
-    const itemProcessor = stack.use(
-      new ItemProcessor({ projectors }),
+    const itemProjector = stack.use(
+      new ItemProjector({ projectors }),
     );
     const itemRenderer = stack.use(
       new ItemRenderer({ renderers }),
@@ -109,7 +109,7 @@ export class Picker implements Disposable {
     this.#title = title;
     this.#selectable = selectable ?? false;
     this.#itemCollector = itemCollector;
-    this.#itemProcessor = itemProcessor;
+    this.#itemProjector = itemProjector;
     this.#itemRenderer = itemRenderer;
     this.#itemPreviewer = itemPreviewer;
     this.#options = options;
@@ -137,23 +137,23 @@ export class Picker implements Disposable {
     return this.#itemCollector.items;
   }
 
-  get processedItems(): readonly Item[] {
-    return this.#itemProcessor.items;
+  get projectedItems(): readonly Item[] {
+    return this.#itemProjector.items;
   }
 
   get selectedItems(): readonly Item[] {
-    const m = new Map(this.processedItems.map((v) => [v.id, v]));
+    const m = new Map(this.projectedItems.map((v) => [v.id, v]));
     return [...this.#picker.select.selected].map((v) => m.get(v)).filter(
       isDefined,
     );
   }
 
   get cursorItem(): Item | undefined {
-    return this.processedItems.at(this.#index);
+    return this.projectedItems.at(this.#index);
   }
 
   #correctIndex(index: number): number {
-    const max = this.processedItems.length - 1;
+    const max = this.projectedItems.length - 1;
     return Math.max(0, Math.min(max, index));
   }
 
@@ -216,8 +216,8 @@ export class Picker implements Disposable {
       }
     });
 
-    const emitItemProcessor = () => {
-      this.#itemProcessor.start({
+    const emitItemProjector = () => {
+      this.#itemProjector.start({
         items: this.collectedItems,
         query: this.#picker.query.cmdline,
       }, {
@@ -234,7 +234,7 @@ export class Picker implements Disposable {
         ],
       );
       this.#itemRenderer.start({
-        items: this.processedItems,
+        items: this.projectedItems,
         index: this.#index,
         width,
         height,
@@ -264,36 +264,36 @@ export class Picker implements Disposable {
       this.#picker.query.collecting = true;
       this.#picker.query.counter = {
         collected: this.#itemCollector.items.length,
-        processed: this.#itemProcessor.items.length,
+        projected: this.#itemProjector.items.length,
         truncated: this.#itemCollector.truncated,
       };
-      emitItemProcessor();
+      emitItemProjector();
     }));
     stack.use(subscribe("item-collector-succeeded", () => {
       this.#picker.query.collecting = false;
       this.#picker.query.processing = true;
       this.#picker.query.counter = {
         collected: this.#itemCollector.items.length,
-        processed: this.#itemProcessor.items.length,
+        projected: this.#itemProjector.items.length,
         truncated: this.#itemCollector.truncated,
       };
-      emitItemProcessor();
+      emitItemProjector();
     }));
     stack.use(subscribe("item-collector-failed", () => {
       this.#picker.query.collecting = "failed";
     }));
-    stack.use(subscribe("item-processor-succeeded", () => {
+    stack.use(subscribe("item-projector-succeeded", () => {
       this.#index = this.#correctIndex(this.#index);
       this.#picker.query.processing = false;
       this.#picker.query.counter = {
         collected: this.#itemCollector.items.length,
-        processed: this.#itemProcessor.items.length,
+        projected: this.#itemProjector.items.length,
         truncated: this.#itemCollector.truncated,
       };
       emitItemRenderer();
       emitItemPreviewer();
     }));
-    stack.use(subscribe("item-processor-failed", () => {
+    stack.use(subscribe("item-projector-failed", () => {
       this.#picker.query.processing = "failed";
     }));
     stack.use(subscribe("item-renderer-succeeded", () => {
@@ -315,7 +315,7 @@ export class Picker implements Disposable {
     }));
     stack.use(subscribe("cmdline-changed", (cmdline) => {
       this.#picker.query.cmdline = cmdline;
-      emitItemProcessor();
+      emitItemProjector();
     }));
     stack.use(subscribe("cmdpos-changed", (cmdpos) => {
       this.#picker.query.cmdpos = cmdpos;
@@ -331,7 +331,7 @@ export class Picker implements Disposable {
     }));
     stack.use(subscribe("select-cursor-move-at", (line) => {
       const newIndex = this.#correctIndex(
-        line === "$" ? this.processedItems.length - 1 : line - 1,
+        line === "$" ? this.projectedItems.length - 1 : line - 1,
       );
       if (this.#index === newIndex) {
         return;
@@ -361,11 +361,11 @@ export class Picker implements Disposable {
         }
       }));
       stack.use(subscribe("select-select-all", () => {
-        if (this.#picker.select.selected.size === this.processedItems.length) {
+        if (this.#picker.select.selected.size === this.projectedItems.length) {
           this.#picker.select.selected.clear();
         } else {
           this.#picker.select.selected = new Set(
-            this.processedItems.map((v) => v.id),
+            this.projectedItems.map((v) => v.id),
           );
         }
       }));

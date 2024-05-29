@@ -19,7 +19,7 @@ export type ActionParams = {
   /**
    * The items that are available (not filtered).
    */
-  readonly processedItems: readonly ActionItem[];
+  readonly projectedItems: readonly ActionItem[];
 };
 
 /**

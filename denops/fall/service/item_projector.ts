@@ -2,9 +2,9 @@ import type { Item, Projector } from "../extension/mod.ts";
 import { dispatch } from "../util/event.ts";
 
 /**
- * Item processor that processes the given items and stores in the `items` attribute.
+ * Item projector that project the given items and stores in the `items` attribute.
  */
-export class ItemProcessor implements Disposable {
+export class ItemProjector implements Disposable {
   readonly #projectors: readonly Projector[];
 
   #controller = new AbortController();
@@ -28,16 +28,16 @@ export class ItemProcessor implements Disposable {
   }
 
   /**
-   * Start processing items with the given query.
+   * Start projecting items with the given query.
    *
    * It dispatch the following events:
    *
-   * - `item-processor-succeeded`: When processing items is succeeded.
-   * - `item-processor-failed`: When processing items is failed.
-   * - `item-processor-completed`: When processing items is succeeded or failed.
+   * - `item-projector-succeeded`: When processing items is succeeded.
+   * - `item-projector-failed`: When processing items is failed.
+   * - `item-projector-completed`: When processing items is succeeded or failed.
    *
-   * Note that when case of aborting, `item-processor-failed` is not dispatched.
-   * To check if the processing is completed, you should use `item-processor-completed`.
+   * Note that when case of aborting, `item-projector-failed` is not dispatched.
+   * To check if the processing is completed, you should use `item-projector-completed`.
    */
   async start(
     { items, query }: {
@@ -67,17 +67,17 @@ export class ItemProcessor implements Disposable {
       }
       this.#processing = false;
       this.#items = projectedItems;
-      dispatch("item-processor-succeeded", undefined);
+      dispatch("item-projector-succeeded", undefined);
     } catch (err) {
       this.#processing = false;
       if (err instanceof DOMException && err.name === "AbortError") return;
-      dispatch("item-processor-failed", undefined);
+      dispatch("item-projector-failed", undefined);
       const m = err.message ?? err;
       console.warn(
         `[fall] Failed to process items with the query '${query}': ${m}`,
       );
     } finally {
-      dispatch("item-processor-completed", undefined);
+      dispatch("item-projector-completed", undefined);
     }
   }
 
