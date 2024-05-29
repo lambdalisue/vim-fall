@@ -103,21 +103,16 @@ async function applyRenderers(
   const size = items.length;
   if (size === 0) return [];
   for (const renderer of renderers) {
-    try {
-      const newItems = await renderer.render({ items, ...params }, { signal });
-      signal.throwIfAborted();
+    const newItems = await renderer.render({ items, ...params }, { signal });
+    signal.throwIfAborted();
 
-      if (newItems.length !== size) {
-        console.warn(
-          `[fall] Renderer ${renderer.name} returned different size of items. Ignore.`,
-        );
-        continue;
-      }
-      items = newItems;
-    } catch (err) {
-      const m = err.message ?? err;
-      console.warn(`[fall] Failed to apply renderer ${renderer.name}: ${m}`);
+    if (newItems.length !== size) {
+      console.warn(
+        `[fall] Renderer ${renderer.name} returned different size of items. Ignore.`,
+      );
+      continue;
     }
+    items = newItems;
   }
   return items;
 }
