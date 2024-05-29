@@ -9,7 +9,6 @@ import type {
   Projector,
   Renderer,
   SourceItem,
-  Transformer,
 } from "../extension/type.ts";
 import { subscribe } from "../util/event.ts";
 import { isDefined } from "../util/collection.ts";
@@ -33,7 +32,6 @@ export type Context = {
 export type Params = {
   readonly title: string;
   readonly stream: ReadableStream<SourceItem>;
-  readonly transformers: readonly Transformer[];
   readonly projectors: readonly Projector[];
   readonly renderers: readonly Renderer[];
   readonly previewers: readonly Previewer[];
@@ -84,7 +82,6 @@ export class Picker implements Disposable {
     {
       title,
       stream,
-      transformers,
       projectors,
       renderers,
       previewers,
@@ -101,7 +98,7 @@ export class Picker implements Disposable {
       }),
     );
     const itemProcessor = stack.use(
-      new ItemProcessor({ transformers, projectors }),
+      new ItemProcessor({ projectors }),
     );
     const itemRenderer = stack.use(
       new ItemRenderer({ renderers }),

@@ -6,7 +6,6 @@ export type ExtensionOptions = Readonly<Record<string, unknown>>;
 
 export type ExtensionConfig = {
   readonly source?: Readonly<Record<string, ExtensionOptions>>;
-  readonly transformer?: Readonly<Record<string, ExtensionOptions>>;
   readonly projector?: Readonly<Record<string, ExtensionOptions>>;
   readonly renderer?: Readonly<Record<string, ExtensionOptions>>;
   readonly previewer?: Readonly<Record<string, ExtensionOptions>>;
@@ -20,7 +19,6 @@ const isExtensionOptions = is.RecordOf(
 
 const isExtensionConfig = is.PartialOf(is.ObjectOf({
   source: is.RecordOf(isExtensionOptions, is.String),
-  transformer: is.RecordOf(isExtensionOptions, is.String),
   projector: is.RecordOf(isExtensionOptions, is.String),
   renderer: is.RecordOf(isExtensionOptions, is.String),
   previewer: is.RecordOf(isExtensionOptions, is.String),

@@ -1,13 +1,10 @@
-import { collect } from "jsr:@lambdalisue/streamtools@1.0.0";
-
-import type { Item, Projector, Transformer } from "../extension/mod.ts";
+import type { Item, Projector } from "../extension/mod.ts";
 import { dispatch } from "../util/event.ts";
 
 /**
  * Item processor that processes the given items and stores in the `items` attribute.
  */
 export class ItemProcessor implements Disposable {
-  readonly #transformers: readonly Transformer[];
   readonly #projectors: readonly Projector[];
 
   #controller = new AbortController();
@@ -15,12 +12,10 @@ export class ItemProcessor implements Disposable {
   #items: readonly Item[] = [];
 
   constructor(
-    { transformers, projectors }: {
-      readonly transformers: readonly Transformer[];
+    { projectors }: {
       readonly projectors: readonly Projector[];
     },
   ) {
-    this.#transformers = transformers;
     this.#projectors = projectors;
   }
 
@@ -60,18 +55,7 @@ export class ItemProcessor implements Disposable {
     ]);
     this.#processing = true;
     try {
-      let stream = ReadableStream.from(items);
-      for (const transformer of this.#transformers) {
-        const transform = await transformer.transform({ query }, { signal });
-        signal.throwIfAborted();
-        if (transform) {
-          stream = stream.pipeThrough(transform, { signal });
-        }
-      }
-      const transformedItems = await collect(stream, { signal });
-      signal.throwIfAborted();
-
-      let projectedItems: readonly Item[] = transformedItems;
+      let projectedItems: readonly Item[] = items;
       for (const projector of this.#projectors) {
         projectedItems = await projector.project({
           query,

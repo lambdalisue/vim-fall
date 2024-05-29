@@ -1,25 +1,8 @@
 import { assertEquals } from "jsr:@std/assert@0.225.1";
 
-import type { Item, Projector, Transformer } from "../extension/mod.ts";
+import type { Item, Projector } from "../extension/mod.ts";
 import { subscribe } from "../util/event.ts";
 import { ItemProcessor } from "./item_processor.ts";
-
-const testTransformers: Transformer[] = [
-  {
-    name: "testTransformer",
-    transform({ query }) {
-      return new TransformStream({
-        transform(chunk, controller) {
-          if (chunk.detail.error) {
-            controller.error(chunk.detail.error);
-          } else if (chunk.value.includes(query)) {
-            controller.enqueue(chunk);
-          }
-        },
-      });
-    },
-  },
-];
 
 const testProjectors: Projector[] = [
   {
@@ -49,7 +32,6 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
     await using processor = new ItemProcessor({
-      transformers: testTransformers,
       projectors: testProjectors,
     });
     processor.start({ items, query: "2" }, { signal });
@@ -80,7 +62,6 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
     await using processor = new ItemProcessor({
-      transformers: testTransformers,
       projectors: testProjectors,
     });
     processor.start({ items, query: "2" }, { signal });
@@ -110,7 +91,6 @@ Deno.test("ItemProcessor", async (t) => {
       { id: "9", value: "33", detail: {}, decorations: [] },
     ];
     await using processor = new ItemProcessor({
-      transformers: testTransformers,
       projectors: testProjectors,
     });
     processor.start({ items, query: "2" }, { signal });

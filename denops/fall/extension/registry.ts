@@ -11,12 +11,10 @@ import type {
   Projector,
   Renderer,
   Source,
-  Transformer,
 } from "./type.ts";
 
 export const registry = {
   source: new Map<string, ExtensionLoader<Source>>(),
-  transformer: new Map<string, ExtensionLoader<Transformer>>(),
   projector: new Map<string, ExtensionLoader<Projector>>(),
   renderer: new Map<string, ExtensionLoader<Renderer>>(),
   previewer: new Map<string, ExtensionLoader<Previewer>>(),
@@ -35,13 +33,6 @@ export async function registerExtensionLoader(
       name,
       script,
       load: mod.getSource.bind(mod),
-    });
-  }
-  if (mod.getTransformer) {
-    registry.transformer.set(name, {
-      name,
-      script,
-      load: mod.getTransformer.bind(mod),
     });
   }
   if (mod.getProjector) {

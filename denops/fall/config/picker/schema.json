@@ -25,13 +25,6 @@
             "type": "string"
           }
         },
-        "transformers": {
-          "description": "The list of transformers available in the source picker.\n",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
         "projectors": {
           "description": "The list of projectors available in the source picker.\n",
           "type": "array",
@@ -48,13 +41,6 @@
         },
         "previewers": {
           "description": "The list of previewers available in the source picker.\n",
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "actionTransformers": {
-          "description": "The list of transformers available in the action picker.\n",
           "type": "array",
           "items": {
             "type": "string"

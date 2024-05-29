@@ -15,8 +15,6 @@ export type {
   Source,
   SourceItem,
   SourceParams,
-  Transformer,
-  TransformerParams,
 } from "./type.ts";
 export {
   discoverExtensionLoaders,

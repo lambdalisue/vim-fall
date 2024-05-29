@@ -5,11 +5,9 @@ import { loadConfig, mergeConfigs } from "../util.ts";
 export type PickerOptions = {
   readonly defaultAction?: string;
   readonly actions?: readonly string[];
-  readonly transformers?: readonly string[];
   readonly projectors?: readonly string[];
   readonly renderers?: readonly string[];
   readonly previewers?: readonly string[];
-  readonly actionTransformers?: readonly string[];
   readonly actionProjectors?: readonly string[];
   readonly actionRenderers?: readonly string[];
   readonly actionPreviewers?: readonly string[];
@@ -28,11 +26,9 @@ export type PickerConfig = Readonly<Record<string, PickerOptions>>;
 const isPickerOptions = is.PartialOf(is.ObjectOf({
   defaultAction: is.String,
   actions: is.ArrayOf(is.String),
-  transformers: is.ArrayOf(is.String),
   projectors: is.ArrayOf(is.String),
   renderers: is.ArrayOf(is.String),
   previewers: is.ArrayOf(is.String),
-  actionTransformers: is.ArrayOf(is.String),
   actionProjectors: is.ArrayOf(is.String),
   actionRenderers: is.ArrayOf(is.String),
   actionPreviewers: is.ArrayOf(is.String),

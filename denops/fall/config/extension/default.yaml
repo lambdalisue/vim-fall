@@ -27,8 +27,6 @@ source:
   buffer:modified:
     mode: "bufmodified"
 
-transformer: {}
-
 projector: {}
 
 renderer: {}

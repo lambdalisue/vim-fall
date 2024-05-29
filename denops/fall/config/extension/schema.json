@@ -10,7 +10,7 @@
     }
   },
   "patternProperties": {
-    "^(source|transformer|projector|renderer|previewer|action)$": {
+    "^(source|projector|renderer|previewer|action)$": {
       "description": "Extension options map for the kind.\nThe key is the name (with variant) of extension and the value is options of extension.\n",
       "type": "object",
       "additionalProperties": false,

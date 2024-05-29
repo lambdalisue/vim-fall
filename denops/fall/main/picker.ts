@@ -127,12 +127,6 @@ async function internalStart(
     "action",
     pickerOptions.actions ?? [],
   );
-  const transformers = await loadExtensions(
-    denops,
-    conf.extension,
-    "transformer",
-    pickerOptions.transformers ?? [],
-  );
   const projectors = await loadExtensions(
     denops,
     conf.extension,
@@ -150,12 +144,6 @@ async function internalStart(
     conf.extension,
     "previewer",
     pickerOptions.previewers ?? [],
-  );
-  const actionTransformers = await loadExtensions(
-    denops,
-    conf.extension,
-    "transformer",
-    pickerOptions.transformers ?? [],
   );
   const actionProjectors = await loadExtensions(
     denops,
@@ -187,7 +175,6 @@ async function internalStart(
     {
       title: `${source.name} ${cmdline}`.trim(),
       stream: sourceStream,
-      transformers,
       projectors,
       renderers,
       previewers,
@@ -216,7 +203,6 @@ async function internalStart(
     {
       title: "action",
       stream: actionStream,
-      transformers: actionTransformers,
       projectors: actionProjectors,
       renderers: actionRenderers,
       previewers: actionPreviewers,

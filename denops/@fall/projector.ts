@@ -21,8 +21,7 @@ export type ProjectorParams = {
  * Projector is responsible for projection of the items.
  *
  * It is mainly designed for item modification, filteration, or sort that requires entire items
- * prior to perform the operation. Use `Transformer` instead when you want to apply the operation
- * on the stream rather than the entire items.
+ * prior to perform the operation.
  */
 export type Projector = {
   /**
