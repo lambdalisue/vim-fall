@@ -9,8 +9,9 @@ export const getProjector: GetProjector = (_denops, options) => {
   assert(options, isOptions);
   const alpha = options.reverse ? -1 : 1;
   return {
-    project({ items }) {
+    project({ items }, { signal }) {
       return items.toSorted((a, b) => {
+        signal?.throwIfAborted();
         return a.value.localeCompare(b.value) * alpha;
       });
     },

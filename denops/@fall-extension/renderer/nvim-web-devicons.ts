@@ -14,6 +14,7 @@ export const getRenderer: GetRenderer = (denops, _options) => {
   return {
     async render({ items }, { signal }) {
       const paths = items.map((v) => {
+        signal?.throwIfAborted();
         if (isPathDetail(v.detail)) {
           return v.detail.path;
         }
@@ -33,6 +34,7 @@ export const getRenderer: GetRenderer = (denops, _options) => {
       signal?.throwIfAborted();
 
       return zip(items, icons).map(([item, icon]) => {
+        signal?.throwIfAborted();
         const prefix = `${icon}  `;
         const offset = getByteLength(prefix);
         const decorations = (item.decorations ?? []).map((v) => ({

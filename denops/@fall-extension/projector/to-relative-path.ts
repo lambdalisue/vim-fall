@@ -10,8 +10,9 @@ const isPathDetail = is.ObjectOf({
 export const getProjector: GetProjector = async (denops, _options) => {
   const cwd = await fn.getcwd(denops);
   return {
-    project({ items }) {
+    project({ items }, { signal }) {
       return items.map((item) => {
+        signal?.throwIfAborted();
         if (!isPathDetail(item.detail)) {
           return item;
         }

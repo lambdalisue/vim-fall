@@ -19,6 +19,7 @@ export const getProjector: GetProjector = (_denops, options) => {
         signal?.throwIfAborted();
         filteredItems = found
           .map((v) => {
+            signal?.throwIfAborted();
             const column = Math.max(0, v.start + 1);
             const length = Math.max(0, v.end - v.start);
             if (length === 0) return v.item;

@@ -28,7 +28,7 @@ export const getProjector: GetProjector = async (denops, options) => {
     flag = s ? "smart" : i ? "ignore" : "none";
   }
   return {
-    project({ query, items }) {
+    project({ query, items }, { signal }) {
       const ignoreCase = flag === "ignore" ||
         (flag === "smart" && query.toLowerCase() === query);
       const norm = (v: string): string => ignoreCase ? v.toLowerCase() : v;
@@ -42,6 +42,7 @@ export const getProjector: GetProjector = async (denops, options) => {
       const pattern = new RegExp(terms.join("|"), ignoreCase ? "ig" : "g");
       return items
         .map((chunk) => {
+          signal?.throwIfAborted();
           if (terms.some((term) => !norm(chunk.value).includes(term))) {
             return;
           }

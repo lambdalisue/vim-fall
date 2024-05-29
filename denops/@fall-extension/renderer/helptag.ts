@@ -10,8 +10,9 @@ const isHelptagDetail = is.ObjectOf({
 
 export const getRenderer: GetRenderer = (_denops, _options) => {
   return {
-    render({ items }) {
+    render({ items }, { signal }) {
       return items.map((v) => {
+        signal?.throwIfAborted();
         if (isHelptagDetail(v.detail) && v.detail.lang) {
           const label = v.label ?? v.value;
           const lang = v.detail.lang;
