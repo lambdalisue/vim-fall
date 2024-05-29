@@ -327,6 +327,9 @@ export class Picker implements Disposable {
     stack.use(subscribe("preview-cursor-move-at", (line) => {
       this.#picker.movePreviewCursorAt(denops, line, { signal });
     }));
+    stack.use(subscribe("preview-cursor-move-horizontal", (offset) => {
+      this.#picker.movePreviewCursorH(denops, offset, { signal });
+    }));
     stack.use(subscribe("preview-previewer-rotate", (offset) => {
       this.#itemPreviewer.index += offset;
       emitItemPreviewer();

@@ -145,6 +145,14 @@ export class PickerComponent implements Component {
     return this.#preview.moveCursor(denops, offset, { signal });
   }
 
+  movePreviewCursorH(
+    denops: Denops,
+    offset: number,
+    { signal }: { signal: AbortSignal },
+  ): Promise<void> {
+    return this.#preview.moveCursorH(denops, offset, { signal });
+  }
+
   movePreviewCursorAt(
     denops: Denops,
     line: number,

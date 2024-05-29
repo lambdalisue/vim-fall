@@ -140,6 +140,39 @@ export class PreviewComponent extends BaseComponent {
     }
   }
 
+  async moveCursorH(
+    denops: Denops,
+    offset: number,
+    _options: { signal: AbortSignal },
+  ): Promise<void> {
+    if (!this.window) {
+      return;
+    }
+    const { winid } = this.window;
+    try {
+      await batch(denops, async (denops) => {
+        if (offset > 0) {
+          await fn.win_execute(
+            denops,
+            winid,
+            `silent! normal! ${offset}zl`,
+          );
+        } else {
+          await fn.win_execute(
+            denops,
+            winid,
+            `silent! normal! ${offset * -1}zh`,
+          );
+        }
+        await denops.cmd("redraw");
+      });
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") return;
+      const m = err.message ?? err;
+      console.warn(`[fall] Failed to move cursor on the preview window: ${m}`);
+    }
+  }
+
   async moveCursorAt(
     denops: Denops,
     line: number,
