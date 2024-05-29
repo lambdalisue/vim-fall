@@ -13,6 +13,18 @@ buffer:
   previewers:
     - buffer
 
+helptag:
+  defaultAction: cmd:helptag
+
+  actions:
+    - cmd:helptag
+
+  renderers:
+    - helptag
+
+  previewers:
+    - helptag
+
 # Fallback setting
 "":
   # Use 'open' as a default action (invoked by <Return>)
