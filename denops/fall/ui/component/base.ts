@@ -15,9 +15,7 @@ import {
   BORDER_TL,
   BORDER_TR,
   getBorder,
-  getDefaultBorder,
 } from "../util/border.ts";
-import { type Divider } from "../util/divider.ts";
 
 export type Layout = {
   readonly width: number;
@@ -26,19 +24,17 @@ export type Layout = {
   readonly row: number;
 };
 
-export type Options = {
+export type Params = {
   readonly title?: string;
-  readonly border?: Border;
-  readonly divider?: Divider;
+  readonly border: Border;
   readonly zindex?: number;
 };
 
 export type Component = {
-  open(
-    denops: Denops,
-    layout: Layout,
-    options: Options,
-  ): Promise<AsyncDisposable>;
+  readonly width: number;
+  readonly height: number;
+
+  open(denops: Denops): Promise<AsyncDisposable>;
   move(denops: Denops, layout: Layout): Promise<void>;
   render(
     denops: Denops,
@@ -49,26 +45,40 @@ export type Component = {
 export abstract class BaseComponent implements Component {
   protected abstract readonly name: string;
 
+  readonly #params: Params;
+
+  #layout: Layout = { width: 0, height: 0, col: 0, row: 0 };
   #window?: popup.PopupWindow;
 
-  get window(): popup.PopupWindow | undefined {
+  constructor(params: Params) {
+    this.#params = params;
+  }
+
+  protected get window(): popup.PopupWindow | undefined {
     return this.#window;
   }
 
-  async open(
-    denops: Denops,
-    layout: Layout,
-    options: Options,
-  ): Promise<AsyncDisposable> {
-    if (this.#window) {
-      throw new Error("The component is already opened");
+  get width(): number {
+    return this.#layout.width;
+  }
+
+  get height(): number {
+    return this.#layout.height;
+  }
+
+  async open(denops: Denops): Promise<AsyncDisposable> {
+    if (this.#window || this.#layout.width === 0 || this.#layout.height === 0) {
+      return {
+        [Symbol.asyncDispose]: async () => {},
+      };
     }
     await using stack = new AsyncDisposableStack();
-    const border = getBorder(options.border ?? await getDefaultBorder(denops));
+    const border = getBorder(this.#params.border);
+    const title = this.#params.title ? ` ${this.#params.title} ` : undefined;
     const window = this.#window = stack.use(
       await popup.open(denops, {
-        ...layout,
-        title: options.title ? ` ${options.title} ` : undefined,
+        ...this.#layout,
+        title,
         relative: "editor",
         anchor: "NW",
         border: [
@@ -85,7 +95,7 @@ export abstract class BaseComponent implements Component {
           normal: "FallNormal",
           border: "FallBorder",
         },
-        zindex: options.zindex,
+        zindex: this.#params.zindex,
         noRedraw: true,
       }),
     );
@@ -116,14 +126,14 @@ export abstract class BaseComponent implements Component {
   }
 
   async move(denops: Denops, layout: Layout): Promise<void> {
-    if (!this.#window) {
-      throw new Error("The component is not opened");
+    this.#layout = layout;
+    if (this.#window) {
+      await popup.config(denops, this.#window.winid, {
+        ...layout,
+        relative: "editor",
+        noRedraw: true,
+      });
     }
-    await popup.config(denops, this.#window.winid, {
-      ...layout,
-      relative: "editor",
-      noRedraw: true,
-    });
   }
 
   abstract render(

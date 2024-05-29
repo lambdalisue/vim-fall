@@ -1,5 +1,4 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 import { collect } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 
@@ -67,7 +66,6 @@ export type Options = {
 
 export class Picker implements Disposable {
   readonly #stack: DisposableStack;
-  readonly #title: string;
   readonly #selectable: boolean;
   readonly #itemCollector: ItemCollector;
   readonly #itemProjector: ItemProjector;
@@ -106,7 +104,6 @@ export class Picker implements Disposable {
     const itemPreviewer = stack.use(
       new ItemPreviewer({ previewers }),
     );
-    this.#title = title;
     this.#selectable = selectable ?? false;
     this.#itemCollector = itemCollector;
     this.#itemProjector = itemProjector;
@@ -114,7 +111,16 @@ export class Picker implements Disposable {
     this.#itemPreviewer = itemPreviewer;
     this.#options = options;
     this.#picker = new PickerComponent({
-      previewRatio: options.style?.previewRatio ?? PREVIEW_RATIO,
+      previewRatio: previewers.length === 0
+        ? 0
+        : options.style?.previewRatio ?? PREVIEW_RATIO,
+      title,
+      border: options.style?.border ?? "single",
+      divider: options.style?.divider ?? "dashed",
+      zindex: options.style?.zindex,
+      spinner: options.query?.spinner,
+      headSymbol: options.query?.headSymbol,
+      failSymbol: options.query?.failSymbol,
     });
     if (context) {
       this.#index = context.index;
@@ -184,27 +190,14 @@ export class Picker implements Disposable {
 
   async open(denops: Denops): Promise<AsyncDisposable> {
     const layout = await this.#calcLayout(denops);
-    return this.#picker.open(denops, layout, {
-      title: this.#title,
-      border: this.#options.style?.border,
-      divider: this.#options.style?.divider,
-      zindex: this.#options.style?.zindex,
-    });
+    await this.#picker.move(denops, layout);
+    return this.#picker.open(denops);
   }
 
   async start(
     denops: Denops,
     options: { signal: AbortSignal },
   ): Promise<boolean> {
-    if (
-      !this.#picker.query.window || !this.#picker.select.window ||
-      !this.#picker.preview.window
-    ) {
-      throw new Error("The component is not opened");
-    }
-    const selectWinid = this.#picker.select.window.winid;
-    const previewWinid = this.#picker.preview.window.winid;
-
     await using stack = new AsyncDisposableStack();
     const controller = new AbortController();
     const signal = AbortSignal.any([options.signal, controller.signal]);
@@ -216,6 +209,9 @@ export class Picker implements Disposable {
       }
     });
 
+    const scrolloff = await opt.scrolloff.get(denops);
+    signal.throwIfAborted();
+
     const emitItemProjector = () => {
       this.#itemProjector.start({
         items: this.collectedItems,
@@ -224,37 +220,22 @@ export class Picker implements Disposable {
         signal,
       });
     };
-    const emitItemRenderer = async () => {
-      const [width, height, scrolloff] = await collect(
-        denops,
-        (denops) => [
-          fn.winwidth(denops, selectWinid),
-          fn.winheight(denops, selectWinid),
-          opt.scrolloff.get(denops),
-        ],
-      );
+    const emitItemRenderer = () => {
       this.#itemRenderer.start({
         items: this.projectedItems,
         index: this.#index,
-        width,
-        height,
+        width: this.#picker.select.width,
+        height: this.#picker.select.height,
         scrolloff,
       }, {
         signal,
       });
     };
-    const emitItemPreviewer = async () => {
-      const [width, height] = await collect(
-        denops,
-        (denops) => [
-          fn.winwidth(denops, previewWinid),
-          fn.winheight(denops, previewWinid),
-        ],
-      );
+    const emitItemPreviewer = () => {
       this.#itemPreviewer.start({
         item: this.cursorItem,
-        width,
-        height,
+        width: this.#picker.preview.width,
+        height: this.#picker.preview.height,
       }, {
         signal,
       });

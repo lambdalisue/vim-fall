@@ -2,9 +2,9 @@ import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 
 import { getByteLength } from "../../util/text.ts";
-import { BaseComponent } from "./base.ts";
+import { BaseComponent, type Params as BaseParams } from "./base.ts";
 
-type Options = {
+type Params = BaseParams & {
   readonly prompt?: string;
 };
 
@@ -17,9 +17,9 @@ export class InputComponent extends BaseComponent {
   #cmdline: string = "";
   #cmdpos: number = 0;
 
-  constructor({ prompt }: Options) {
-    super();
-    this.#prompt = prompt ?? "";
+  constructor(params: Params) {
+    super(params);
+    this.#prompt = params.prompt ?? "";
     this.#promptByteLength = getByteLength(this.#prompt);
   }
 
@@ -48,7 +48,7 @@ export class InputComponent extends BaseComponent {
     { signal }: { signal: AbortSignal },
   ): Promise<void | true> {
     if (!this.window) {
-      throw new Error("The component is not opened");
+      return true;
     }
     const { bufnr } = this.window;
     if (!this.#modified) {

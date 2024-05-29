@@ -5,7 +5,7 @@ import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
 
 import { getByteLength } from "../../util/text.ts";
 import { Spinner } from "../util/spinner.ts";
-import { BaseComponent } from "./base.ts";
+import { BaseComponent, type Params as BaseParams } from "./base.ts";
 
 export type Counter = {
   readonly projected: number;
@@ -13,7 +13,7 @@ export type Counter = {
   readonly truncated: boolean;
 };
 
-export type Options = {
+export type Params = BaseParams & {
   readonly spinner?: readonly string[];
   readonly headSymbol?: string;
   readonly failSymbol?: string;
@@ -37,11 +37,11 @@ export class QueryComponent extends BaseComponent implements Disposable {
   #collecting: boolean | "failed" = false;
   #processing: boolean | "failed" = false;
 
-  constructor({ spinner, headSymbol, failSymbol }: Options) {
-    super();
-    this.#spinner = new Spinner(spinner);
-    this.#headSymbol = headSymbol ?? HEAD_SYMBOL;
-    this.#failSymbol = failSymbol ?? FAIL_SYMBOL;
+  constructor(options: Params) {
+    super(options);
+    this.#spinner = new Spinner(options.spinner);
+    this.#headSymbol = options.headSymbol ?? HEAD_SYMBOL;
+    this.#failSymbol = options.failSymbol ?? FAIL_SYMBOL;
   }
 
   get cmdline(): string {
@@ -95,7 +95,7 @@ export class QueryComponent extends BaseComponent implements Disposable {
     { signal }: { signal: AbortSignal },
   ): Promise<void | true> {
     if (!this.window) {
-      throw new Error("The component is not opened");
+      return true;
     }
     const { winid, bufnr } = this.window;
     if (!this.#modified && !this.#collecting && !this.#processing) {

@@ -45,7 +45,7 @@ export class PreviewComponent extends BaseComponent {
     { signal }: { signal: AbortSignal },
   ): Promise<void | true> {
     if (!this.window) {
-      throw new Error("The component is not opened");
+      return true;
     }
     const { winid, bufnr } = this.window;
     if (!this.#modified) {
@@ -114,7 +114,7 @@ export class PreviewComponent extends BaseComponent {
     { signal }: { signal: AbortSignal },
   ): Promise<void> {
     if (!this.window) {
-      throw new Error("The component is not opened");
+      return;
     }
     const { winid } = this.window;
     try {
@@ -143,7 +143,7 @@ export class PreviewComponent extends BaseComponent {
     { signal }: { signal: AbortSignal },
   ): Promise<void> {
     if (!this.window) {
-      throw new Error("The component is not opened");
+      return;
     }
     const { winid } = this.window;
     try {

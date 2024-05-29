@@ -51,7 +51,7 @@ export class SelectComponent extends BaseComponent {
     { signal }: { signal: AbortSignal },
   ): Promise<void | true> {
     if (!this.window) {
-      throw new Error("The component is not opened");
+      return true;
     }
     const { bufnr } = this.window;
     if (!this.#modified) {
