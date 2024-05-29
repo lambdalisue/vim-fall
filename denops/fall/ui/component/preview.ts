@@ -125,11 +125,14 @@ export class PreviewComponent extends BaseComponent {
       signal.throwIfAborted();
 
       const newLine = Math.max(1, Math.min(line + offset, linecount));
-      await fn.win_execute(
-        denops,
-        winid,
-        `silent! normal! ${newLine}G`,
-      );
+      await batch(denops, async (denops) => {
+        await fn.win_execute(
+          denops,
+          winid,
+          `silent! normal! ${newLine}G`,
+        );
+        await denops.cmd("redraw");
+      });
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
       const m = err.message ?? err;
@@ -151,11 +154,14 @@ export class PreviewComponent extends BaseComponent {
       signal.throwIfAborted();
 
       const newLine = Math.max(1, Math.min(line, linecount));
-      await fn.win_execute(
-        denops,
-        winid,
-        `silent! normal! ${newLine}G`,
-      );
+      await batch(denops, async (denops) => {
+        await fn.win_execute(
+          denops,
+          winid,
+          `silent! normal! ${newLine}G`,
+        );
+        await denops.cmd("redraw");
+      });
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
       const m = err.message ?? err;
