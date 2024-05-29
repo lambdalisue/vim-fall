@@ -39,12 +39,10 @@ helptag:
     - open:tabedit
     - quickfix
 
-  # Use 'relative-path' transformer to prefer relative path
-  transformers:
-    - relative-path
-
+  # Use 'to-relative-path' projector to prefer relative path
   # Use 'fzf-matcher' projector to filter/sort items
   projectors:
+    - to-relative-path
     - fzf-matcher
 
   # Try several previewers to preview the content of the item
