@@ -1,7 +1,3 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
-import { collect } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
-import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
-
 export type Border =
   | "none"
   | "ascii"
@@ -84,38 +80,6 @@ const DEFAULT_BORDER_NONE: RawBorder = [
   "",
   "",
 ] as const;
-
-/**
- * Get default border characters based on conditions explained in Vim's 'borderchars'.
- *
- * Note that the result is cached.
- */
-export async function getDefaultBorder(denops: Denops): Promise<RawBorder> {
-  if (getDefaultBorderCache !== undefined) {
-    return getDefaultBorderCache;
-  }
-  try {
-    const [encoding, ambiwidth] = await collect(
-      denops,
-      (denops) => [
-        opt.encoding.get(denops),
-        opt.ambiwidth.get(denops),
-      ],
-    );
-    getDefaultBorderCache = encoding === "utf-8" && ambiwidth === "single"
-      ? DEFAULT_BORDER_DOUBLE
-      : DEFAULT_BORDER_ASCII;
-    return getDefaultBorderCache;
-  } catch (err) {
-    // Fail silently
-    console.debug(
-      `[fall] Failed to get properties to determine default border: ${err}`,
-    );
-    getDefaultBorderCache = DEFAULT_BORDER_ASCII;
-    return getDefaultBorderCache;
-  }
-}
-let getDefaultBorderCache: RawBorder | undefined;
 
 export function getBorder(border: Border): RawBorder {
   switch (border) {
