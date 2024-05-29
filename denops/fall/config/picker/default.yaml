@@ -32,6 +32,10 @@ helptag:
 
   # Allow the following actions
   actions:
+    - cd
+    - lcd
+    - tcd
+    - yank
     - debug
     - open
     - open:split
