@@ -3,7 +3,7 @@ import { dirname } from "jsr:@std/path@0.225.0/dirname";
 import { is } from "jsr:@core/unknownutil@3.18.0";
 
 const description = `
-Execute 'tcd' command with the directory of the cursor item.
+Execute 'lcd' command with the directory of the cursor item.
 `.trim();
 
 const isPathDetail = is.ObjectOf({
