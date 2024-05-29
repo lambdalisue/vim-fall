@@ -3,105 +3,13 @@ if exists('g:loaded_fall_mapping')
 endif
 let g:loaded_fall_mapping = 1
 
-function! s:map_source_picker() abort
-  " Cursor
-  cnoremap <nowait><buffer> <C-p> <Plug>(fall-cursor-prev)
-  cnoremap <nowait><buffer> <C-n> <Plug>(fall-cursor-next)
-  cnoremap <nowait><buffer> <C-u> <Plug>(fall-cursor-prev-scroll)
-  cnoremap <nowait><buffer> <C-d> <Plug>(fall-cursor-next-scroll)
-  cnoremap <nowait><buffer> <C-t> <Plug>(fall-cursor-first)
-  cnoremap <nowait><buffer> <C-g> <Plug>(fall-cursor-last)
-  " Select
-  cnoremap <nowait><buffer> <C-,> <Plug>(fall-select)
-  cnoremap <nowait><buffer> <C-.> <Plug>(fall-select-all)
-  cnoremap <nowait><buffer> <C-j> <Plug>(fall-select)<Plug>(fall-cursor-next)
-  cnoremap <nowait><buffer> <C-k> <Plug>(fall-cursor-prev)<Plug>(fall-select)
-  " Action
-  cnoremap <nowait><buffer> <Tab> <Plug>(fall-action-select)
-  cnoremap <nowait><buffer> <Return> <Plug>(fall-action-default)
-  " Preview
-  cnoremap <nowait><buffer> <Up> <Plug>(fall-preview-prev)
-  cnoremap <nowait><buffer> <Down> <Plug>(fall-preview-next)
-  cnoremap <nowait><buffer> <PageUp> <Plug>(fall-preview-prev-scroll)
-  cnoremap <nowait><buffer> <PageDown> <Plug>(fall-preview-next-scroll)
-  cnoremap <nowait><buffer> <Home> <Plug>(fall-preview-first)
-  cnoremap <nowait><buffer> <End> <Plug>(fall-preview-last)
-  cnoremap <nowait><buffer> <C-PageUp> <Plug>(fall-preview-previewer-prev)
-  cnoremap <nowait><buffer> <C-PageDown> <Plug>(fall-preview-previewer-next)
-endfunction
-
-function! s:unmap_source_picker() abort
-  " Cursor
-  silent cunmap <buffer> <C-p>
-  silent cunmap <buffer> <C-n>
-  silent cunmap <buffer> <C-u>
-  silent cunmap <buffer> <C-d>
-  silent cunmap <buffer> <C-t>
-  silent cunmap <buffer> <C-g>
-  " Select
-  silent cunmap <buffer> <C-,>
-  silent cunmap <buffer> <C-.>
-  silent cunmap <buffer> <C-j>
-  silent cunmap <buffer> <C-k>
-  " Action
-  silent cunmap <buffer> <Tab>
-  silent cunmap <buffer> <Return>
-  " Preview
-  silent cunmap <buffer> <Up>
-  silent cunmap <buffer> <Down>
-  silent cunmap <buffer> <Home>
-  silent cunmap <buffer> <End>
-  silent cunmap <buffer> <PageUp>
-  silent cunmap <buffer> <PageDown>
-  silent cunmap <buffer> <C-PageUp>
-  silent cunmap <buffer> <C-PageDown>
-endfunction
-
-function! s:map_action_picker() abort
-  " Cursor
-  cnoremap <nowait><buffer> <C-p> <Plug>(fall-cursor-prev)
-  cnoremap <nowait><buffer> <C-n> <Plug>(fall-cursor-next)
-  cnoremap <nowait><buffer> <C-u> <Plug>(fall-cursor-prev-scroll)
-  cnoremap <nowait><buffer> <C-d> <Plug>(fall-cursor-next-scroll)
-  cnoremap <nowait><buffer> <C-t> <Plug>(fall-cursor-first)
-  cnoremap <nowait><buffer> <C-g> <Plug>(fall-cursor-last)
-  " Preview
-  cnoremap <nowait><buffer> <Up> <Plug>(fall-preview-prev)
-  cnoremap <nowait><buffer> <Down> <Plug>(fall-preview-next)
-  cnoremap <nowait><buffer> <PageUp> <Plug>(fall-preview-prev-scroll)
-  cnoremap <nowait><buffer> <PageDown> <Plug>(fall-preview-next-scroll)
-  cnoremap <nowait><buffer> <Home> <Plug>(fall-preview-first)
-  cnoremap <nowait><buffer> <End> <Plug>(fall-preview-last)
-  cnoremap <nowait><buffer> <C-PageUp> <Plug>(fall-preview-previewer-prev)
-  cnoremap <nowait><buffer> <C-PageDown> <Plug>(fall-preview-previewer-next)
-endfunction
-
-function! s:unmap_action_picker() abort
-  " Cursor
-  silent cunmap <buffer> <C-p>
-  silent cunmap <buffer> <C-n>
-  silent cunmap <buffer> <C-u>
-  silent cunmap <buffer> <C-d>
-  silent cunmap <buffer> <C-t>
-  silent cunmap <buffer> <C-g>
-  " Preview
-  silent cunmap <buffer> <Up>
-  silent cunmap <buffer> <Down>
-  silent cunmap <buffer> <Home>
-  silent cunmap <buffer> <End>
-  silent cunmap <buffer> <PageUp>
-  silent cunmap <buffer> <PageDown>
-  silent cunmap <buffer> <C-PageUp>
-  silent cunmap <buffer> <C-PageDown>
-endfunction
-
 " Cursor
 cnoremap <silent> <Plug>(fall-cursor-first) <Cmd>call <SID>dispatch('select-cursor-move-at', 1)<CR>
 cnoremap <silent> <Plug>(fall-cursor-last) <Cmd>call <SID>dispatch('select-cursor-move-at', '$')<CR>
 cnoremap <silent> <Plug>(fall-cursor-next) <Cmd>call <SID>dispatch('select-cursor-move', 1)<CR>
 cnoremap <silent> <Plug>(fall-cursor-prev) <Cmd>call <SID>dispatch('select-cursor-move', -1)<CR>
-cnoremap <silent> <Plug>(fall-cursor-next-scroll) <Cmd>call <SID>dispatch('select-cursor-move', <SID>select_scroll())<CR>
-cnoremap <silent> <Plug>(fall-cursor-prev-scroll) <Cmd>call <SID>dispatch('select-cursor-move', -1 * <SID>select_scroll())<CR>
+cnoremap <silent> <Plug>(fall-cursor-scroll-next) <Cmd>call <SID>dispatch('select-cursor-move', <SID>select_scroll())<CR>
+cnoremap <silent> <Plug>(fall-cursor-scroll-prev) <Cmd>call <SID>dispatch('select-cursor-move', -1 * <SID>select_scroll())<CR>
 " Select
 cnoremap <silent> <Plug>(fall-select) <Cmd>call <SID>dispatch('select-select')<CR>
 cnoremap <silent> <Plug>(fall-select-all) <Cmd>call <SID>dispatch('select-select-all')<CR>
@@ -113,8 +21,10 @@ cnoremap <silent> <Plug>(fall-preview-first) <Cmd>call <SID>dispatch('preview-cu
 cnoremap <silent> <Plug>(fall-preview-last) <Cmd>call <SID>dispatch('preview-cursor-move-at', '$')<CR>
 cnoremap <silent> <Plug>(fall-preview-next) <Cmd>call <SID>dispatch('preview-cursor-move', 1)<CR>
 cnoremap <silent> <Plug>(fall-preview-prev) <Cmd>call <SID>dispatch('preview-cursor-move', -1)<CR>
-cnoremap <silent> <Plug>(fall-preview-next-scroll) <Cmd>call <SID>dispatch('preview-cursor-move', <SID>preview_scroll())<CR>
-cnoremap <silent> <Plug>(fall-preview-prev-scroll) <Cmd>call <SID>dispatch('preview-cursor-move', -1 * <SID>preview_scroll())<CR>
+cnoremap <silent> <Plug>(fall-preview-scroll-next) <Cmd>call <SID>dispatch('preview-cursor-move', <SID>preview_scroll())<CR>
+cnoremap <silent> <Plug>(fall-preview-scroll-prev) <Cmd>call <SID>dispatch('preview-cursor-move', -1 * <SID>preview_scroll())<CR>
+cnoremap <silent> <Plug>(fall-preview-scroll-right) <Cmd>call <SID>dispatch('preview-cursor-move-horizontal', 1)<CR>
+cnoremap <silent> <Plug>(fall-preview-scroll-left) <Cmd>call <SID>dispatch('preview-cursor-move-horizontal', -1)<CR>
 cnoremap <silent> <Plug>(fall-preview-previewer-next) <Cmd>call <SID>dispatch('preview-previewer-rotate', 1)<CR>
 cnoremap <silent> <Plug>(fall-preview-previewer-prev) <Cmd>call <SID>dispatch('preview-previewer-rotate', -1)<CR>
 
@@ -140,11 +50,79 @@ function! s:preview_scroll() abort
 endfunction
 
 if !get(g:, 'fall_disable_default_mapping')
+  function! s:map_picker() abort
+    " Cursor
+    cnoremap <nowait><buffer> <C-p> <Plug>(fall-cursor-prev)
+    cnoremap <nowait><buffer> <C-n> <Plug>(fall-cursor-next)
+    cnoremap <nowait><buffer> <Up> <Plug>(fall-cursor-prev)
+    cnoremap <nowait><buffer> <Down> <Plug>(fall-cursor-next)
+    cnoremap <nowait><buffer> <C-u> <Plug>(fall-cursor-scroll-prev)
+    cnoremap <nowait><buffer> <C-d> <Plug>(fall-cursor-scroll-next)
+    cnoremap <nowait><buffer> <PageUp> <Plug>(fall-cursor-scroll-prev)
+    cnoremap <nowait><buffer> <PageDown> <Plug>(fall-cursor-scroll-next)
+    cnoremap <nowait><buffer> <C-t> <Plug>(fall-cursor-first)
+    cnoremap <nowait><buffer> <C-g> <Plug>(fall-cursor-last)
+    cnoremap <nowait><buffer> <Home> <Plug>(fall-cursor-first)
+    cnoremap <nowait><buffer> <End> <Plug>(fall-cursor-last)
+    " Select
+    cnoremap <nowait><buffer> <C-,> <Plug>(fall-select)
+    cnoremap <nowait><buffer> <C-.> <Plug>(fall-select-all)
+    cnoremap <nowait><buffer> <C-j> <Plug>(fall-select)<Plug>(fall-cursor-next)
+    cnoremap <nowait><buffer> <C-k> <Plug>(fall-cursor-prev)<Plug>(fall-select)
+    " Action
+    cnoremap <nowait><buffer> <Tab> <Plug>(fall-action-select)
+    cnoremap <nowait><buffer> <Return> <Plug>(fall-action-default)
+    " Preview
+    cnoremap <nowait><buffer> <C-Up> <Plug>(fall-preview-prev)
+    cnoremap <nowait><buffer> <C-Down> <Plug>(fall-preview-next)
+    cnoremap <nowait><buffer> <C-PageUp> <Plug>(fall-preview-scroll-prev)
+    cnoremap <nowait><buffer> <C-PageDown> <Plug>(fall-preview-scroll-next)
+    cnoremap <nowait><buffer> <C-Home> <Plug>(fall-preview-first)
+    cnoremap <nowait><buffer> <C-End> <Plug>(fall-preview-last)
+    cnoremap <nowait><buffer> <C-Left> <Plug>(fall-preview-scroll-left)
+    cnoremap <nowait><buffer> <C-Right> <Plug>(fall-preview-scroll-right)
+    cnoremap <nowait><buffer> <C-9> <Plug>(fall-preview-previewer-prev)
+    cnoremap <nowait><buffer> <C-0> <Plug>(fall-preview-previewer-next)
+  endfunction
+
+  function! s:unmap_picker() abort
+    " Cursor
+    silent cunmap <buffer> <C-p>
+    silent cunmap <buffer> <C-n>
+    silent cunmap <buffer> <Up>
+    silent cunmap <buffer> <Down>
+    silent cunmap <buffer> <C-u>
+    silent cunmap <buffer> <C-d>
+    silent cunmap <buffer> <PageUp>
+    silent cunmap <buffer> <PageDown>
+    silent cunmap <buffer> <C-t>
+    silent cunmap <buffer> <C-g>
+    silent cunmap <buffer> <Home>
+    silent cunmap <buffer> <End>
+    " Select
+    silent cunmap <buffer> <C-,>
+    silent cunmap <buffer> <C-.>
+    silent cunmap <buffer> <C-j>
+    silent cunmap <buffer> <C-k>
+    " Action
+    silent cunmap <buffer> <Tab>
+    silent cunmap <buffer> <Return>
+    " Preview
+    silent cunmap <buffer> <C-Up>
+    silent cunmap <buffer> <C-Down>
+    silent cunmap <buffer> <C-PageUp>
+    silent cunmap <buffer> <C-PageDown>
+    silent cunmap <buffer> <C-Home>
+    silent cunmap <buffer> <C-End>
+    silent cunmap <buffer> <C-Left>
+    silent cunmap <buffer> <C-Right>
+    silent cunmap <buffer> <C-9>
+    silent cunmap <buffer> <C-0>
+  endfunction
+
   augroup fall_mapping_plugin
     autocmd!
-    autocmd User FallPickerEnter:source:* call s:map_source_picker()
-    autocmd User FallPickerLeave:source:* call s:unmap_source_picker()
-    autocmd User FallPickerEnter:action call s:map_action_picker()
-    autocmd User FallPickerLeave:action call s:unmap_action_picker()
+    autocmd User FallPickerEnter:* call s:map_picker()
+    autocmd User FallPickerLeave:* call s:unmap_picker()
   augroup END
 endif
