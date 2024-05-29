@@ -3,6 +3,15 @@ file:
   renderers:
     - smart-path
 
+oldfiles:
+  projectors:
+    - cwd-filter
+    - to-relative-path
+    - fzf-matcher
+
+  renderers:
+    - smart-path
+
 # Use 'buffer' previewer for the source
 line:
   previewers:
