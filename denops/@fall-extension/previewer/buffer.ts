@@ -16,7 +16,7 @@ export const getPreviewer: GetPreviewer = (denops, options) => {
   const lineAttribute = options.lineAttribute ?? "line";
   const columnAttribute = options.columnAttribute ?? "column";
   return {
-    async preview({ item }) {
+    async preview({ item }, { signal }) {
       const bufnr = maybe(item.detail[attribute], is.Number);
       if (!bufnr) {
         return;
@@ -26,6 +26,8 @@ export const getPreviewer: GetPreviewer = (denops, options) => {
         fn.bufname(denops, bufnr),
         fn.getbufline(denops, bufnr, 1, "$"),
       ]);
+      signal?.throwIfAborted();
+
       if (!bufloaded) {
         return;
       }

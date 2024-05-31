@@ -31,6 +31,8 @@ export const getPreviewer: GetPreviewer = (denops, options) => {
       const data = await Deno.readFile(abspath, {
         signal,
       });
+      signal?.throwIfAborted();
+
       try {
         const text = decoder.decode(data);
         return {
