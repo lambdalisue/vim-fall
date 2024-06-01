@@ -1,6 +1,7 @@
 # 🍂 fall
 
 [![Test](https://github.com/lambdalisue/vim-fall/actions/workflows/test.yml/badge.svg)](https://github.com/lambdalisue/vim-fall/actions/workflows/test.yml)
+[![codecov](https://codecov.io/gh/lambdalisue/vim-fall/graph/badge.svg?token=IsZ3yEM1by)](https://codecov.io/gh/lambdalisue/vim-fall)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![vim help](https://img.shields.io/badge/vim-%3Ah%20fall-orange.svg)](doc/fall.txt)
 
