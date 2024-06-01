@@ -1,4 +1,21 @@
 {
+  "name": "@lambdalisue/vim-fall",
+  "version": "0.0.0",
+  "exports": {
+    ".": "./denops/@fall/mod.ts",
+    "./action": "./denops/@fall/action.ts",
+    "./item": "./denops/@fall/item.ts",
+    "./previewer": "./denops/@fall/previewer.ts",
+    "./projector": "./denops/@fall/projector.ts",
+    "./renderer": "./denops/@fall/renderer.ts",
+    "./source": "./denops/@fall/source.ts",
+    "./util/input": "./denops/@fall/util/input.ts"
+  },
+  "publish": {
+    "include": [
+      "./denops/@fall"
+    ]
+  },
   "exclude": [
     "docs/**",
     ".coverage/**"
