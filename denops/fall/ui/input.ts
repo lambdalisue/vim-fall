@@ -5,8 +5,8 @@ import { collect } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
 import { subscribe } from "../util/event.ts";
 import { startAsyncScheduler } from "../util/async_scheduler.ts";
 import { observeInput, startInput } from "./util/input.ts";
-import { type Border } from "./util/border.ts";
-import { type Layout } from "./component/base.ts";
+import type { Border } from "./util/border.ts";
+import type { Layout } from "./component/base.ts";
 import { InputComponent } from "./component/input.ts";
 
 export type Options = {

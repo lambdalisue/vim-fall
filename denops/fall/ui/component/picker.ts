@@ -25,7 +25,7 @@ import {
 } from "./query.ts";
 import { SelectComponent } from "./select.ts";
 import { PreviewComponent } from "./preview.ts";
-import { Component, type Layout } from "./base.ts";
+import type { Component, Layout } from "./base.ts";
 
 type Params = QueryComponentOptions & {
   readonly previewRatio: number;
