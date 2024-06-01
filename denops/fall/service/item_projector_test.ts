@@ -6,9 +6,24 @@ import { ItemProjector } from "./item_projector.ts";
 
 const testProjectors: Projector[] = [
   {
-    name: "textProjector",
-    project({ items }) {
-      return items.toSorted((a, b) => -1 * a.value.localeCompare(b.value));
+    name: "filter",
+    project({ items, query }, { signal }) {
+      return items.filter((v) => {
+        signal?.throwIfAborted();
+        if (v.detail.error) {
+          throw v.detail.error;
+        }
+        return v.value.includes(query);
+      });
+    },
+  },
+  {
+    name: "sort",
+    project({ items }, { signal }) {
+      return items.toSorted((a, b) => {
+        signal?.throwIfAborted();
+        return -1 * a.value.localeCompare(b.value);
+      });
     },
   },
 ];
