@@ -1,4 +1,4 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
+import type { Denops } from "jsr:@denops/core@6.1.0";
 import { ensure, is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
 export interface InputParams {

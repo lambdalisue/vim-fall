@@ -1,8 +1,17 @@
-import type { Decoration } from "https://deno.land/x/denops_std@v6.3.0/buffer/decoration.ts";
-
-export type ItemDecoration =
-  & Omit<Decoration, "line" | "highlight">
-  & Partial<Pick<Decoration, "highlight">>;
+export type ItemDecoration = {
+  /**
+   * Column number (bytes)
+   */
+  column: number;
+  /**
+   * Length (bytes)
+   */
+  length: number;
+  /**
+   * Highlight name
+   */
+  highlight?: string;
+};
 
 export type Item = {
   /**
