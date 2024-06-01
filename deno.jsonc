@@ -1,8 +1,6 @@
 {
-  "lock": false,
   "exclude": [
     "docs/**",
-    ".deps/**",
     ".coverage/**"
   ],
   "tasks": {
@@ -10,8 +8,8 @@
     "test": "deno test -A --parallel --shuffle --doc",
     "test:coverage": "deno task test --coverage=.coverage",
     "coverage": "deno coverage .coverage --exclude=testdata/",
-    "gen": "deno run -A ./.script/build_fall_config_schema.ts",
-    "upgrade": "deno run -q -A https://deno.land/x/molt@0.14.2/cli.ts ./**/*.ts",
-    "upgrade:commit": "deno task -q upgrade --commit --prefix :package: --pre-commit=fmt"
+    "update": "deno run --allow-env --allow-read --allow-write=. --allow-run=git,deno --allow-net=deno.land,jsr.io,registry.npmjs.org jsr:@molt/cli ./**/*.ts",
+    "update:commit": "deno task -q update --commit --pre-commit=fmt,lint",
+    "gen": "deno run -A ./.script/build_fall_config_schema.ts"
   }
 }
