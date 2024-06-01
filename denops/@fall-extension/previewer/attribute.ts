@@ -1,4 +1,4 @@
-import type { GetPreviewer } from "../../@fall/previewer.ts";
+import type { GetPreviewer } from "jsr:@lambdalisue/vim-fall@0.6.0/previewer";
 import { assert, is, maybe } from "jsr:@core/unknownutil@3.18.0";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({

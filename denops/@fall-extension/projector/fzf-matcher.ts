@@ -1,4 +1,4 @@
-import type { GetProjector } from "../../@fall/projector.ts";
+import type { GetProjector } from "jsr:@lambdalisue/vim-fall@0.6.0/projector";
 import type { ItemDecoration } from "../../@fall/item.ts";
 import { AsyncFzf } from "npm:fzf@0.5.2";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";

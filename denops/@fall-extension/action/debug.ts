@@ -1,4 +1,4 @@
-import type { GetAction } from "../../@fall/action.ts";
+import type { GetAction } from "jsr:@lambdalisue/vim-fall@0.6.0/action";
 
 const description = `
 Print JSON representation of cursor or selected item(s).

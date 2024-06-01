@@ -1,4 +1,4 @@
-import type { GetAction } from "../../@fall/action.ts";
+import type { GetAction } from "jsr:@lambdalisue/vim-fall@0.6.0/action";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 
 const description = `

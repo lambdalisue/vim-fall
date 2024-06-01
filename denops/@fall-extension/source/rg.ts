@@ -1,9 +1,11 @@
-import type { GetSource, SourceItem } from "../../@fall/source.ts";
+import type {
+  GetSource,
+  SourceItem,
+} from "jsr:@lambdalisue/vim-fall@0.6.0/source";
+import { input } from "jsr:@lambdalisue/vim-fall@0.6.0/util/input";
 import { TextLineStream } from "https://deno.land/std@0.224.0/streams/mod.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.2/function/mod.ts";
 import { assert, is, maybe } from "jsr:@core/unknownutil@3.18.0";
-
-import { input } from "../../@fall/util/input.ts";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
   args: is.ArrayOf(is.String),

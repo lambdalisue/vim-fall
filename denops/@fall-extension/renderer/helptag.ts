@@ -1,4 +1,4 @@
-import type { GetRenderer } from "../../@fall/renderer.ts";
+import type { GetRenderer } from "jsr:@lambdalisue/vim-fall@0.6.0/renderer";
 import { is } from "jsr:@core/unknownutil@3.18.0";
 
 import { getByteLength } from "../util.ts";

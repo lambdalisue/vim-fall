@@ -1,4 +1,4 @@
-import type { GetSource } from "../../@fall/source.ts";
+import type { GetSource } from "jsr:@lambdalisue/vim-fall@0.6.0/source";
 import * as fn from "https://deno.land/x/denops_std@v6.3.0/function/mod.ts";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 

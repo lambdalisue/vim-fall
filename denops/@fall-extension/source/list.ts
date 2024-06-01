@@ -1,4 +1,4 @@
-import type { GetSource } from "../../@fall/source.ts";
+import type { GetSource } from "jsr:@lambdalisue/vim-fall@0.6.0/source";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 
 const isSourceItem = is.ObjectOf({

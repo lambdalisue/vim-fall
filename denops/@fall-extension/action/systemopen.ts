@@ -1,4 +1,4 @@
-import type { GetAction } from "../../@fall/action.ts";
+import type { GetAction } from "jsr:@lambdalisue/vim-fall@0.6.0/action";
 import { systemopen } from "jsr:@lambdalisue/systemopen@1.0.0";
 import { is } from "jsr:@core/unknownutil@3.18.0";
 

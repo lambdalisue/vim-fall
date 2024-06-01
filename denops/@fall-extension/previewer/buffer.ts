@@ -1,4 +1,4 @@
-import type { GetPreviewer } from "../../@fall/previewer.ts";
+import type { GetPreviewer } from "jsr:@lambdalisue/vim-fall@0.6.0/previewer";
 import { collect } from "https://deno.land/x/denops_std@v6.3.0/batch/mod.ts";
 import { basename } from "https://deno.land/std@0.224.0/path/basename.ts";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";

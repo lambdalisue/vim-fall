@@ -1,4 +1,4 @@
-import type { GetSource } from "../../@fall/source.ts";
+import type { GetSource } from "jsr:@lambdalisue/vim-fall@0.6.0/source";
 import * as opt from "https://deno.land/x/denops_std@v6.3.0/option/mod.ts";
 import { walk, WalkError } from "jsr:@std/fs@0.229.0/walk";
 import { join } from "jsr:@std/path@0.225.1/join";
