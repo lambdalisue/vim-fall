@@ -1,4 +1,8 @@
 file:
+  projectors:
+    - to-relative-path
+    - fzf-matcher
+
   renderers:
     - smart-path
 
