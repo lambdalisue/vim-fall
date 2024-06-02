@@ -6,6 +6,10 @@ export async function hideMsgArea(denops: Denops): Promise<AsyncDisposable> {
     await denops.call("fall#internal#msgarea#show");
   });
   await denops.call("fall#internal#msgarea#hide");
+  stack.defer(async () => {
+    await denops.call("fall#internal#cursor#show");
+  });
+  await denops.call("fall#internal#cursor#hide");
   const moved = stack.move();
   return {
     [Symbol.asyncDispose]: async () => {
