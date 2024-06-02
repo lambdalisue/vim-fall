@@ -19,6 +19,7 @@ export type Preview = {
   readonly line?: number;
   readonly column?: number;
   readonly filename?: string;
+  readonly filetype?: string;
 };
 
 /**

@@ -196,6 +196,7 @@ async function internalStart(
     value: v.name,
     detail: {
       description: v.description,
+      filetype: "markdown",
     },
     decorations: [],
   })));

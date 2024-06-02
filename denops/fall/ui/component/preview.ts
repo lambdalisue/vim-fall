@@ -63,7 +63,8 @@ export class PreviewComponent extends BaseComponent {
 
       const line = this.#preview?.line ?? 1;
       const column = this.#preview?.column ?? 1;
-      const filename = this.#preview?.filename;
+      const filename = this.#preview?.filename ?? "";
+      const filetype = this.#preview?.filetype ?? "";
       await batch(denops, async (denops) => {
         // Clear previous buffer context
         await fn.win_execute(
@@ -80,13 +81,19 @@ export class PreviewComponent extends BaseComponent {
         await fn.win_execute(
           denops,
           winid,
-          `silent! file fall://preview/${filename ?? ""}`,
+          `silent! file fall://preview/${filename}`,
+        );
+        // Detect filetype
+        await fn.win_execute(
+          denops,
+          winid,
+          `silent! call fall#internal#preview#detect()`,
         );
         // Apply highlight
         await fn.win_execute(
           denops,
           winid,
-          `silent! call fall#internal#preview#highlight()`,
+          `silent! call fall#internal#preview#highlight('${filetype}')`,
         );
         // Overwrite buffer local options may configured by ftplugin
         await fn.win_execute(
