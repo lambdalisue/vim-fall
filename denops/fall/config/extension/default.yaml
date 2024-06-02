@@ -18,41 +18,10 @@ source:
       - ".*/node_modules/.*"
       - ".*/target/.*"
 
-  buffer:
-    mode: "bufloaded"
-
-  buffer:listed:
-    mode: "buflisted"
-
-  buffer:modified:
-    mode: "bufmodified"
-
-projector: {}
-
-renderer: {}
-
-previewer:
-  # Preview the content in 'item.detail.description'
-  attribute:description:
-    attribute: description
-
 action:
-  # Define variants of 'open' action
-  open:split:
-    opener: split
-  open:vsplit:
-    opener: vsplit
-  open:tabedit:
-    opener: tabedit
-
   # Open quickfix window after `quickfix` action
   quickfix:
     after: copen
-
-  # Open helptag
-  cmd:helptag:
-    immediate: true
-    prefix: "help "
 
 # JSON schema of this file
 # yaml-language-server: $schema=https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/extension/schema.json

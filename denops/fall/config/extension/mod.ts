@@ -1,6 +1,6 @@
 import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
-import { loadConfig, mergeConfigs } from "../util.ts";
+import { loadBuiltinConfig, loadConfig, mergeConfigs } from "../util.ts";
 
 export type ExtensionOptions = Readonly<Record<string, unknown>>;
 
@@ -46,5 +46,15 @@ export function loadExtensionConfig(
     "extension",
     isExtensionConfig,
     configDir,
+  );
+}
+
+export function loadBuiltinExtensionConfig(
+  runtimepath: string,
+): Promise<ExtensionConfig> {
+  return loadBuiltinConfig(
+    "extension",
+    isExtensionConfig,
+    runtimepath,
   );
 }

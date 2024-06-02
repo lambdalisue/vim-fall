@@ -1,0 +1,69 @@
+file:
+  renderers:
+    - smart-path
+
+oldfiles:
+  projectors:
+    - cwd-filter
+    - to-relative-path
+    - fzf-matcher
+
+  renderers:
+    - smart-path
+
+line:
+  previewers:
+    - buffer
+
+buffer:
+  previewers:
+    - buffer
+
+helptag:
+  defaultAction: cmd:help
+
+  actions:
+    - cmd:help
+
+  renderers:
+    - helptag
+
+  previewers:
+    - helptag
+
+# Fallback setting
+"":
+  defaultAction: open
+
+  actions:
+    - cd
+    - cmd
+    - debug
+    - lcd
+    - open
+    - open:drop
+    - open:split
+    - open:tabedit
+    - open:vsplit
+    - quickfix
+    - systemopen
+    - tcd
+    - yank
+
+  projectors:
+    - fzf-matcher
+
+  previewers:
+    - file
+    - buffer
+    - attr
+
+  actionProjectors:
+    - fzf-matcher
+
+  actionPreviewers:
+    - attr
+
+# JSON schema of this file
+# yaml-language-server: $schema=https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/picker/schema.json
+$schema: https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/picker/schema.json

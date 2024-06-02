@@ -54,3 +54,26 @@ export async function loadConfig<T extends Record<string, unknown>>(
     };
   }
 }
+
+export async function loadBuiltinConfig<T extends Record<string, unknown>>(
+  name: string,
+  pred: Predicate<T>,
+  runtimepath: string,
+): Promise<T> {
+  const paths = runtimepath.split(",").map((v) =>
+    join(v, "denops", "@fall-extension", `${name}.yaml`)
+  );
+  const configs: T[] = [];
+  for (const path of paths) {
+    try {
+      const text = await Deno.readTextFile(path);
+      const data = ensure(parseYaml(text), is.Record);
+      configs.push(ensure(omit(data, ["$schema"]), pred));
+    } catch (err) {
+      if (err instanceof Deno.errors.NotFound) continue;
+      const m = err.message ?? err;
+      console.warn(`[fall] Failed to load builtin ${name} config file: ${m}`);
+    }
+  }
+  return mergeConfigs({} as T, ...configs);
+}

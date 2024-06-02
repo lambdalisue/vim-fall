@@ -4,7 +4,7 @@ import type { Border } from "../../ui/util/border.ts";
 import type { Divider } from "../../ui/util/divider.ts";
 import type { Options as InputOptions } from "../../ui/input.ts";
 import type { Options as PickerOptions } from "../../ui/picker.ts";
-import { loadConfig, mergeConfigs } from "../util.ts";
+import { loadBuiltinConfig, loadConfig, mergeConfigs } from "../util.ts";
 
 export const isBorder = is.UnionOf([
   is.LiteralOneOf(["none", "ascii", "single", "double", "rounded"] as const),
@@ -107,5 +107,15 @@ export function loadStyleConfig(
     "style",
     isStyleConfig,
     configDir,
+  );
+}
+
+export function loadBuiltinStyleConfig(
+  runtimepath: string,
+): Promise<StyleConfig> {
+  return loadBuiltinConfig(
+    "style",
+    isStyleConfig,
+    runtimepath,
   );
 }

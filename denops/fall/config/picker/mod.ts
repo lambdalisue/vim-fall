@@ -1,6 +1,6 @@
 import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
-import { loadConfig, mergeConfigs } from "../util.ts";
+import { loadBuiltinConfig, loadConfig, mergeConfigs } from "../util.ts";
 
 export type PickerOptions = {
   readonly defaultAction?: string;
@@ -66,5 +66,15 @@ export function loadPickerConfig(
     "picker",
     isPickerConfig,
     configDir,
+  );
+}
+
+export function loadBuiltinPickerConfig(
+  runtimepath: string,
+): Promise<PickerConfig> {
+  return loadBuiltinConfig(
+    "picker",
+    isPickerConfig,
+    runtimepath,
   );
 }
