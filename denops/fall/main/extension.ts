@@ -2,7 +2,12 @@ import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 import { assert, ensure, is } from "jsr:@core/unknownutil@3.18.0";
 
-import { getConfigDir, loadExtensionConfig } from "../config/mod.ts";
+import {
+  getConfigDir,
+  loadBuiltinExtensionConfig,
+  loadExtensionConfig,
+  mergeConfigs,
+} from "../config/mod.ts";
 import {
   discoverExtensionLoaders,
   listExtensionLoaders,
@@ -32,7 +37,11 @@ export function main(denops: Denops): void {
         assert(cmdline, is.String);
         assert(cursorpos, is.Number);
         const configDir = await getConfigDir(denops);
-        const conf = await loadExtensionConfig(configDir);
+        const runtimepath = await opt.runtimepath.get(denops);
+        const conf = mergeConfigs(
+          await loadBuiltinExtensionConfig(runtimepath),
+          await loadExtensionConfig(configDir),
+        );
         const expr = cmdline.replace(/^\S+\s+/, "");
         if (!expr.includes(" ")) {
           const sources = new Set([
