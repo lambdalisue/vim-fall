@@ -1,11 +1,18 @@
+let s:counter = 0
+
 function! fall#internal#msgarea#hide() abort
+  let s:counter += 1
   call s:hide_msgarea()
   redraw
 endfunction
 
 function! fall#internal#msgarea#show() abort
-  call s:show_msgarea()
-  redraw
+  let s:counter -= 1
+  if s:counter <= 0
+    let s:counter = 0
+    call s:show_msgarea()
+    redraw
+  endif
 endfunction
 
 if has('nvim')

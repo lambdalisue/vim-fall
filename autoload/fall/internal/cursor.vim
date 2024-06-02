@@ -1,9 +1,16 @@
+let s:counter = 0
+
 function! fall#internal#cursor#hide() abort
+  let s:counter += 1
   call s:hide_cursor()
 endfunction
 
 function! fall#internal#cursor#show() abort
-  call s:show_cursor()
+  let s:counter -= 1
+  if s:counter <= 0
+    let s:counter = 0
+    call s:show_cursor()
+  endif
 endfunction
 
 if has('nvim')
