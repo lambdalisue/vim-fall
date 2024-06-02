@@ -2,7 +2,10 @@ import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
 import { loadBuiltinConfig, loadConfig, mergeConfigs } from "../util.ts";
 
-export type ExtensionOptions = Readonly<Record<string, unknown>>;
+export type ExtensionOptions = {
+  readonly description?: string;
+  readonly options: Readonly<Record<string, unknown>>;
+};
 
 export type ExtensionConfig = {
   readonly source?: Readonly<Record<string, ExtensionOptions>>;
@@ -12,10 +15,13 @@ export type ExtensionConfig = {
   readonly action?: Readonly<Record<string, ExtensionOptions>>;
 };
 
-const isExtensionOptions = is.RecordOf(
-  is.Unknown,
-  is.String,
-) satisfies Predicate<ExtensionOptions>;
+const isExtensionOptions = is.ObjectOf({
+  description: is.OptionalOf(is.String),
+  options: is.RecordOf(
+    is.Unknown,
+    is.String,
+  ),
+}) satisfies Predicate<ExtensionOptions>;
 
 const isExtensionConfig = is.PartialOf(is.ObjectOf({
   source: is.RecordOf(isExtensionOptions, is.String),
@@ -34,8 +40,8 @@ export function getExtensionOptions(
 ): ExtensionOptions {
   const [root] = name.split(":", 1);
   return mergeConfigs(
-    conf[type]?.[root] ?? {},
-    conf[type]?.[name] ?? {},
+    conf[type]?.[root] ?? { options: {} },
+    conf[type]?.[name] ?? { options: {} },
   );
 }
 

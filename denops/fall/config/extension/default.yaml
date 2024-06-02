@@ -1,27 +1,30 @@
 source:
   # Exclude some files from the result
   file:
-    excludes:
-      - ".*/\\.DS_Store"
-      - ".*/\\.git/.*"
-      - ".*/\\.cache/.*"
-      - ".*/\\.Trash/.*"
-      - ".*/node_modules/.*"
-      - ".*/target/.*"
+    options:
+      excludes:
+        - ".*/\\.DS_Store"
+        - ".*/\\.git/.*"
+        - ".*/\\.cache/.*"
+        - ".*/\\.Trash/.*"
+        - ".*/node_modules/.*"
+        - ".*/target/.*"
 
   rg:
-    excludes:
-      - ".*/\\.DS_Store"
-      - ".*/\\.git/.*"
-      - ".*/\\.cache/.*"
-      - ".*/\\.Trash/.*"
-      - ".*/node_modules/.*"
-      - ".*/target/.*"
+    options:
+      excludes:
+        - ".*/\\.DS_Store"
+        - ".*/\\.git/.*"
+        - ".*/\\.cache/.*"
+        - ".*/\\.Trash/.*"
+        - ".*/node_modules/.*"
+        - ".*/target/.*"
 
 action:
   # Open quickfix window after `quickfix` action
   quickfix:
-    after: copen
+    options:
+      after: copen
 
 # JSON schema of this file
 # yaml-language-server: $schema=https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/extension/schema.json

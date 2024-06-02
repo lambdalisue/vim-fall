@@ -1,40 +1,53 @@
 source:
   # Define variants of 'buffer' source
   buffer:
-    mode: "bufloaded"
+    options:
+      mode: "bufloaded"
   buffer:listed:
-    mode: "buflisted"
+    options:
+      mode: "buflisted"
   buffer:modified:
-    mode: "bufmodified"
+    options:
+      mode: "bufmodified"
 
 action:
   # Define variants of 'open' action
   open:drop:
-    opener: drop
+    options:
+      opener: drop
   open:split:
-    opener: split
+    options:
+      opener: split
   open:vsplit:
-    opener: vsplit
+    options:
+      opener: vsplit
   open:tabedit:
-    opener: tabedit
+    options:
+      opener: tabedit
 
   # Define variants of 'cmd' action
   cmd:help:
-    immediate: true
-    prefix: "help "
+    description: "Open help page"
+    options:
+      immediate: true
+      prefix: "help "
   cmd:write:
-    immediate: true
-    prefix: "tabedit "
-    suffix: " | write | tabclose"
+    options:
+      immediate: true
+      prefix: "tabedit "
+      suffix: " | write | tabclose"
   cmd:bunload:
-    immediate: true
-    prefix: "bunload "
+    options:
+      immediate: true
+      prefix: "bunload "
   cmd:bdelete:
-    immediate: true
-    prefix: "bdelete "
+    options:
+      immediate: true
+      prefix: "bdelete "
   cmd:bwipeout:
-    immediate: true
-    prefix: "bwipeout "
+    options:
+      immediate: true
+      prefix: "bwipeout "
 
 # JSON schema of this file
 # yaml-language-server: $schema=https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/extension/schema.json

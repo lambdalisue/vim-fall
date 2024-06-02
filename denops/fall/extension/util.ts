@@ -19,16 +19,15 @@ export async function loadExtension<
     if (!loader) {
       throw new Error(`No ${type} extension '${root}' is registered`);
     }
-    const opt = await loader.load(
-      denops,
-      getExtensionOptions(conf, type, name),
-    );
+    const extopt = getExtensionOptions(conf, type, name);
+    const opt = await loader.load(denops, extopt.options);
     if (!opt) {
       console.warn(`[fall] No ${type} extension '${root}' exist. Skip`);
       return;
     }
     return {
       ...opt,
+      description: extopt.description ?? opt.description,
       script: loader.script,
       name,
     } as R;
