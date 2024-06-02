@@ -202,7 +202,6 @@ async function internalStart(
     value: actionAliases[v.name] ?? v.name,
     detail: {
       description: v.description,
-      filetype: "markdown",
     },
     decorations: [],
   })));

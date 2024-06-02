@@ -54,10 +54,13 @@ helptag:
     - attr
 
   actionProjectors:
+    - lexical-sorter
     - fzf-matcher
 
-  actionPreviewers:
-    - attr
+  actionRenderers:
+    - description
+
+  actionPreviewers: []
 
 # JSON schema of this file
 # yaml-language-server: $schema=https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/picker/schema.json
