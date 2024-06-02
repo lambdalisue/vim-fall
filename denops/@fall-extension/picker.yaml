@@ -34,8 +34,11 @@ helptag:
 # Fallback setting
 "":
   actionAliases:
-    cmd:bdelete: bdelete
+    cmd:cd: cd
+    cmd:lcd: lcd
+    cmd:tcd: tcd
     cmd:bunload: bunload
+    cmd:bdelete: bdelete
     cmd:bwipeout: bwipeout
     cmd:help: help
     cmd:write: write
