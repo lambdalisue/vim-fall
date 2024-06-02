@@ -33,6 +33,13 @@ helptag:
 
 # Fallback setting
 "":
+  actionAliases:
+    cmd:bdelete: bdelete
+    cmd:bunload: bunload
+    cmd:bwipeout: bwipeout
+    cmd:help: help
+    cmd:write: write
+
   defaultAction: open
 
   actions:

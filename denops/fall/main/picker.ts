@@ -196,9 +196,10 @@ async function internalStart(
     },
   );
 
+  const actionAliases = pickerOptions.actionAliases ?? {};
   const actionStream = ReadableStream.from(actions.map((v, id) => ({
     id,
-    value: v.name,
+    value: actionAliases[v.name] ?? v.name,
     detail: {
       description: v.description,
       filetype: "markdown",
@@ -285,7 +286,9 @@ async function internalStart(
           // Cancel
           return;
         }
-        action = actions.find((v) => v.name === actionName);
+        action = actions.find((v) =>
+          (actionAliases[v.name] ?? v.name) === actionName
+        );
       } else if (nextAction == "@default") {
         action = actions.find((v) => v.name === pickerOptions.defaultAction);
       } else {

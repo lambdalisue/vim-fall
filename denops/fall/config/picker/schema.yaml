@@ -11,6 +11,14 @@ patternProperties:
     description: |
       Picker options of the source.
     properties:
+      actionAliases:
+        description: |
+          The list of action aliases.
+        type: object
+        additionalProperties: false
+        patternProperties:
+          "^[a-zA-Z0-9_\\-:]*$":
+            type: string
       defaultAction:
         description: |
           The default action to perform.

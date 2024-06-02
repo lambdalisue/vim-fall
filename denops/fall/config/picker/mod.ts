@@ -3,6 +3,7 @@ import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 import { loadBuiltinConfig, loadConfig, mergeConfigs } from "../util.ts";
 
 export type PickerOptions = {
+  readonly actionAliases?: Record<string, string>;
   readonly defaultAction?: string;
   readonly actions?: readonly string[];
   readonly projectors?: readonly string[];
@@ -24,6 +25,7 @@ export type PickerOptions = {
 export type PickerConfig = Readonly<Record<string, PickerOptions>>;
 
 const isPickerOptions = is.PartialOf(is.ObjectOf({
+  actionAliases: is.RecordOf(is.String, is.String),
   defaultAction: is.String,
   actions: is.ArrayOf(is.String),
   projectors: is.ArrayOf(is.String),
