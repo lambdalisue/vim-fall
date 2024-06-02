@@ -5,6 +5,12 @@
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![vim help](https://img.shields.io/badge/vim-%3Ah%20fall-orange.svg)](doc/fall.txt)
 
+<div align="center">
+
+![Screencast](https://private-user-images.githubusercontent.com/546312/335872453-4e0b5de1-f4c2-40d4-a188-d972ba6c3fef.gif?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3MTczMzgwMjUsIm5iZiI6MTcxNzMzNzcyNSwicGF0aCI6Ii81NDYzMTIvMzM1ODcyNDUzLTRlMGI1ZGUxLWY0YzItNDBkNC1hMTg4LWQ5NzJiYTZjM2ZlZi5naWY_WC1BbXotQWxnb3JpdGhtPUFXUzQtSE1BQy1TSEEyNTYmWC1BbXotQ3JlZGVudGlhbD1BS0lBVkNPRFlMU0E1M1BRSzRaQSUyRjIwMjQwNjAyJTJGdXMtZWFzdC0xJTJGczMlMkZhd3M0X3JlcXVlc3QmWC1BbXotRGF0ZT0yMDI0MDYwMlQxNDE1MjVaJlgtQW16LUV4cGlyZXM9MzAwJlgtQW16LVNpZ25hdHVyZT03N2QzZDFjMmI0ZTYyZDM1MDExMzFlOTNjNWMzOWM1ODg0ZmE0NDQ5NzM3MmJjNmEwZDU3NjE1ZjZhM2VmMzBiJlgtQW16LVNpZ25lZEhlYWRlcnM9aG9zdCZhY3Rvcl9pZD0wJmtleV9pZD0wJnJlcG9faWQ9MCJ9.2rLo11QdMw4D51DIwtmiYYV5SuLq97sltLzo3cJDrkc)
+
+</div>
+
 Fall (_vim-fall_) is an abbreviation for "Filter All," another fuzzy finder
 designed for Vim and Neovim and implemented in [Denops].
 
