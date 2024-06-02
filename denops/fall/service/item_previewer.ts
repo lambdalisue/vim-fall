@@ -65,10 +65,10 @@ export class ItemPreviewer implements Disposable {
     },
     options: { signal: AbortSignal },
   ): Promise<void> {
-    if (!item) {
+    if (!item || !this.#previewer) {
       this.#previous = undefined;
       this.#preview = {
-        content: ["No preview item is available"],
+        content: ["No previewer or item is available"],
       };
       return;
     }
