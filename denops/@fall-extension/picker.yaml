@@ -35,6 +35,10 @@ helptag:
   previewers:
     - helptag
 
+history:
+  defaultAction: cmd
+  previewers: []
+
 # Fallback setting
 "":
   actionAliases:
