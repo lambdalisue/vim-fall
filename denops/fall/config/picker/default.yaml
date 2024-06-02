@@ -41,17 +41,18 @@ helptag:
 
   # Allow the following actions
   actions:
+
     - cd
-    - lcd
-    - tcd
-    - yank
+    - cmd
     - debug
+    - lcd
     - open
     - open:split
-    - open:vsplit
     - open:tabedit
+    - open:vsplit
     - quickfix
-
+    - tcd
+    - yank
   # Use 'to-relative-path' projector to prefer relative path
   # Use 'fzf-matcher' projector to filter/sort items
   projectors:

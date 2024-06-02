@@ -51,7 +51,8 @@ action:
 
   # Open helptag
   cmd:helptag:
-    command: "help {}"
+    immediate: true
+    prefix: "help "
 
 # JSON schema of this file
 # yaml-language-server: $schema=https://raw.githubusercontent.com/lambdalisue/vim-fall/main/denops/fall/config/extension/schema.json
