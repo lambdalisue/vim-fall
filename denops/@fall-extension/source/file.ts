@@ -30,6 +30,7 @@ export const getSource: GetSource = (denops, options) => {
           for await (
             const { path } of walk(abspath, {
               includeDirs: false,
+              followSymlinks: true,
               match: includes?.map((v) => new RegExp(v)),
               skip: excludes.map((v) => new RegExp(v)),
             })
