@@ -17,7 +17,20 @@
       "patternProperties": {
         "^[a-zA-Z0-9_\\-:]*$": {
           "type": "object",
-          "description": "Extension options.\nSee the extension's documentation for valid options.\n"
+          "required": [
+            "options"
+          ],
+          "additionalProperties": false,
+          "properties": {
+            "description": {
+              "type": "string",
+              "description": "Description of the variant.\nThis is used for the user interface.\n"
+            },
+            "options": {
+              "type": "object",
+              "description": "Extension options.\nSee the extension's documentation for valid options.\n"
+            }
+          }
         }
       }
     }
