@@ -92,6 +92,7 @@ export const getSource: GetSource = (denops, options) => {
         stderr: "null",
       });
       const proc = cmd.spawn();
+      proc.unref();
       return proc.stdout
         .pipeThrough(new TextDecoderStream())
         .pipeThrough(new TextLineStream())
