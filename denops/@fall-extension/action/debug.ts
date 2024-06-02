@@ -1,12 +1,8 @@
 import type { GetAction } from "jsr:@lambdalisue/vim-fall@0.6.0/action";
 
-const description = `
-Print JSON representation of cursor or selected item(s).
-`.trim();
-
 export const getAction: GetAction = (_denops, _options) => {
   return {
-    description,
+    description: "Print JSON representation of cursor or selected item(s)",
 
     invoke({ cursorItem, selectedItems }) {
       const items = selectedItems.length > 0

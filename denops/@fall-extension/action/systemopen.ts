@@ -2,17 +2,14 @@ import type { GetAction } from "jsr:@lambdalisue/vim-fall@0.6.0/action";
 import { systemopen } from "jsr:@lambdalisue/systemopen@1.0.0";
 import { is } from "jsr:@core/unknownutil@3.18.0";
 
-const description = `
-Open the cursor item or selected items with system default application.
-`.trim();
-
 const isPathDetail = is.ObjectOf({
   path: is.String,
 });
 
 export const getAction: GetAction = () => {
   return {
-    description,
+    description:
+      "Open the cursor item or selected items with system default application",
 
     async invoke({ cursorItem, selectedItems }, { signal }) {
       const items = selectedItems.length > 0
