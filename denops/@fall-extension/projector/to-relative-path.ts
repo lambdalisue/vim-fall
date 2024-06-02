@@ -16,25 +16,14 @@ export const getProjector: GetProjector = async (denops, _options) => {
         if (!isPathDetail(item.detail)) {
           return item;
         }
-        const path = relative(cwd, item.detail.path);
-        if (item.value === item.detail.path) {
-          return {
-            ...item,
-            detail: {
-              ...item.detail,
-              path,
-            },
-            value: path,
-          };
-        } else {
-          return {
-            ...item,
-            detail: {
-              ...item.detail,
-              path,
-            },
-          };
+        if (item.value !== item.detail.path) {
+          return item;
         }
+        const relpath = relative(cwd, item.detail.path);
+        return {
+          ...item,
+          value: relpath,
+        };
       });
     },
   };
