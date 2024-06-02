@@ -33,7 +33,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "layout": {
+        "style": {
           "$ref": "#/$defs/pickerStyleParams"
         },
         "query": {
@@ -63,7 +63,7 @@
       "type": "object",
       "additionalProperties": false,
       "properties": {
-        "layout": {
+        "style": {
           "$ref": "#/$defs/pickerStyleParams"
         }
       }
