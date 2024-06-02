@@ -10,6 +10,7 @@ patternProperties:
     type: object
     description: |
       Picker options of the source.
+    additionalProperties: false
     properties:
       actionAliases:
         description: |
