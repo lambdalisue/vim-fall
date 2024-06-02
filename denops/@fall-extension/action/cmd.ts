@@ -3,7 +3,7 @@ import type { GetAction } from "jsr:@lambdalisue/vim-fall@0.6.0/action";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
 import { input } from "https://deno.land/x/denops_std@v6.4.0/helper/input.ts";
 import { dirname } from "jsr:@std/path@0.225.0/dirname";
-import { assert, is, Predicate } from "jsr:@core/unknownutil@3.18.0";
+import { assert, is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
 import { retrieve } from "../util.ts";
 
