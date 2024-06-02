@@ -36,19 +36,7 @@ helptag:
   defaultAction: open
 
   actions:
-    - cd
-    - cmd
-    - debug
-    - lcd
-    - open
-    - open:drop
-    - open:split
-    - open:tabedit
-    - open:vsplit
-    - quickfix
-    - systemopen
-    - tcd
-    - yank
+    - "*"
 
   projectors:
     - fzf-matcher

@@ -1,6 +1,5 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 
-import { isDefined } from "../util/collection.ts";
 import { type ExtensionConfig, getExtensionOptions } from "../config/mod.ts";
 import type { ExtensionLoader, ExtensionType, GetExtension } from "./type.ts";
 import { registry } from "./registry.ts";
@@ -48,10 +47,31 @@ export async function loadExtensions<
   type: T,
   names: readonly string[],
 ): Promise<readonly R[]> {
-  const vs = await Promise.all(
-    names.map((v) => loadExtension(denops, conf, type, v)),
-  );
-  return vs.filter(isDefined) as R[];
+  const extensions: R[] = [];
+  for (const name of names) {
+    if (name.includes("*")) {
+      const keys = [
+        ...registry[type].keys(),
+        ...Object.keys(conf[type] ?? {}),
+      ];
+      const [head, tail] = name.split("*", 2);
+      const exts = await loadExtensions(
+        denops,
+        conf,
+        type,
+        keys.filter((v) =>
+          (!head || v.startsWith(head)) && (!tail || v.endsWith(tail))
+        ),
+      );
+      extensions.push(...(exts as R[]));
+    } else {
+      const ext = await loadExtension(denops, conf, type, name);
+      if (ext) {
+        extensions.push(ext as R);
+      }
+    }
+  }
+  return extensions;
 }
 
 export function listExtensionLoaders<
