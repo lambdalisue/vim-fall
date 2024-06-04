@@ -1,5 +1,4 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
-import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
 import { send } from "https://deno.land/x/denops_std@v6.4.0/helper/keymap.ts";
 import { exprQuote as q } from "https://deno.land/x/denops_std@v6.4.0/helper/expr_string.ts";
 import { ensure, is, maybe } from "jsr:@core/unknownutil@3.18.0";
@@ -15,13 +14,9 @@ import {
   getConfigDir,
   getPickerOptions,
   getSourcePickerStyleConfig,
-  loadBuiltinExtensionConfig,
-  loadBuiltinPickerConfig,
-  loadBuiltinStyleConfig,
   loadExtensionConfig,
   loadPickerConfig,
   loadStyleConfig,
-  mergeConfigs,
   type PickerConfig,
   type StyleConfig,
 } from "../config/mod.ts";
@@ -321,28 +316,17 @@ async function internalStart(
 }
 
 async function getConfig(denops: Denops): Promise<Config> {
-  const runtimepath = await opt.runtimepath.get(denops);
   const configDir = await getConfigDir(denops);
   const [
     extension,
     picker,
     style,
-    builtinExtension,
-    builtinPicker,
-    builtinStyle,
   ] = await Promise.all([
     loadExtensionConfig(configDir),
     loadPickerConfig(configDir),
     loadStyleConfig(configDir),
-    loadBuiltinExtensionConfig(runtimepath),
-    loadBuiltinPickerConfig(runtimepath),
-    loadBuiltinStyleConfig(runtimepath),
   ]);
-  return {
-    extension: mergeConfigs(builtinExtension, extension),
-    picker: mergeConfigs(builtinPicker, picker),
-    style: mergeConfigs(builtinStyle, style),
-  };
+  return { extension, picker, style };
 }
 
 export function main(denops: Denops): void {
