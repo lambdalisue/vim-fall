@@ -102,10 +102,12 @@ export function getInputStyleConfig(style: StyleConfig): InputStyleConfig {
 
 export function loadStyleConfig(
   configDir: string,
+  { overwriteWithDefault }: { overwriteWithDefault?: boolean } = {},
 ): Promise<StyleConfig & { path: string }> {
   return loadConfig(
     "style",
     isStyleConfig,
     configDir,
+    { overwriteWithDefault },
   );
 }

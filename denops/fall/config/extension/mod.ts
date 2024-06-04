@@ -47,10 +47,12 @@ export function getExtensionOptions(
 
 export function loadExtensionConfig(
   configDir: string,
+  { overwriteWithDefault }: { overwriteWithDefault?: boolean } = {},
 ): Promise<ExtensionConfig & { path: string }> {
   return loadConfig(
     "extension",
     isExtensionConfig,
     configDir,
+    { overwriteWithDefault },
   );
 }

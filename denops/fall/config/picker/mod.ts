@@ -63,10 +63,12 @@ export function getPickerOptions(
 
 export function loadPickerConfig(
   configDir: string,
+  { overwriteWithDefault }: { overwriteWithDefault?: boolean } = {},
 ): Promise<PickerConfig & { path: string }> {
   return loadConfig(
     "picker",
     isPickerConfig,
     configDir,
+    { overwriteWithDefault },
   );
 }
