@@ -1,7 +1,7 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import { send } from "https://deno.land/x/denops_std@v6.4.0/helper/keymap.ts";
 import { exprQuote as q } from "https://deno.land/x/denops_std@v6.4.0/helper/expr_string.ts";
-import { ensure, is, maybe } from "jsr:@core/unknownutil@3.18.0";
+import { assert, ensure, is, maybe } from "jsr:@core/unknownutil@3.18.0";
 
 import { subscribe } from "../util/event.ts";
 import { isDefined } from "../util/collection.ts";
@@ -332,7 +332,10 @@ async function getConfig(denops: Denops): Promise<Config> {
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "picker:start": async (name, cmdline) => {
+    "picker:start": async (args) => {
+      assert(args, is.ArrayOf(is.String));
+      const name = args.splice(0, 1)[0];
+      const cmdline = args.join(" ");
       await using _guard = await hideMsgArea(denops);
       await start(
         denops,

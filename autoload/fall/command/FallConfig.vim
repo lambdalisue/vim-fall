@@ -1,7 +1,7 @@
-function! fall#command#FallConfig#call(qargs) abort
+function! fall#command#FallConfig#call(args) abort
   call denops#plugin#wait_async(
         \ 'fall',
-        \ { -> denops#notify('fall', printf('config:edit:%s', a:qargs), []) },
+        \ { -> denops#notify('fall', 'config:edit', [a:args]) },
         \)
 endfunction
 
