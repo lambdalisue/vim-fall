@@ -43,19 +43,19 @@ Use `:Fall` command to open the fuzzy finder. The command accepts the following
 arguments:
 
 ```
-:Fall {source} {source_args}...
+Fall {source} {source_args}...
 ```
 
 For example, if you'd like to use `file` source, you can use the following
 
 ```
-:Fall file
+Fall file
 ```
 
 Or `line` source with `README.md` as an argument
 
 ```
-:Fall line README.md
+Fall line README.md
 ```
 
 ## Similar Projects
