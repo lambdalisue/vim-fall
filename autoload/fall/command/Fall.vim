@@ -1,8 +1,15 @@
 function! fall#command#Fall#call(args) abort
-  call denops#plugin#wait_async(
-        \ 'fall',
-        \ { -> denops#notify('fall', 'picker:start', [a:args]) },
-        \)
+  if denops#plugin#wait('fall') isnot# 0
+    return
+  endif
+  try
+    call fall#internal#cursor#hide()
+    call fall#internal#msgarea#hide()
+    call denops#request('fall', 'picker:start', [a:args])
+  finally
+    silent! call fall#internal#msgarea#show()
+    silent! call fall#internal#cursor#show()
+  endtry
 endfunction
 
 function! fall#command#Fall#complete(arglead, cmdline, cursorpos) abort

@@ -2,7 +2,6 @@ import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import { ensure, is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 
 import { isDefined } from "../util/collection.ts";
-import { hideMsgArea } from "../util/hide_msg_area.ts";
 import { Input } from "../ui/input.ts";
 import {
   getConfigDir,
@@ -60,9 +59,8 @@ async function input(
 export function main(denops: Denops): void {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "util:input": async (params) => {
-      await using _guard = await hideMsgArea(denops);
-      return await input(denops, ensure(params, isInputParams));
+    "util:input": (params) => {
+      return input(denops, ensure(params, isInputParams));
     },
   };
 }

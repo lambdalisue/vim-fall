@@ -5,7 +5,6 @@ import { assert, ensure, is, maybe } from "jsr:@core/unknownutil@3.18.0";
 
 import { subscribe } from "../util/event.ts";
 import { isDefined } from "../util/collection.ts";
-import { hideMsgArea } from "../util/hide_msg_area.ts";
 import { type Context as PickerContext, Picker } from "../ui/picker.ts";
 import { emitPickerEnter, emitPickerLeave } from "../ui/util/emitter.ts";
 import {
@@ -336,7 +335,6 @@ export function main(denops: Denops): void {
       assert(args, is.ArrayOf(is.String));
       const name = args.splice(0, 1)[0];
       const cmdline = args.join(" ");
-      await using _guard = await hideMsgArea(denops);
       await start(
         denops,
         ensure(name, is.String),
@@ -344,7 +342,6 @@ export function main(denops: Denops): void {
       );
     },
     "picker:restore": async () => {
-      await using _guard = await hideMsgArea(denops);
       await restore(denops);
     },
   };
