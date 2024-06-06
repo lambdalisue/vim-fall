@@ -9,6 +9,11 @@ function! fall#command#Fall#call(args) abort
   finally
     silent! call fall#internal#msgarea#show()
     silent! call fall#internal#cursor#show()
+    " Close all popup windows in case of denops death
+    silent! call fall#internal#popup#close(g:_fall_component_preview_winid)
+    silent! call fall#internal#popup#close(g:_fall_component_select_winid)
+    silent! call fall#internal#popup#close(g:_fall_component_query_winid)
+    silent! call fall#internal#popup#close(g:_fall_component_input_winid)
   endtry
 endfunction
 
