@@ -85,44 +85,8 @@ if !get(g:, 'fall_disable_default_mapping')
     cnoremap <nowait><buffer> <C-0> <Plug>(fall-preview-previewer-next)
   endfunction
 
-  function! s:unmap_picker() abort
-    " Cursor
-    silent cunmap <buffer> <C-p>
-    silent cunmap <buffer> <C-n>
-    silent cunmap <buffer> <Up>
-    silent cunmap <buffer> <Down>
-    silent cunmap <buffer> <C-u>
-    silent cunmap <buffer> <C-d>
-    silent cunmap <buffer> <PageUp>
-    silent cunmap <buffer> <PageDown>
-    silent cunmap <buffer> <C-t>
-    silent cunmap <buffer> <C-g>
-    silent cunmap <buffer> <Home>
-    silent cunmap <buffer> <End>
-    " Select
-    silent cunmap <buffer> <C-,>
-    silent cunmap <buffer> <C-.>
-    silent cunmap <buffer> <C-j>
-    silent cunmap <buffer> <C-k>
-    " Action
-    silent cunmap <buffer> <Tab>
-    silent cunmap <buffer> <Return>
-    " Preview
-    silent cunmap <buffer> <C-Up>
-    silent cunmap <buffer> <C-Down>
-    silent cunmap <buffer> <C-PageUp>
-    silent cunmap <buffer> <C-PageDown>
-    silent cunmap <buffer> <C-Home>
-    silent cunmap <buffer> <C-End>
-    silent cunmap <buffer> <C-Left>
-    silent cunmap <buffer> <C-Right>
-    silent cunmap <buffer> <C-9>
-    silent cunmap <buffer> <C-0>
-  endfunction
-
   augroup fall_mapping_plugin
     autocmd!
     autocmd User FallPickerEnter:* call s:map_picker()
-    autocmd User FallPickerLeave:* call s:unmap_picker()
   augroup END
 endif

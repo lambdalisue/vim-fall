@@ -11,7 +11,6 @@ export async function emitPickerEnter(
   name: string,
 ): Promise<void> {
   try {
-    await denops.call("fall#internal#mapping#store");
     await emit(denops, "User", `FallPickerEnter:${name}`, { nomodeline: true });
   } catch (err) {
     console.warn(`[fall] Failed to emit FallPickerEnter:${name}`, err);
@@ -29,7 +28,5 @@ export async function emitPickerLeave(
     await emit(denops, "User", `FallPickerLeave:${name}`, { nomodeline: true });
   } catch (err) {
     console.warn(`[fall] Failed to emit FallPickerLeave:${name}`, err);
-  } finally {
-    await denops.call("fall#internal#mapping#restore");
   }
 }

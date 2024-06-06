@@ -5,8 +5,10 @@ function! fall#command#Fall#call(args) abort
   try
     call fall#internal#cursor#hide()
     call fall#internal#msgarea#hide()
+    call fall#internal#mapping#store()
     call denops#request('fall', 'picker:start', [a:args])
   finally
+    silent! call fall#internal#mapping#restore()
     silent! call fall#internal#msgarea#show()
     silent! call fall#internal#cursor#show()
     " Close all popup windows in case of denops death
