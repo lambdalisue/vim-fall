@@ -21,12 +21,7 @@ export const getSource: GetSource = (denops, options) => {
       );
       return new ReadableStream({
         async start(controller) {
-          for await (const path of walk(abspath)) {
-            if (includes && !includes.some((p) => p.test(path))) {
-              continue;
-            } else if (excludes && excludes.some((p) => p.test(path))) {
-              continue;
-            }
+          for await (const path of walk(abspath, includes, excludes)) {
             controller.enqueue({
               value: path,
               detail: { path },
@@ -41,9 +36,16 @@ export const getSource: GetSource = (denops, options) => {
 
 async function* walk(
   root: string,
+  includes?: RegExp[],
+  excludes?: RegExp[],
 ): AsyncIterableIterator<string> {
   for await (const entry of Deno.readDir(root)) {
     const path = join(root, entry.name);
+    if (includes && !includes.some((p) => p.test(path))) {
+      continue;
+    } else if (excludes && excludes.some((p) => p.test(path))) {
+      continue;
+    }
     let { isSymlink, isDirectory } = entry;
     if (isSymlink) {
       // Follow Symlink
