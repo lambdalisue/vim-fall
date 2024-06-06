@@ -64,18 +64,23 @@ export class SelectComponent extends BaseComponent {
         .map((id) => indexMap.get(id))
         .filter(isDefined);
 
-      const content = this.#items.map((v) => v.label ?? v.value);
+      const width = this.width;
+      const content = this.#items.map((v) =>
+        (v.label ?? v.value).substring(0, width)
+      );
       const decorations = this.#items.reduce((acc, v, i) => {
         if (!v.decorations) {
           return acc;
         }
         const line = i + 1;
         return acc.concat(
-          v.decorations.map((d) => ({
-            highlight: "FallSelectMatch",
-            ...d,
-            line,
-          })),
+          v.decorations
+            .filter((d) => d.column < width)
+            .map((d) => ({
+              highlight: "FallSelectMatch",
+              ...d,
+              line,
+            })),
         );
       }, [] as Decoration[]);
 
