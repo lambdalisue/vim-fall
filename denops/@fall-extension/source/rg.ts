@@ -100,25 +100,29 @@ export const getSource: GetSource = (denops, options) => {
         stderr: "null",
       });
       const proc = cmd.spawn();
-      return proc.stdout
-        .pipeThrough(new TextDecoderStream())
-        .pipeThrough(new TextLineStream())
-        .pipeThrough(
-          new TransformStream({
-            transform(chunk, controller) {
-              parse(chunk, highlight).forEach((item) => {
-                const { path } = item.detail;
-                if (includes && !includes.some((p) => p.test(path))) {
-                  return;
-                }
-                if (excludes && excludes.some((p) => p.test(path))) {
-                  return;
-                }
-                controller.enqueue(item);
-              });
-            },
-          }),
-        );
+      return new ReadableStream({
+        async start(controller) {
+          const stream = proc.stdout.pipeThrough(new TextDecoderStream())
+            .pipeThrough(new TextLineStream());
+          for await (const chunk of stream) {
+            parse(chunk, highlight).forEach((item) => {
+              const { path } = item.detail;
+              if (includes && !includes.some((p) => p.test(path))) {
+                return;
+              }
+              if (excludes && excludes.some((p) => p.test(path))) {
+                return;
+              }
+              controller.enqueue(item);
+            });
+          }
+          controller.close();
+        },
+        cancel() {
+          proc.unref();
+          proc.kill();
+        },
+      });
     },
   };
 };
