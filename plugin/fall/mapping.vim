@@ -34,7 +34,7 @@ function! s:dispatch(name, ...) abort
 endfunction
 
 function! s:select_scroll() abort
-  let l:winid = get(g:, '_fall_layout_select_winid')
+  let l:winid = get(g:, '_fall_component_select_winid')
   if !l:winid
     return &scroll
   endif
@@ -42,7 +42,7 @@ function! s:select_scroll() abort
 endfunction
 
 function! s:preview_scroll() abort
-  let l:winid = get(g:, '_fall_layout_preview_winid')
+  let l:winid = get(g:, '_fall_component_preview_winid')
   if !l:winid
     return &scroll
   endif
