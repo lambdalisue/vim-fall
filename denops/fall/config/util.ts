@@ -44,7 +44,7 @@ export async function loadConfig<T extends Record<string, unknown>>(
     };
   } catch (err) {
     if (!overwriteWithDefault && err instanceof Deno.errors.NotFound) {
-      return loadConfig(name, pred, path, { overwriteWithDefault: true });
+      return loadConfig(name, pred, configDir, { overwriteWithDefault: true });
     }
     const m = err.message ?? err;
     console.warn(`[fall] Failed to load ${name} config file: ${m}`);
