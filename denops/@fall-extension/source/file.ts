@@ -1,6 +1,6 @@
 import type { GetSource } from "jsr:@lambdalisue/vim-fall@0.6.0/source";
 import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
-import { walk } from "jsr:@std/fs@0.229.0/walk";
+import { join } from "jsr:@std/path@1.0.0-rc.1/join";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
@@ -8,16 +8,10 @@ const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
   excludes: is.ArrayOf(is.String),
 })));
 
-const defaultExcludes: string[] = [
-  ".*/\.DS_Store",
-  ".*/\.git/.*",
-  ".*/node_modules/.*",
-];
-
 export const getSource: GetSource = (denops, options) => {
   assert(options, isOptions);
-  const includes = options.includes;
-  const excludes = options.excludes ?? defaultExcludes;
+  const includes = options.includes?.map((p) => new RegExp(p));
+  const excludes = options.excludes?.map((p) => new RegExp(p));
   return {
     async stream({ cmdline }) {
       const abspath = await fn.fnamemodify(
@@ -27,14 +21,12 @@ export const getSource: GetSource = (denops, options) => {
       );
       return new ReadableStream({
         async start(controller) {
-          for await (
-            const { path } of walk(abspath, {
-              includeDirs: false,
-              followSymlinks: true,
-              match: includes?.map((v) => new RegExp(v)),
-              skip: excludes.map((v) => new RegExp(v)),
-            })
-          ) {
+          for await (const path of walk(abspath)) {
+            if (includes && !includes.some((p) => p.test(path))) {
+              continue;
+            } else if (excludes && excludes.some((p) => p.test(path))) {
+              continue;
+            }
             controller.enqueue({
               value: path,
               detail: { path },
@@ -46,3 +38,30 @@ export const getSource: GetSource = (denops, options) => {
     },
   };
 };
+
+async function* walk(
+  root: string,
+): AsyncIterableIterator<string> {
+  for await (const entry of Deno.readDir(root)) {
+    const path = join(root, entry.name);
+    let { isSymlink, isDirectory } = entry;
+    if (isSymlink) {
+      // Follow Symlink
+      try {
+        const realPath = await Deno.realPath(path);
+        ({ isSymlink, isDirectory } = await Deno.lstat(realPath));
+      } catch (err) {
+        if (err instanceof Deno.errors.NotFound) {
+          // The symlink target is not found
+          continue;
+        }
+        throw err;
+      }
+    }
+    if (isSymlink || isDirectory) {
+      yield* walk(path);
+    } else {
+      yield path;
+    }
+  }
+}
