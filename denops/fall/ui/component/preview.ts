@@ -64,7 +64,7 @@ export class PreviewComponent extends BaseComponent {
       const line = this.#preview?.line ?? 1;
       const column = this.#preview?.column ?? 1;
       const filename = this.#preview?.filename ?? "";
-      const filetype = this.#preview?.filetype ?? "";
+      const filetype = this.#preview?.filetype;
       await batch(denops, async (denops) => {
         // Clear previous buffer context
         await fn.win_execute(
@@ -83,23 +83,24 @@ export class PreviewComponent extends BaseComponent {
           winid,
           `silent! file fall://preview/${filename}`,
         );
-        // Detect filetype
+        // Detect filetype and apply highlight
         await fn.win_execute(
           denops,
           winid,
-          `silent! call fall#internal#preview#detect()`,
+          `silent! setlocal winfixbuf winfixwidth winfixheight`,
         );
-        // Apply highlight
         await fn.win_execute(
           denops,
           winid,
-          `silent! call fall#internal#preview#highlight('${filetype}')`,
+          filetype
+            ? `silent! set filetype=${filetype}`
+            : `silent! filetype detect`,
         );
         // Overwrite buffer local options may configured by ftplugin
         await fn.win_execute(
           denops,
           winid,
-          `silent! setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile cursorline nomodifiable nowrap`,
+          `silent! setlocal buftype=nofile bufhidden=wipe nobuflisted noswapfile nomodifiable nowrap cursorline`,
         );
         // Move cursor
         await fn.win_execute(
