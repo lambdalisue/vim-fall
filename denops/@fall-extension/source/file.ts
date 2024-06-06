@@ -61,7 +61,7 @@ async function* walk(
       }
     }
     if (isSymlink || isDirectory) {
-      yield* walk(path);
+      yield* walk(path, includes, excludes);
     } else {
       yield path;
     }
