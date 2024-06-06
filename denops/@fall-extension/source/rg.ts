@@ -37,7 +37,15 @@ const isMatchResult = is.ObjectOf({
 function parse(
   s: string,
   highlight: string,
-): SourceItem[] {
+): (SourceItem & {
+  detail: {
+    path: string;
+    line: number;
+    column: number;
+    length: number;
+    content: string;
+  };
+})[] {
   const m = maybe(JSON.parse(s), isMatchResult);
   if (!m) return [];
   const path = m.data.path.text;
@@ -100,10 +108,11 @@ export const getSource: GetSource = (denops, options) => {
           new TransformStream({
             transform(chunk, controller) {
               parse(chunk, highlight).forEach((item) => {
-                if (includes && includes.every((p) => !p.test(item.value))) {
+                const { path } = item.detail;
+                if (includes && !includes.some((p) => p.test(path))) {
                   return;
                 }
-                if (excludes && excludes.some((p) => p.test(item.value))) {
+                if (excludes && excludes.some((p) => p.test(path))) {
                   return;
                 }
                 controller.enqueue(item);
