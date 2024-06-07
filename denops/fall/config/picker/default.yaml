@@ -39,6 +39,10 @@ history:
   defaultAction: cmd
   previewers: []
 
+extension:
+  previewers:
+    - extension
+
 # Fallback setting
 "":
   actionAliases:

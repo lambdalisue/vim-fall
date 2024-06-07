@@ -16,6 +16,7 @@ export type {
   SourceItem,
   SourceParams,
 } from "./type.ts";
+export { isExtensionType } from "./type.ts";
 export {
   discoverExtensionLoaders,
   registerExtensionLoader,

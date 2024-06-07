@@ -31,6 +31,19 @@ source:
     options:
       mode: "bufmodified"
 
+  extension:projector:
+    options:
+      type: "projector"
+  extension:renderer:
+    options:
+      type: "renderer"
+  extension:previewer:
+    options:
+      type: "previewer"
+  extension:action:
+    options:
+      type: "action"
+
 action:
   # Define variants of 'open' action
   open:drop:
