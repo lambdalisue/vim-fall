@@ -30,6 +30,7 @@ export async function registerExtensionLoader(
   const mod = await import(script);
   if (mod.getSource) {
     registry.source.set(name, {
+      type: "source",
       name,
       script,
       load: mod.getSource.bind(mod),
@@ -37,6 +38,7 @@ export async function registerExtensionLoader(
   }
   if (mod.getProjector) {
     registry.projector.set(name, {
+      type: "projector",
       name,
       script,
       load: mod.getProjector.bind(mod),
@@ -44,6 +46,7 @@ export async function registerExtensionLoader(
   }
   if (mod.getRenderer) {
     registry.renderer.set(name, {
+      type: "renderer",
       name,
       script,
       load: mod.getRenderer.bind(mod),
@@ -51,6 +54,7 @@ export async function registerExtensionLoader(
   }
   if (mod.getPreviewer) {
     registry.previewer.set(name, {
+      type: "previewer",
       name,
       script,
       load: mod.getPreviewer.bind(mod),
@@ -58,6 +62,7 @@ export async function registerExtensionLoader(
   }
   if (mod.getAction) {
     registry.action.set(name, {
+      type: "action",
       name,
       script,
       load: mod.getAction.bind(mod),

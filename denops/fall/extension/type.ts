@@ -47,6 +47,13 @@ export type GetExtension<T extends ExtensionType> = T extends "source" ? Source
   : T extends "action" ? Action
   : never;
 
+export type GetExtensionType<T extends Extension> = T extends Source ? "source"
+  : T extends Projector ? "projector"
+  : T extends Renderer ? "renderer"
+  : T extends Previewer ? "previewer"
+  : T extends Action ? "action"
+  : never;
+
 export const isExtensionType = is.LiteralOneOf(
   [
     "source",
@@ -57,7 +64,8 @@ export const isExtensionType = is.LiteralOneOf(
   ] as const,
 ) satisfies Predicate<ExtensionType>;
 
-export type ExtensionLoader<T> = {
+export type ExtensionLoader<T extends Extension, R = GetExtensionType<T>> = {
+  readonly type: R;
   readonly name: string;
   readonly script: string;
   readonly load: (

@@ -1,7 +1,12 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 
 import { type ExtensionConfig, getExtensionOptions } from "../config/mod.ts";
-import type { ExtensionLoader, ExtensionType, GetExtension } from "./type.ts";
+import type {
+  Extension,
+  ExtensionLoader,
+  ExtensionType,
+  GetExtension,
+} from "./type.ts";
 import { registry } from "./registry.ts";
 
 export async function loadExtension<
@@ -75,7 +80,7 @@ export async function loadExtensions<
 
 export function listExtensionLoaders<
   T extends ExtensionType,
-  R = GetExtension<T>,
+  R extends Extension = GetExtension<T>,
 >(
   type: T,
 ): readonly ExtensionLoader<R>[] {
