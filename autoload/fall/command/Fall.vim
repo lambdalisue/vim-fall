@@ -2,7 +2,9 @@ function! fall#command#Fall#call(args) abort
   if denops#plugin#wait('fall') isnot# 0
     return
   endif
+  let l:laststatus_saved = &laststatus
   try
+    set laststatus=0
     call fall#internal#cursor#hide()
     call fall#internal#msgarea#hide()
     call fall#internal#mapping#store()
@@ -16,6 +18,7 @@ function! fall#command#Fall#call(args) abort
     silent! call fall#internal#popup#close(g:_fall_component_select_winid)
     silent! call fall#internal#popup#close(g:_fall_component_query_winid)
     silent! call fall#internal#popup#close(g:_fall_component_input_winid)
+    silent! let &laststatus = l:laststatus_saved
   endtry
 endfunction
 
