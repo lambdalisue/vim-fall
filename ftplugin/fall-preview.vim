@@ -7,4 +7,4 @@ let b:did_ftplugin = 1
 setlocal bufhidden=wipe buftype=nofile nobuflisted noswapfile
 
 " Window local options
-setlocal signcolumn=no nofoldenable nowrap
+setlocal signcolumn=no nofoldenable nowrap number
