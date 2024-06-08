@@ -1,5 +1,4 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
-import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
 import type * as core from "../../@fall/mod.ts";
 
 export type {
@@ -53,16 +52,6 @@ export type GetExtensionType<T extends Extension> = T extends Source ? "source"
   : T extends Previewer ? "previewer"
   : T extends Action ? "action"
   : never;
-
-export const isExtensionType = is.LiteralOneOf(
-  [
-    "source",
-    "projector",
-    "renderer",
-    "previewer",
-    "action",
-  ] as const,
-) satisfies Predicate<ExtensionType>;
 
 export type ExtensionLoader<T extends Extension, R = GetExtensionType<T>> = {
   readonly type: R;

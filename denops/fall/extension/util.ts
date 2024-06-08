@@ -78,11 +78,22 @@ export async function loadExtensions<
   return extensions;
 }
 
-export function listExtensionLoaders<
-  T extends ExtensionType,
-  R extends Extension = GetExtension<T>,
->(
+export function listExtensionLoaders(): readonly ExtensionLoader<Extension>[];
+export function listExtensionLoaders<T extends ExtensionType>(
   type: T,
-): readonly ExtensionLoader<R>[] {
-  return [...registry[type].values()] as ExtensionLoader<R>[];
+): readonly ExtensionLoader<GetExtension<T>>[];
+export function listExtensionLoaders<T extends ExtensionType>(
+  type?: T,
+): readonly ExtensionLoader<Extension>[] {
+  if (type) {
+    return [...registry[type].values()];
+  } else {
+    return [
+      ...registry.source.values(),
+      ...registry.projector.values(),
+      ...registry.renderer.values(),
+      ...registry.previewer.values(),
+      ...registry.action.values(),
+    ];
+  }
 }

@@ -2,6 +2,9 @@ export type {
   Action,
   ActionItem,
   ActionParams,
+  Extension,
+  ExtensionLoader,
+  ExtensionType,
   Item,
   Preview,
   Previewer,
@@ -16,7 +19,6 @@ export type {
   SourceItem,
   SourceParams,
 } from "./type.ts";
-export { isExtensionType } from "./type.ts";
 export {
   discoverExtensionLoaders,
   registerExtensionLoader,

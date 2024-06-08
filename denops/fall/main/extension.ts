@@ -1,16 +1,32 @@
 import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
 import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
-import { assert, ensure, is } from "jsr:@core/unknownutil@3.18.0";
+import {
+  assert,
+  ensure,
+  is,
+  type Predicate,
+} from "jsr:@core/unknownutil@3.18.0";
 
 import { getConfigDir, loadExtensionConfig } from "../config/mod.ts";
 import {
   discoverExtensionLoaders,
+  type ExtensionType,
   listExtensionLoaders,
   loadExtension,
   registerExtensionLoader,
 } from "../extension/mod.ts";
 
 const isDefs = is.RecordOf(is.String, is.String);
+
+export const isExtensionType = is.LiteralOneOf(
+  [
+    "source",
+    "projector",
+    "renderer",
+    "previewer",
+    "action",
+  ] as const,
+) satisfies Predicate<ExtensionType>;
 
 export function main(denops: Denops): void {
   denops.dispatcher = {
@@ -48,6 +64,17 @@ export function main(denops: Denops): void {
       } catch (err) {
         console.debug(err.message ?? err);
       }
+    },
+    "extension:list": (type) => {
+      assert(type, is.OptionalOf(isExtensionType));
+      const loaders = type
+        ? listExtensionLoaders(type)
+        : listExtensionLoaders();
+      return loaders.map((v) => ({
+        type: v.type,
+        name: v.name,
+        script: v.script,
+      }));
     },
   };
 }
