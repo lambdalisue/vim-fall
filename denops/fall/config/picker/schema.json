@@ -93,6 +93,20 @@
                 }
               }
             },
+            "preview": {
+              "type": "object",
+              "additionalProperties": false,
+              "properties": {
+                "mode": {
+                  "description": "Preview highlight mode.\n",
+                  "type": "string",
+                  "enum": [
+                    "fast",
+                    "correct"
+                  ]
+                }
+              }
+            },
             "itemCollector": {
               "type": "object",
               "additionalProperties": false,
