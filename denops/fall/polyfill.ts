@@ -10,3 +10,20 @@ import {
 (globalThis as any).DisposableStack ??= DisposableStack;
 // deno-lint-ignore no-explicit-any
 (globalThis as any).AsyncDisposableStack ??= AsyncDisposableStack;
+
+// Support BigInt in JSON.stringify()
+declare global {
+  interface BigInt {
+    toJSON(): string;
+  }
+}
+if (BigInt.prototype.toJSON === undefined) {
+  Object.defineProperty(BigInt.prototype, "toJSON", {
+    value() {
+      return this.toString();
+    },
+    configurable: true,
+    enumerable: false,
+    writable: true,
+  });
+}
