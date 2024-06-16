@@ -27,8 +27,13 @@ export const getPreviewer: GetPreviewer = () => {
         },
       }));
       const content = [
+        `/`.repeat(80),
+        `//`,
         `// # Applied configuration`,
+        `//`,
         ...yaml.map((line) => `// ${line}`),
+        `//`,
+        `/`.repeat(80),
         ...text,
       ];
       return {
