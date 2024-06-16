@@ -16,11 +16,8 @@ const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
   // Execute the command immediately without confirmation
   immediate: is.Boolean,
 
-  // Prefix of the command
-  prefix: is.String,
-
-  // Suffix of the command
-  suffix: is.String,
+  // Template of the command. `{}` will be replaced with the value of the item.
+  template: is.String,
 
   // Restrict items that point to a file or a directory
   restriction: is.LiteralOneOf(
@@ -43,8 +40,7 @@ export const getAction: GetAction = (denops, options) => {
   assert(options, isOptions);
   const attrs = options.attrs ?? ["value"];
   const immediate = options.immediate ?? false;
-  const prefix = options.prefix ?? "";
-  const suffix = options.suffix ?? "";
+  const template = options.template ?? "{}";
   const restriction = options.restriction;
   const fnameescape = options.fnameescape ?? false;
   const shellescape = options.shellescape ?? false;
@@ -71,7 +67,7 @@ export const getAction: GetAction = (denops, options) => {
           if (shellescape) {
             value = await fn.shellescape(denops, value);
           }
-          const cmd = `${prefix}${value}${suffix}`;
+          const cmd = template.replaceAll("{}", value);
           try {
             await execute(denops, cmd, immediate);
           } catch (err) {
