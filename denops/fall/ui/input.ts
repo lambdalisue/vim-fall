@@ -100,8 +100,10 @@ export class Input {
 
     startAsyncScheduler(
       async () => {
-        await this.#input.render(denops, { signal });
-        await denops.cmd("redraw");
+        const skipped = await this.#input.render(denops, { signal });
+        if (!skipped) {
+          await denops.cmd("redraw");
+        }
       },
       this.#options.redraw?.interval ?? REDRAW_INTERVAL,
       { signal },
