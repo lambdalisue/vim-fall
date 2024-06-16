@@ -31,6 +31,9 @@ source:
     options:
       mode: "bufmodified"
 
+  extension:source:
+    options:
+      type: "source"
   extension:projector:
     options:
       type: "projector"

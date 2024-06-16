@@ -24,12 +24,15 @@ type Extension = {
   script: string;
 };
 
-export const getSource: GetSource = (denops, _options) => {
-  return {
-    async stream({ cmdline }) {
-      const extensionType = cmdline || undefined;
-      assert(extensionType, is.OptionalOf(isExtensionType));
+const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
+  type: isExtensionType,
+})));
 
+export const getSource: GetSource = (denops, options) => {
+  assert(options, isOptions);
+  const extensionType = options.type;
+  return {
+    async stream() {
       const cMap = new Map(
         Object.entries(await loadConfig(denops))
           .filter(([type]) => !extensionType || type === extensionType)
@@ -68,7 +71,9 @@ export const getSource: GetSource = (denops, _options) => {
           };
         })
         .filter(isDefined)
-        .filter((v) => !cmdline || v.detail.extension.type === cmdline);
+        .filter((v) =>
+          !extensionType || v.detail.extension.type === extensionType
+        );
       return ReadableStream.from(items);
     },
 
