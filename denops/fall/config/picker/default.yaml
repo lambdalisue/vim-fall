@@ -47,8 +47,6 @@ extension:
   projectors:
     - lexical-sorter
     - fzf-matcher
-  renderers:
-    - extension
   previewers:
     - extension
 
