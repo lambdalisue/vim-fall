@@ -9,16 +9,26 @@ import * as popup from "https://deno.land/x/denops_std@v6.4.0/popup/mod.ts";
 import { equal } from "jsr:@std/assert@0.225.1/equal";
 
 import type { Preview } from "../../extension/mod.ts";
-import { BaseComponent } from "./base.ts";
+import { BaseComponent, type as BaseParams } from "./base.ts";
+
+type Params = BaseParams & {
+  readonly mode?: "fast" | "correct";
+};
 
 export class PreviewComponent extends BaseComponent {
   protected readonly name = "preview";
+  readonly #mode: "fast" | "correct";
 
   #modified = true;
   #title = "";
   #preview: Preview = {
     content: ["No preview is available"],
   };
+
+  constructor(params: Params) {
+    super(params);
+    this.#mode = params.mode ?? "fast";
+  }
 
   get title(): string {
     return this.#title;
@@ -64,7 +74,7 @@ export class PreviewComponent extends BaseComponent {
       const line = this.#preview?.line ?? 1;
       const column = this.#preview?.column ?? 1;
       const filename = this.#preview?.filename ?? "";
-      const filetype = this.#preview?.filetype;
+      const filetype = this.#preview?.filetype ?? "";
       await batch(denops, async (denops) => {
         // Clear previous buffer context
         await fn.win_execute(
@@ -77,24 +87,24 @@ export class PreviewComponent extends BaseComponent {
           winid,
           `silent! syntax clear`,
         );
-        // Change buffer name
+        // Change buffer name and reset options
         await fn.win_execute(
           denops,
           winid,
           `silent! file fall://preview/${filename}`,
         );
-        // Detect filetype and apply highlight
         await fn.win_execute(
           denops,
           winid,
           `silent! setlocal winfixbuf winfixwidth winfixheight`,
         );
+        // Apply highlight
         await fn.win_execute(
           denops,
           winid,
-          filetype
-            ? `silent! set filetype=${filetype}`
-            : `silent! filetype detect`,
+          this.#mode === "fast"
+            ? `call fall#internal#highlight#fast('${filetype}')`
+            : `call fall#internal#highlight#correct('${filetype}')`,
         );
         // Overwrite buffer local options may configured by ftplugin
         await fn.win_execute(

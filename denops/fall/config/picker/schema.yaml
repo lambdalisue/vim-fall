@@ -80,6 +80,17 @@ patternProperties:
                 description: |
                   Interval in millisecond to redraw screen.
                 type: number
+          preview:
+            type: object
+            additionalProperties: false
+            properties:
+              mode:
+                description: |
+                  Preview highlight mode.
+                type: string
+                enum:
+                  - "fast"
+                  - "correct"
           itemCollector:
             type: object
             additionalProperties: false

@@ -59,6 +59,9 @@ export type Options = {
     readonly headSymbol?: string;
     readonly failSymbol?: string;
   };
+  readonly preview?: {
+    readonly mode?: "fast" | "correct";
+  };
   readonly itemCollector?: {
     readonly threshold?: number;
   };
@@ -114,6 +117,7 @@ export class Picker implements Disposable {
       previewRatio: previewers.length === 0
         ? 0
         : options.style?.previewRatio ?? PREVIEW_RATIO,
+      previewMode: options.preview?.mode ?? "fast",
       title,
       border: options.style?.border ?? "single",
       divider: options.style?.divider ?? "dashed",

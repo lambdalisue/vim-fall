@@ -29,6 +29,7 @@ import type { Component, Layout } from "./base.ts";
 
 type Params = QueryComponentOptions & {
   readonly previewRatio: number;
+  readonly previewMode: "fast" | "correct";
   readonly title?: string;
   readonly border: Border;
   readonly divider: Divider;
@@ -71,6 +72,7 @@ export class PickerComponent implements Component {
       zindex: params.zindex,
     });
     this.#preview = new PreviewComponent({
+      mode: params.previewMode,
       border: [
         border[BORDER_TL],
         border[BORDER_T],

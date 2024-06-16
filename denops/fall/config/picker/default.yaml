@@ -83,6 +83,8 @@ extension:
   actionPreviewers: []
 
   options:
+    preview:
+      mode: "fast"
     itemCollector:
       threshold: 20000
 

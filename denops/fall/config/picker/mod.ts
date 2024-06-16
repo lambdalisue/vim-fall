@@ -16,6 +16,9 @@ export type PickerOptions = {
     readonly redraw?: {
       readonly interval?: number;
     };
+    readonly preview?: {
+      readonly mode?: "fast" | "correct";
+    };
     readonly itemCollector?: {
       readonly threshold?: number;
     };
@@ -37,6 +40,9 @@ const isPickerOptions = is.PartialOf(is.ObjectOf({
   options: is.PartialOf(is.ObjectOf({
     redraw: is.PartialOf(is.ObjectOf({
       interval: is.Number,
+    })),
+    preview: is.PartialOf(is.ObjectOf({
+      mode: is.LiteralOneOf(["fast", "correct"] as const),
     })),
     itemCollector: is.PartialOf(is.ObjectOf({
       threshold: is.Number,
