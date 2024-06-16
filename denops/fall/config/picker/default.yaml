@@ -9,6 +9,7 @@ file:
 oldfiles:
   projectors:
     - cwd-filter
+    - exists-filter
     - to-relative-path
     - fzf-matcher
 
