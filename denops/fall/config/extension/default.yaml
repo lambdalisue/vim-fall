@@ -44,6 +44,29 @@ source:
     options:
       type: "action"
 
+projector:
+  numerical-sorter:fzf-score:
+    description: "Sort by the score of fzf"
+    options:
+      attrs:
+        - "detail.fzf.score"
+
+  date-sorter:stat-atime:
+    description: "Sort by the atime (last access time) of the file stat"
+    options:
+      attrs:
+        - "detail.stat.atime"
+  date-sorter:stat-mtime:
+    description: "Sort by the mtime (last modified time) of the file stat"
+    options:
+      attrs:
+        - "detail.stat.mtime"
+  date-sorter:stat-birthtime:
+    description: "Sort by the birthtime (creation time) of the file stat"
+    options:
+      attrs:
+        - "detail.stat.birthtime"
+
 action:
   # Define variants of 'open' action
   open:drop:

@@ -12,6 +12,9 @@ oldfiles:
     - exists-filter
     - to-relative-path
     - fzf-matcher
+    - stat-annotator
+    - date-sorter:stat-mtime
+    - numerical-sorter:fzf-score
 
   renderers:
     - smart-path
