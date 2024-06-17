@@ -9,7 +9,7 @@ import * as popup from "https://deno.land/x/denops_std@v6.4.0/popup/mod.ts";
 import { equal } from "jsr:@std/assert@0.225.1/equal";
 
 import type { Preview } from "../../extension/mod.ts";
-import { BaseComponent, type as BaseParams } from "./base.ts";
+import { BaseComponent, type Params as BaseParams } from "./base.ts";
 
 type Params = BaseParams & {
   readonly mode?: "fast" | "correct";
