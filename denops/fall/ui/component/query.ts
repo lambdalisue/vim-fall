@@ -1,7 +1,7 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
+import type { Denops } from "jsr:@denops/std@7.0.0";
 import { equal } from "jsr:@std/assert/equal";
-import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
+import * as fn from "jsr:@denops/std@7.0.0/function";
+import * as buffer from "jsr:@denops/std@7.0.0/buffer";
 
 import { getByteLength } from "../../util/text.ts";
 import { Spinner } from "../util/spinner.ts";

@@ -1,4 +1,4 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
+import type { Denops } from "jsr:@denops/std@7.0.0";
 import type { GetSource } from "jsr:@lambdalisue/vim-fall@0.6.0/source";
 import { omit } from "jsr:@std/collections@1.0.0-rc.1/omit";
 import { deepMerge } from "jsr:@std/collections@0.224.2/deep-merge";

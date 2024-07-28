@@ -1,5 +1,5 @@
 import type { GetPreviewer } from "jsr:@lambdalisue/vim-fall@0.6.0/previewer";
-import * as opt from "https://deno.land/x/denops_std@v6.3.0/option/mod.ts";
+import * as opt from "jsr:@denops/std@7.0.0/option";
 import { join } from "jsr:@std/path@0.225.1/join";
 import { is } from "jsr:@core/unknownutil@3.18.0";
 

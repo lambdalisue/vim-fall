@@ -1,6 +1,6 @@
 import type { GetAction } from "jsr:@lambdalisue/vim-fall@0.6.0/action";
-import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
+import * as buffer from "jsr:@denops/std@7.0.0/buffer";
+import * as fn from "jsr:@denops/std@7.0.0/function";
 import { assert, is } from "jsr:@core/unknownutil@3.18.0";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({

@@ -1,4 +1,4 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
+import type { Denops } from "jsr:@denops/std@7.0.0";
 
 import { type ExtensionConfig, getExtensionOptions } from "../config/mod.ts";
 import type {

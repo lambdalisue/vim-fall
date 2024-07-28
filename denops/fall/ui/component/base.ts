@@ -1,8 +1,8 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
-import { batch } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
-import * as popup from "https://deno.land/x/denops_std@v6.4.0/popup/mod.ts";
-import { g } from "https://deno.land/x/denops_std@v6.4.0/variable/mod.ts";
+import type { Denops } from "jsr:@denops/std@7.0.0";
+import { batch } from "jsr:@denops/std@7.0.0/batch";
+import * as fn from "jsr:@denops/std@7.0.0/function";
+import * as popup from "jsr:@denops/std@7.0.0/popup";
+import { g } from "jsr:@denops/std@7.0.0/variable";
 
 import {
   type Border,

@@ -1,5 +1,5 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
-import { emit } from "https://deno.land/x/denops_std@v6.4.0/autocmd/mod.ts";
+import type { Denops } from "jsr:@denops/std@7.0.0";
+import { emit } from "jsr:@denops/std@7.0.0/autocmd";
 
 /**
  * Save current cmap and emit `User FallPickerEnter:{name}` autocmd.

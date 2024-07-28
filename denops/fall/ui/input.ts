@@ -1,6 +1,6 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
-import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
-import { collect } from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
+import type { Denops } from "jsr:@denops/std@7.0.0";
+import * as opt from "jsr:@denops/std@7.0.0/option";
+import { collect } from "jsr:@denops/std@7.0.0/batch";
 
 import { subscribe } from "../util/event.ts";
 import { startAsyncScheduler } from "../util/async_scheduler.ts";

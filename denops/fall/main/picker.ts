@@ -1,6 +1,6 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
-import { send } from "https://deno.land/x/denops_std@v6.4.0/helper/keymap.ts";
-import { exprQuote as q } from "https://deno.land/x/denops_std@v6.4.0/helper/expr_string.ts";
+import type { Denops } from "jsr:@denops/std@7.0.0";
+import { send } from "jsr:@denops/std@7.0.0/helper/keymap";
+import { exprQuote as q } from "jsr:@denops/std@7.0.0/helper/expr_string";
 import { assert, ensure, is, maybe } from "jsr:@core/unknownutil@3.18.0";
 
 import { subscribe } from "../util/event.ts";

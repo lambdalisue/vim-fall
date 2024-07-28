@@ -1,11 +1,8 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
-import {
-  batch,
-  collect,
-} from "https://deno.land/x/denops_std@v6.4.0/batch/mod.ts";
-import * as fn from "https://deno.land/x/denops_std@v6.4.0/function/mod.ts";
-import * as buffer from "https://deno.land/x/denops_std@v6.4.0/buffer/mod.ts";
-import * as popup from "https://deno.land/x/denops_std@v6.4.0/popup/mod.ts";
+import type { Denops } from "jsr:@denops/std@7.0.0";
+import { batch, collect } from "jsr:@denops/std@7.0.0/batch";
+import * as fn from "jsr:@denops/std@7.0.0/function";
+import * as buffer from "jsr:@denops/std@7.0.0/buffer";
+import * as popup from "jsr:@denops/std@7.0.0/popup";
 import { equal } from "jsr:@std/assert@0.225.1/equal";
 
 import type { Preview } from "../../extension/mod.ts";

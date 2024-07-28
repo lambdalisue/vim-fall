@@ -1,5 +1,5 @@
-import type { Denops } from "https://deno.land/x/denops_std@v6.4.0/mod.ts";
-import * as opt from "https://deno.land/x/denops_std@v6.4.0/option/mod.ts";
+import type { Denops } from "jsr:@denops/std@7.0.0";
+import * as opt from "jsr:@denops/std@7.0.0/option";
 import {
   assert,
   ensure,
