@@ -1,4 +1,4 @@
-import type { Denops } from "jsr:@denops/core@6.1.0";
+import type { Denops } from "jsr:@denops/std@7.0.0";
 
 import type { Promish } from "./_common.ts";
 import type { Item } from "./item.ts";
