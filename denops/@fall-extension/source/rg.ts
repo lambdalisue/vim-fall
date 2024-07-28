@@ -3,7 +3,7 @@ import type {
   SourceItem,
 } from "jsr:@lambdalisue/vim-fall@0.6.0/source";
 import { input } from "jsr:@lambdalisue/vim-fall@0.6.0/util/input";
-import { TextLineStream } from "https://deno.land/std@0.224.0/streams/mod.ts";
+import { TextLineStream } from "jsr:@std/streams@1.0.0/text-line-stream";
 import * as fn from "jsr:@denops/std@7.0.0/function";
 import { assert, is, maybe } from "jsr:@core/unknownutil@3.18.0";
 

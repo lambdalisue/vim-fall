@@ -1,7 +1,4 @@
-import {
-  AsyncDisposableStack,
-  DisposableStack,
-} from "https://deno.land/x/dispose@1.0.1/mod.ts";
+import { AsyncDisposableStack, DisposableStack } from "jsr:@nick/dispose@1.1.0";
 
 // DisposableStack and AsyncDisposableStack are not available yet.
 // https://github.com/denoland/deno/issues/20821
