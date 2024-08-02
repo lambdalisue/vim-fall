@@ -1,14 +1,14 @@
 import type { GetPreviewer } from "jsr:@lambdalisue/vim-fall@0.6.0/previewer";
 import { stringify } from "jsr:@std/yaml@0.224.1/stringify";
 import { basename } from "jsr:@std/path@1.0.0-rc.1/basename";
-import { is } from "jsr:@core/unknownutil@3.18.0";
+import { as, is } from "jsr:@core/unknownutil@^4.0.0";
 
 const isExtensionDetail = is.ObjectOf({
   extension: is.ObjectOf({
     type: is.String,
     name: is.String,
     script: is.String,
-    config: is.OptionalOf(is.Record),
+    config: as.Optional(is.Record),
   }),
 });
 

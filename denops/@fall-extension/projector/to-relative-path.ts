@@ -1,7 +1,7 @@
 import type { GetProjector } from "jsr:@lambdalisue/vim-fall@0.6.0/projector";
 import * as fn from "jsr:@denops/std@7.0.0/function";
 import { relative } from "jsr:@std/path@0.225.0/relative";
-import { is } from "jsr:@core/unknownutil@3.18.0";
+import { is } from "jsr:@core/unknownutil@^4.0.0";
 
 const isPathDetail = is.ObjectOf({
   path: is.String,

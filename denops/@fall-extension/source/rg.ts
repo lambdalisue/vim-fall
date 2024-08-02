@@ -5,7 +5,7 @@ import type {
 import { input } from "jsr:@lambdalisue/vim-fall@0.6.0/util/input";
 import { TextLineStream } from "jsr:@std/streams@1.0.0/text-line-stream";
 import * as fn from "jsr:@denops/std@7.0.0/function";
-import { assert, is, maybe } from "jsr:@core/unknownutil@3.18.0";
+import { assert, is, maybe } from "jsr:@core/unknownutil@^4.0.0";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
   args: is.ArrayOf(is.String),

@@ -1,10 +1,10 @@
 import type { GetSource } from "jsr:@lambdalisue/vim-fall@0.6.0/source";
-import { assert, is } from "jsr:@core/unknownutil@3.18.0";
+import { assert, as, is } from "jsr:@core/unknownutil@^4.0.0";
 
 const isSourceItem = is.ObjectOf({
   value: is.String,
-  label: is.OptionalOf(is.String),
-  detail: is.OptionalOf(is.RecordOf(is.Unknown, is.String)),
+  label: as.Optional(is.String),
+  detail: as.Optional(is.RecordOf(is.Unknown, is.String)),
 });
 
 const isOptions = is.StrictOf(is.ObjectOf({

@@ -1,4 +1,4 @@
-import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
+import { as, is, type Predicate } from "jsr:@core/unknownutil@^4.0.0";
 
 import type { Border } from "../../ui/util/border.ts";
 import type { Divider } from "../../ui/util/divider.ts";
@@ -48,9 +48,9 @@ const isPickerStyleConfig = is.PartialOf(is.ObjectOf({
     heightMin: is.Number,
     heightMax: is.Number,
     previewRatio: is.Number,
-    border: is.OptionalOf(isBorder),
-    divider: is.OptionalOf(isDivider),
-    zindex: is.OptionalOf(is.Number),
+    border: as.Optional(isBorder),
+    divider: as.Optional(isDivider),
+    zindex: as.Optional(is.Number),
   })),
   query: is.PartialOf(is.ObjectOf({
     spinner: is.ArrayOf(is.String),
@@ -64,8 +64,8 @@ const isInputStyleConfig = is.PartialOf(is.ObjectOf({
     widthRatio: is.Number,
     widthMin: is.Number,
     widthMax: is.Number,
-    border: is.OptionalOf(isBorder),
-    zindex: is.OptionalOf(is.Number),
+    border: as.Optional(isBorder),
+    zindex: as.Optional(is.Number),
   })),
 })) satisfies Predicate<InputStyleConfig>;
 

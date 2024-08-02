@@ -1,6 +1,6 @@
 import type { GetSource } from "jsr:@lambdalisue/vim-fall@0.6.0/source";
 import * as fn from "jsr:@denops/std@7.0.0/function";
-import { assert, is } from "jsr:@core/unknownutil@3.18.0";
+import { assert, is } from "jsr:@core/unknownutil@^4.0.0";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
   mode: is.LiteralOneOf(["cmd", "search", "expr", "input", "debug"] as const),

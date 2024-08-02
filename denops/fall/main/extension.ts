@@ -66,7 +66,7 @@ export function main(denops: Denops): void {
       }
     },
     "extension:list": (type) => {
-      assert(type, is.OptionalOf(isExtensionType));
+      assert(type, as.Optional(isExtensionType));
       const loaders = type
         ? listExtensionLoaders(type)
         : listExtensionLoaders();

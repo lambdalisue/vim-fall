@@ -1,4 +1,4 @@
-import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
+import { is, type Predicate } from "jsr:@core/unknownutil@^4.0.0";
 
 import { loadConfig, mergeConfigs } from "../util.ts";
 

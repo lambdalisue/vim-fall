@@ -1,6 +1,6 @@
 import type { GetAction } from "jsr:@lambdalisue/vim-fall@0.6.0/action";
 import * as fn from "jsr:@denops/std@7.0.0/function";
-import { assert, is } from "jsr:@core/unknownutil@3.18.0";
+import { assert, as, is } from "jsr:@core/unknownutil@^4.0.0";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
   what: is.PartialOf(is.ObjectOf({
@@ -16,16 +16,16 @@ const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
 
 const isGrepDetail = is.ObjectOf({
   path: is.String,
-  line: is.OptionalOf(is.Number),
-  column: is.OptionalOf(is.Number),
-  length: is.OptionalOf(is.Number),
-  content: is.OptionalOf(is.String),
+  line: as.Optional(is.Number),
+  column: as.Optional(is.Number),
+  length: as.Optional(is.Number),
+  content: as.Optional(is.String),
 });
 
 const isPathDetail = is.ObjectOf({
   path: is.String,
-  line: is.OptionalOf(is.Number),
-  column: is.OptionalOf(is.Number),
+  line: as.Optional(is.Number),
+  column: as.Optional(is.Number),
 });
 
 function isDefined<T>(value: T | undefined): value is T {

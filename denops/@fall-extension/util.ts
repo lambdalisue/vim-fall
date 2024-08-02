@@ -1,4 +1,4 @@
-import { is, type Predicate } from "jsr:@core/unknownutil@3.18.1";
+import { is, type Predicate } from "jsr:@core/unknownutil@^4.0.0";
 
 export function dig(obj: unknown, path: string): unknown {
   const inner = (obj: unknown, path: string[]): unknown => {

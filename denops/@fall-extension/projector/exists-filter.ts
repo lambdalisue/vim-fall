@@ -1,6 +1,6 @@
 import type { GetProjector } from "jsr:@lambdalisue/vim-fall@0.6.0/projector";
 import { exists } from "jsr:@std/fs@0.229.0/exists";
-import { is } from "jsr:@core/unknownutil@3.18.0";
+import { is } from "jsr:@core/unknownutil@^4.0.0";
 
 const isPathDetail = is.ObjectOf({
   path: is.String,

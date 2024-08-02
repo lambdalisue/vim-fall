@@ -1,5 +1,5 @@
 import type { GetPreviewer } from "jsr:@lambdalisue/vim-fall@0.6.0/previewer";
-import { assert, is } from "jsr:@core/unknownutil@3.18.0";
+import { assert, is } from "jsr:@core/unknownutil@^4.0.0";
 
 import { retrieve } from "../util.ts";
 

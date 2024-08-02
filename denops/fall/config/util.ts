@@ -1,6 +1,6 @@
 import type { Denops } from "jsr:@denops/std@7.0.0";
 import * as vars from "jsr:@denops/std@7.0.0/variable";
-import { ensure, is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
+import { ensure, is, type Predicate } from "jsr:@core/unknownutil@^4.0.0";
 import { parse as parseYaml } from "jsr:@std/yaml@0.224.0/parse";
 import { join } from "jsr:@std/path@0.225.1/join";
 import { omit } from "jsr:@std/collections@0.224.2/omit";

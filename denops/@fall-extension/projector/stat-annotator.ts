@@ -1,9 +1,9 @@
 import type { GetProjector } from "jsr:@lambdalisue/vim-fall@0.6.0/projector";
-import { is } from "jsr:@core/unknownutil@3.18.0";
+import { as, is } from "jsr:@core/unknownutil@^4.0.0";
 
 const isPathDetail = is.ObjectOf({
   path: is.String,
-  stat: is.OptionalOf(is.Record),
+  stat: as.Optional(is.Record),
 });
 
 export const getProjector: GetProjector = (_denops, _options) => {

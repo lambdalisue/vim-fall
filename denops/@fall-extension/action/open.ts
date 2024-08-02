@@ -1,7 +1,7 @@
 import type { GetAction } from "jsr:@lambdalisue/vim-fall@0.6.0/action";
 import * as buffer from "jsr:@denops/std@7.0.0/buffer";
 import * as fn from "jsr:@denops/std@7.0.0/function";
-import { assert, is } from "jsr:@core/unknownutil@3.18.0";
+import { assert, as, is } from "jsr:@core/unknownutil@^4.0.0";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
   bang: is.Boolean,
@@ -13,8 +13,8 @@ const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({
 
 const isPathDetail = is.ObjectOf({
   path: is.String,
-  line: is.OptionalOf(is.Number),
-  column: is.OptionalOf(is.Number),
+  line: as.Optional(is.Number),
+  column: as.Optional(is.Number),
 });
 
 export const getAction: GetAction = (denops, options) => {

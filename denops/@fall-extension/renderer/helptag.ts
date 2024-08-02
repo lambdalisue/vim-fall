@@ -1,11 +1,11 @@
 import type { GetRenderer } from "jsr:@lambdalisue/vim-fall@0.6.0/renderer";
-import { is } from "jsr:@core/unknownutil@3.18.0";
+import { as, is } from "jsr:@core/unknownutil@^4.0.0";
 
 import { getByteLength } from "../util.ts";
 
 const isHelptagDetail = is.ObjectOf({
   helptag: is.String,
-  lang: is.OptionalOf(is.String),
+  lang: as.Optional(is.String),
 });
 
 export const getRenderer: GetRenderer = (_denops, _options) => {

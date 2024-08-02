@@ -1,6 +1,6 @@
 import type { GetProjector } from "jsr:@lambdalisue/vim-fall@0.6.0/projector";
 import * as fn from "jsr:@denops/std@7.0.0/function";
-import { assert, is } from "jsr:@core/unknownutil@3.18.0";
+import { assert, is } from "jsr:@core/unknownutil@^4.0.0";
 
 import { retrieve } from "../util.ts";
 

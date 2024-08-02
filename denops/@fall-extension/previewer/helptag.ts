@@ -1,12 +1,12 @@
 import type { GetPreviewer } from "jsr:@lambdalisue/vim-fall@0.6.0/previewer";
 import * as opt from "jsr:@denops/std@7.0.0/option";
 import { join } from "jsr:@std/path@0.225.1/join";
-import { is } from "jsr:@core/unknownutil@3.18.0";
+import { as, is } from "jsr:@core/unknownutil@^4.0.0";
 
 const isHelptagDetail = is.ObjectOf({
   helptag: is.String,
   helpfile: is.String,
-  lang: is.OptionalOf(is.String),
+  lang: as.Optional(is.String),
 });
 
 export const getPreviewer: GetPreviewer = async (denops, _options) => {

@@ -1,5 +1,5 @@
 import type { Denops } from "jsr:@denops/std@7.0.0";
-import { ensure, is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
+import { ensure, as, is, type Predicate } from "jsr:@core/unknownutil@^4.0.0";
 
 import { isDefined } from "../util/collection.ts";
 import { Input } from "../ui/input.ts";
@@ -18,9 +18,9 @@ interface InputParams {
 
 const isInputParams = is.ObjectOf({
   prompt: is.String,
-  text: is.OptionalOf(is.String),
-  completion: is.OptionalOf(is.String),
-  title: is.OptionalOf(is.String),
+  text: as.Optional(is.String),
+  completion: as.Optional(is.String),
+  title: as.Optional(is.String),
 }) satisfies Predicate<InputParams>;
 
 async function input(

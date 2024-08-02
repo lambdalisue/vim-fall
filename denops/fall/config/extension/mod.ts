@@ -1,4 +1,4 @@
-import { is, type Predicate } from "jsr:@core/unknownutil@3.18.0";
+import { as, is, type Predicate } from "jsr:@core/unknownutil@^4.0.0";
 
 import { loadConfig, mergeConfigs } from "../util.ts";
 
@@ -16,7 +16,7 @@ export type ExtensionConfig = {
 };
 
 const isExtensionOptions = is.ObjectOf({
-  description: is.OptionalOf(is.String),
+  description: as.Optional(is.String),
   options: is.RecordOf(
     is.Unknown,
     is.String,
