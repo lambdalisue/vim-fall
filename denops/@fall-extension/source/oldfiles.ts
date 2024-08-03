@@ -1,5 +1,5 @@
-import type { GetSource } from "jsr:@lambdalisue/vim-fall@0.6.0/source";
-import * as vars from "jsr:@denops/std@7.0.0/variable";
+import type { GetSource } from "jsr:@lambdalisue/vim-fall@^0.6.0/source";
+import * as vars from "jsr:@denops/std@^7.0.0/variable";
 import { ensure, is } from "jsr:@core/unknownutil@^4.0.0";
 
 export const getSource: GetSource = (denops, _options) => {

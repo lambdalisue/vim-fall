@@ -1,6 +1,6 @@
-import { walk, WalkError } from "jsr:@std/fs@0.229.0/walk";
-import { join } from "jsr:@std/path@0.225.0/join";
-import { basename } from "jsr:@std/path@0.225.0/basename";
+import { walk } from "jsr:@std/fs@^1.0.0/walk";
+import { join } from "jsr:@std/path@^1.0.0/join";
+import { basename } from "jsr:@std/path@^1.0.0/basename";
 
 import type {
   Action,
@@ -87,7 +87,7 @@ export async function discoverExtensionLoaders(
         promises.push(registerExtensionLoader(basename(path, ".ts"), path));
       }
     } catch (err) {
-      if (err instanceof WalkError) {
+      if (err instanceof Deno.errors.NotFound) {
         continue;
       }
       throw err;

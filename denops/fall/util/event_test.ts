@@ -1,4 +1,4 @@
-import { assert, assertEquals } from "jsr:@std/assert@0.225.1";
+import { assert, assertEquals } from "jsr:@std/assert@^1.0.0";
 import { dispatch, isFallEventName, subscribe } from "./event.ts";
 
 Deno.test("subscribe and dispatch events", () => {

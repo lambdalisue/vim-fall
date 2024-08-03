@@ -1,12 +1,12 @@
-import type { Denops } from "jsr:@denops/std@7.0.0";
-import * as buffer from "jsr:@denops/std@7.0.0/buffer";
-import { parseArgs } from "jsr:@std/cli@0.224.5/parse-args";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import * as buffer from "jsr:@denops/std@^7.0.0/buffer";
+import { parseArgs } from "jsr:@std/cli@^1.0.0/parse-args";
 import {
   assert,
   ensure,
   is,
   type Predicate,
-} from "jsr:@core/unknownutil@3.18.0";
+} from "jsr:@core/unknownutil@^3.18.0";
 
 import {
   getConfigDir,

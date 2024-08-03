@@ -1,4 +1,4 @@
-import type { Denops } from "jsr:@denops/std@7.0.0";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
 import { ensure, is } from "jsr:@core/unknownutil@^4.0.0";
 
 export type InputParams = {

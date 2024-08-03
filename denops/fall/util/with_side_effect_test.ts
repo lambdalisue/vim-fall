@@ -1,4 +1,4 @@
-import { assertEquals } from "jsr:@std/assert@0.225.1";
+import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import { withSideEffect } from "./with_side_effect.ts";
 
 Deno.test("withSideEffect should execute the side effect and return the value", () => {

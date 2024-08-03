@@ -1,5 +1,5 @@
-import type { Denops } from "jsr:@denops/std@7.0.0";
-import { ensure, as, is, type Predicate } from "jsr:@core/unknownutil@^4.0.0";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import { as, ensure, is, type Predicate } from "jsr:@core/unknownutil@^4.0.0";
 
 import { isDefined } from "../util/collection.ts";
 import { Input } from "../ui/input.ts";

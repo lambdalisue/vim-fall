@@ -1,5 +1,5 @@
-import type { GetRenderer } from "jsr:@lambdalisue/vim-fall@0.6.0/renderer";
-import { SEPARATOR } from "jsr:@std/path@0.225.0/constants";
+import type { GetRenderer } from "jsr:@lambdalisue/vim-fall@^0.6.0/renderer";
+import { SEPARATOR } from "jsr:@std/path@^1.0.0/constants";
 
 import { getByteLength } from "../util.ts";
 

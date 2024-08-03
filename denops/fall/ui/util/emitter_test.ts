@@ -1,5 +1,5 @@
-import { assertEquals } from "jsr:@std/assert@0.225.1";
-import { DenopsStub } from "jsr:@denops/test@3.0.1/stub";
+import { assertEquals } from "jsr:@std/assert@^1.0.0";
+import { DenopsStub } from "jsr:@denops/test@^3.0.1/stub";
 
 import { emitPickerEnter, emitPickerLeave } from "./emitter.ts";
 

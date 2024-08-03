@@ -1,8 +1,8 @@
-import type { Denops } from "jsr:@denops/std@7.0.0";
-import type { GetAction } from "jsr:@lambdalisue/vim-fall@0.6.0/action";
-import * as fn from "jsr:@denops/std@7.0.0/function";
-import { input } from "jsr:@denops/std@7.0.0/helper/input";
-import { dirname } from "jsr:@std/path@0.225.0/dirname";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import type { GetAction } from "jsr:@lambdalisue/vim-fall@^0.6.0/action";
+import * as fn from "jsr:@denops/std@^7.0.0/function";
+import { input } from "jsr:@denops/std@^7.0.0/helper/input";
+import { dirname } from "jsr:@std/path@^1.0.0/dirname";
 import { assert, is, type Predicate } from "jsr:@core/unknownutil@^4.0.0";
 
 import { retrieve } from "../util.ts";

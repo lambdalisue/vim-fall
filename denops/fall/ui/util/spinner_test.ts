@@ -1,5 +1,5 @@
-import { assertEquals } from "jsr:@std/assert@0.225.1";
-import { delay } from "jsr:@std/async@0.224.0";
+import { assertEquals } from "jsr:@std/assert@^1.0.0";
+import { delay } from "jsr:@std/async@^0.224.0";
 
 import { Spinner, UNICODE_SPINNER } from "./spinner.ts";
 

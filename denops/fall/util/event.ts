@@ -2,7 +2,7 @@ import {
   is,
   type Predicate,
   type PredicateType,
-} from "jsr:@core/unknownutil@3.18.0";
+} from "jsr:@core/unknownutil@^3.18.0";
 
 /**
  * Subscribe to an event.

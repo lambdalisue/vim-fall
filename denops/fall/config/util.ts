@@ -1,11 +1,11 @@
-import type { Denops } from "jsr:@denops/std@7.0.0";
-import * as vars from "jsr:@denops/std@7.0.0/variable";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import * as vars from "jsr:@denops/std@^7.0.0/variable";
 import { ensure, is, type Predicate } from "jsr:@core/unknownutil@^4.0.0";
-import { parse as parseYaml } from "jsr:@std/yaml@0.224.0/parse";
-import { join } from "jsr:@std/path@0.225.1/join";
-import { omit } from "jsr:@std/collections@0.224.2/omit";
-import { deepMerge } from "jsr:@std/collections@0.224.2/deep-merge";
-import { ensureDir } from "jsr:@std/fs@0.229.0/ensure-dir";
+import { parse as parseYaml } from "jsr:@std/yaml@^1.0.0/parse";
+import { join } from "jsr:@std/path@^1.0.0/join";
+import { omit } from "jsr:@std/collections@^1.0.0/omit";
+import { deepMerge } from "jsr:@std/collections@^1.0.0/deep-merge";
+import { ensureDir } from "jsr:@std/fs@^1.0.0/ensure-dir";
 
 export function mergeConfigs<T extends Record<PropertyKey, unknown>>(
   ...configs: readonly T[]

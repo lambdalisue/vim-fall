@@ -1,5 +1,5 @@
-import type { Denops } from "jsr:@denops/std@7.0.0";
-import type { GetAction } from "jsr:@lambdalisue/vim-fall@0.6.0/action";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import type { GetAction } from "jsr:@lambdalisue/vim-fall@^0.6.0/action";
 
 export const getAction: GetAction = (denops, _options) => {
   return {

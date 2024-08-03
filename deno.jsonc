@@ -13,7 +13,9 @@
   },
   "publish": {
     "include": [
-      "./denops/@fall"
+      "./denops/@fall",
+      "README.md",
+      "LICENSE"
     ]
   },
   "exclude": [
@@ -26,7 +28,8 @@
     "test:coverage": "deno task test --coverage=.coverage",
     "coverage": "deno coverage .coverage --exclude=testdata/",
     "update": "deno run --allow-env --allow-read --allow-write=. --allow-run=git,deno --allow-net=deno.land,jsr.io,registry.npmjs.org jsr:@molt/cli ./**/*.ts",
-    "update:commit": "deno task -q update --commit --pre-commit=fmt,lint",
+    "update:write": "deno task -q update --write",
+    "update:commit": "deno task -q update --commit --prefix :package: --pre-commit=fmt,lint",
     "gen": "deno run -A ./.script/build_fall_config_schema.ts && deno fmt"
   }
 }

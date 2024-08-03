@@ -1,4 +1,4 @@
-import { assertEquals } from "jsr:@std/assert@0.225.1";
+import { assertEquals } from "jsr:@std/assert@^1.0.0";
 import { DynamicChunkStream } from "./dynamic_chunk_stream.ts";
 
 Deno.test("DynamicChunkStream", async (t) => {

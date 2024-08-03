@@ -1,11 +1,12 @@
-import type { Denops } from "jsr:@denops/std@7.0.0";
-import * as opt from "jsr:@denops/std@7.0.0/option";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import * as opt from "jsr:@denops/std@^7.0.0/option";
 import {
+  as,
   assert,
   ensure,
   is,
   type Predicate,
-} from "jsr:@core/unknownutil@3.18.0";
+} from "jsr:@core/unknownutil@^4.0.0";
 
 import { getConfigDir, loadExtensionConfig } from "../config/mod.ts";
 import {

@@ -1,4 +1,4 @@
-import type { Denops } from "jsr:@denops/std@7.0.0";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
 import { ensure } from "jsr:@core/unknownutil@^4.0.0";
 
 import { dispatch, isFallEventName } from "../util/event.ts";

@@ -1,9 +1,9 @@
-import type { Denops } from "jsr:@denops/std@7.0.0";
-import { batch, collect } from "jsr:@denops/std@7.0.0/batch";
-import * as fn from "jsr:@denops/std@7.0.0/function";
-import * as buffer from "jsr:@denops/std@7.0.0/buffer";
-import * as popup from "jsr:@denops/std@7.0.0/popup";
-import { equal } from "jsr:@std/assert@0.225.1/equal";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import { batch, collect } from "jsr:@denops/std@^7.0.0/batch";
+import * as fn from "jsr:@denops/std@^7.0.0/function";
+import * as buffer from "jsr:@denops/std@^7.0.0/buffer";
+import * as popup from "jsr:@denops/std@^7.0.0/popup";
+import { equal } from "jsr:@std/assert@^1.0.0/equal";
 
 import type { Preview } from "../../extension/mod.ts";
 import { BaseComponent, type Params as BaseParams } from "./base.ts";

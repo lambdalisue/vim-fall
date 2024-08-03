@@ -1,4 +1,4 @@
-import { equal } from "jsr:@std/assert@0.225.2/equal";
+import { equal } from "jsr:@std/assert@^1.0.0/equal";
 
 import type { Preview, Previewer, PreviewerItem } from "../extension/mod.ts";
 import { dispatch } from "../util/event.ts";
