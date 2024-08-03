@@ -1,5 +1,5 @@
 import type { GetPreviewer } from "jsr:@lambdalisue/vim-fall@^0.6.0/previewer";
-import { basename } from "jsr:@std/path@^1.0.2/basename";
+import { basename } from "jsr:@std/path@^1.0.0/basename";
 import * as fn from "jsr:@denops/std@^7.0.0/function";
 import { assert, is } from "jsr:@core/unknownutil@^4.0.0";
 

@@ -1,6 +1,6 @@
 import type { GetPreviewer } from "jsr:@lambdalisue/vim-fall@^0.6.0/previewer";
-import { stringify } from "jsr:@std/yaml@^0.224.1/stringify";
-import { basename } from "jsr:@std/path@^1.0.0-rc.1/basename";
+import { stringify } from "jsr:@std/yaml@^1.0.0/stringify";
+import { basename } from "jsr:@std/path@^1.0.0/basename";
 import { as, is } from "jsr:@core/unknownutil@^4.0.0";
 
 const isExtensionDetail = is.ObjectOf({

@@ -1,4 +1,4 @@
-import { assertEquals } from "jsr:@std/assert@^0.225.1";
+import { assertEquals } from "jsr:@std/assert@^1.0.0";
 
 import type { Item, Projector } from "../extension/mod.ts";
 import { subscribe } from "../util/event.ts";
