@@ -5,24 +5,57 @@ on:
     branches:
       - main
   pull_request:
+    paths:
+      - "**.md"
+      - "**.ts"
+      - "deno.jsonc"
+      - ".github/workflows/test.yml"
   workflow_dispatch:
+    inputs:
+      denops_branch:
+        description: "Denops branch to test"
+        required: false
+        default: "main"
 
 defaults:
   run:
     shell: bash --noprofile --norc -eo pipefail {0}
 
+env:
+  DENOPS_BRANCH: ${{ github.event.inputs.denops_branch || 'main' }}
+
 jobs:
   check:
-    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        runner:
+          - ubuntu-latest
+        deno_version:
+          - "1.x"
+    runs-on: ${{ matrix.runner }}
     steps:
+      - run: git config --global core.autocrlf false
+        if: runner.os == 'Windows'
       - uses: actions/checkout@v4
-      - uses: denoland/setup-deno@v1
-      - name: Lint
+      - uses: denoland/setup-deno@v1.1.4
+        with:
+          deno-version: "${{ matrix.deno_version }}"
+      - uses: actions/cache@v4
+        with:
+          key: deno-${{ hashFiles('**/*') }}
+          restore-keys: deno-
+          path: |
+            /home/runner/.cache/deno/deps/https/deno.land
+      - name: Lint check
         run: deno lint
-      - name: Format
+      - name: Format check
         run: deno fmt --check
       - name: Type check
         run: deno task check
+      - name: Gen check
+        run: |
+          deno task gen
+          git diff --exit-code
 
   test:
     strategy:
@@ -32,39 +65,43 @@ jobs:
           - macos-latest
           - ubuntu-latest
         deno_version:
-          - "1.45.x"
+          - "1.45.0"
           - "1.x"
         host_version:
           - vim: "v9.1.0448"
             nvim: "v0.10.0"
-
     runs-on: ${{ matrix.runner }}
-
+    timeout-minutes: 15
     steps:
       - run: git config --global core.autocrlf false
         if: runner.os == 'Windows'
 
       - uses: actions/checkout@v4
 
-      - uses: denoland/setup-deno@v1
+      - uses: denoland/setup-deno@v1.1.4
         with:
-          deno-version: ${{ matrix.deno_version }}
+          deno-version: "${{ matrix.deno_version }}"
 
       - name: Get denops
         run: |
           git clone https://github.com/vim-denops/denops.vim /tmp/denops.vim
           echo "DENOPS_TEST_DENOPS_PATH=/tmp/denops.vim" >> "$GITHUB_ENV"
 
+      - name: Try switching denops branch
+        run: |
+          git -C /tmp/denops.vim switch ${{ env.DENOPS_BRANCH }} || true
+          git -C /tmp/denops.vim branch
+
       - uses: rhysd/action-setup-vim@v1
         id: vim
         with:
-          version: ${{ matrix.host_version.vim }}
+          version: "${{ matrix.host_version.vim }}"
 
       - uses: rhysd/action-setup-vim@v1
         id: nvim
         with:
           neovim: true
-          version: ${{ matrix.host_version.nvim }}
+          version: "${{ matrix.host_version.nvim }}"
 
       - name: Export executables
         run: |
@@ -79,14 +116,15 @@ jobs:
 
       - name: Perform pre-cache
         run: |
-          deno cache ${DENOPS_TEST_DENOPS_PATH}/denops/@denops-private/mod.ts
-          deno cache ./denops/**/*.ts
+          deno cache \
+            ${DENOPS_TEST_DENOPS_PATH}/denops/@denops-private/mod.ts ./denops/fall/main.ts
 
-      - name: Run tests
-        run: |
-          deno task test:coverage
+      - name: Test
+        run: deno task test:coverage
+        timeout-minutes: 15
+
+      - run: |
           deno task coverage --lcov > coverage.lcov
-        timeout-minutes: 5
 
       - uses: codecov/codecov-action@v4
         with:
