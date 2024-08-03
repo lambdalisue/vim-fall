@@ -1,5 +1,5 @@
-import type { Denops } from "jsr:@denops/std@7.0.0";
-import * as buffer from "jsr:@denops/std@7.0.0/buffer";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import * as buffer from "jsr:@denops/std@^7.0.0/buffer";
 
 import { getByteLength } from "../../util/text.ts";
 import { BaseComponent, type Params as BaseParams } from "./base.ts";

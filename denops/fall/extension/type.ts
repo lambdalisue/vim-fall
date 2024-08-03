@@ -1,4 +1,4 @@
-import type { Denops } from "jsr:@denops/std@7.0.0";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
 import type * as core from "../../@fall/mod.ts";
 
 export type {

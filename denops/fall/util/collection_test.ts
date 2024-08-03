@@ -1,4 +1,4 @@
-import { assertEquals } from "jsr:@std/assert@0.225.1";
+import { assertEquals } from "jsr:@std/assert@^0.225.1";
 import * as collection from "./collection.ts";
 
 Deno.test("isDefined", async (t) => {

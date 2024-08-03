@@ -1,7 +1,7 @@
-import type { GetSource } from "jsr:@lambdalisue/vim-fall@0.6.0/source";
-import * as opt from "jsr:@denops/std@7.0.0/option";
-import { walk, WalkError } from "jsr:@std/fs@0.229.0/walk";
-import { join } from "jsr:@std/path@0.225.1/join";
+import type { GetSource } from "jsr:@lambdalisue/vim-fall@^0.6.0/source";
+import * as opt from "jsr:@denops/std@^7.0.0/option";
+import { walk, WalkError } from "jsr:@std/fs@^0.229.0/walk";
+import { join } from "jsr:@std/path@^0.225.1/join";
 
 type Helptag = {
   helptag: string;

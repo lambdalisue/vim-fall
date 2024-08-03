@@ -1,7 +1,7 @@
-import type { GetProjector } from "jsr:@lambdalisue/vim-fall@0.6.0/projector";
+import type { GetProjector } from "jsr:@lambdalisue/vim-fall@^0.6.0/projector";
 import type { ItemDecoration } from "../../@fall/item.ts";
 import { AsyncFzf } from "npm:fzf@0.5.2";
-import { omit } from "jsr:@std/collections@1.0.0-rc.1/omit";
+import { omit } from "jsr:@std/collections@^1.0.0-rc.1/omit";
 import { assert, is } from "jsr:@core/unknownutil@^4.0.0";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({})));

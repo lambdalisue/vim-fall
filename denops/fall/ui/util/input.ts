@@ -1,9 +1,9 @@
-import type { Denops } from "jsr:@denops/std@7.0.0";
-import * as fn from "jsr:@denops/std@7.0.0/function";
-import { collect } from "jsr:@denops/std@7.0.0/batch";
-import { input, type InputOptions } from "jsr:@denops/std@7.0.0/helper/input";
-import { send } from "jsr:@denops/std@7.0.0/helper/keymap";
-import { exprQuote as q } from "jsr:@denops/std@7.0.0/helper/expr_string";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import * as fn from "jsr:@denops/std@^7.0.0/function";
+import { collect } from "jsr:@denops/std@^7.0.0/batch";
+import { input, type InputOptions } from "jsr:@denops/std@^7.0.0/helper/input";
+import { send } from "jsr:@denops/std@^7.0.0/helper/keymap";
+import { exprQuote as q } from "jsr:@denops/std@^7.0.0/helper/expr_string";
 
 import { startAsyncScheduler } from "../../util/async_scheduler.ts";
 import { dispatch } from "../../util/event.ts";

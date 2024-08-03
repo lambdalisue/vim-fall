@@ -1,4 +1,4 @@
-import { assertEquals } from "jsr:@std/assert@0.225.1";
+import { assertEquals } from "jsr:@std/assert@^0.225.1";
 import { subscribe } from "../util/event.ts";
 import { ItemCollector } from "./item_collector.ts";
 

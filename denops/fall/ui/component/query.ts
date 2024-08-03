@@ -1,7 +1,7 @@
-import type { Denops } from "jsr:@denops/std@7.0.0";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
 import { equal } from "jsr:@std/assert/equal";
-import * as fn from "jsr:@denops/std@7.0.0/function";
-import * as buffer from "jsr:@denops/std@7.0.0/buffer";
+import * as fn from "jsr:@denops/std@^7.0.0/function";
+import * as buffer from "jsr:@denops/std@^7.0.0/buffer";
 
 import { getByteLength } from "../../util/text.ts";
 import { Spinner } from "../util/spinner.ts";

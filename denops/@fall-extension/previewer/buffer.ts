@@ -1,7 +1,7 @@
-import type { GetPreviewer } from "jsr:@lambdalisue/vim-fall@0.6.0/previewer";
-import { collect } from "jsr:@denops/std@7.0.0/batch";
-import { basename } from "jsr:@std/path@1.0.2/basename";
-import * as fn from "jsr:@denops/std@7.0.0/function";
+import type { GetPreviewer } from "jsr:@lambdalisue/vim-fall@^0.6.0/previewer";
+import { collect } from "jsr:@denops/std@^7.0.0/batch";
+import { basename } from "jsr:@std/path@^1.0.2/basename";
+import * as fn from "jsr:@denops/std@^7.0.0/function";
 import { assert, is } from "jsr:@core/unknownutil@^4.0.0";
 
 import { retrieve } from "../util.ts";

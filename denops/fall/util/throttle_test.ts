@@ -1,5 +1,5 @@
-import { assertEquals } from "jsr:@std/assert@0.225.1";
-import { delay } from "jsr:@std/async@0.224.0/delay";
+import { assertEquals } from "jsr:@std/assert@^0.225.1";
+import { delay } from "jsr:@std/async@^0.224.0/delay";
 import { throttle } from "./throttle.ts";
 
 Deno.test("throttle", async (t) => {

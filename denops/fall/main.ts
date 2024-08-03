@@ -1,6 +1,6 @@
 import "./polyfill.ts";
 
-import type { Denops } from "jsr:@denops/std@7.0.0";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
 
 import { main as mainConfig } from "./main/config.ts";
 import { main as mainEvent } from "./main/event.ts";

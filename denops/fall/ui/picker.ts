@@ -1,6 +1,6 @@
-import type { Denops } from "jsr:@denops/std@7.0.0";
-import * as opt from "jsr:@denops/std@7.0.0/option";
-import { collect } from "jsr:@denops/std@7.0.0/batch";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
+import * as opt from "jsr:@denops/std@^7.0.0/option";
+import { collect } from "jsr:@denops/std@^7.0.0/batch";
 
 import type {
   Item,

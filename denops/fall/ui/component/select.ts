@@ -1,9 +1,9 @@
-import type { Denops } from "jsr:@denops/std@7.0.0";
+import type { Denops } from "jsr:@denops/std@^7.0.0";
 import { equal } from "jsr:@std/assert/equal";
-import type { Decoration as Decoration } from "jsr:@denops/std@7.0.0/buffer";
-import { batch } from "jsr:@denops/std@7.0.0/batch";
-import * as fn from "jsr:@denops/std@7.0.0/function";
-import * as buffer from "jsr:@denops/std@7.0.0/buffer";
+import type { Decoration as Decoration } from "jsr:@denops/std@^7.0.0/buffer";
+import { batch } from "jsr:@denops/std@^7.0.0/batch";
+import * as fn from "jsr:@denops/std@^7.0.0/function";
+import * as buffer from "jsr:@denops/std@^7.0.0/buffer";
 
 import type { RendererItem } from "../../extension/mod.ts";
 import { isDefined } from "../../util/collection.ts";

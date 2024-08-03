@@ -1,6 +1,6 @@
-import { walk, WalkError } from "jsr:@std/fs@0.229.0/walk";
-import { join } from "jsr:@std/path@0.225.0/join";
-import { basename } from "jsr:@std/path@0.225.0/basename";
+import { walk, WalkError } from "jsr:@std/fs@^0.229.0/walk";
+import { join } from "jsr:@std/path@^0.225.0/join";
+import { basename } from "jsr:@std/path@^0.225.0/basename";
 
 import type {
   Action,

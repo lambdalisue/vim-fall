@@ -1,6 +1,6 @@
-import type { GetSource } from "jsr:@lambdalisue/vim-fall@0.6.0/source";
-import * as fn from "jsr:@denops/std@7.0.0/function";
-import { join } from "jsr:@std/path@1.0.0-rc.1/join";
+import type { GetSource } from "jsr:@lambdalisue/vim-fall@^0.6.0/source";
+import * as fn from "jsr:@denops/std@^7.0.0/function";
+import { join } from "jsr:@std/path@^1.0.0-rc.1/join";
 import { assert, is } from "jsr:@core/unknownutil@^4.0.0";
 
 const isOptions = is.StrictOf(is.PartialOf(is.ObjectOf({

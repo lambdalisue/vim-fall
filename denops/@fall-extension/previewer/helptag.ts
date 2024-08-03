@@ -1,6 +1,6 @@
-import type { GetPreviewer } from "jsr:@lambdalisue/vim-fall@0.6.0/previewer";
-import * as opt from "jsr:@denops/std@7.0.0/option";
-import { join } from "jsr:@std/path@0.225.1/join";
+import type { GetPreviewer } from "jsr:@lambdalisue/vim-fall@^0.6.0/previewer";
+import * as opt from "jsr:@denops/std@^7.0.0/option";
+import { join } from "jsr:@std/path@^0.225.1/join";
 import { as, is } from "jsr:@core/unknownutil@^4.0.0";
 
 const isHelptagDetail = is.ObjectOf({
