@@ -49,7 +49,7 @@ else
     if !exists('s:hl_msgarea')
       return
     endif
-    call hlset(s:hl_msgarea)
+    call hlset([extend(#{ force: 1 }, s:hl_msgarea[0])])
     unlet s:hl_msgarea
   endfunction
 endif
