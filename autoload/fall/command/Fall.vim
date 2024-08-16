@@ -10,9 +10,9 @@ function! fall#command#Fall#call(args)
     call fall#internal#mapping#store()
     call denops#request('fall', 'picker:start', [a:args])
   finally
-    call fall#internal#mapping#restore()
-    call fall#internal#msgarea#show()
-    call fall#internal#cursor#show()
+    silent! call fall#internal#mapping#restore()
+    silent! call fall#internal#msgarea#show()
+    silent! call fall#internal#cursor#show()
     " Close all popup windows in case of denops death
     silent! call fall#internal#popup#close(g:_fall_component_preview_winid)
     silent! call fall#internal#popup#close(g:_fall_component_select_winid)
