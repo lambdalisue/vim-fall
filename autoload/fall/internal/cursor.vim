@@ -1,5 +1,4 @@
 let s:t_ve_saved = &t_ve
-let s:guicursor_saved = &guicursor
 
 function! fall#internal#cursor#hide() abort
   call s:hide_cursor()
@@ -15,8 +14,7 @@ if has('nvim-0.5.0')
   endfunction
 
   function! s:show_cursor() abort
-    set guicursor+=a:Cursor/lCursor
-    let &guicursor = s:guicursor_saved
+    set guicursor-=a:FallTransparentCursor/lCursor
   endfunction
 
   function! s:highlight() abort
