@@ -1,6 +1,7 @@
 import { walk } from "jsr:@std/fs@^1.0.0/walk";
 import { join } from "jsr:@std/path@^1.0.0/join";
 import { basename } from "jsr:@std/path@^1.0.0/basename";
+import { toFileUrl } from "jsr:@std/path@^1.0.0/to-file-url";
 
 import type {
   Action,
@@ -27,7 +28,7 @@ export async function registerExtensionLoader(
   name: string,
   script: string,
 ): Promise<void> {
-  const mod = await import(script);
+  const mod = await import(toFileUrl(script).href);
   if (mod.getSource) {
     registry.source.set(name, {
       type: "source",
