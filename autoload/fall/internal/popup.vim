@@ -1,5 +1,8 @@
-function! fall#internal#popup#close(winid) abort
-  call s:close(a:winid)
+function! fall#internal#popup#closeall() abort
+  let l:winids = range(1, winnr('$'))
+        \ ->map({_, v -> win_getid(v)})
+        \ ->filter({_, v -> win_gettype(v) ==# 'popup'})
+  call foreach(l:winids, {_, v -> s:close(v)})
 endfunction
 
 if has('nvim')

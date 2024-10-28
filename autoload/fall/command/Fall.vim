@@ -14,10 +14,7 @@ function! fall#command#Fall#call(args)
     silent! call fall#internal#msgarea#show()
     silent! call fall#internal#cursor#show()
     " Close all popup windows in case of denops death
-    silent! call fall#internal#popup#close(g:_fall_component_preview_winid)
-    silent! call fall#internal#popup#close(g:_fall_component_select_winid)
-    silent! call fall#internal#popup#close(g:_fall_component_query_winid)
-    silent! call fall#internal#popup#close(g:_fall_component_input_winid)
+    silent! call fall#internal#popup#closeall()
     let &laststatus = l:laststatus_saved
   endtry
 endfunction
