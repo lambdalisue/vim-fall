@@ -1,6 +1,6 @@
-import type { Entrypoint } from "../../@fall/config.ts";
+import type { Entrypoint } from "jsr:@lambdalisue/vim-fall@^0.11.0/config";
 
-import * as builtin from "../../@fall/builtin/mod.ts";
+import * as builtin from "jsr:@lambdalisue/vim-fall@^0.11.0/builtin";
 
 const quickfixActions = {
   ...builtin.action.quickfixAction,
