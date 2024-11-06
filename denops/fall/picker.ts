@@ -348,6 +348,12 @@ export class Picker<T> implements AsyncDisposable {
       case "match-processor-started":
         this.#inputComponent.processing = true;
         break;
+      case "match-processor-updated":
+        this.#inputComponent.processed = this.#matchProcessor.items.length;
+        this.#visualizeProcessor.start(denops, {
+          items: this.#matchProcessor.items,
+        });
+        break;
       case "match-processor-succeeded":
         this.#inputComponent.processing = false;
         this.#inputComponent.processed = this.#matchProcessor.items.length;

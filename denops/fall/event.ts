@@ -31,6 +31,7 @@ export type Event =
   | { type: "collect-processor-succeeded" }
   | { type: "collect-processor-failed"; err: unknown }
   | { type: "match-processor-started" }
+  | { type: "match-processor-updated" }
   | { type: "match-processor-succeeded" }
   | { type: "match-processor-failed"; err: unknown }
   | { type: "visualize-processor-started" }

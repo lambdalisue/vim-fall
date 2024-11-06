@@ -67,11 +67,16 @@ export class MatchProcessor<T> {
           : this.#filter.match(denops, { items, query }, { signal }),
         this.#threshold,
       );
-      const matchedItems = [];
+      // Gradually update items when `items` is empty to improve latency
+      // of Curator.
+      const matchedItems = items.length === 0
+        ? (this.#items = [], this.#items)
+        : [];
       for await (const chunk of chunked(iter, this.#chunkSize)) {
         if (this.#paused) await this.#paused.promise;
         signal.throwIfAborted();
         matchedItems.push(...chunk);
+        dispatch({ type: "match-processor-updated" });
         await delay(this.#interval, { signal });
       }
       this.#items = matchedItems;
