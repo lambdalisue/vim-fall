@@ -129,7 +129,7 @@ export class Picker<T> implements AsyncDisposable {
     stack.use(await this.#inputComponent.open(denops, { signal }));
     stack.use(await this.#listComponent.open(denops, { signal }));
     stack.use(await this.#previewComponent?.open(denops, { signal }));
-    // Emit 'FillPickerEnter/FillPickerLeave' autocmd
+    // Emit 'FallPickerEnter/FallPickerLeave' autocmd
     stack.defer(async () => {
       await emitPickerLeave(denops, this.#name);
     });

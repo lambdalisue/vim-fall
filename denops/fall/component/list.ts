@@ -8,9 +8,9 @@ import type { Dimension } from "../../@fall/layout.ts";
 import type { DisplayItem } from "../../@fall/item.ts";
 import { BaseComponent } from "./_component.ts";
 
-export const HIGHLIGHT_MATCH = "FillListMatch";
-export const SIGN_GROUP_SELECTED = "PopUpFillListSelected";
-export const SIGN_SELECTED = "FillListSelected";
+export const HIGHLIGHT_MATCH = "FallListMatch";
+export const SIGN_GROUP_SELECTED = "PopUpFallListSelected";
+export const SIGN_SELECTED = "FallListSelected";
 
 export class ListComponent extends BaseComponent {
   #scroll = 1;

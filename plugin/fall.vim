@@ -8,8 +8,8 @@ command! -nargs=0 FallConfig call fall#command#FallConfig#call()
 
 augroup fall_plugin
   autocmd! *
-  autocmd User FillPickerEnter:* :
-  autocmd User FillPickerLeave:* :
+  autocmd User FallPickerEnter:* :
+  autocmd User FallPickerLeave:* :
   autocmd VimResized * call fall#internal#dispatch(#{type: 'vim-resized', width: &columns, height: &lines})
 augroup END
 

@@ -5,22 +5,22 @@ let g:loaded_fall_highlight = 1
 
 function! s:init() abort
   if has('nvim')
-    highlight default link FillNormal FloatNormal
-    highlight default link FillBorder FloatBorder
+    highlight default link FallNormal FloatNormal
+    highlight default link FallBorder FloatBorder
   else
-    highlight default link FillNormal Normal
-    highlight default link FillBorder EndOfBuffer
+    highlight default link FallNormal Normal
+    highlight default link FallBorder EndOfBuffer
   endif
 
   " Input
-  highlight default link FillInputHeader FillBorder
-  highlight default link FillInputCounter FillBorder
-  highlight default link FillInputCursor Cursor
+  highlight default link FallInputHeader FallBorder
+  highlight default link FallInputCounter FallBorder
+  highlight default link FallInputCursor Cursor
 
   " List
-  highlight default link FillListMatch Search
-  highlight default link FillListSelected CurSearch
-  sign define FillListSelected text=≫
+  highlight default link FallListMatch Search
+  highlight default link FallListSelected CurSearch
+  sign define FallListSelected text=≫
 endfunction
 
 augroup fall_plugin_highlight

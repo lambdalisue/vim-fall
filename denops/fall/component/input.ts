@@ -6,9 +6,9 @@ import { Spinner } from "../lib/spinner.ts";
 import { adjustOffset } from "../lib/adjust_offset.ts";
 import { BaseComponent, type ComponentParams } from "./_component.ts";
 
-export const HIGHLIGHT_HEADER = "FillInputHeader";
-export const HIGHLIGHT_CURSOR = "FillInputCursor";
-export const HIGHLIGHT_COUNTER = "FillInputCounter";
+export const HIGHLIGHT_HEADER = "FallInputHeader";
+export const HIGHLIGHT_CURSOR = "FallInputCursor";
+export const HIGHLIGHT_COUNTER = "FallInputCounter";
 
 export type InputComponentParams = ComponentParams & {
   title?: string;
