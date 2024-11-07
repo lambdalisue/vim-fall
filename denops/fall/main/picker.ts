@@ -94,9 +94,9 @@ async function startPicker(
     }),
   );
 
-  zindex++;
+  zindex += 5;
   stack.defer(() => {
-    zindex--;
+    zindex -= 5;
   });
   stack.use(await itemPicker.open(denops, { signal }));
   while (true) {

@@ -68,6 +68,7 @@ export class Picker<T> implements AsyncDisposable {
     this.#name = params.name;
     this.#layout = params.layout;
 
+    const zindex = params.zindex ?? 50;
     const { screen, theme } = params;
     const isPreviewRequired = !!params.previewer;
     const borders = isPreviewRequired
@@ -81,14 +82,14 @@ export class Picker<T> implements AsyncDisposable {
         dimension: dimensions.input,
         border: borders.input,
         title: this.#name,
-        zindex: params.zindex,
+        zindex,
       }),
     );
     this.#listComponent = this.#stack.use(
       new ListComponent({
         dimension: dimensions.list,
         border: borders.list,
-        zindex: params.zindex,
+        zindex: zindex + 1,
       }),
     );
     if ("preview" in dimensions && "preview" in borders) {
@@ -96,7 +97,7 @@ export class Picker<T> implements AsyncDisposable {
         new PreviewComponent({
           dimension: dimensions.preview as Dimension,
           border: borders.preview as Border,
-          zindex: params.zindex,
+          zindex: zindex + 2,
         }),
       );
     }
