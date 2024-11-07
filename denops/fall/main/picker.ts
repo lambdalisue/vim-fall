@@ -22,6 +22,7 @@ import {
 import { Picker } from "../picker.ts";
 
 let initialized: Promise<void>;
+let zindex = 50;
 
 export const main: Entrypoint = (denops) => {
   denops.dispatcher = {
@@ -75,21 +76,29 @@ async function startPicker(
   params: ItemPickerParams<unknown, string> & GlobalConfig,
   { signal }: { signal?: AbortSignal } = {},
 ): Promise<void | true> {
+  await using stack = new AsyncDisposableStack();
   const pickerParams = { screen, ...params };
-  await using itemPicker = new Picker(pickerParams);
-  await using actionPicker = new Picker({
-    name: "@action",
-    screen,
-    source: new ListSource(
-      Object.entries(params.actions).map(([name, action]) => ({
-        value: name,
-        detail: action,
-      })),
-    ),
-    ...getActionPickerParams(),
-  });
+  const itemPicker = stack.use(new Picker({ ...pickerParams, zindex }));
+  const actionPicker = stack.use(
+    new Picker({
+      name: "@action",
+      screen,
+      source: new ListSource(
+        Object.entries(params.actions).map(([name, action]) => ({
+          value: name,
+          detail: action,
+        })),
+      ),
+      ...getActionPickerParams(),
+      zindex: zindex + 1,
+    }),
+  );
 
-  await using _guardItemPicker = await itemPicker.open(denops, { signal });
+  zindex++;
+  stack.defer(() => {
+    zindex--;
+  });
+  stack.use(await itemPicker.open(denops, { signal }));
   while (true) {
     // Select items
     const resultItem = await itemPicker.start(

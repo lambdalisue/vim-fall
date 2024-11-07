@@ -33,6 +33,7 @@ export type PickerParams<T> = {
   sorter?: Sorter<T>;
   renderer?: Renderer<T>;
   previewer?: Previewer<T>;
+  zindex?: number;
 };
 
 export type PickerResult<T> = {
@@ -80,12 +81,14 @@ export class Picker<T> implements AsyncDisposable {
         dimension: dimensions.input,
         border: borders.input,
         title: this.#name,
+        zindex: params.zindex,
       }),
     );
     this.#listComponent = this.#stack.use(
       new ListComponent({
         dimension: dimensions.list,
         border: borders.list,
+        zindex: params.zindex,
       }),
     );
     if ("preview" in dimensions && "preview" in borders) {
@@ -93,6 +96,7 @@ export class Picker<T> implements AsyncDisposable {
         new PreviewComponent({
           dimension: dimensions.preview as Dimension,
           border: borders.preview as Border,
+          zindex: params.zindex,
         }),
       );
     }
