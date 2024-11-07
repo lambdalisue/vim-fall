@@ -9,7 +9,7 @@ function! s:init() abort
     highlight default link FallBorder FloatBorder
   else
     highlight default link FallNormal Normal
-    highlight default link FallBorder EndOfBuffer
+    highlight default link FallBorder Comment
   endif
 
   " Input
