@@ -1,4 +1,9 @@
-export type Item<T> = {
+export type IdItem<T> = {
+  /**
+   * The unique identifier of the item.
+   */
+  readonly id: number;
+
   /**
    * The value of the item.
    */
@@ -31,13 +36,6 @@ export type Item<T> = {
    * for highlighting the matched part.
    */
   decorations?: readonly ItemDecoration[];
-};
-
-export type IdItem<T> = Item<T> & {
-  /**
-   * The unique identifier of the item.
-   */
-  readonly id: number;
 };
 
 export type DisplayItem<T> = IdItem<T> & {

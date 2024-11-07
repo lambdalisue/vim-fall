@@ -84,7 +84,8 @@ async function startPicker(
       name: "@action",
       screen,
       source: new ListSource(
-        Object.entries(params.actions).map(([name, action]) => ({
+        Object.entries(params.actions).map(([name, action], i) => ({
+          id: i,
           value: name,
           detail: action,
         })),

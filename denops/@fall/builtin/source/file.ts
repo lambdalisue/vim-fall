@@ -2,7 +2,7 @@ import type { Denops } from "jsr:@denops/std@^7.3.0";
 import * as fn from "jsr:@denops/std@^7.3.0/function";
 import { join } from "jsr:@std/path@^1.0.0/join";
 
-import type { Item } from "../../item.ts";
+import type { IdItem } from "../../item.ts";
 import type { CollectParams, Source } from "../../source.ts";
 
 type Options = {
@@ -31,7 +31,7 @@ export class FileSource implements Source<Detail> {
     denops: Denops,
     { args }: CollectParams,
     { signal }: { signal?: AbortSignal },
-  ): AsyncIterableIterator<Item<Detail>> {
+  ): AsyncIterableIterator<IdItem<Detail>> {
     const path = await fn.expand(denops, args[0] ?? ".") as string;
     signal?.throwIfAborted();
     const abspath = await fn.fnamemodify(denops, path, ":p");
@@ -50,7 +50,9 @@ async function* collect(
   includes: RegExp[] | undefined,
   excludes: RegExp[] | undefined,
   signal?: AbortSignal,
-): AsyncIterableIterator<Item<Detail>> {
+  offset = 0,
+): AsyncIterableIterator<IdItem<Detail>> {
+  let id = offset;
   for await (const entry of Deno.readDir(root)) {
     const path = join(root, entry.name);
     if (includes && !includes.some((p) => p.test(path))) {
@@ -81,9 +83,10 @@ async function* collect(
       }
     }
     if (fileInfo.isDirectory) {
-      yield* collect(path, includes, excludes, signal);
+      yield* collect(path, includes, excludes, signal, id);
     } else {
       yield {
+        id: id++,
         value: path,
         detail: {
           path,

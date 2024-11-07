@@ -1,6 +1,6 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 
-import type { Item } from "./item.ts";
+import type { IdItem } from "./item.ts";
 
 export type CollectParams = {
   /**
@@ -22,5 +22,15 @@ export type Source<T> = {
     denops: Denops,
     params: CollectParams,
     options: { signal?: AbortSignal },
-  ): AsyncIterableIterator<Item<T>>;
+  ): AsyncIterableIterator<IdItem<T>>;
 };
+
+export function defineSource<T>(
+  collect: (
+    denops: Denops,
+    params: CollectParams,
+    options: { signal?: AbortSignal },
+  ) => AsyncIterableIterator<IdItem<T>>,
+): Source<T> {
+  return { collect };
+}

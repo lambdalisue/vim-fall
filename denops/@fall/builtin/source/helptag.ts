@@ -3,7 +3,7 @@ import * as opt from "jsr:@denops/std@^7.0.0/option";
 import { walk } from "jsr:@std/fs@^1.0.0/walk";
 import { join } from "jsr:@std/path@^1.0.0/join";
 
-import type { Item } from "../../item.ts";
+import type { IdItem } from "../../item.ts";
 import type { CollectParams, Source } from "../../source.ts";
 
 type Helptag = {
@@ -20,9 +20,10 @@ export class HelptagSource implements Source<Helptag> {
     denops: Denops,
     _params: CollectParams,
     _options: { signal?: AbortSignal },
-  ): AsyncIterableIterator<Item<Helptag>> {
+  ): AsyncIterableIterator<IdItem<Helptag>> {
     const runtimepaths = (await opt.runtimepath.get(denops)).split(",");
     const seen = new Set<string>();
+    let id = 0;
     for (const runtimepath of runtimepaths) {
       for await (const helptag of discoverHelptags(runtimepath)) {
         const key = `${helptag.helptag}:${helptag.lang ?? ""}`;
@@ -30,6 +31,7 @@ export class HelptagSource implements Source<Helptag> {
           continue;
         }
         yield {
+          id: id++,
           value: helptag.helptag,
           detail: helptag,
         };

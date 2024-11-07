@@ -1,7 +1,7 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 import * as fn from "jsr:@denops/std@^7.0.0/function";
 
-import type { Item } from "../../item.ts";
+import type { IdItem } from "../../item.ts";
 import type { CollectParams, Source } from "../../source.ts";
 
 type Filter = "buflisted" | "bufloaded" | "bufmodified";
@@ -33,7 +33,7 @@ export class BufferSource implements Source<Detail> {
     denops: Denops,
     _params: CollectParams,
     { signal }: { signal?: AbortSignal },
-  ): AsyncIterableIterator<Item<Detail>> {
+  ): AsyncIterableIterator<IdItem<Detail>> {
     const bufinfo = await fn.getbufinfo(denops);
     signal?.throwIfAborted();
     const items = bufinfo
@@ -48,7 +48,8 @@ export class BufferSource implements Source<Detail> {
         }
         return true;
       })
-      .map((v) => ({
+      .map((v, i) => ({
+        id: i,
         value: v.name,
         detail: {
           bufnr: v.bufnr,

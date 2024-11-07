@@ -3,6 +3,7 @@
   "version": "0.0.0",
   "exports": {
     ".": "./denops/@fall/mod.ts",
+    "./action": "./denops/@fall/action.ts",
     "./builtin": "./denops/@fall/builtin/mod.ts",
     "./builtin/action": "./denops/@fall/builtin/action/mod.ts",
     "./builtin/action/cmd": "./denops/@fall/builtin/action/cmd.ts",
@@ -49,18 +50,18 @@
     "./builtin/theme/double": "./denops/@fall/builtin/theme/double.ts",
     "./builtin/theme/modern": "./denops/@fall/builtin/theme/modern.ts",
     "./builtin/theme/single": "./denops/@fall/builtin/theme/single.ts",
-    "./util/testutil": "./denops/@fall/util/testutil.ts",
-    "./action": "./denops/@fall/action.ts",
     "./config": "./denops/@fall/config.ts",
     "./curator": "./denops/@fall/curator.ts",
     "./item": "./denops/@fall/item.ts",
     "./layout": "./denops/@fall/layout.ts",
     "./matcher": "./denops/@fall/matcher.ts",
     "./previewer": "./denops/@fall/previewer.ts",
+    "./projector": "./denops/@fall/projector.ts",
     "./renderer": "./denops/@fall/renderer.ts",
     "./sorter": "./denops/@fall/sorter.ts",
     "./source": "./denops/@fall/source.ts",
-    "./theme": "./denops/@fall/theme.ts"
+    "./theme": "./denops/@fall/theme.ts",
+    "./util/testutil": "./denops/@fall/util/testutil.ts"
   },
   "publish": {
     "include": [

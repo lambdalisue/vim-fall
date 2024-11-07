@@ -1,6 +1,7 @@
-import type { Entrypoint } from "jsr:@lambdalisue/vim-fall@^0.11.0/config";
+import type { Entrypoint } from "../../@fall/config.ts";
 
-import * as builtin from "jsr:@lambdalisue/vim-fall@^0.11.0/builtin";
+import * as builtin from "../../@fall/builtin/mod.ts";
+import { compose } from "../../@fall/projector.ts";
 
 const quickfixActions = {
   ...builtin.action.quickfixAction,
@@ -20,44 +21,54 @@ export const main: Entrypoint = (
     layout: new builtin.layout.ModernLayout(),
   });
 
-  defineItemPickerFromCurator("grep", new builtin.curator.RgCurator(), {
-    renderer: new builtin.renderer.SmartPathRenderer(),
-    previewer: new builtin.previewer.FilePreviewer(),
-    actions: {
-      ...builtin.action.echoAction,
-      ...builtin.action.openActions,
-      ...builtin.action.cdActions,
-      ...builtin.action.bufferActions,
-      ...builtin.action.writeAction,
-      ...builtin.action.systemopenAction,
-      ...quickfixActions,
-      "submatch:fzf": new builtin.action.SubmatchAction(
-        new builtin.matcher.FzfMatcher(),
-      ),
-      "submatch:substring": new builtin.action.SubmatchAction(
-        new builtin.matcher.SubstringMatcher(),
-      ),
-      "submatch:regexp": new builtin.action.SubmatchAction(
-        new builtin.matcher.RegexpMatcher(),
-      ),
+  defineItemPickerFromCurator(
+    "grep",
+    compose(
+      new builtin.curator.RgCurator(),
+      new builtin.modifier.RelativePathModifier(),
+    ),
+    {
+      renderer: new builtin.renderer.SmartPathRenderer(),
+      previewer: new builtin.previewer.FilePreviewer(),
+      actions: {
+        ...builtin.action.echoAction,
+        ...builtin.action.openActions,
+        ...builtin.action.cdActions,
+        ...builtin.action.bufferActions,
+        ...builtin.action.writeAction,
+        ...builtin.action.systemopenAction,
+        ...quickfixActions,
+        "submatch:fzf": new builtin.action.SubmatchAction(
+          new builtin.matcher.FzfMatcher(),
+        ),
+        "submatch:substring": new builtin.action.SubmatchAction(
+          new builtin.matcher.SubstringMatcher(),
+        ),
+        "submatch:regexp": new builtin.action.SubmatchAction(
+          new builtin.matcher.RegexpMatcher(),
+        ),
+      },
+      defaultAction: "open",
     },
-    defaultAction: "open",
-  });
+  );
 
   defineItemPickerFromSource(
     "file",
-    new builtin.source.FileSource({
-      excludes: [
-        /.*\/node_modules\/.*/,
-        /.*\/target\/.*/,
-        /.*\/dist\/.*/,
-        /.*\/.git\/.*/,
-        /.*\/.svn\/.*/,
-        /.*\/.hg\/.*/,
-        /.*\/.DS_Store$/,
-        /.*\/.coverage\//,
-      ],
-    }),
+    compose(
+      new builtin.source.FileSource({
+        excludes: [
+          /.*\/node_modules\/.*/,
+          /.*\/target\/.*/,
+          /.*\/dist\/.*/,
+          /.*\/.git\/.*/,
+          /.*\/.svn\/.*/,
+          /.*\/.hg\/.*/,
+          /.*\/.DS_Store$/,
+          /.*\/.coverage\//,
+        ],
+      }),
+      new builtin.modifier.RelativePathModifier(),
+    ),
     {
       matcher: new builtin.matcher.FzfMatcher(),
       renderer: new builtin.renderer.SmartPathRenderer(),

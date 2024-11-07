@@ -19,7 +19,7 @@ export class DummySource implements Source<undefined> {
     _options: { signal?: AbortSignal },
   ) {
     for (let i = 0; i < 10; i++) {
-      yield { value: i.toString(), detail: undefined };
+      yield { id: i, value: i.toString(), detail: undefined };
     }
   }
 }
@@ -37,9 +37,9 @@ export class DummyTickSource implements Source<undefined> {
     _params: CollectParams,
     _options: { signal?: AbortSignal },
   ) {
-    yield { value: "0", detail: undefined };
+    yield { id: 0, value: "0", detail: undefined };
     await this.#waiter.promise;
-    yield { value: "1", detail: undefined };
+    yield { id: 1, value: "1", detail: undefined };
   }
 }
 

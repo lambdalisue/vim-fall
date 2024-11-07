@@ -1,7 +1,7 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 import * as fn from "jsr:@denops/std@^7.3.0/function";
 
-import type { Item } from "../../item.ts";
+import type { IdItem } from "../../item.ts";
 import type { CollectParams, Source } from "../../source.ts";
 
 const CHUNK_SIZE = 1000;
@@ -31,7 +31,7 @@ export class LineSource implements Source<Detail> {
     denops: Denops,
     { args }: CollectParams,
     { signal }: { signal?: AbortSignal } = {},
-  ): AsyncIterableIterator<Item<Detail>> {
+  ): AsyncIterableIterator<IdItem<Detail>> {
     const expr = args[0] ?? "%";
     await fn.bufload(denops, expr);
     signal?.throwIfAborted();
@@ -40,6 +40,7 @@ export class LineSource implements Source<Detail> {
     const bufinfo = bufinfos[0];
 
     let line = 1;
+    let id = 0;
     while (line <= bufinfo.linecount) {
       const content = await fn.getbufline(
         denops,
@@ -51,6 +52,7 @@ export class LineSource implements Source<Detail> {
       let offset = 0;
       for (const value of content) {
         yield {
+          id: id++,
           value,
           detail: {
             line: line + offset,

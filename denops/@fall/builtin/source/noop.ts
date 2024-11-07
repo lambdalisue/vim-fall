@@ -1,6 +1,6 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 
-import type { Item } from "../../item.ts";
+import type { IdItem } from "../../item.ts";
 import type { CollectParams, Source } from "../../source.ts";
 
 /**
@@ -11,5 +11,5 @@ export class NoopSource implements Source<undefined> {
     _denops: Denops,
     _params: CollectParams,
     _options: { signal?: AbortSignal },
-  ): AsyncIterableIterator<Item<undefined>> {}
+  ): AsyncIterableIterator<IdItem<undefined>> {}
 }
