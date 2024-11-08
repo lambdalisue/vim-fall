@@ -42,7 +42,7 @@ Deno.test("Scheduler", async (t) => {
         scheduler.start(() => {
           count++;
           throw new Error("Error");
-        });
+        }).catch(() => {});
         await delay(500);
       }
       // ```
