@@ -12,7 +12,6 @@ import {
 
 import type { Size } from "../../@fall/layout.ts";
 import type { GlobalConfig, ItemPickerParams } from "../../@fall/config.ts";
-import { ListSource } from "../../@fall/builtin/source/list.ts";
 import {
   getActionPickerParams,
   getGlobalConfig,
@@ -83,13 +82,15 @@ async function startPicker(
     new Picker({
       name: "@action",
       screen,
-      source: new ListSource(
-        Object.entries(params.actions).map(([name, action], i) => ({
-          id: i,
-          value: name,
-          detail: action,
-        })),
-      ),
+      source: {
+        collect: async function* () {
+          yield* Object.entries(params.actions).map(([name, action], id) => ({
+            id,
+            value: name,
+            detail: action,
+          }));
+        },
+      },
       ...getActionPickerParams(),
       zindex: zindex + 3,
     }),
