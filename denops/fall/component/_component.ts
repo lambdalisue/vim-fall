@@ -76,7 +76,7 @@ export abstract class BaseComponent implements Component {
     return { bufnr, winid };
   }
 
-  get dimension(): Readonly<Dimension> {
+  protected get dimension(): Readonly<Dimension> {
     return this.#dimension;
   }
 
