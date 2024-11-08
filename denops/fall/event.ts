@@ -24,8 +24,8 @@ export type Event =
   | { type: "select-item"; cursor?: number | "$"; method?: SelectMethod }
   | { type: "select-all-items"; method?: SelectMethod }
   | { type: "action-invoke"; name: string }
-  | { type: "list-execute"; command: string }
-  | { type: "preview-execute"; command: string }
+  | { type: "list-component-execute"; command: string }
+  | { type: "preview-component-execute"; command: string }
   | { type: "collect-processor-started" }
   | { type: "collect-processor-updated" }
   | { type: "collect-processor-succeeded" }

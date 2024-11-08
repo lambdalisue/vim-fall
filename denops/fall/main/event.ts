@@ -54,12 +54,12 @@ const isEventComplement = is.UnionOf([
   }),
   // List
   is.ObjectOf({
-    type: is.LiteralOf("list-execute"),
+    type: is.LiteralOf("list-component-execute"),
     command: is.String,
   }),
   // Preview
   is.ObjectOf({
-    type: is.LiteralOf("preview-execute"),
+    type: is.LiteralOf("preview-component-execute"),
     command: is.String,
   }),
 ]) satisfies Predicate<Event>;

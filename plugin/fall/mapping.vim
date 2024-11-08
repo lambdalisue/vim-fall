@@ -10,25 +10,25 @@ cnoremap <silent> <Plug>(fall-prev) <Cmd>call fall#internal#dispatch(#{type: 'mo
 cnoremap <silent> <Plug>(fall-next) <Cmd>call fall#internal#dispatch(#{type: 'move-cursor', amount: 1})<CR>
 cnoremap <silent> <Plug>(fall-prev:scroll) <Cmd>call fall#internal#dispatch(#{type: 'move-cursor', amount: -1, scroll: v:true})<CR>
 cnoremap <silent> <Plug>(fall-next:scroll) <Cmd>call fall#internal#dispatch(#{type: 'move-cursor', amount: 1, scroll: v:true})<CR>
-cnoremap <silent> <Plug>(fall-left) <Cmd>call fall#internal#dispatch(#{type: 'list-execute', command: 'silent! normal! zh'})<CR>
-cnoremap <silent> <Plug>(fall-right) <Cmd>call fall#internal#dispatch(#{type: 'list-execute', command: 'silent! normal! zl'})<CR>
-cnoremap <silent> <Plug>(fall-left:scroll) <Cmd>call fall#internal#dispatch(#{type: 'list-execute', command: 'silent! normal! zH'})<CR>
-cnoremap <silent> <Plug>(fall-right:scroll) <Cmd>call fall#internal#dispatch(#{type: 'list-execute', command: 'silent! normal! zL'})<CR>
+cnoremap <silent> <Plug>(fall-left) <Cmd>call fall#internal#dispatch(#{type: 'list-component-execute', command: 'silent! normal! zh'})<CR>
+cnoremap <silent> <Plug>(fall-right) <Cmd>call fall#internal#dispatch(#{type: 'list-component-execute', command: 'silent! normal! zl'})<CR>
+cnoremap <silent> <Plug>(fall-left:scroll) <Cmd>call fall#internal#dispatch(#{type: 'list-component-execute', command: 'silent! normal! zH'})<CR>
+cnoremap <silent> <Plug>(fall-right:scroll) <Cmd>call fall#internal#dispatch(#{type: 'list-component-execute', command: 'silent! normal! zL'})<CR>
 
 cnoremap <silent> <Plug>(fall-select) <Cmd>call fall#internal#dispatch(#{type: 'select-item'})<CR>
 cnoremap <silent> <Plug>(fall-select-all) <Cmd>call fall#internal#dispatch(#{type: 'select-all-items'})<CR>
 
 " Preview
-cnoremap <silent> <Plug>(fall-preview-first) <Cmd>call fall#internal#dispatch(#{type: 'preview-execute', command: 'silent! normal! gg'})<CR>
-cnoremap <silent> <Plug>(fall-preview-last) <Cmd>call fall#internal#dispatch(#{type: 'preview-execute', command: 'silent! normal! G'})<CR>
-cnoremap <silent> <Plug>(fall-preview-prev) <Cmd>call fall#internal#dispatch(#{type: 'preview-execute', command: 'silent! normal! k'})<CR>
-cnoremap <silent> <Plug>(fall-preview-next) <Cmd>call fall#internal#dispatch(#{type: 'preview-execute', command: 'silent! normal! j'})<CR>
-cnoremap <silent> <Plug>(fall-preview-prev:scroll) <Cmd>call fall#internal#dispatch(#{type: 'preview-execute', command: 'silent! normal! <C-u>'})<CR>
-cnoremap <silent> <Plug>(fall-preview-next:scroll) <Cmd>call fall#internal#dispatch(#{type: 'preview-execute', command: 'silent! normal! <C-d>'})<CR>
-cnoremap <silent> <Plug>(fall-preview-left) <Cmd>call fall#internal#dispatch(#{type: 'preview-execute', command: 'silent! normal! zh'})<CR>
-cnoremap <silent> <Plug>(fall-preview-right) <Cmd>call fall#internal#dispatch(#{type: 'preview-execute', command: 'silent! normal! zl'})<CR>
-cnoremap <silent> <Plug>(fall-preview-left:scroll) <Cmd>call fall#internal#dispatch(#{type: 'preview-execute', command: 'silent! normal! zH'})<CR>
-cnoremap <silent> <Plug>(fall-preview-right:scroll) <Cmd>call fall#internal#dispatch(#{type: 'preview-execute', command: 'silent! normal! zL'})<CR>
+cnoremap <silent> <Plug>(fall-preview-first) <Cmd>call fall#internal#dispatch(#{type: 'preview-component-execute', command: 'silent! normal! gg'})<CR>
+cnoremap <silent> <Plug>(fall-preview-last) <Cmd>call fall#internal#dispatch(#{type: 'preview-component-execute', command: 'silent! normal! G'})<CR>
+cnoremap <silent> <Plug>(fall-preview-prev) <Cmd>call fall#internal#dispatch(#{type: 'preview-component-execute', command: 'silent! normal! k'})<CR>
+cnoremap <silent> <Plug>(fall-preview-next) <Cmd>call fall#internal#dispatch(#{type: 'preview-component-execute', command: 'silent! normal! j'})<CR>
+cnoremap <silent> <Plug>(fall-preview-prev:scroll) <Cmd>call fall#internal#dispatch(#{type: 'preview-component-execute', command: 'silent! normal! <C-u>'})<CR>
+cnoremap <silent> <Plug>(fall-preview-next:scroll) <Cmd>call fall#internal#dispatch(#{type: 'preview-component-execute', command: 'silent! normal! <C-d>'})<CR>
+cnoremap <silent> <Plug>(fall-preview-left) <Cmd>call fall#internal#dispatch(#{type: 'preview-component-execute', command: 'silent! normal! zh'})<CR>
+cnoremap <silent> <Plug>(fall-preview-right) <Cmd>call fall#internal#dispatch(#{type: 'preview-component-execute', command: 'silent! normal! zl'})<CR>
+cnoremap <silent> <Plug>(fall-preview-left:scroll) <Cmd>call fall#internal#dispatch(#{type: 'preview-component-execute', command: 'silent! normal! zH'})<CR>
+cnoremap <silent> <Plug>(fall-preview-right:scroll) <Cmd>call fall#internal#dispatch(#{type: 'preview-component-execute', command: 'silent! normal! zL'})<CR>
 
 " Action
 cnoremap <silent> <Plug>(fall-action-select) <Cmd>call fall#action('@select')<CR>

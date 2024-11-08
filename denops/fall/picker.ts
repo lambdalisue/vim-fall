@@ -322,10 +322,10 @@ export class Picker<T> implements AsyncDisposable {
       case "action-invoke":
         accept(event.name);
         break;
-      case "list-execute":
+      case "list-component-execute":
         this.#listComponent.execute(event.command);
         break;
-      case "preview-execute":
+      case "preview-component-execute":
         if (!this.#previewComponent) break;
         this.#previewComponent.execute(event.command);
         break;
