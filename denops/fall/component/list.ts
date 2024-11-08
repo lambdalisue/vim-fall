@@ -54,10 +54,11 @@ export class ListComponent extends BaseComponent {
 
   override async open(
     denops: Denops,
+    dimension: Readonly<Dimension>,
     { signal }: { signal?: AbortSignal } = {},
   ): Promise<AsyncDisposable> {
     await using stack = new AsyncDisposableStack();
-    stack.use(await super.open(denops, { signal }));
+    stack.use(await super.open(denops, dimension, { signal }));
     const { winid } = this.info!;
 
     signal?.throwIfAborted();
@@ -86,7 +87,7 @@ export class ListComponent extends BaseComponent {
     this.#scroll = await fn.getwinvar(denops, winid, "&scroll") as number;
   }
 
-  async render(
+  override async render(
     denops: Denops,
     { signal }: { signal?: AbortSignal } = {},
   ): Promise<true | void> {
@@ -111,8 +112,7 @@ export class ListComponent extends BaseComponent {
     if (!this.#modifiedContent || !this.info) return;
     this.#modifiedContent = false;
 
-    const { bufnr } = this.info;
-    const { width } = this.dimension;
+    const { bufnr, dimension: { width } } = this.info;
     const content = this.#items.map((v) => v.label);
     const decorations = this.#items
       .reduce((acc, v, i) => {

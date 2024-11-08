@@ -10,7 +10,6 @@ augroup fall_plugin
   autocmd! *
   autocmd User FallPickerEnter:* :
   autocmd User FallPickerLeave:* :
-  autocmd VimResized * call fall#internal#dispatch(#{type: 'vim-resized', width: &columns, height: &lines})
 augroup END
 
 let g:fall_config_path = '~/.config/fall/config.ts'

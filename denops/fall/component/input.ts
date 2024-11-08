@@ -2,15 +2,16 @@ import type { Denops } from "jsr:@denops/std@^7.3.0";
 import * as fn from "jsr:@denops/std@^7.3.0/function";
 import * as buffer from "jsr:@denops/std@^7.3.0/buffer";
 
+import type { Dimension } from "../../@fall/layout.ts";
 import { Spinner } from "../lib/spinner.ts";
 import { adjustOffset } from "../lib/adjust_offset.ts";
-import { BaseComponent, type ComponentParams } from "./_component.ts";
+import { BaseComponent, type ComponentProperties } from "./_component.ts";
 
 export const HIGHLIGHT_HEADER = "FallInputHeader";
 export const HIGHLIGHT_CURSOR = "FallInputCursor";
 export const HIGHLIGHT_COUNTER = "FallInputCounter";
 
-export type InputComponentParams = ComponentParams & {
+export type InputComponentParams = ComponentProperties & {
   title?: string;
   spinner?: readonly string[];
   headSymbol?: string;
@@ -35,7 +36,8 @@ export class InputComponent extends BaseComponent {
   #modifiedContent = true;
 
   constructor(
-    { title, spinner, headSymbol, failSymbol, ...params }: InputComponentParams,
+    { title, spinner, headSymbol, failSymbol, ...params }:
+      InputComponentParams = {},
   ) {
     super(params);
     this.#title = title ?? "";
@@ -146,10 +148,11 @@ export class InputComponent extends BaseComponent {
 
   override async open(
     denops: Denops,
+    dimension: Readonly<Dimension>,
     { signal }: { signal?: AbortSignal } = {},
   ): Promise<AsyncDisposable> {
     await using stack = new AsyncDisposableStack();
-    stack.use(await super.open(denops, { signal }));
+    stack.use(await super.open(denops, dimension, { signal }));
     signal?.throwIfAborted();
     await fn.win_execute(
       denops,
@@ -160,7 +163,7 @@ export class InputComponent extends BaseComponent {
     return stack.move();
   }
 
-  async render(
+  override async render(
     denops: Denops,
     { signal }: { signal?: AbortSignal } = {},
   ): Promise<true | void> {
@@ -199,8 +202,7 @@ export class InputComponent extends BaseComponent {
     if (!this.#modifiedContent && !this.#isSpinnerUpdated) return;
     this.#modifiedContent = false;
 
-    const { bufnr } = this.info;
-    const { width } = this.dimension;
+    const { bufnr, dimension: { width } } = this.info;
 
     const prefix = this.#prefix;
     const suffix = this.#suffix;

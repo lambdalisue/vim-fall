@@ -6,17 +6,19 @@ import type { Sorter } from "../../@fall/sorter.ts";
 import { dispatch } from "../event.ts";
 import { adjustOffset } from "../lib/adjust_offset.ts";
 
+const HEIGHT = 10;
 const SCROLL_OFFSET = 2;
 
 export type VisualizeProcessorOptions = {
+  height?: number;
   scrollOffset?: number;
 };
 
 export class VisualizeProcessor<T> {
-  #height: number;
   #sorter?: Sorter<T>;
   #renderer?: Renderer<T>;
-  #scrollOffset = 2;
+  #height: number;
+  #scrollOffset: number;
   #controller: AbortController = new AbortController();
   #processing?: Promise<void>;
   #reserved?: () => void;
@@ -26,14 +28,13 @@ export class VisualizeProcessor<T> {
   #offset: number = 0;
 
   constructor(
-    height: number,
     sorter: Sorter<T> | undefined,
     renderer: Renderer<T> | undefined,
     options: VisualizeProcessorOptions = {},
   ) {
-    this.#height = height;
     this.#sorter = sorter;
     this.#renderer = renderer;
+    this.#height = options.height ?? HEIGHT;
     this.#scrollOffset = options.scrollOffset ?? SCROLL_OFFSET;
   }
 

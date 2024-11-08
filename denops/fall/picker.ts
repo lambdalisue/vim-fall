@@ -1,4 +1,8 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
+import * as opt from "jsr:@denops/std@^7.3.0/option";
+import * as autocmd from "jsr:@denops/std@^7.3.0/autocmd";
+import * as lambda from "jsr:@denops/std@^7.3.0/lambda";
+import { collect } from "jsr:@denops/std@^7.3.0/batch";
 import { unreachable } from "jsr:@core/errorutil@^1.2.0/unreachable";
 
 import type { IdItem } from "../@fall/item.ts";
@@ -61,47 +65,53 @@ export class Picker<T> implements AsyncDisposable {
   readonly #listComponent: ListComponent;
   readonly #previewComponent?: PreviewComponent;
   #selection: Set<unknown> = new Set();
-  #resized?: Size;
 
   constructor(params: PickerParams<T>, options: PickerOptions = {}) {
     this.#schedulerInterval = options.schedulerInterval ?? SCHEDULER_INTERVAL;
     this.#name = params.name;
     this.#layout = params.layout;
 
-    const zindex = params.zindex ?? 50;
-    const { screen, theme } = params;
-    const isPreviewRequired = !!params.previewer;
-    const borders = isPreviewRequired
-      ? this.#layout.style3(theme)
-      : this.#layout.style2(theme);
-    const dimensions = isPreviewRequired
-      ? this.#layout.layout3(screen)
-      : this.#layout.layout2(screen);
-    this.#inputComponent = this.#stack.use(
-      new InputComponent({
-        dimension: dimensions.input,
-        border: borders.input,
-        title: this.#name,
-        zindex,
-      }),
-    );
-    this.#listComponent = this.#stack.use(
-      new ListComponent({
-        dimension: dimensions.list,
-        border: borders.list,
-        zindex: zindex + 1,
-      }),
-    );
-    if ("preview" in dimensions && "preview" in borders) {
+    // Components
+    const { theme, zindex = 50 } = params;
+    if (params.previewer) {
+      const borders = this.#layout.style3(theme);
+      this.#inputComponent = this.#stack.use(
+        new InputComponent({
+          border: borders.input,
+          title: this.#name,
+          zindex,
+        }),
+      );
+      this.#listComponent = this.#stack.use(
+        new ListComponent({
+          border: borders.list,
+          zindex: zindex + 1,
+        }),
+      );
       this.#previewComponent = this.#stack.use(
         new PreviewComponent({
-          dimension: dimensions.preview as Dimension,
           border: borders.preview as Border,
           zindex: zindex + 2,
         }),
       );
+    } else {
+      const borders = this.#layout.style2(theme);
+      this.#inputComponent = this.#stack.use(
+        new InputComponent({
+          border: borders.input,
+          title: this.#name,
+          zindex,
+        }),
+      );
+      this.#listComponent = this.#stack.use(
+        new ListComponent({
+          border: borders.list,
+          zindex: zindex + 1,
+        }),
+      );
     }
 
+    // Processor
     this.#collectProcessor = this.#stack.use(
       new CollectProcessor(params.source),
     );
@@ -110,7 +120,6 @@ export class Picker<T> implements AsyncDisposable {
     );
     this.#visualizeProcessor = this.#stack.use(
       new VisualizeProcessor(
-        dimensions.list.height,
         params.sorter,
         params.renderer,
       ),
@@ -127,14 +136,78 @@ export class Picker<T> implements AsyncDisposable {
     { signal }: { signal?: AbortSignal },
   ): Promise<AsyncDisposable> {
     await using stack = new AsyncDisposableStack();
-    stack.use(await this.#inputComponent.open(denops, { signal }));
-    stack.use(await this.#listComponent.open(denops, { signal }));
-    stack.use(await this.#previewComponent?.open(denops, { signal }));
+
+    // Calculate dimensions
+    const screen = await getScreenSize(denops);
+    const dimensions = this.#dimensions(screen);
+    stack.use(
+      await this.#inputComponent.open(
+        denops,
+        dimensions.input,
+        { signal },
+      ),
+    );
+    stack.use(
+      await this.#listComponent.open(
+        denops,
+        dimensions.list,
+        { signal },
+      ),
+    );
+    stack.use(
+      await this.#previewComponent?.open(
+        denops,
+        dimensions.preview!,
+        { signal },
+      ),
+    );
+    this.#visualizeProcessor.height = dimensions.list.height;
+
+    // Register autocmd to resize components
+    const resizeComponents = stack.use(lambda.add(denops, async () => {
+      const screen = await getScreenSize(denops);
+      const dimensions = this.#dimensions(screen);
+      await this.#inputComponent.move(
+        denops,
+        dimensions.input,
+        { signal },
+      );
+      await this.#listComponent.move(
+        denops,
+        dimensions.list,
+        { signal },
+      );
+      await this.#previewComponent?.move(
+        denops,
+        dimensions.preview!,
+        { signal },
+      );
+      this.#inputComponent.forceRender();
+      this.#listComponent.forceRender();
+      this.#previewComponent?.forceRender();
+      this.#visualizeProcessor.height = dimensions.list.height;
+    }));
+    const autocmdGroupName = `fall-picker-${this.#name}-${resizeComponents.id}`;
+    stack.defer(async () => {
+      await autocmd.remove(denops, "VimResized", "*", {
+        group: autocmdGroupName,
+      });
+    });
+    await autocmd.group(
+      denops,
+      autocmdGroupName,
+      (helper) => {
+        helper.remove("*");
+        helper.define("VimResized", "*", `call ${resizeComponents.notify()}`);
+      },
+    );
+
     // Emit 'FallPickerEnter/FallPickerLeave' autocmd
     stack.defer(async () => {
       await emitPickerLeave(denops, this.#name);
     });
     await emitPickerEnter(denops, this.#name);
+
     return stack.move();
   }
 
@@ -165,26 +238,6 @@ export class Picker<T> implements AsyncDisposable {
 
       // Handle events
       consume((event) => this.#handleEvent(denops, event, { accept }));
-
-      // Resize components
-      if (this.#resized) {
-        const dimensions = this.#previewComponent
-          ? this.#layout.layout3(this.#resized)
-          : this.#layout.layout2(this.#resized);
-        await this.#inputComponent.move(denops, dimensions.input, { signal });
-        await this.#listComponent.move(denops, dimensions.list, { signal });
-        if ("preview" in dimensions) {
-          await this.#previewComponent?.move(
-            denops,
-            dimensions.preview as Dimension,
-            { signal },
-          );
-        }
-        this.#inputComponent.forceRender();
-        this.#listComponent.forceRender();
-        this.#previewComponent?.forceRender();
-        this.#resized = undefined;
-      }
 
       // Render components
       const renderResults = [
@@ -217,6 +270,14 @@ export class Picker<T> implements AsyncDisposable {
       selectedItems,
       filteredItems: this.#matchProcessor.items,
     };
+  }
+
+  #dimensions(
+    screen: Size,
+  ): { input: Dimension; list: Dimension; preview?: Dimension } {
+    return this.#previewComponent
+      ? this.#layout.layout3(screen)
+      : this.#layout.layout2(screen);
   }
 
   #select(
@@ -282,18 +343,6 @@ export class Picker<T> implements AsyncDisposable {
     accept: (name: string) => Promise<void>;
   }): void {
     switch (event.type) {
-      case "debug-error":
-        console.log(
-          `[fall] 'debug-error' event has received: ${event.message}`,
-        );
-        throw new Error(event.message);
-      case "vim-resized": {
-        this.#resized = {
-          width: event.width,
-          height: event.height,
-        };
-        break;
-      }
       case "vim-cmdline-changed":
         this.#inputComponent.cmdline = event.cmdline;
         this.#matchProcessor.start(denops, {
@@ -425,4 +474,12 @@ export class Picker<T> implements AsyncDisposable {
   [Symbol.asyncDispose]() {
     return this.#stack[Symbol.asyncDispose]();
   }
+}
+
+async function getScreenSize(denops: Denops): Promise<Size> {
+  const [width, height] = await collect(denops, (denops) => [
+    opt.columns.get(denops),
+    opt.lines.get(denops),
+  ]);
+  return { width, height };
 }

@@ -34,8 +34,8 @@ test({
   fn: async (denops, t) => {
     await t.step("render", async (t) => {
       await t.step("renders content properly", async () => {
-        await using component = new ListComponent({ dimension });
-        await component.open(denops);
+        await using component = new ListComponent();
+        await component.open(denops, dimension);
         await component.render(denops);
         await denops.cmd("redraw");
 
@@ -57,8 +57,8 @@ test({
       await t.step(
         "places sign on selected lines",
         async () => {
-          await using component = new ListComponent({ dimension });
-          await component.open(denops);
+          await using component = new ListComponent();
+          await component.open(denops, dimension);
           await component.render(denops);
           await denops.cmd("redraw");
 
@@ -107,8 +107,8 @@ test({
       await t.step(
         "applies decorations",
         async () => {
-          await using component = new ListComponent({ dimension });
-          await component.open(denops);
+          await using component = new ListComponent();
+          await component.open(denops, dimension);
           await component.render(denops);
           await denops.cmd("redraw");
 

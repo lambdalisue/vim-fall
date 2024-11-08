@@ -33,8 +33,8 @@ test({
   fn: async (denops, t) => {
     await t.step("render", async (t) => {
       await t.step("renders content properly", async () => {
-        await using component = new InputComponent({ dimension });
-        await component.open(denops);
+        await using component = new InputComponent();
+        await component.open(denops, dimension);
         await component.render(denops);
         await denops.cmd("redraw");
 
@@ -465,8 +465,8 @@ test({
       });
 
       await t.step("renders prefix properly (processing)", async () => {
-        await using component = new InputComponent({ dimension });
-        await component.open(denops);
+        await using component = new InputComponent();
+        await component.open(denops, dimension);
         await component.render(denops);
         await denops.cmd("redraw");
 
@@ -506,8 +506,8 @@ test({
       });
 
       await t.step("renders suffix properly (collecting)", async () => {
-        await using component = new InputComponent({ dimension });
-        await component.open(denops);
+        await using component = new InputComponent();
+        await component.open(denops, dimension);
         await component.render(denops);
         await denops.cmd("redraw");
 

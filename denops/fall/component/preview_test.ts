@@ -26,8 +26,8 @@ test({
   fn: async (denops, t) => {
     await t.step("render", async (t) => {
       await t.step("renders content fairly", async () => {
-        await using component = new PreviewComponent({ dimension });
-        await component.open(denops);
+        await using component = new PreviewComponent();
+        await component.open(denops, dimension);
         await component.render(denops);
         await denops.cmd("redraw");
 
@@ -95,10 +95,9 @@ test({
 
       await t.step("renders content properly", async () => {
         await using component = new PreviewComponent({
-          dimension,
           realHighlight: true,
         });
-        await component.open(denops);
+        await component.open(denops, dimension);
         await component.render(denops);
         await denops.cmd("redraw");
 

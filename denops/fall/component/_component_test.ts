@@ -1,4 +1,3 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
 import { test } from "jsr:@denops/test@^3.0.4";
 import * as fn from "jsr:@denops/std@^7.3.0/function";
 import { assertEquals, assertNotEquals } from "jsr:@std/assert@^1.0.7";
@@ -7,15 +6,6 @@ import { SINGLE_BORDER } from "../../@fall/builtin/theme/single.ts";
 import { DOUBLE_BORDER } from "../../@fall/builtin/theme/double.ts";
 import { screentext } from "./_testutil.ts";
 import { BaseComponent } from "./_component.ts";
-
-class TestComponent extends BaseComponent {
-  render(
-    _denops: Denops,
-    _option?: { signal?: AbortSignal },
-  ): Promise<true | void> {
-    return Promise.resolve(true);
-  }
-}
 
 const dimension = {
   col: 1,
@@ -31,14 +21,14 @@ test(
     await t.step(
       "info is `undefined` if the component is not opened",
       async () => {
-        await using component = new TestComponent({ dimension });
+        await using component = new BaseComponent();
         assertEquals(component.info, undefined);
       },
     );
 
     await t.step("info is a value if the component is opened", async () => {
-      await using component = new TestComponent({ dimension });
-      await component.open(denops);
+      await using component = new BaseComponent();
+      await component.open(denops, dimension);
       assertNotEquals(component.info, undefined);
     });
   },
@@ -46,16 +36,15 @@ test(
 
 test("nvim", "Component", async (denops, t) => {
   await t.step("open opens the component window", async () => {
-    await using component = new TestComponent({
-      dimension: {
-        col: 1,
-        row: 1,
-        width: 5,
-        height: 5,
-      },
+    await using component = new BaseComponent({
       border: SINGLE_BORDER,
     });
-    await component.open(denops);
+    await component.open(denops, {
+      col: 1,
+      row: 1,
+      width: 5,
+      height: 5,
+    });
     await denops.cmd("redraw");
 
     const info = component.info!;
@@ -92,33 +81,36 @@ test("nvim", "Component", async (denops, t) => {
   await t.step(
     "open does nothing if the component window is already opened",
     async () => {
-      await using component = new TestComponent({
-        dimension: {
-          col: 1,
-          row: 1,
-          width: 5,
-          height: 5,
-        },
+      await using component = new BaseComponent({
         border: SINGLE_BORDER,
       });
-      await component.open(denops);
-      await component.open(denops);
+      await component.open(denops, {
+        col: 1,
+        row: 1,
+        width: 5,
+        height: 5,
+      });
+      await component.open(denops, {
+        col: 1,
+        row: 1,
+        width: 5,
+        height: 5,
+      });
     },
   );
 
   await t.step(
     "move moves the component window",
     async () => {
-      await using component = new TestComponent({
-        dimension: {
-          col: 1,
-          row: 1,
-          width: 5,
-          height: 5,
-        },
+      await using component = new BaseComponent({
         border: SINGLE_BORDER,
       });
-      await component.open(denops);
+      await component.open(denops, {
+        col: 1,
+        row: 1,
+        width: 5,
+        height: 5,
+      });
       await component.move(denops, {
         col: 10,
         row: 10,
@@ -167,13 +159,7 @@ test("nvim", "Component", async (denops, t) => {
   await t.step(
     "move does nothing if the component window is not opened",
     async () => {
-      await using component = new TestComponent({
-        dimension: {
-          col: 1,
-          row: 1,
-          width: 5,
-          height: 5,
-        },
+      await using component = new BaseComponent({
         border: SINGLE_BORDER,
       });
       await component.move(denops, {
@@ -188,16 +174,15 @@ test("nvim", "Component", async (denops, t) => {
   await t.step(
     "update updates the component window",
     async () => {
-      await using component = new TestComponent({
-        dimension: {
-          col: 1,
-          row: 1,
-          width: 5,
-          height: 5,
-        },
+      await using component = new BaseComponent({
         border: SINGLE_BORDER,
       });
-      await component.open(denops);
+      await component.open(denops, {
+        col: 1,
+        row: 1,
+        width: 5,
+        height: 5,
+      });
       await component.update(denops, {
         title: "Test",
         border: DOUBLE_BORDER,
@@ -239,13 +224,7 @@ test("nvim", "Component", async (denops, t) => {
   await t.step(
     "update does nothing if the component window is not opened",
     async () => {
-      await using component = new TestComponent({
-        dimension: {
-          col: 1,
-          row: 1,
-          width: 5,
-          height: 5,
-        },
+      await using component = new BaseComponent({
         border: SINGLE_BORDER,
       });
       await component.update(denops, {
@@ -256,16 +235,15 @@ test("nvim", "Component", async (denops, t) => {
   );
 
   await t.step("close closes the component window", async () => {
-    await using component = new TestComponent({
-      dimension: {
-        col: 1,
-        row: 1,
-        width: 5,
-        height: 5,
-      },
+    await using component = new BaseComponent({
       border: SINGLE_BORDER,
     });
-    await component.open(denops);
+    await component.open(denops, {
+      col: 1,
+      row: 1,
+      width: 5,
+      height: 5,
+    });
     await denops.cmd("redraw");
 
     const info = component.info!;

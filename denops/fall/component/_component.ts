@@ -10,18 +10,16 @@ export type ComponentProperties = {
   zindex?: number;
 };
 
-export type ComponentParams = ComponentProperties & {
-  dimension: Readonly<Dimension>;
-};
-
 export type ComponentInfo = {
   bufnr: number;
   winid: number;
+  dimension: Readonly<Dimension>;
 };
 
 export type Component = AsyncDisposable & {
   open(
     denops: Denops,
+    dimension: Readonly<Partial<Dimension>>,
     option?: { signal?: AbortSignal },
   ): Promise<AsyncDisposable>;
 
@@ -58,53 +56,49 @@ export type Component = AsyncDisposable & {
  * ╰─────────────────────────────────────╯
  * ```
  */
-export abstract class BaseComponent implements Component {
-  #window?: popup.PopupWindow;
-  #dimension: Readonly<Dimension>;
+export class BaseComponent implements Component {
+  #opened?: {
+    readonly window: popup.PopupWindow;
+    readonly dimension: Readonly<Dimension>;
+  };
   protected properties: Readonly<ComponentProperties>;
 
-  constructor({ dimension, ...properties }: Readonly<ComponentParams>) {
-    this.#dimension = dimension;
+  constructor(properties: Readonly<ComponentProperties> = {}) {
     this.properties = properties;
   }
 
   get info(): Readonly<ComponentInfo> | undefined {
-    if (!this.#window) {
+    if (!this.#opened) {
       return undefined;
     }
-    const { bufnr, winid } = this.#window;
-    return { bufnr, winid };
-  }
-
-  protected get dimension(): Readonly<Dimension> {
-    return this.#dimension;
+    const { bufnr, winid } = this.#opened.window;
+    return { bufnr, winid, dimension: this.#opened.dimension };
   }
 
   async open(
     denops: Denops,
+    dimension: Readonly<Dimension>,
     { signal }: { signal?: AbortSignal } = {},
   ): Promise<AsyncDisposable> {
-    if (this.#window) {
+    if (this.#opened) {
       return this;
     }
     signal?.throwIfAborted();
-    this.#window = await popup.open(denops, {
-      ...this.#dimension,
-      ...this.properties,
-      relative: "editor",
-      anchor: "NW",
-      highlight: {
-        normal: "FallNormal",
-        border: "FallBorder",
-      },
-      noRedraw: true,
-    });
+    this.#opened = {
+      window: await popup.open(denops, {
+        ...dimension,
+        ...this.properties,
+        relative: "editor",
+        anchor: "NW",
+        highlight: {
+          normal: "FallNormal",
+          border: "FallBorder",
+        },
+        noRedraw: true,
+      }),
+      dimension,
+    };
     return this;
-  }
-
-  async close(): Promise<void> {
-    await this.#window?.close();
-    this.#window = undefined;
   }
 
   async move(
@@ -112,13 +106,16 @@ export abstract class BaseComponent implements Component {
     dimension: Readonly<Partial<Dimension>>,
     { signal }: { signal?: AbortSignal } = {},
   ): Promise<void> {
-    this.#dimension = {
-      ...this.#dimension,
-      ...dimension,
-    };
-    if (this.#window) {
+    if (this.#opened) {
+      this.#opened = {
+        ...this.#opened,
+        dimension: {
+          ...this.#opened.dimension,
+          ...dimension,
+        },
+      };
       signal?.throwIfAborted();
-      await popup.config(denops, this.#window.winid, {
+      await popup.config(denops, this.#opened.window.winid, {
         ...dimension,
         relative: "editor",
         noRedraw: true,
@@ -135,19 +132,26 @@ export abstract class BaseComponent implements Component {
       ...this.properties,
       ...properties,
     };
-    if (this.#window) {
+    if (this.#opened) {
       signal?.throwIfAborted();
-      await popup.config(denops, this.#window.winid, {
+      await popup.config(denops, this.#opened.window.winid, {
         ...properties,
         noRedraw: true,
       });
     }
   }
 
-  abstract render(
+  render(
     _denops: Denops,
     _option?: { signal?: AbortSignal },
-  ): Promise<true | void>;
+  ): Promise<true | void> {
+    return Promise.resolve(true);
+  }
+
+  async close(): Promise<void> {
+    await this.#opened?.window.close();
+    this.#opened = undefined;
+  }
 
   async [Symbol.asyncDispose]() {
     await this.close();

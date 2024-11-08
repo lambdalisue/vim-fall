@@ -3,10 +3,11 @@ import * as fn from "jsr:@denops/std@^7.3.0/function";
 import * as buffer from "jsr:@denops/std@^7.3.0/buffer";
 import { batch } from "jsr:@denops/std@^7.3.0/batch";
 
+import type { Dimension } from "../../@fall/layout.ts";
 import type { PreviewItem } from "../../@fall/item.ts";
-import { BaseComponent, type ComponentParams } from "./_component.ts";
+import { BaseComponent, type ComponentProperties } from "./_component.ts";
 
-export type PreviewComponentParams = ComponentParams & {
+export type PreviewComponentParams = ComponentProperties & {
   realHighlight?: boolean;
 };
 
@@ -16,7 +17,7 @@ export class PreviewComponent extends BaseComponent {
   #modifiedContent = true;
   #reservedCommands: string[] = [];
 
-  constructor({ realHighlight, ...params }: PreviewComponentParams) {
+  constructor({ realHighlight, ...params }: PreviewComponentParams = {}) {
     super(params);
     this.#realHighlight = realHighlight ?? false;
   }
@@ -40,10 +41,11 @@ export class PreviewComponent extends BaseComponent {
 
   override async open(
     denops: Denops,
+    dimension: Readonly<Dimension>,
     { signal }: { signal?: AbortSignal } = {},
   ): Promise<AsyncDisposable> {
     await using stack = new AsyncDisposableStack();
-    stack.use(await super.open(denops, { signal }));
+    stack.use(await super.open(denops, dimension, { signal }));
     const { winid } = this.info!;
 
     signal?.throwIfAborted();
@@ -52,7 +54,7 @@ export class PreviewComponent extends BaseComponent {
     return stack.move();
   }
 
-  async render(
+  override async render(
     denops: Denops,
     { signal }: { signal?: AbortSignal } = {},
   ): Promise<true | void> {
