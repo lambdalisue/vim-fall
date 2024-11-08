@@ -91,13 +91,13 @@ async function startPicker(
         })),
       ),
       ...getActionPickerParams(),
-      zindex: zindex + 1,
+      zindex: zindex + 3,
     }),
   );
 
-  zindex += 5;
+  zindex += 6;
   stack.defer(() => {
-    zindex -= 5;
+    zindex -= 6;
   });
   stack.use(await itemPicker.open(denops, { signal }));
   while (true) {
