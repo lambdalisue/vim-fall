@@ -18,8 +18,8 @@ export function nerdfont<T extends Detail>(): Renderer<T> {
       const { path } = item.detail;
       const icon = fromPattern(path) ??
         fromBasename(path) ??
-        fromExtension(path);
-      if (!icon) return;
+        fromExtension(path) ??
+        extensionJson["."];
       const prefix = `${icon}  `;
       const offset = getByteLength(prefix);
       item.label = `${prefix}${item.label}`;

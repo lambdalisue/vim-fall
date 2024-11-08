@@ -1,6 +1,7 @@
-import type { Entrypoint } from "jsr:@lambdalisue/vim-fall@^0.12.0/config";
-import { pipeProjectors } from "jsr:@lambdalisue/vim-fall@^0.12.0/projector";
-import * as builtin from "jsr:@lambdalisue/vim-fall@^0.12.0/builtin";
+import type { Entrypoint } from "jsr:@lambdalisue/vim-fall@^0.13.0/config";
+import { pipeProjectors } from "jsr:@lambdalisue/vim-fall@^0.13.0/projector";
+import { composeRenderer } from "jsr:@lambdalisue/vim-fall@^0.13.0/renderer";
+import * as builtin from "jsr:@lambdalisue/vim-fall@^0.13.0/builtin";
 
 const quickfixActions = {
   ...builtin.action.defaultQuickfixActions,
@@ -99,7 +100,10 @@ export const main: Entrypoint = (
     ),
     {
       matcher: builtin.matcher.fzf,
-      renderer: builtin.renderer.smartPath,
+      renderer: composeRenderer(
+        builtin.renderer.smartPath,
+        builtin.renderer.nerdfont,
+      ),
       previewer: builtin.previewer.file,
       actions: {
         ...quickfixActions,
