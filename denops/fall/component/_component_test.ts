@@ -2,8 +2,6 @@ import { test } from "jsr:@denops/test@^3.0.4";
 import * as fn from "jsr:@denops/std@^7.3.0/function";
 import { assertEquals, assertNotEquals } from "jsr:@std/assert@^1.0.7";
 
-import { SINGLE_BORDER } from "../../@fall/builtin/theme/single.ts";
-import { DOUBLE_BORDER } from "../../@fall/builtin/theme/double.ts";
 import { screentext } from "./_testutil.ts";
 import { BaseComponent } from "./_component.ts";
 
@@ -13,6 +11,28 @@ const dimension = {
   width: 5,
   height: 5,
 };
+
+const SINGLE_BORDER = [
+  "┌",
+  "─",
+  "┐",
+  "│",
+  "┘",
+  "─",
+  "└",
+  "│",
+] as const;
+
+const DOUBLE_BORDER = [
+  "╔",
+  "═",
+  "╗",
+  "║",
+  "╝",
+  "═",
+  "╚",
+  "║",
+] as const;
 
 test(
   "all",
