@@ -157,7 +157,7 @@ export class InputComponent extends BaseComponent {
     await fn.win_execute(
       denops,
       this.info!.winid,
-      "setlocal signcolumn=no nofoldenable nonumber norelativenumber",
+      "setlocal signcolumn=no nofoldenable nonumber norelativenumber filetype=fall-input",
     );
     this.forceRender();
     return stack.move();
