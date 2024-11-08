@@ -19,6 +19,10 @@ const itemPickerParamsMap = new Map<
   ItemPickerParams<unknown, string>
 >();
 
+export function listItemPickerNames(): readonly string[] {
+  return Array.from(itemPickerParamsMap.keys());
+}
+
 export function getItemPickerParams(
   name: string,
 ): Readonly<ItemPickerParams<unknown, string> & GlobalConfig> | undefined {

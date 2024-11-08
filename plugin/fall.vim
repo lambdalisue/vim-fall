@@ -3,7 +3,9 @@ if exists('g:loaded_fall')
 endif
 let g:loaded_fall = 1
 
-command! -nargs=+ Fall call fall#command#Fall#call([<f-args>])
+command! -nargs=+ -complete=customlist,fall#command#Fall#complete 
+      \ Fall call fall#command#Fall#call([<f-args>])
+
 command! -nargs=0 FallConfig call fall#command#FallConfig#call()
 
 augroup fall_plugin

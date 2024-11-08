@@ -11,7 +11,7 @@ function! fall#command#Fall#call(args) abort
   try
     set laststatus=0
     call fall#internal#mapping#store()
-    call denops#request('fall', 'picker:start:command', [a:args])
+    call denops#request('fall', 'picker:command', [a:args])
   finally
     augroup fall_command_Fall
       autocmd!
@@ -23,10 +23,10 @@ function! fall#command#Fall#call(args) abort
 endfunction
 
 function! fall#command#Fall#complete(arglead, cmdline, cursorpos) abort
-  if denops#plugin#wait('fall') == 0
+  if denops#plugin#wait('fall') isnot# 0
     return []
   endif
-  return []
+  return denops#request('fall', 'picker:command:complete', [a:arglead, a:cmdline, a:cursorpos])
 endfunction
 
 function! s:hide() abort

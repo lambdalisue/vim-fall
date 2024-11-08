@@ -16,6 +16,7 @@ import {
   getActionPickerParams,
   getGlobalConfig,
   getItemPickerParams,
+  listItemPickerNames,
   loadUserConfig,
 } from "../config.ts";
 import { Picker } from "../picker.ts";
@@ -26,7 +27,7 @@ let zindex = 50;
 export const main: Entrypoint = (denops) => {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "picker:start:command": async (args) => {
+    "picker:command": async (args) => {
       await init(denops);
       // Split the command arguments
       const [name, ...sourceArgs] = ensure(args, isArgs);
@@ -48,6 +49,13 @@ export const main: Entrypoint = (denops) => {
         itemPickerParams,
         { signal: denops.interrupted },
       );
+    },
+    "picker:command:complete": async (arglead, cmdline, cursorpos) => {
+      await init(denops);
+      assert(arglead, is.String);
+      assert(cmdline, is.String);
+      assert(cursorpos, is.Number);
+      return listItemPickerNames().filter((name) => name.startsWith(arglead));
     },
     "picker:start": async (args, screen, params, options) => {
       await init(denops);
