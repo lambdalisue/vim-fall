@@ -51,6 +51,7 @@
     "./builtin/sorter": "./denops/@fall/builtin/sorter/mod.ts",
     "./builtin/sorter/lexical": "./denops/@fall/builtin/sorter/lexical.ts",
     "./builtin/sorter/noop": "./denops/@fall/builtin/sorter/noop.ts",
+    "./builtin/sorter/numerical": "./denops/@fall/builtin/sorter/numerical.ts",
     "./builtin/source": "./denops/@fall/builtin/source/mod.ts",
     "./builtin/source/buffer": "./denops/@fall/builtin/source/buffer.ts",
     "./builtin/source/file": "./denops/@fall/builtin/source/file.ts",
