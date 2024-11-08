@@ -1,20 +1,22 @@
 import { assertEquals } from "jsr:@std/assert@^1.0.6";
 
-import { MODERN_THEME } from "../theme/modern.ts";
+import { modern } from "../theme/modern.ts";
 import { buildCanvas, renderCanvas } from "../../util/testutil.ts";
-import { SeparateLayout } from "./separate.ts";
+import { separate } from "./separate.ts";
 
 const SCREEN = {
   width: 40, // -> 32
   height: 15, // -> 12
 } as const;
 
+const MODERN_THEME = modern();
+
 const WIDTH_RATIO = 0.8;
 const HEIGHT_RATIO = 0.8;
 const PREVIEW_RATIO = 0.5;
 
-Deno.test("SeparateLayout", async (t) => {
-  const layout = new SeparateLayout({
+Deno.test("separate", async (t) => {
+  const layout = separate({
     widthRatio: WIDTH_RATIO,
     heightRatio: HEIGHT_RATIO,
     previewRatio: PREVIEW_RATIO,

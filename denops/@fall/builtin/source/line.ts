@@ -1,8 +1,6 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
 import * as fn from "jsr:@denops/std@^7.3.0/function";
 
-import type { IdItem } from "../../item.ts";
-import type { CollectParams, Source } from "../../source.ts";
+import { defineSource, type Source } from "../../source.ts";
 
 const CHUNK_SIZE = 1000;
 
@@ -17,21 +15,9 @@ type Detail = {
   context: string;
 };
 
-/**
- * A source to collect lines.
- */
-export class LineSource implements Source<Detail> {
-  readonly #chunkSize: number;
-
-  constructor(options: Readonly<Options> = {}) {
-    this.#chunkSize = options.chunkSize ?? CHUNK_SIZE;
-  }
-
-  async *collect(
-    denops: Denops,
-    { args }: CollectParams,
-    { signal }: { signal?: AbortSignal } = {},
-  ): AsyncIterableIterator<IdItem<Detail>> {
+export function line(options: Options = {}): Source<Detail> {
+  const { chunkSize = CHUNK_SIZE } = options;
+  return defineSource<Detail>(async function* (denops, { args }, { signal }) {
     const expr = args[0] ?? "%";
     await fn.bufload(denops, expr);
     signal?.throwIfAborted();
@@ -46,7 +32,7 @@ export class LineSource implements Source<Detail> {
         denops,
         expr,
         line,
-        line + this.#chunkSize - 1,
+        line + chunkSize - 1,
       );
       signal?.throwIfAborted();
       let offset = 0;
@@ -63,7 +49,7 @@ export class LineSource implements Source<Detail> {
         };
         offset++;
       }
-      line += this.#chunkSize;
+      line += chunkSize;
     }
-  }
+  });
 }

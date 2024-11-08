@@ -1,9 +1,8 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
 import * as fn from "jsr:@denops/std@^7.0.0/function";
 import { relative } from "jsr:@std/path@^1.0.0/relative";
 
 import type { IdItem } from "../../item.ts";
-import type { Projector, ProjectParams } from "../../projector.ts";
+import { defineProjector, type Projector } from "../../projector.ts";
 
 type Detail = {
   path: string;
@@ -13,13 +12,11 @@ type DetailAfter = {
   abspath: string;
 };
 
-export class RelativePathModifier<T extends Detail, U extends T & DetailAfter>
-  implements Projector<T, U> {
-  async *project(
-    denops: Denops,
-    { items }: ProjectParams<T>,
-    { signal }: { signal?: AbortSignal },
-  ): AsyncIterableIterator<IdItem<U>> {
+export function relativePath<
+  T extends Detail,
+  U extends T & DetailAfter,
+>(): Projector<T, U> {
+  return defineProjector(async function* (denops, { items }, { signal }) {
     const cwd = await fn.getcwd(denops);
     signal?.throwIfAborted();
     for await (const item of items) {
@@ -35,5 +32,5 @@ export class RelativePathModifier<T extends Detail, U extends T & DetailAfter>
         },
       } as IdItem<U>;
     }
-  }
+  });
 }

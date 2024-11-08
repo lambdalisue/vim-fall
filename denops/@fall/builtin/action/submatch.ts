@@ -1,5 +1,3 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
-import type { Action, InvokeParams } from "../../action.ts";
 import type { Matcher } from "../../matcher.ts";
 import type { Renderer } from "../../renderer.ts";
 import type { Theme } from "../../theme.ts";
@@ -7,68 +5,81 @@ import type { Sorter } from "../../sorter.ts";
 import type { Previewer } from "../../previewer.ts";
 import type { Layout } from "../../layout.ts";
 import type { Actions, GlobalConfig, ItemPickerParams } from "../../config.ts";
-import { ListSource } from "../source/list.ts";
+import { list } from "../source/list.ts";
+import { type Action, defineAction } from "../../action.ts";
+import {
+  type Derivable,
+  type DerivableMap,
+  derive,
+  deriveMap,
+} from "../../util/derivable.ts";
+import { fzf } from "../matcher/fzf.ts";
+import { substring } from "../matcher/substring.ts";
+import { regexp } from "../matcher/regexp.ts";
 
 type Options<T, A extends string> = {
-  actions?: Actions<T, A>;
+  actions?: DerivableMap<Actions<T, A>>;
   defaultAction?: A;
-  sorter?: Sorter<T> | null;
-  renderer?: Renderer<T> | null;
-  previewer?: Previewer<T> | null;
-  layout?: Layout | null;
-  theme?: Theme | null;
+  sorter?: Derivable<Sorter<T>> | null;
+  renderer?: Derivable<Renderer<T>> | null;
+  previewer?: Derivable<Previewer<T>> | null;
+  layout?: Derivable<Layout> | null;
+  theme?: Derivable<Theme> | null;
 };
 
-export class SubmatchAction<T, A extends string> implements Action<T> {
-  #matcher: Matcher<T>;
-  #options: Options<T, string>;
-
-  constructor(matcher: Matcher<T>, options: Options<T, A> = {}) {
-    this.#matcher = matcher;
-    this.#options = options;
-  }
-
-  async invoke(
-    denops: Denops,
-    { selectedItems, filteredItems, context }: InvokeParams<T>,
-    { signal }: { signal?: AbortSignal },
-  ): Promise<void | true> {
-    const params: ItemPickerParams<T, string> & GlobalConfig = {
-      ...context.pickerParams,
-      source: new ListSource(selectedItems ?? filteredItems),
-      matcher: this.#matcher,
-    };
-    if (this.#options.actions) {
-      params.actions = this.#options.actions;
-    }
-    if (this.#options.defaultAction) {
-      params.defaultAction = this.#options.defaultAction;
-    }
-    if (this.#options.sorter !== undefined) {
-      params.sorter = this.#options.sorter ?? undefined;
-    }
-    if (this.#options.renderer !== undefined) {
-      params.renderer = this.#options.renderer ?? undefined;
-    }
-    if (this.#options.previewer !== undefined) {
-      params.previewer = this.#options.previewer ?? undefined;
-    }
-    if (this.#options.layout !== undefined) {
-      params.layout = this.#options.layout ?? context.globalConfig.layout;
-    }
-    if (this.#options.theme !== undefined) {
-      params.theme = this.#options.theme ?? context.globalConfig.theme;
-    }
-    const result = await denops.dispatch(
-      "fall",
-      "picker:start",
-      [],
-      context.screen,
-      params,
-      { signal },
-    );
-    if (result) {
-      return true;
-    }
-  }
+export function submatch<T, A extends string>(
+  matcher: Derivable<Matcher<T>>,
+  options: Options<T, A> = {},
+): Action<T> {
+  return defineAction<T>(
+    async (denops, { selectedItems, filteredItems, context }, { signal }) => {
+      const params: ItemPickerParams<T, string> & GlobalConfig = {
+        ...context.pickerParams,
+        source: list(selectedItems ?? filteredItems),
+        matcher: derive(matcher),
+      };
+      if (options.actions) {
+        params.actions = deriveMap(params.actions);
+      }
+      if (options.defaultAction) {
+        params.defaultAction = options.defaultAction;
+      }
+      if (options.sorter !== undefined) {
+        params.sorter = derive(options.sorter) ?? undefined;
+      }
+      if (options.renderer !== undefined) {
+        params.renderer = derive(options.renderer) ?? undefined;
+      }
+      if (options.previewer !== undefined) {
+        params.previewer = derive(options.previewer) ?? undefined;
+      }
+      if (options.layout !== undefined) {
+        params.layout = derive(options.layout) ?? context.globalConfig.layout;
+      }
+      if (options.theme !== undefined) {
+        params.theme = derive(options.theme) ?? context.globalConfig.theme;
+      }
+      const result = await denops.dispatch(
+        "fall",
+        "picker:start",
+        [],
+        context.screen,
+        params,
+        { signal },
+      );
+      if (result) {
+        return true;
+      }
+    },
+  );
 }
+
+export const defaultSubmatchActions: {
+  "sub:fzf": Action<unknown>;
+  "sub:substring": Action<unknown>;
+  "sub:regexp": Action<unknown>;
+} = {
+  "sub:fzf": submatch(fzf),
+  "sub:substring": submatch(substring),
+  "sub:regexp": submatch(regexp),
+};

@@ -2,6 +2,7 @@ import type { Denops } from "jsr:@denops/std@^7.3.0";
 
 import type { Promish } from "./_typeutil.ts";
 import type { DisplayItem } from "./item.ts";
+import { type DerivableArray, deriveArray } from "./util/derivable.ts";
 
 export type RenderParams<T> = {
   /**
@@ -52,13 +53,13 @@ export function defineRenderer<T>(
  */
 export function composeRenderer<
   T,
-  R extends [Renderer<T>, Renderer<T>, ...Renderer<T>[]],
+  R extends DerivableArray<[Renderer<T>, ...Renderer<T>[]]>,
 >(
   ...renderers: R
 ): Renderer<T> {
   return {
     render: async (denops, params, options) => {
-      for (const renderer of renderers) {
+      for (const renderer of deriveArray(renderers)) {
         await renderer.render(denops, params, options);
       }
     },

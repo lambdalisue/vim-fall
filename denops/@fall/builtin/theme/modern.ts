@@ -1,6 +1,6 @@
 import type { Border, Divider, Theme } from "../../theme.ts";
 
-export const ROUNDED_BORDER: Border = [
+const ROUNDED_BORDER: Border = [
   "╭",
   "─",
   "╮",
@@ -11,7 +11,7 @@ export const ROUNDED_BORDER: Border = [
   "│",
 ] as const;
 
-export const DASHED_DIVIDER: Divider = [
+const DASHED_DIVIDER: Divider = [
   "├",
   "╌",
   "┤",
@@ -20,7 +20,9 @@ export const DASHED_DIVIDER: Divider = [
   "┴",
 ] as const;
 
-export const MODERN_THEME: Theme = {
-  border: ROUNDED_BORDER,
-  divider: DASHED_DIVIDER,
-} as const;
+export function modern(): Theme {
+  return {
+    border: ROUNDED_BORDER,
+    divider: DASHED_DIVIDER,
+  };
+}

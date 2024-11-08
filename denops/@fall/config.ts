@@ -9,6 +9,7 @@ import type { Sorter } from "./sorter.ts";
 import type { Renderer } from "./renderer.ts";
 import type { Previewer } from "./previewer.ts";
 import type { Action } from "./action.ts";
+import type { Derivable, DerivableMap } from "./util/derivable.ts";
 
 export type Actions<T, A extends string> =
   & Record<string, Action<T>>
@@ -46,16 +47,16 @@ export type GlobalConfig = {
  */
 export type DefineItemPickerFromSource = <T, A extends string>(
   name: string,
-  source: Source<T>,
+  source: Derivable<Source<T>>,
   params: {
-    matcher: Matcher<NoInfer<T>>;
-    actions: Actions<NoInfer<T>, NoInfer<A>>;
+    matcher: Derivable<Matcher<NoInfer<T>>>;
+    actions: DerivableMap<Actions<NoInfer<T>, NoInfer<A>>>;
     defaultAction: A;
-    sorter?: Sorter<NoInfer<T>>;
-    renderer?: Renderer<NoInfer<T>>;
-    previewer?: Previewer<NoInfer<T>>;
-    layout?: Layout;
-    theme?: Theme;
+    sorter?: Derivable<Sorter<NoInfer<T>>>;
+    renderer?: Derivable<Renderer<NoInfer<T>>>;
+    previewer?: Derivable<Previewer<NoInfer<T>>>;
+    layout?: Derivable<Layout>;
+    theme?: Derivable<Theme>;
   },
 ) => void;
 
@@ -64,15 +65,15 @@ export type DefineItemPickerFromSource = <T, A extends string>(
  */
 export type DefineItemPickerFromCurator = <T, A extends string>(
   name: string,
-  curator: Curator<T>,
+  curator: Derivable<Curator<T>>,
   params: {
-    actions: Actions<NoInfer<T>, NoInfer<A>>;
+    actions: DerivableMap<Actions<NoInfer<T>, NoInfer<A>>>;
     defaultAction: A;
-    sorter?: Sorter<NoInfer<T>>;
-    renderer?: Renderer<NoInfer<T>>;
-    previewer?: Previewer<NoInfer<T>>;
-    layout?: Layout;
-    theme?: Theme;
+    sorter?: Derivable<Sorter<NoInfer<T>>>;
+    renderer?: Derivable<Renderer<NoInfer<T>>>;
+    previewer?: Derivable<Previewer<NoInfer<T>>>;
+    layout?: Derivable<Layout>;
+    theme?: Derivable<Theme>;
   },
 ) => void;
 
@@ -81,13 +82,12 @@ export type DefineItemPickerFromCurator = <T, A extends string>(
  */
 export type RefineActionPicker = (
   params: {
-    name: string;
-    matcher: Matcher<Action<unknown>>;
-    sorter?: Sorter<Action<unknown>>;
-    renderer?: Renderer<Action<unknown>>;
-    previewer?: Previewer<Action<unknown>>;
-    layout?: Layout;
-    theme?: Theme;
+    matcher?: Derivable<Matcher<Action<unknown>>>;
+    sorter?: Derivable<Sorter<Action<unknown>>>;
+    renderer?: Derivable<Renderer<Action<unknown>>>;
+    previewer?: Derivable<Previewer<Action<unknown>>>;
+    layout?: Derivable<Layout>;
+    theme?: Derivable<Theme>;
   },
 ) => void;
 
@@ -96,8 +96,8 @@ export type RefineActionPicker = (
  */
 export type RefineGlobalConfig = (
   params: {
-    layout?: Layout;
-    theme?: Theme;
+    layout?: Derivable<Layout>;
+    theme?: Derivable<Theme>;
   },
 ) => void;
 

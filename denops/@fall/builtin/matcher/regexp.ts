@@ -1,15 +1,8 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
-
-import type { IdItem } from "../../item.ts";
-import type { Matcher, MatchParams } from "../../matcher.ts";
+import { defineMatcher, type Matcher } from "../../matcher.ts";
 import { getByteLength } from "../_util.ts";
 
-export class RegexpMatcher<T> implements Matcher<T> {
-  async *match(
-    _denops: Denops,
-    { query, items }: MatchParams<T>,
-    { signal }: { signal?: AbortSignal },
-  ): AsyncIterableIterator<IdItem<T>> {
+export function regexp<T>(): Matcher<T> {
+  return defineMatcher(async function* (_denops, { query, items }, { signal }) {
     const pattern = new RegExp(query, "g");
     for await (const item of items) {
       signal?.throwIfAborted();
@@ -32,5 +25,5 @@ export class RegexpMatcher<T> implements Matcher<T> {
           : decorations,
       };
     }
-  }
+  });
 }

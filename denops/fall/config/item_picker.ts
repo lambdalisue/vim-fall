@@ -9,7 +9,10 @@ import type {
   GlobalConfig,
   ItemPickerParams,
 } from "../../@fall/config.ts";
+import { derive, deriveMap } from "../../@fall/util/derivable.ts";
 import { getGlobalConfig } from "./global_config.ts";
+
+type Actions = ItemPickerParams<unknown, string>["actions"];
 
 const itemPickerParamsMap = new Map<
   string,
@@ -34,10 +37,15 @@ export const defineItemPickerFromSource: DefineItemPickerFromSource = (
   if (itemPickerParamsMap.has(name)) {
     throw new Error(`Item picker "${name}" is already defined.`);
   }
+  const derivedParams = {
+    ...deriveMap(params),
+    actions: deriveMap(params.actions) as Actions,
+    defaultAction: params.defaultAction,
+  };
   itemPickerParamsMap.set(name, {
-    ...params,
+    ...derivedParams,
     name,
-    source,
+    source: derive(source),
   });
 };
 
@@ -49,9 +57,14 @@ export const defineItemPickerFromCurator: DefineItemPickerFromCurator = (
   if (itemPickerParamsMap.has(name)) {
     throw new Error(`Item picker "${name}" is already defined.`);
   }
-  const source = new CuratorSourceMatcher(curator);
+  const source = new CuratorSourceMatcher(derive(curator));
+  const derivedParams = {
+    ...deriveMap(params),
+    actions: deriveMap(params.actions) as Actions,
+    defaultAction: params.defaultAction,
+  };
   itemPickerParamsMap.set(name, {
-    ...params,
+    ...derivedParams,
     name,
     source,
     matcher: source,

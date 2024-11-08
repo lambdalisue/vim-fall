@@ -1,8 +1,7 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
+import { unreachable } from "jsr:@core/errorutil@^1.2.0/unreachable";
 import * as fn from "jsr:@denops/std@^7.0.0/function";
 
-import type { IdItem } from "../../item.ts";
-import type { CollectParams, Source } from "../../source.ts";
+import { defineSource, type Source } from "../../source.ts";
 
 type Filter = "buflisted" | "bufloaded" | "bufmodified";
 
@@ -19,34 +18,26 @@ type Detail = {
   bufinfo: fn.BufInfo;
 };
 
-/**
- * A source to collect buffers.
- */
-export class BufferSource implements Source<Detail> {
-  readonly #filter?: Filter;
-
-  constructor(options: Readonly<Options> = {}) {
-    this.#filter = options.filter;
-  }
-
-  async *collect(
-    denops: Denops,
-    _params: CollectParams,
-    { signal }: { signal?: AbortSignal },
-  ): AsyncIterableIterator<IdItem<Detail>> {
+export function buffer(options: Readonly<Options> = {}): Source<Detail> {
+  const filter = options.filter;
+  return defineSource(async function* (denops, _params, { signal }) {
     const bufinfo = await fn.getbufinfo(denops);
     signal?.throwIfAborted();
     const items = bufinfo
       .filter((v) => v.name !== "")
       .filter((v) => {
-        if (this.#filter === "buflisted") {
-          return v.listed;
-        } else if (this.#filter === "bufloaded") {
-          return v.loaded;
-        } else if (this.#filter === "bufmodified") {
-          return v.changed;
+        switch (filter) {
+          case "buflisted":
+            return v.listed;
+          case "bufloaded":
+            return v.loaded;
+          case "bufmodified":
+            return v.changed;
+          case undefined:
+            return true;
+          default:
+            unreachable(filter);
         }
-        return true;
       })
       .map((v, i) => ({
         id: i,
@@ -58,5 +49,5 @@ export class BufferSource implements Source<Detail> {
         },
       }));
     yield* items;
-  }
+  });
 }

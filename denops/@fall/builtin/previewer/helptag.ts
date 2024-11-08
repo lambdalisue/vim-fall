@@ -1,9 +1,7 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
 import * as opt from "jsr:@denops/std@^7.0.0/option";
 import { join } from "jsr:@std/path@^1.0.0/join";
 
-import type { PreviewItem } from "../../item.ts";
-import type { Previewer, PreviewParams } from "../../previewer.ts";
+import { definePreviewer, type Previewer } from "../../previewer.ts";
 
 const helpfileCache = new Map<string, string>();
 
@@ -13,15 +11,8 @@ type Detail = {
   lang?: string;
 };
 
-/**
- * A previewer to preview helptag.
- */
-export class HelptagPreviewer<T extends Detail> implements Previewer<T> {
-  async preview(
-    denops: Denops,
-    { item }: PreviewParams<T>,
-    { signal }: { signal?: AbortSignal },
-  ): Promise<PreviewItem> {
+export function helptag<T extends Detail>(): Previewer<T> {
+  return definePreviewer(async (denops, { item }, { signal }) => {
     const runtimepaths = (await opt.runtimepath.get(denops)).split(",");
     signal?.throwIfAborted();
     const text = await readHelpfile(
@@ -38,7 +29,7 @@ export class HelptagPreviewer<T extends Detail> implements Previewer<T> {
       content,
       line: index === -1 ? undefined : index + 1,
     };
-  }
+  });
 }
 
 async function readHelpfile(

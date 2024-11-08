@@ -1,9 +1,8 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
 import * as fn from "jsr:@denops/std@^7.3.0/function";
+import { enumerate } from "jsr:@core/iterutil@^0.9.0/async/enumerate";
 import { join } from "jsr:@std/path@^1.0.0/join";
 
-import type { IdItem } from "../../item.ts";
-import type { CollectParams, Source } from "../../source.ts";
+import { defineSource, type Source } from "../../source.ts";
 
 type Options = {
   includes?: RegExp[];
@@ -15,34 +14,25 @@ type Detail = {
   stat: Deno.FileInfo;
 };
 
-/**
- * A source to collect files recursively.
- */
-export class FileSource implements Source<Detail> {
-  readonly #includes?: RegExp[];
-  readonly #excludes?: RegExp[];
-
-  constructor(options: Readonly<Options> = {}) {
-    this.#includes = options.includes;
-    this.#excludes = options.excludes;
-  }
-
-  async *collect(
-    denops: Denops,
-    { args }: CollectParams,
-    { signal }: { signal?: AbortSignal },
-  ): AsyncIterableIterator<IdItem<Detail>> {
+export function file(options: Readonly<Options> = {}): Source<Detail> {
+  const { includes, excludes } = options;
+  return defineSource(async function* (denops, { args }, { signal }) {
     const path = await fn.expand(denops, args[0] ?? ".") as string;
     signal?.throwIfAborted();
     const abspath = await fn.fnamemodify(denops, path, ":p");
     signal?.throwIfAborted();
-    yield* collect(
-      abspath,
-      this.#includes,
-      this.#excludes,
-      signal,
-    );
-  }
+    for await (
+      const [id, detail] of enumerate(
+        collect(abspath, includes, excludes, signal),
+      )
+    ) {
+      yield {
+        id,
+        value: detail.path,
+        detail,
+      };
+    }
+  });
 }
 
 async function* collect(
@@ -50,9 +40,7 @@ async function* collect(
   includes: RegExp[] | undefined,
   excludes: RegExp[] | undefined,
   signal?: AbortSignal,
-  offset = 0,
-): AsyncIterableIterator<IdItem<Detail>> {
-  let id = offset;
+): AsyncIterableIterator<Detail> {
   for await (const entry of Deno.readDir(root)) {
     const path = join(root, entry.name);
     if (includes && !includes.some((p) => p.test(path))) {
@@ -83,15 +71,11 @@ async function* collect(
       }
     }
     if (fileInfo.isDirectory) {
-      yield* collect(path, includes, excludes, signal, id);
+      yield* collect(path, includes, excludes, signal);
     } else {
       yield {
-        id: id++,
-        value: path,
-        detail: {
-          path,
-          stat: fileInfo,
-        },
+        path,
+        stat: fileInfo,
       };
     }
   }

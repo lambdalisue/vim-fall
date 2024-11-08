@@ -1,16 +1,5 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
+import { defineSorter, type Sorter } from "../../sorter.ts";
 
-import type { Sorter, SortParams } from "../../sorter.ts";
-
-/**
- * A sorter to do nothing.
- */
-export class NoopSorter<T> implements Sorter<T> {
-  sort(
-    _denops: Denops,
-    _params: SortParams<T>,
-    _options: { signal?: AbortSignal },
-  ) {
-    return;
-  }
+export function noop<T>(): Sorter<T> {
+  return defineSorter<T>(() => {});
 }

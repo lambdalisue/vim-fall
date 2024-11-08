@@ -1,10 +1,8 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
 import * as opt from "jsr:@denops/std@^7.0.0/option";
 import { walk } from "jsr:@std/fs@^1.0.0/walk";
 import { join } from "jsr:@std/path@^1.0.0/join";
 
-import type { IdItem } from "../../item.ts";
-import type { CollectParams, Source } from "../../source.ts";
+import { defineSource, type Source } from "../../source.ts";
 
 type Helptag = {
   helptag: string;
@@ -12,20 +10,15 @@ type Helptag = {
   lang?: string;
 };
 
-/**
- * A source to collect helptags.
- */
-export class HelptagSource implements Source<Helptag> {
-  async *collect(
-    denops: Denops,
-    _params: CollectParams,
-    _options: { signal?: AbortSignal },
-  ): AsyncIterableIterator<IdItem<Helptag>> {
+export function helptag(): Source<Helptag> {
+  return defineSource(async function* (denops, _params, { signal }) {
     const runtimepaths = (await opt.runtimepath.get(denops)).split(",");
+    signal?.throwIfAborted();
     const seen = new Set<string>();
     let id = 0;
     for (const runtimepath of runtimepaths) {
       for await (const helptag of discoverHelptags(runtimepath)) {
+        signal?.throwIfAborted();
         const key = `${helptag.helptag}:${helptag.lang ?? ""}`;
         if (seen.has(key)) {
           continue;
@@ -38,7 +31,7 @@ export class HelptagSource implements Source<Helptag> {
         seen.add(key);
       }
     }
-  }
+  });
 }
 
 async function* discoverHelptags(

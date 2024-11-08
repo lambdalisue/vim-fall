@@ -1,8 +1,7 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
 import { asyncExtendedMatch, AsyncFzf } from "npm:fzf@^0.5.2";
 
 import type { IdItem } from "../../item.ts";
-import type { Matcher, MatchParams } from "../../matcher.ts";
+import { defineMatcher, type Matcher } from "../../matcher.ts";
 
 type Options = {
   casing?: "smart-case" | "case-sensitive" | "case-insensitive";
@@ -11,32 +10,20 @@ type Options = {
   forward?: boolean;
 };
 
-export class FzfMatcher<T> implements Matcher<T> {
-  #casing: "smart-case" | "case-sensitive" | "case-insensitive";
-  #normalize: boolean;
-  #sort: boolean;
-  #forward: boolean;
-
-  constructor(options: Options = {}) {
-    this.#casing = options.casing ?? "smart-case";
-    this.#normalize = options.normalize ?? true;
-    this.#sort = options.sort ?? true;
-    this.#forward = options.forward ?? true;
-  }
-
-  async *match(
-    _denops: Denops,
-    { items, query }: MatchParams<T>,
-    { signal }: { signal?: AbortSignal },
-  ): AsyncIterableIterator<IdItem<T>> {
+export function fzf<T>(options: Options = {}): Matcher<T> {
+  const casing = options.casing ?? "smart-case";
+  const normalize = options.normalize ?? true;
+  const sort = options.sort ?? true;
+  const forward = options.forward ?? true;
+  return defineMatcher(async function* (_denops, { items, query }, { signal }) {
     const terms = query.split(/\s+/).filter((v) => v.length > 0);
     const filter = async (items: readonly IdItem<T>[], term: string) => {
       const fzf = new AsyncFzf(items, {
         selector: (v) => v.value,
-        casing: this.#casing,
-        normalize: this.#normalize,
-        sort: this.#sort,
-        forward: this.#forward,
+        casing,
+        normalize,
+        sort,
+        forward,
         match: asyncExtendedMatch,
       });
       const found = await fzf.find(term);
@@ -60,5 +47,5 @@ export class FzfMatcher<T> implements Matcher<T> {
       items = await filter(items, term);
     }
     yield* items;
-  }
+  });
 }

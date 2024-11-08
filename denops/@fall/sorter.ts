@@ -2,6 +2,7 @@ import type { Denops } from "jsr:@denops/std@^7.3.0";
 
 import type { Promish } from "./_typeutil.ts";
 import type { IdItem } from "./item.ts";
+import { type DerivableArray, deriveArray } from "./util/derivable.ts";
 
 export type SortParams<T> = {
   readonly items: IdItem<T>[];
@@ -49,11 +50,11 @@ export function defineSorter<T>(
  */
 export function composeSorter<
   T,
-  S extends [Sorter<T>, Sorter<T>, ...Sorter<T>[]],
+  S extends DerivableArray<[Sorter<T>, ...Sorter<T>[]]>,
 >(...sorters: S): Sorter<T> {
   return {
     sort: async (denops, params, options) => {
-      for (const sorter of sorters) {
+      for (const sorter of deriveArray(sorters)) {
         await sorter.sort(denops, params, options);
       }
     },

@@ -4,8 +4,8 @@ import * as builtin from "../../@fall/builtin/mod.ts";
 import { pipeProjectors } from "../../@fall/projector.ts";
 
 const quickfixActions = {
-  ...builtin.action.quickfixAction,
-  "quickfix:qfreplace": new builtin.action.QuickfixAction({
+  ...builtin.action.defaultQuickfixActions,
+  "quickfix:qfreplace": builtin.action.quickfix({
     after: "Qfreplace",
   }),
 };
@@ -18,35 +18,25 @@ export const main: Entrypoint = (
   },
 ) => {
   refineGlobalConfig({
-    layout: new builtin.layout.ModernLayout(),
+    layout: builtin.layout.modern,
   });
 
   defineItemPickerFromCurator(
     "grep",
     pipeProjectors(
-      new builtin.curator.RgCurator(),
-      new builtin.modifier.RelativePathModifier(),
+      builtin.curator.rg,
+      builtin.modifier.relativePath,
     ),
     {
-      renderer: new builtin.renderer.SmartPathRenderer(),
-      previewer: new builtin.previewer.FilePreviewer(),
+      renderer: builtin.renderer.smartPath,
+      previewer: builtin.previewer.file,
       actions: {
-        ...builtin.action.echoAction,
-        ...builtin.action.openActions,
-        ...builtin.action.cdActions,
-        ...builtin.action.bufferActions,
-        ...builtin.action.writeAction,
-        ...builtin.action.systemopenAction,
         ...quickfixActions,
-        "submatch:fzf": new builtin.action.SubmatchAction(
-          new builtin.matcher.FzfMatcher(),
-        ),
-        "submatch:substring": new builtin.action.SubmatchAction(
-          new builtin.matcher.SubstringMatcher(),
-        ),
-        "submatch:regexp": new builtin.action.SubmatchAction(
-          new builtin.matcher.RegexpMatcher(),
-        ),
+        ...builtin.action.defaultOpenActions,
+        ...builtin.action.defaultCdActions,
+        ...builtin.action.defaultEchoActions,
+        ...builtin.action.defaultSystemopenActions,
+        ...builtin.action.defaultSubmatchActions,
       },
       defaultAction: "open",
     },
@@ -55,7 +45,7 @@ export const main: Entrypoint = (
   defineItemPickerFromSource(
     "file",
     pipeProjectors(
-      new builtin.source.FileSource({
+      builtin.source.file({
         excludes: [
           /.*\/node_modules\/.*/,
           /.*\/target\/.*/,
@@ -67,83 +57,63 @@ export const main: Entrypoint = (
           /.*\/.coverage\//,
         ],
       }),
-      new builtin.modifier.RelativePathModifier(),
+      builtin.modifier.relativePath,
     ),
     {
-      matcher: new builtin.matcher.FzfMatcher(),
-      renderer: new builtin.renderer.SmartPathRenderer(),
-      previewer: new builtin.previewer.FilePreviewer(),
+      matcher: builtin.matcher.fzf,
+      renderer: builtin.renderer.smartPath,
+      previewer: builtin.previewer.file,
       actions: {
-        ...builtin.action.echoAction,
-        ...builtin.action.openActions,
-        ...builtin.action.cdActions,
-        ...builtin.action.bufferActions,
-        ...builtin.action.writeAction,
-        ...builtin.action.systemopenAction,
         ...quickfixActions,
-        "submatch:substring": new builtin.action.SubmatchAction(
-          new builtin.matcher.SubstringMatcher(),
-        ),
-        "submatch:regexp": new builtin.action.SubmatchAction(
-          new builtin.matcher.RegexpMatcher(),
-        ),
+        ...builtin.action.defaultOpenActions,
+        ...builtin.action.defaultCdActions,
+        ...builtin.action.defaultEchoActions,
+        ...builtin.action.defaultSystemopenActions,
+        ...builtin.action.defaultSubmatchActions,
       },
       defaultAction: "open",
     },
   );
 
-  defineItemPickerFromSource("line", new builtin.source.LineSource(), {
-    matcher: new builtin.matcher.FzfMatcher(),
-    previewer: new builtin.previewer.BufferPreviewer(),
+  defineItemPickerFromSource("line", builtin.source.line, {
+    matcher: builtin.matcher.fzf,
+    previewer: builtin.previewer.buffer,
     actions: {
-      ...builtin.action.echoAction,
-      ...builtin.action.openActions,
       ...quickfixActions,
-      "submatch:substring": new builtin.action.SubmatchAction(
-        new builtin.matcher.SubstringMatcher(),
-      ),
-      "submatch:regexp": new builtin.action.SubmatchAction(
-        new builtin.matcher.RegexpMatcher(),
-      ),
+      ...builtin.action.defaultOpenActions,
+      ...builtin.action.defaultBufferActions,
+      ...builtin.action.defaultCdActions,
+      ...builtin.action.defaultEchoActions,
+      ...builtin.action.defaultSubmatchActions,
     },
     defaultAction: "open",
   });
 
   defineItemPickerFromSource(
     "buffer",
-    new builtin.source.BufferSource({ filter: "bufloaded" }),
+    builtin.source.buffer({ filter: "bufloaded" }),
     {
-      matcher: new builtin.matcher.FzfMatcher(),
-      previewer: new builtin.previewer.BufferPreviewer(),
+      matcher: builtin.matcher.fzf,
+      previewer: builtin.previewer.buffer,
       actions: {
-        ...builtin.action.echoAction,
-        ...builtin.action.openActions,
-        ...builtin.action.writeAction,
-        ...builtin.action.bufferActions,
         ...quickfixActions,
-        "submatch:substring": new builtin.action.SubmatchAction(
-          new builtin.matcher.SubstringMatcher(),
-        ),
-        "submatch:regexp": new builtin.action.SubmatchAction(
-          new builtin.matcher.RegexpMatcher(),
-        ),
+        ...builtin.action.defaultOpenActions,
+        ...builtin.action.defaultBufferActions,
+        ...builtin.action.defaultCdActions,
+        ...builtin.action.defaultEchoActions,
+        ...builtin.action.defaultSubmatchActions,
       },
       defaultAction: "open",
     },
   );
 
-  defineItemPickerFromSource("help", new builtin.source.HelptagSource(), {
-    matcher: new builtin.matcher.FzfMatcher(),
-    previewer: new builtin.previewer.HelptagPreviewer(),
+  defineItemPickerFromSource("help", builtin.source.helptag, {
+    matcher: builtin.matcher.fzf,
+    previewer: builtin.previewer.helptag,
     actions: {
-      ...builtin.action.echoAction,
-      ...builtin.action.helpAction,
-      "submatch:substring": new builtin.action.SubmatchAction(
-        new builtin.matcher.SubstringMatcher(),
-      ),
-      "submatch:regexp": new builtin.action.SubmatchAction(
-        new builtin.matcher.RegexpMatcher(),
-      ),
+      ...builtin.action.defaultHelpActions,
+      ...builtin.action.defaultEchoActions,
+      ...builtin.action.defaultSubmatchActions,
     },
     defaultAction: "help",
   });

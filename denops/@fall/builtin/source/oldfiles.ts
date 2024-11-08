@@ -1,33 +1,24 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
+import { enumerate } from "jsr:@core/iterutil@^0.9.0/enumerate";
 import * as vars from "jsr:@denops/std@^7.0.0/variable";
 
-import type { IdItem } from "../../item.ts";
-import type { CollectParams, Source } from "../../source.ts";
+import { defineSource, type Source } from "../../source.ts";
 
 type Detail = {
   path: string;
 };
 
-/**
- * A source to collect oldfiles.
- */
-export class OldfilesSource implements Source<Detail> {
-  async *collect(
-    denops: Denops,
-    _params: CollectParams,
-    { signal }: { signal?: AbortSignal },
-  ): AsyncIterableIterator<IdItem<Detail>> {
+export function oldfiles(): Source<Detail> {
+  return defineSource<Detail>(async function* (denops, _params, { signal }) {
     const oldfiles = await vars.v.get(denops, "oldfiles") as string[];
     signal?.throwIfAborted();
-    let id = 0;
-    for (const path of oldfiles) {
+    for (const [id, path] of enumerate(oldfiles)) {
       yield {
-        id: id++,
+        id,
         value: path,
         detail: {
           path,
         },
       };
     }
-  }
+  });
 }

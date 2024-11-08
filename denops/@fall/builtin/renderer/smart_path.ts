@@ -1,18 +1,10 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
 import { SEPARATOR } from "jsr:@std/path@^1.0.0/constants";
 
-import type { Renderer, RenderParams } from "../../renderer.ts";
+import { defineRenderer, type Renderer } from "../../renderer.ts";
 import { getByteLength } from "../_util.ts";
 
-/**
- * A renderer to render smart paths.
- */
-export class SmartPathRenderer<T> implements Renderer<T> {
-  render(
-    _denops: Denops,
-    { items }: RenderParams<T>,
-    { signal }: { signal?: AbortSignal },
-  ) {
+export function smartPath<T>(): Renderer<T> {
+  return defineRenderer<T>((_denops, { items }, { signal }) => {
     for (const item of items) {
       signal?.throwIfAborted();
 
@@ -47,5 +39,5 @@ export class SmartPathRenderer<T> implements Renderer<T> {
         },
       ];
     }
-  }
+  });
 }

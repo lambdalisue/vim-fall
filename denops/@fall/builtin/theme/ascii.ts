@@ -1,6 +1,6 @@
 import type { Border, Divider, Theme } from "../../theme.ts";
 
-export const ASCII_BORDER: Border = [
+const ASCII_BORDER: Border = [
   "+",
   "-",
   "+",
@@ -11,7 +11,7 @@ export const ASCII_BORDER: Border = [
   "|",
 ] as const;
 
-export const ASCII_DIVIDER: Divider = [
+const ASCII_DIVIDER: Divider = [
   "|",
   "-",
   "|",
@@ -20,7 +20,9 @@ export const ASCII_DIVIDER: Divider = [
   "-",
 ] as const;
 
-export const ASCII_THEME: Theme = {
-  border: ASCII_BORDER,
-  divider: ASCII_DIVIDER,
-} as const;
+export function ascii(): Theme {
+  return {
+    border: ASCII_BORDER,
+    divider: ASCII_DIVIDER,
+  };
+}

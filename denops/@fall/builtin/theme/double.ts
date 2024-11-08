@@ -1,6 +1,6 @@
 import type { Border, Divider, Theme } from "../../theme.ts";
 
-export const DOUBLE_BORDER: Border = [
+const DOUBLE_BORDER: Border = [
   "╔",
   "═",
   "╗",
@@ -11,7 +11,7 @@ export const DOUBLE_BORDER: Border = [
   "║",
 ] as const;
 
-export const DOUBLE_DIVIDER: Divider = [
+const DOUBLE_DIVIDER: Divider = [
   "╠",
   "═",
   "╣",
@@ -20,7 +20,9 @@ export const DOUBLE_DIVIDER: Divider = [
   "╩",
 ] as const;
 
-export const DOUBLE_THEME: Theme = {
-  border: DOUBLE_BORDER,
-  divider: DOUBLE_DIVIDER,
-} as const;
+export function double(): Theme {
+  return {
+    border: DOUBLE_BORDER,
+    divider: DOUBLE_DIVIDER,
+  };
+}

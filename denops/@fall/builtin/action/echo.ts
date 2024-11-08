@@ -1,16 +1,13 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
-import type { Action, InvokeParams } from "../../action.ts";
+import { type Action, defineAction } from "../../action.ts";
 
-export class EchoAction<T> implements Action<T> {
-  invoke(
-    _denops: Denops,
-    { item }: InvokeParams<T>,
-    _options: { signal?: AbortSignal },
-  ): void {
+export function echo<T>(): Action<T> {
+  return defineAction((_denops, { item }, _options) => {
     console.log(JSON.stringify(item, null, 2));
-  }
+  });
 }
 
-export const echoAction: { echo: EchoAction<unknown> } = {
-  echo: new EchoAction(),
+export const defaultEchoActions: {
+  echo: Action<unknown>;
+} = {
+  echo: echo(),
 };

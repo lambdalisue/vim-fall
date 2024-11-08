@@ -1,6 +1,6 @@
 import type { Border, Divider, Theme } from "../../theme.ts";
 
-export const SINGLE_BORDER: Border = [
+const SINGLE_BORDER: Border = [
   "┌",
   "─",
   "┐",
@@ -11,7 +11,7 @@ export const SINGLE_BORDER: Border = [
   "│",
 ] as const;
 
-export const SINGLE_DIVIDER: Divider = [
+const SINGLE_DIVIDER: Divider = [
   "├",
   "─",
   "┤",
@@ -20,7 +20,9 @@ export const SINGLE_DIVIDER: Divider = [
   "┴",
 ] as const;
 
-export const SINGLE_THEME: Theme = {
-  border: SINGLE_BORDER,
-  divider: SINGLE_DIVIDER,
-} as const;
+export function single(): Theme {
+  return {
+    border: SINGLE_BORDER,
+    divider: SINGLE_DIVIDER,
+  };
+}

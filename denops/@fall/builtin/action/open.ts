@@ -1,8 +1,7 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
 import * as buffer from "jsr:@denops/std@^7.0.0/buffer";
 import * as fn from "jsr:@denops/std@^7.0.0/function";
 
-import type { Action, InvokeParams } from "../../action.ts";
+import { type Action, defineAction } from "../../action.ts";
 
 type Options = {
   bang?: boolean;
@@ -22,75 +21,51 @@ type Detail = {
   column?: number;
 };
 
-export class OpenAction<T extends Detail> implements Action<T> {
-  #bang: boolean;
-  #mods: string;
-  #cmdarg: string;
-  #opener: string;
-  #splitter: string;
-
-  constructor(options: Options = {}) {
-    this.#bang = options.bang ?? false;
-    this.#mods = options.mods ?? "";
-    this.#cmdarg = options.cmdarg ?? "";
-    this.#opener = options.opener ?? "edit";
-    this.#splitter = options.splitter ?? this.#opener;
-  }
-
-  async invoke(
-    denops: Denops,
-    { item, selectedItems }: InvokeParams<T>,
-    { signal }: { signal?: AbortSignal },
-  ): Promise<void> {
+export function open<T extends Detail>(options: Options = {}): Action<T> {
+  const bang = options.bang ?? false;
+  const mods = options.mods ?? "";
+  const cmdarg = options.cmdarg ?? "";
+  const opener = options.opener ?? "edit";
+  const splitter = options.splitter ?? opener;
+  return defineAction(async (denops, { item, selectedItems }, { signal }) => {
     const items = selectedItems ?? [item];
-    let opener = this.#opener;
+    let currentOpener = opener;
     for (const item of items.filter((v) => !!v)) {
       const expr = "bufname" in item.detail
         ? item.detail.bufname
         : item.detail.path;
-      try {
-        const info = await buffer.open(denops, expr, {
-          bang: this.#bang,
-          mods: this.#mods,
-          cmdarg: this.#cmdarg,
-          opener,
-        });
-        signal?.throwIfAborted();
+      const info = await buffer.open(denops, expr, {
+        bang,
+        mods,
+        cmdarg,
+        opener: currentOpener,
+      });
+      signal?.throwIfAborted();
 
-        opener = this.#splitter;
-        if (item.detail.line || item.detail.column) {
-          const line = item.detail.line ?? 1;
-          const column = item.detail.column ?? 1;
-          await fn.win_execute(
-            denops,
-            info.winid,
-            `silent! call cursor(${line}, ${column})`,
-          );
-          await fn.win_execute(
-            denops,
-            info.winid,
-            `silent! normal! zv`,
-          );
-        }
-      } catch (err) {
-        if (err instanceof DOMException && err.name === "AbortError") return;
-        const m = err instanceof Error ? err.message : String(err);
-        console.warn(`[fall] Failed to open ${expr}: ${m}`);
+      currentOpener = splitter;
+      if (item.detail.line || item.detail.column) {
+        const line = item.detail.line ?? 1;
+        const column = item.detail.column ?? 1;
+        await fn.win_execute(
+          denops,
+          info.winid,
+          `silent! normal! ${line}G${column}|zv`,
+        );
       }
     }
-  }
+  });
 }
 
-export const openActions: {
-  open: OpenAction<Detail>;
-  "open:drop": OpenAction<Detail>;
-  "open:split": OpenAction<Detail>;
-  "open:vsplit": OpenAction<Detail>;
-  "open:tabedit": OpenAction<Detail>;
+export const defaultOpenActions: {
+  open: Action<Detail>;
+  "open:split": Action<Detail>;
+  "open:vsplit": Action<Detail>;
+  "open:tabedit": Action<Detail>;
+  "open:drop": Action<Detail>;
 } = {
-  open: new OpenAction(),
-  "open:drop": new OpenAction({ opener: "drop" }),
-  "open:split": new OpenAction({ opener: "split" }),
-  "open:vsplit": new OpenAction({ opener: "vsplit" }),
-  "open:tabedit": new OpenAction({ opener: "tabedit" }),
+  open: open(),
+  "open:split": open({ opener: "split" }),
+  "open:vsplit": open({ opener: "vsplit" }),
+  "open:tabedit": open({ opener: "tabedit" }),
+  "open:drop": open({ opener: "drop" }),
 };

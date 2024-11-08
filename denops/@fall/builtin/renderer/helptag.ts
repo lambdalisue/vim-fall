@@ -1,17 +1,9 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
+import { defineRenderer, type Renderer } from "../../renderer.ts";
 
-import type { Renderer, RenderParams } from "../../renderer.ts";
-
-/**
- * A renderer to render helptags.
- */
-export class HelptagRenderer<T extends { helptag: string; lang?: string }>
-  implements Renderer<T> {
-  async render(
-    _denops: Denops,
-    { items }: RenderParams<T>,
-    { signal }: { signal?: AbortSignal },
-  ) {
+export function helptag<
+  T extends { helptag: string; lang?: string },
+>(): Renderer<T> {
+  return defineRenderer<T>(async (_denops, { items }, { signal }) => {
     for await (const item of items) {
       signal?.throwIfAborted();
       if (item.detail.lang) {
@@ -25,5 +17,5 @@ export class HelptagRenderer<T extends { helptag: string; lang?: string }>
         ];
       }
     }
-  }
+  });
 }

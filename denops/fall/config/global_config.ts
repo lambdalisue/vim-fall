@@ -1,11 +1,12 @@
 import type { GlobalConfig, RefineGlobalConfig } from "../../@fall/config.ts";
 
-import { ModernLayout } from "../../@fall/builtin/layout/modern.ts";
-import { MODERN_THEME } from "../../@fall/builtin/theme/modern.ts";
+import { modern as modernLayout } from "../../@fall/builtin/layout/modern.ts";
+import { modern as modernTheme } from "../../@fall/builtin/theme/modern.ts";
+import { derive } from "../../@fall/util/derivable.ts";
 
 const globalConfig: GlobalConfig = {
-  layout: new ModernLayout(),
-  theme: MODERN_THEME,
+  layout: modernLayout(),
+  theme: modernTheme(),
 };
 
 export function getGlobalConfig(): Readonly<GlobalConfig> {
@@ -14,9 +15,9 @@ export function getGlobalConfig(): Readonly<GlobalConfig> {
 
 export const refineGlobalConfig: RefineGlobalConfig = (params) => {
   if (params.theme) {
-    globalConfig.theme = params.theme;
+    globalConfig.theme = derive(params.theme);
   }
   if (params.layout) {
-    globalConfig.layout = params.layout;
+    globalConfig.layout = derive(params.layout);
   }
 };

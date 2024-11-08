@@ -1,16 +1,18 @@
 import { assertEquals } from "jsr:@std/assert@^1.0.6";
 
-import { MODERN_THEME } from "../theme/modern.ts";
+import { modern } from "../theme/modern.ts";
 import { buildCanvas, renderCanvas } from "../../util/testutil.ts";
-import { CompactLayout } from "./compact.ts";
+import { compact } from "./compact.ts";
 
 const SCREEN = {
   width: 40,
   height: 15,
 } as const;
 
-Deno.test("CompactLayout", async (t) => {
-  const layout = new CompactLayout({
+const MODERN_THEME = modern();
+
+Deno.test("compact", async (t) => {
+  const layout = compact({
     widthRatio: 0.8,
     heightRatio: 0.8,
   });
