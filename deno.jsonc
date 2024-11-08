@@ -46,6 +46,7 @@
     "./builtin/previewer/noop": "./denops/@fall/builtin/previewer/noop.ts",
     "./builtin/renderer": "./denops/@fall/builtin/renderer/mod.ts",
     "./builtin/renderer/helptag": "./denops/@fall/builtin/renderer/helptag.ts",
+    "./builtin/renderer/nerdfont": "./denops/@fall/builtin/renderer/nerdfont.ts",
     "./builtin/renderer/noop": "./denops/@fall/builtin/renderer/noop.ts",
     "./builtin/renderer/smart-path": "./denops/@fall/builtin/renderer/smart_path.ts",
     "./builtin/sorter": "./denops/@fall/builtin/sorter/mod.ts",
@@ -97,7 +98,8 @@
   "tasks": {
     "gen:mod": "deno run -A ./.script/gen-mod.ts && deno fmt",
     "gen:exports": "deno run -A ./.script/gen-exports.ts && deno fmt",
-    "gen": "deno task gen:mod && deno task gen:exports",
+    "gen:builtin-renderer-nerdfont": "deno run -A ./.script/gen-builtin-renderer-nerdfont.ts && deno fmt",
+    "gen": "deno task gen:mod && deno task gen:exports && deno task gen:builtin-renderer-nerdfont",
     "check": "deno check ./**/*.ts",
     "test": "deno test -A --parallel --shuffle --doc",
     "test:coverage": "deno task test --coverage=.coverage",
