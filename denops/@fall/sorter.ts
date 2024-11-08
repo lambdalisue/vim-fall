@@ -1,5 +1,6 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 
+import type { Promish } from "./_typeutil.ts";
 import type { IdItem } from "./item.ts";
 
 export type SortParams<T> = {
@@ -21,7 +22,7 @@ export type Sorter<T> = {
     denops: Denops,
     params: SortParams<T>,
     options: { signal?: AbortSignal },
-  ): void | Promise<void>;
+  ): Promish<void>;
 };
 
 /**

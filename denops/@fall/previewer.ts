@@ -1,5 +1,6 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 
+import type { Promish } from "./_typeutil.ts";
 import type { IdItem, PreviewItem } from "./item.ts";
 
 export type PreviewParams<T> = {
@@ -21,7 +22,7 @@ export type Previewer<T> = {
     denops: Denops,
     params: PreviewParams<T>,
     options: { signal?: AbortSignal },
-  ): void | PreviewItem | Promise<void | PreviewItem>;
+  ): Promish<void | PreviewItem>;
 };
 
 /**

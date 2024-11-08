@@ -1,5 +1,6 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 
+import type { Promish } from "./_typeutil.ts";
 import type { DisplayItem } from "./item.ts";
 
 export type RenderParams<T> = {
@@ -24,7 +25,7 @@ export type Renderer<T> = {
     denops: Denops,
     params: RenderParams<T>,
     options: { signal?: AbortSignal },
-  ): void | Promise<void>;
+  ): Promish<void>;
 };
 
 /**

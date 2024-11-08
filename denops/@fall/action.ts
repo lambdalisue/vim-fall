@@ -1,5 +1,6 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 
+import type { Promish } from "./_typeutil.ts";
 import type { IdItem } from "./item.ts";
 import type { Size } from "./layout.ts";
 import type { GlobalConfig, ItemPickerParams } from "./config.ts";
@@ -51,7 +52,7 @@ export type Action<T> = {
     denops: Denops,
     params: InvokeParams<T>,
     options: { signal?: AbortSignal },
-  ): void | true | Promise<void | true>;
+  ): Promish<void | true>;
 };
 
 /**
@@ -65,7 +66,7 @@ export function defineAction<T>(
     denops: Denops,
     params: InvokeParams<T>,
     options: { signal?: AbortSignal },
-  ) => void | true | Promise<void | true>,
+  ) => Promish<void | true>,
 ): Action<T> {
   return {
     invoke,
