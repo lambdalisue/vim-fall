@@ -24,11 +24,50 @@ export const main: Entrypoint = (
   defineItemPickerFromCurator(
     "grep",
     pipeProjectors(
+      builtin.curator.grep,
+      builtin.modifier.relativePath,
+    ),
+    {
+      previewer: builtin.previewer.file,
+      actions: {
+        ...quickfixActions,
+        ...builtin.action.defaultOpenActions,
+        ...builtin.action.defaultCdActions,
+        ...builtin.action.defaultEchoActions,
+        ...builtin.action.defaultSystemopenActions,
+        ...builtin.action.defaultSubmatchActions,
+      },
+      defaultAction: "open",
+    },
+  );
+
+  defineItemPickerFromCurator(
+    "git-grep",
+    pipeProjectors(
+      builtin.curator.gitGrep,
+      builtin.modifier.relativePath,
+    ),
+    {
+      previewer: builtin.previewer.file,
+      actions: {
+        ...quickfixActions,
+        ...builtin.action.defaultOpenActions,
+        ...builtin.action.defaultCdActions,
+        ...builtin.action.defaultEchoActions,
+        ...builtin.action.defaultSystemopenActions,
+        ...builtin.action.defaultSubmatchActions,
+      },
+      defaultAction: "open",
+    },
+  );
+
+  defineItemPickerFromCurator(
+    "rg",
+    pipeProjectors(
       builtin.curator.rg,
       builtin.modifier.relativePath,
     ),
     {
-      renderer: builtin.renderer.smartPath,
       previewer: builtin.previewer.file,
       actions: {
         ...quickfixActions,

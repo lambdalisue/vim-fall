@@ -18,6 +18,8 @@
     "./builtin/action/systemopen": "./denops/@fall/builtin/action/systemopen.ts",
     "./builtin/action/yank": "./denops/@fall/builtin/action/yank.ts",
     "./builtin/curator": "./denops/@fall/builtin/curator/mod.ts",
+    "./builtin/curator/git-grep": "./denops/@fall/builtin/curator/git_grep.ts",
+    "./builtin/curator/grep": "./denops/@fall/builtin/curator/grep.ts",
     "./builtin/curator/noop": "./denops/@fall/builtin/curator/noop.ts",
     "./builtin/curator/rg": "./denops/@fall/builtin/curator/rg.ts",
     "./builtin/filter": "./denops/@fall/builtin/filter/mod.ts",
