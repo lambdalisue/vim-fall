@@ -1,7 +1,6 @@
-import type { Entrypoint } from "../../@fall/config.ts";
-
-import * as builtin from "../../@fall/builtin/mod.ts";
-import { pipeProjectors } from "../../@fall/projector.ts";
+import type { Entrypoint } from "jsr:@lambdalisue/vim-fall@^0.12.0/config";
+import { pipeProjectors } from "jsr:@lambdalisue/vim-fall@^0.12.0/projector";
+import * as builtin from "jsr:@lambdalisue/vim-fall@^0.12.0/builtin";
 
 const quickfixActions = {
   ...builtin.action.defaultQuickfixActions,
