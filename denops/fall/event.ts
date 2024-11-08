@@ -7,15 +7,15 @@ export function dispatch(event: Readonly<Event>): void {
 }
 
 export function consume(consumer: Consumer): void {
-  for (const event of eventQueue) {
-    consumer(event);
-  }
+  const events = eventQueue;
   eventQueue = [];
+  events.forEach(consumer);
 }
 
 type SelectMethod = "on" | "off" | "toggle";
 
 export type Event =
+  | { type: "debug-error"; message: string }
   | { type: "vim-resized"; width: number; height: number }
   | { type: "vim-cmdline-changed"; cmdline: string }
   | { type: "vim-cmdpos-changed"; cmdpos: number }

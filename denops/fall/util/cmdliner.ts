@@ -18,6 +18,9 @@ export class Cmdliner {
 
   static async #feedkeys(denops: Denops, key: string): Promise<void> {
     try {
+      if (!(await fn.mode(denops)).startsWith("c")) {
+        return;
+      }
       await useEval(denops, async (denops) => {
         await fn.feedkeys(denops, key, "n");
       });
@@ -65,7 +68,7 @@ export class Cmdliner {
       fn.getcmdline(denops),
       fn.getcmdpos(denops),
     ]);
-    if (mode !== "c") {
+    if (!mode.startsWith("c")) {
       // Not in command-line mode
       return;
     }

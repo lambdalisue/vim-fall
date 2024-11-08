@@ -21,6 +21,10 @@ function eventDispatch(event: unknown): void {
 // Only event that is dispatched from Vim requires predicate function.
 // So this is NOT a full list of event types.
 const isEventComplement = is.UnionOf([
+  is.ObjectOf({
+    type: is.LiteralOf("debug-error"),
+    message: is.String,
+  }),
   // Vim
   is.ObjectOf({
     type: is.LiteralOf("vim-resized"),

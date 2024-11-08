@@ -8,18 +8,19 @@ export class Scheduler implements Disposable {
 
   #tick(
     callback: () => void | Promise<void>,
-    { signal }: { signal?: AbortSignal } = {},
+    { reject, signal }: {
+      reject: (reason: unknown) => void;
+      signal?: AbortSignal;
+    },
   ): void {
     this.#timer = setTimeout(async () => {
       if (!this.#timer || signal?.aborted) return;
       try {
         await callback();
         if (!this.#timer || signal?.aborted) return;
-        this.#tick(callback, { signal });
+        this.#tick(callback, { reject, signal });
       } catch (err) {
-        if (err instanceof DOMException && err.name === "AbortError") return;
-        const m = err instanceof Error ? err.message : String(err);
-        console.error(`[fall] Unexpected error in Scheduler: ${m}`);
+        reject(err);
       }
     }, this.#interval);
   }
@@ -27,11 +28,13 @@ export class Scheduler implements Disposable {
   start(
     callback: () => void | Promise<void>,
     { signal }: { signal?: AbortSignal } = {},
-  ): void {
+  ): Promise<never> {
     if (this.#timer !== undefined) {
-      throw new Error("Scheduler is already started");
+      return Promise.reject(new Error("Scheduler is already started"));
     }
-    this.#tick(callback, { signal });
+    return new Promise((_, reject) => {
+      this.#tick(callback, { reject, signal });
+    });
   }
 
   stop(): void {

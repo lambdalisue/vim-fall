@@ -143,7 +143,7 @@ export class Picker<T> implements AsyncDisposable {
     { args }: { args: string[] },
     { signal }: { signal?: AbortSignal } = {},
   ): Promise<PickerResult<T> | undefined> {
-    using stack = new DisposableStack();
+    await using stack = new AsyncDisposableStack();
 
     this.#collectProcessor.start(denops, { args });
     stack.defer(() => this.#collectProcessor.pause());
@@ -158,8 +158,8 @@ export class Picker<T> implements AsyncDisposable {
       cmdline: this.#inputComponent.cmdline,
       cmdpos: this.#inputComponent.cmdpos,
     });
-    using scheduler = new Scheduler(this.#schedulerInterval);
-    scheduler.start(async () => {
+    const scheduler = stack.use(new Scheduler(this.#schedulerInterval));
+    const waiter = scheduler.start(async () => {
       // Check cmdline/cmdpos
       await cmdliner.check(denops);
 
@@ -197,7 +197,11 @@ export class Picker<T> implements AsyncDisposable {
       }
     }, { signal });
 
-    const query = await cmdliner.input(denops, { signal });
+    stack.defer(() => Cmdliner.cancel(denops));
+    const query = await Promise.race([
+      cmdliner.input(denops, { signal }),
+      waiter,
+    ]);
     if (query == null) {
       return;
     }
@@ -278,6 +282,11 @@ export class Picker<T> implements AsyncDisposable {
     accept: (name: string) => Promise<void>;
   }): void {
     switch (event.type) {
+      case "debug-error":
+        console.log(
+          `[fall] 'debug-error' event has received: ${event.message}`,
+        );
+        throw new Error(event.message);
       case "vim-resized": {
         this.#resized = {
           width: event.width,
