@@ -26,3 +26,40 @@ export type Renderer<T> = {
     options: { signal?: AbortSignal },
   ): void | Promise<void>;
 };
+
+/**
+ * Define a renderer.
+ *
+ * @param render The function to render items.
+ * @returns The renderer.
+ */
+export function defineRenderer<T>(
+  render: (
+    denops: Denops,
+    params: RenderParams<T>,
+    options: { signal?: AbortSignal },
+  ) => void | Promise<void>,
+): Renderer<T> {
+  return { render };
+}
+
+/**
+ * Compose multiple renderers.
+ *
+ * @param renderers The renderers to compose.
+ * @returns The composed renderer.
+ */
+export function composeRenderer<
+  T,
+  R extends [Renderer<T>, Renderer<T>, ...Renderer<T>[]],
+>(
+  ...renderers: R
+): Renderer<T> {
+  return {
+    render: async (denops, params, options) => {
+      for (const renderer of renderers) {
+        await renderer.render(denops, params, options);
+      }
+    },
+  };
+}

@@ -25,6 +25,12 @@ export type Source<T> = {
   ): AsyncIterableIterator<IdItem<T>>;
 };
 
+/**
+ * Define a source.
+ *
+ * @param collect The function to collect items.
+ * @returns The source.
+ */
 export function defineSource<T>(
   collect: (
     denops: Denops,

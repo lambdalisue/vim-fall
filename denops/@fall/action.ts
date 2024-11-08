@@ -5,8 +5,17 @@ import type { Size } from "./layout.ts";
 import type { GlobalConfig, ItemPickerParams } from "./config.ts";
 
 export type Context<T, A extends string> = {
+  /**
+   * The screen size.
+   */
   readonly screen: Size;
+  /**
+   * The global configuration.
+   */
   readonly globalConfig: GlobalConfig;
+  /**
+   * The picker parameters.
+   */
   readonly pickerParams: ItemPickerParams<T, A> & GlobalConfig;
 };
 
@@ -44,3 +53,21 @@ export type Action<T> = {
     options: { signal?: AbortSignal },
   ): void | true | Promise<void | true>;
 };
+
+/**
+ * Define an action.
+ *
+ * @param invoke The function to invoke the action.
+ * @returns The action.
+ */
+export function defineAction<T>(
+  invoke: (
+    denops: Denops,
+    params: InvokeParams<T>,
+    options: { signal?: AbortSignal },
+  ) => void | true | Promise<void | true>,
+): Action<T> {
+  return {
+    invoke,
+  };
+}

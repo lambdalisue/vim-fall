@@ -59,21 +59,6 @@ export type DisplayItem<T> = IdItem<T> & {
   decorations: readonly ItemDecoration[];
 };
 
-export type ItemDecoration = {
-  /**
-   * Column number (bytes)
-   */
-  readonly column: number;
-  /**
-   * Length (bytes)
-   */
-  readonly length: number;
-  /**
-   * Highlight name
-   */
-  readonly highlight?: string;
-};
-
 export type PreviewItem = {
   /**
    * The content to preview.
@@ -95,4 +80,19 @@ export type PreviewItem = {
    * The filename used in the buffer name.
    */
   readonly filename?: string;
+};
+
+export type ItemDecoration = {
+  /**
+   * Column number (bytes)
+   */
+  readonly column: number;
+  /**
+   * Length (bytes)
+   */
+  readonly length: number;
+  /**
+   * Highlight name
+   */
+  readonly highlight?: string;
 };

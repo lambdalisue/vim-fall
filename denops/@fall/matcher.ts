@@ -27,3 +27,19 @@ export type Matcher<T> = {
     options: { signal?: AbortSignal },
   ): AsyncIterableIterator<IdItem<T>>;
 };
+
+/**
+ * Define a matcher.
+ *
+ * @param match The function to match items.
+ * @returns The matcher.
+ */
+export function defineMatcher<T>(
+  match: (
+    denops: Denops,
+    params: MatchParams<T>,
+    options: { signal?: AbortSignal },
+  ) => AsyncIterableIterator<IdItem<T>>,
+): Matcher<T> {
+  return { match };
+}

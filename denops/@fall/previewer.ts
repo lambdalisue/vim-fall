@@ -23,3 +23,19 @@ export type Previewer<T> = {
     options: { signal?: AbortSignal },
   ): void | PreviewItem | Promise<void | PreviewItem>;
 };
+
+/**
+ * Define a previewer.
+ *
+ * @param preview The function to preview an item.
+ * @returns The previewer.
+ */
+export function definePreviewer<T>(
+  preview: (
+    denops: Denops,
+    params: PreviewParams<T>,
+    options: { signal?: AbortSignal },
+  ) => void | PreviewItem | Promise<void | PreviewItem>,
+): Previewer<T> {
+  return { preview };
+}

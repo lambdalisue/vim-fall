@@ -1,7 +1,7 @@
 import type { Entrypoint } from "../../@fall/config.ts";
 
 import * as builtin from "../../@fall/builtin/mod.ts";
-import { compose } from "../../@fall/projector.ts";
+import { pipeProjectors } from "../../@fall/projector.ts";
 
 const quickfixActions = {
   ...builtin.action.quickfixAction,
@@ -23,7 +23,7 @@ export const main: Entrypoint = (
 
   defineItemPickerFromCurator(
     "grep",
-    compose(
+    pipeProjectors(
       new builtin.curator.RgCurator(),
       new builtin.modifier.RelativePathModifier(),
     ),
@@ -54,7 +54,7 @@ export const main: Entrypoint = (
 
   defineItemPickerFromSource(
     "file",
-    compose(
+    pipeProjectors(
       new builtin.source.FileSource({
         excludes: [
           /.*\/node_modules\/.*/,
