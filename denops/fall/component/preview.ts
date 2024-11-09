@@ -2,9 +2,9 @@ import type { Denops } from "jsr:@denops/std@^7.3.0";
 import * as fn from "jsr:@denops/std@^7.3.0/function";
 import * as buffer from "jsr:@denops/std@^7.3.0/buffer";
 import { batch } from "jsr:@denops/std@^7.3.0/batch";
+import type { PreviewItem } from "jsr:@vim-fall/core@^0.1.0-pre.0/item";
+import type { Dimension } from "jsr:@vim-fall/core@^0.1.0-pre.0/coordinator";
 
-import type { Dimension } from "../../@fall/coordinator.ts";
-import type { PreviewItem } from "../../@fall/item.ts";
 import { BaseComponent, type ComponentProperties } from "./_component.ts";
 
 export type PreviewComponentParams = ComponentProperties & {

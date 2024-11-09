@@ -1,8 +1,7 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 import * as popup from "jsr:@denops/std@^7.3.0/popup";
-
-import type { Border } from "../../@fall/theme.ts";
-import type { Dimension } from "../../@fall/coordinator.ts";
+import type { Border } from "jsr:@vim-fall/core@^0.1.0-pre.0/theme";
+import type { Dimension } from "jsr:@vim-fall/core@^0.1.0-pre.0/coordinator";
 
 export type ComponentProperties = {
   title?: string;

@@ -3,9 +3,12 @@ import { delay } from "jsr:@std/async@^1.0.0/delay";
 import { chunked } from "jsr:@core/iterutil@^0.9.0/async/chunked";
 import { take } from "jsr:@core/iterutil@^0.9.0/async/take";
 import { toAsyncIterable } from "jsr:@core/iterutil@^0.9.0/async/to-async-iterable";
+import type { IdItem } from "jsr:@vim-fall/std@^0.1.0-pre.0/item";
+import type {
+  Matcher,
+  MatchParams,
+} from "jsr:@vim-fall/std@^0.1.0-pre.0/matcher";
 
-import type { IdItem } from "../../@fall/item.ts";
-import type { Matcher, MatchParams } from "../../@fall/matcher.ts";
 import { dispatch } from "../event.ts";
 
 const INTERVAL = 0;

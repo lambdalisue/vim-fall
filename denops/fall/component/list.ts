@@ -3,9 +3,9 @@ import type { Decoration } from "jsr:@denops/std@^7.3.0/buffer";
 import { batch } from "jsr:@denops/std@^7.3.0/batch";
 import * as fn from "jsr:@denops/std@^7.3.0/function";
 import * as buffer from "jsr:@denops/std@^7.3.0/buffer";
+import type { DisplayItem } from "jsr:@vim-fall/core@^0.1.0-pre.0/item";
+import type { Dimension } from "jsr:@vim-fall/core@^0.1.0-pre.0/coordinator";
 
-import type { Dimension } from "../../@fall/coordinator.ts";
-import type { DisplayItem } from "../../@fall/item.ts";
 import { BaseComponent } from "./_component.ts";
 
 export const HIGHLIGHT_MATCH = "FallListMatch";

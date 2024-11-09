@@ -1,7 +1,5 @@
 # 🍂 fall
 
-[![Test](https://github.com/lambdalisue/vim-fall/actions/workflows/test.yml/badge.svg)](https://github.com/lambdalisue/vim-fall/actions/workflows/test.yml)
-[![codecov](https://codecov.io/gh/lambdalisue/vim-fall/graph/badge.svg?token=IsZ3yEM1by)](https://codecov.io/gh/lambdalisue/vim-fall)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![vim help](https://img.shields.io/badge/vim-%3Ah%20fall-orange.svg)](doc/fall.txt)
 
@@ -11,8 +9,8 @@
 
 </div>
 
-Fall (_vim-fall_) is an abbreviation for "Filter All," another fuzzy finder
-designed for Vim and Neovim and implemented in [Denops].
+Fall is an abbreviation for "Filter All," another fuzzy finder designed for Vim
+and Neovim and implemented in [Denops].
 
 **Alpha version. Please note that any changes, including those that may be
 backward incompatible, will be implemented without prior announcements.**
@@ -32,7 +30,7 @@ To install [Denops] and this plugin using your preferred plugin manager, such as
 
 ```vim
 Plug 'vim-denops/denops.vim'
-Plug 'lambdalisue/vim-fall'
+Plug 'vim-fall/fall'
 ```
 
 [vim-plug]: https://github.com/junegunn/vim-plug

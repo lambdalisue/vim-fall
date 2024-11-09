@@ -1,25 +1,21 @@
 
-
-# Guide (v1.0)
+# **Conventional Commits**
 #
-# 👍  :+1:      Apply changes.
+# <type>[optional scope]: <description>
 #
-# 🌿  :herb:    Add or update things for tests.
-# ☕  :coffee:  Add or update things for developments.
-# 📦  :package: Add or update dependencies.
-# 📝  :memo:    Add or update documentations.
+# feat:      feature (minor)
+# deps:      dependencies (minor/patch)
+# fix:       bug fix (patch)
+# refactor:  refactoring code
+# test:      test fix; no code change
+# docs:      documentation fix; no code change
+# style:     formatting, missing semi colons, etc; no code change
+# chore:     updating build tasks, package manager configs, etc; no code change
 #
-# 🐛  :bug:     Bugfixes.
-# 💋  :kiss:    Critical hotfixes.
-# 🚿  :shower:  Remove features, codes, or files.
+# **Install**
 #
-# 🚀  :rocket:  Improve performance.
-# 💪  :muscle:  Refactor codes.
-# 💥  :boom:    Breaking changes.
-# 💩  :poop:    Bad codes needs to be improved.
-#
-# How to use:
 #   git config commit.template .gitmessage
 #
-# Reference:
-#   https://github.com/lambdalisue/emojiprefix
+# **Reference**
+#
+# - https://www.conventionalcommits.org/en/v1.0.0/

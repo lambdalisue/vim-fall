@@ -9,9 +9,12 @@ import {
   is,
   type Predicate,
 } from "jsr:@core/unknownutil@^4.3.0";
+import type { Size } from "jsr:@vim-fall/std@^0.1.0-pre.0/coordinator";
+import type {
+  GlobalConfig,
+  ItemPickerParams,
+} from "jsr:@vim-fall/std@^0.1.0-pre.0/config";
 
-import type { Size } from "../../@fall/coordinator.ts";
-import type { GlobalConfig, ItemPickerParams } from "../../@fall/config.ts";
 import {
   getActionPickerParams,
   getGlobalConfig,

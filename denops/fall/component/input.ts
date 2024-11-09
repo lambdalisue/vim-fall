@@ -1,8 +1,8 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 import * as fn from "jsr:@denops/std@^7.3.0/function";
 import * as buffer from "jsr:@denops/std@^7.3.0/buffer";
+import type { Dimension } from "jsr:@vim-fall/std@^0.1.0-pre.0/coordinator";
 
-import type { Dimension } from "../../@fall/coordinator.ts";
 import { Spinner } from "../lib/spinner.ts";
 import { adjustOffset } from "../lib/adjust_offset.ts";
 import { BaseComponent, type ComponentProperties } from "./_component.ts";

@@ -4,15 +4,18 @@ import * as autocmd from "jsr:@denops/std@^7.3.0/autocmd";
 import * as lambda from "jsr:@denops/std@^7.3.0/lambda";
 import { collect } from "jsr:@denops/std@^7.3.0/batch";
 import { unreachable } from "jsr:@core/errorutil@^1.2.0/unreachable";
+import type { IdItem } from "jsr:@vim-fall/std@^0.1.0-pre.0/item";
+import type {
+  Coordinator,
+  Size,
+} from "jsr:@vim-fall/std@^0.1.0-pre.0/coordinator";
+import type { Source } from "jsr:@vim-fall/std@^0.1.0-pre.0/source";
+import type { Matcher } from "jsr:@vim-fall/std@^0.1.0-pre.0/matcher";
+import type { Sorter } from "jsr:@vim-fall/std@^0.1.0-pre.0/sorter";
+import type { Renderer } from "jsr:@vim-fall/std@^0.1.0-pre.0/renderer";
+import type { Previewer } from "jsr:@vim-fall/std@^0.1.0-pre.0/previewer";
+import type { Theme } from "jsr:@vim-fall/std@^0.1.0-pre.0/theme";
 
-import type { IdItem } from "../@fall/item.ts";
-import type { Coordinator, Size } from "../@fall/coordinator.ts";
-import type { Source } from "../@fall/source.ts";
-import type { Matcher } from "../@fall/matcher.ts";
-import type { Sorter } from "../@fall/sorter.ts";
-import type { Renderer } from "../@fall/renderer.ts";
-import type { Previewer } from "../@fall/previewer.ts";
-import type { Theme } from "../@fall/theme.ts";
 import { Scheduler } from "./lib/scheduler.ts";
 import { Cmdliner } from "./util/cmdliner.ts";
 import { emitPickerEnter, emitPickerLeave } from "./util/emitter.ts";

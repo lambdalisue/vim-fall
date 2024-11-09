@@ -1,15 +1,25 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
-
-import type { Curator } from "../../@fall/curator.ts";
-import type { CollectParams, Source } from "../../@fall/source.ts";
-import type { Matcher, MatchParams } from "../../@fall/matcher.ts";
+import type { Curator } from "jsr:@vim-fall/std@^0.1.0-pre.0/curator";
+import type {
+  CollectParams,
+  Source,
+} from "jsr:@vim-fall/std@^0.1.0-pre.0/source";
+import type {
+  Matcher,
+  MatchParams,
+} from "jsr:@vim-fall/std@^0.1.0-pre.0/matcher";
 import type {
   DefineItemPickerFromCurator,
   DefineItemPickerFromSource,
   GlobalConfig,
   ItemPickerParams,
-} from "../../@fall/config.ts";
-import { derive, deriveArray, deriveMap } from "../../@fall/util/derivable.ts";
+} from "jsr:@vim-fall/std@^0.1.0-pre.0/config";
+import {
+  derive,
+  deriveArray,
+  deriveMap,
+} from "jsr:@vim-fall/std@^0.1.0-pre.0/util/derivable";
+
 import { getGlobalConfig } from "./global_config.ts";
 
 type Actions = ItemPickerParams<unknown, string>["actions"];

@@ -5,11 +5,6 @@ on:
     branches:
       - main
   pull_request:
-    paths:
-      - "**.md"
-      - "**.ts"
-      - "deno.jsonc"
-      - ".github/workflows/test.yml"
   workflow_dispatch:
     inputs:
       denops_branch:
@@ -32,6 +27,7 @@ jobs:
           - ubuntu-latest
         deno_version:
           - "1.x"
+          - "2.x"
     runs-on: ${{ matrix.runner }}
     steps:
       - run: git config --global core.autocrlf false
@@ -65,8 +61,8 @@ jobs:
           - macos-latest
           - ubuntu-latest
         deno_version:
-          - "1.45.0"
           - "1.x"
+          - "2.x"
         host_version:
           - vim: "v9.1.0448"
             nvim: "v0.10.0"
@@ -131,14 +127,3 @@ jobs:
           os: ${{ runner.os }}
           files: ./coverage.lcov
           token: ${{ secrets.CODECOV_TOKEN }}
-
-  jsr-publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: denoland/setup-deno@v1
-        with:
-          deno-version: ${{ env.DENO_VERSION }}
-      - name: Publish (dry-run)
-        run: |
-          deno publish --dry-run

@@ -1,7 +1,7 @@
-import type { Entrypoint } from "jsr:@lambdalisue/vim-fall@^0.13.0/config";
-import { pipeProjectors } from "jsr:@lambdalisue/vim-fall@^0.13.0/projector";
-import { composeRenderer } from "jsr:@lambdalisue/vim-fall@^0.13.0/renderer";
-import * as builtin from "jsr:@lambdalisue/vim-fall@^0.13.0/builtin";
+import type { Entrypoint } from "jsr:@vim-fall/std@^0.1.0-pre.0/config";
+import { pipeProjectors } from "jsr:@vim-fall/std@^0.1.0-pre.0/projector";
+import { composeRenderer } from "jsr:@vim-fall/std@^0.1.0-pre.0/renderer";
+import * as builtin from "jsr:@vim-fall/std@^0.1.0-pre.0/builtin";
 
 const quickfixActions = {
   ...builtin.action.defaultQuickfixActions,
@@ -18,7 +18,7 @@ export const main: Entrypoint = (
   },
 ) => {
   refineGlobalConfig({
-    coordinator: builtin.coordinator.compact,
+    coordinator: builtin.coordinator.modern,
   });
 
   defineItemPickerFromCurator(
