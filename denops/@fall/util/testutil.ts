@@ -1,4 +1,9 @@
-import { type Border, BorderIndex as BI } from "../theme.ts";
+import {
+  type Border,
+  BorderIndex as BI,
+  DividerIndex as DI,
+  type Theme,
+} from "../theme.ts";
 import type { Dimension, Size } from "../coordinator.ts";
 
 /**
@@ -20,7 +25,7 @@ export function buildCanvas({ width, height }: Size): string[][] {
  * @param dimension The dimension of the canvas.
  * @returns The canvas with the border.
  */
-export function renderCanvas(
+export function renderBorder(
   canvas: string[][],
   border: Border,
   dimension: Dimension,
@@ -64,4 +69,84 @@ export function renderCanvas(
       }
     }
   }
+}
+
+/**
+ * Render the theme sample.
+ *
+ * It returns the theme as like below:
+ *
+ * ```
+ * ╭─────────╮╭────┬────╮
+ * │         ││    ╎    │
+ * ├╌╌╌╌╌╌╌╌╌┤│    ╎    │
+ * │         ││    ╎    │
+ * ╰─────────╯╰────┴────╯
+ * ```
+ *
+ * @param theme The theme to render.
+ */
+export function renderTheme(theme: Theme): string[] {
+  const width = 22;
+  const halfWidth = width / 2;
+  const height = 5;
+  const canvas = buildCanvas({ width, height });
+  const getChar = (x: number, y: number): string => {
+    // Corners
+    if (x === 0 && y === 0 || x === halfWidth && y === 0) {
+      return theme.border[BI.TopLeft];
+    }
+    if (x === halfWidth - 1 && y === 0 || x === width - 1 && y === 0) {
+      return theme.border[BI.TopRight];
+    }
+    if (x === 0 && y === height - 1 || x === halfWidth && y === height - 1) {
+      return theme.border[BI.BottomLeft];
+    }
+    if (
+      x === halfWidth - 1 && y === height - 1 ||
+      x === width - 1 && y === height - 1
+    ) {
+      return theme.border[BI.BottomRight];
+    }
+    // Dividers
+    if (x === 0 && y === 2) {
+      return theme.divider[DI.Left];
+    }
+    if (x === halfWidth - 1 && y === 2) {
+      return theme.divider[DI.Right];
+    }
+    if (y === 2 && x > 0 && x < halfWidth - 1) {
+      return theme.divider[DI.Horizonal];
+    }
+    if (x === 16 && y === 0) {
+      return theme.divider[DI.Top];
+    }
+    if (x === 16 && y === height - 1) {
+      return theme.divider[DI.Bottom];
+    }
+    if (x === 16) {
+      return theme.divider[DI.Vertical];
+    }
+    // Other borders
+    if (x === 0 || x === halfWidth) {
+      return theme.border[BI.Left];
+    }
+    if (x === halfWidth - 1 || x === width - 1) {
+      return theme.border[BI.Right];
+    }
+    if (y === 0) {
+      return theme.border[BI.Top];
+    }
+    if (y === height - 1) {
+      return theme.border[BI.Bottom];
+    }
+    // Inside
+    return " ";
+  };
+  for (let y = 0; y < height; y++) {
+    for (let x = 0; x < width; x++) {
+      canvas[y][x] = getChar(x, y);
+    }
+  }
+  return canvas.map((row) => row.join(""));
 }

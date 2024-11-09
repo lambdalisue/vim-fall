@@ -1,7 +1,7 @@
 import { assertEquals } from "jsr:@std/assert@^1.0.6";
 
 import { MODERN_THEME } from "../theme/modern.ts";
-import { buildCanvas, renderCanvas } from "../../util/testutil.ts";
+import { buildCanvas, renderBorder } from "../../util/testutil.ts";
 import { separate } from "./separate.ts";
 
 const WIDTH_RATIO = 0.8;
@@ -34,9 +34,9 @@ Deno.test("separate", async (t) => {
     assertEquals(dimensions.preview!.height + 2, height);
 
     const canvas = buildCanvas(SCREEN);
-    renderCanvas(canvas, borders.input, dimensions.input);
-    renderCanvas(canvas, borders.list, dimensions.list);
-    renderCanvas(canvas, borders.preview!, dimensions.preview!);
+    renderBorder(canvas, borders.input, dimensions.input);
+    renderBorder(canvas, borders.list, dimensions.list);
+    renderBorder(canvas, borders.preview!, dimensions.preview!);
 
     const content = canvas.map((row) => row.join(""));
     assertEquals(content, [
@@ -69,8 +69,8 @@ Deno.test("separate", async (t) => {
     const dimensions = coordinator.layout(SCREEN);
 
     const canvas = buildCanvas(SCREEN);
-    renderCanvas(canvas, borders.input, dimensions.input);
-    renderCanvas(canvas, borders.list, dimensions.list);
+    renderBorder(canvas, borders.input, dimensions.input);
+    renderBorder(canvas, borders.list, dimensions.list);
 
     const content = canvas.map((row) => row.join(""));
     assertEquals(content, [
