@@ -20,9 +20,7 @@ const SINGLE_DIVIDER: Divider = [
   "┴",
 ] as const;
 
-export function single(): Theme {
-  return {
-    border: SINGLE_BORDER,
-    divider: SINGLE_DIVIDER,
-  };
-}
+export const SINGLE_THEME: Theme = {
+  border: SINGLE_BORDER,
+  divider: SINGLE_DIVIDER,
+} as const;

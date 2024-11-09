@@ -20,9 +20,7 @@ const ASCII_DIVIDER: Divider = [
   "-",
 ] as const;
 
-export function ascii(): Theme {
-  return {
-    border: ASCII_BORDER,
-    divider: ASCII_DIVIDER,
-  };
-}
+export const ASCII_THEME: Theme = {
+  border: ASCII_BORDER,
+  divider: ASCII_DIVIDER,
+} as const;

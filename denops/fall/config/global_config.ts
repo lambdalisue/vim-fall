@@ -1,12 +1,12 @@
 import type { GlobalConfig, RefineGlobalConfig } from "../../@fall/config.ts";
 
 import { modern as modernLayout } from "../../@fall/builtin/layout/modern.ts";
-import { modern as modernTheme } from "../../@fall/builtin/theme/modern.ts";
+import { MODERN_THEME } from "../../@fall/builtin/theme/modern.ts";
 import { derive } from "../../@fall/util/derivable.ts";
 
 const globalConfig: GlobalConfig = {
   layout: modernLayout(),
-  theme: modernTheme(),
+  theme: MODERN_THEME,
 };
 
 export function getGlobalConfig(): Readonly<GlobalConfig> {

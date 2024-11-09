@@ -20,9 +20,7 @@ const DOUBLE_DIVIDER: Divider = [
   "╩",
 ] as const;
 
-export function double(): Theme {
-  return {
-    border: DOUBLE_BORDER,
-    divider: DOUBLE_DIVIDER,
-  };
-}
+export const DOUBLE_THEME: Theme = {
+  border: DOUBLE_BORDER,
+  divider: DOUBLE_DIVIDER,
+} as const;
