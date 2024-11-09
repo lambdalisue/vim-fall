@@ -58,6 +58,14 @@ Or `line` source with `README.md` as an argument
 Fall line README.md
 ```
 
+## Related Projects
+
+| Repository                                                    | Package                                             | Description                                      |
+| ------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------ |
+| [vim-fall/fall-core](https://github.com/vim-fall/fall-core)   | [`@vim-fall/core`](https://jsr.io/@vim-fall/core)   | Core types for Fall. Not meant for external use. |
+| [vim-fall/fall-std](https://github.com/vim-fall/fall-std)     | [`@vim-fall/std`](https://jsr.io/@vim-fall/std)     | Standard library for using Fall.                 |
+| [vim-fall/fall-extra](https://github.com/vim-fall/fall-extra) | [`@vim-fall/extra`](https://jsr.io/@vim-fall/extra) | Extra library for using Fall.                    |
+
 ## Similar Projects
 
 - [ddu.vim](https://github.com/Shougo/ddu.vim)<br>A highly customizable and
