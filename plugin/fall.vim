@@ -2,6 +2,7 @@ if exists('g:loaded_fall')
   finish
 endif
 let g:loaded_fall = 1
+let s:sep = has('win32') ? '\' : '/'
 
 command! -nargs=+ -complete=customlist,fall#command#Fall#complete 
       \ Fall call fall#command#Fall#call([<f-args>])
@@ -14,4 +15,8 @@ augroup fall_plugin
   autocmd User FallPickerLeave:* :
 augroup END
 
-let g:fall_config_path = '~/.config/fall/config.ts'
+if !exists('g:fall_config_path')
+  let g:fall_config_path = has('nvim')
+        \ ? join([stdpath('config'), 'fall', 'config.ts'], s:sep)
+        \ : join([$HOME, '.vim', 'fall', 'config.ts'], s:sep)
+endif
