@@ -7,10 +7,10 @@ import { getGlobalConfig } from "./global_config.ts";
 
 import { modern as modernLayout } from "../../@fall/builtin/coordinator/modern.ts";
 import { fzf as fzfMatcher } from "../../@fall/builtin/matcher/fzf.ts";
-import { derive } from "../../@fall/util/derivable.ts";
+import { derive, deriveArray } from "../../@fall/util/derivable.ts";
 
 const actionPickerParams: ActionPickerParams = {
-  matcher: fzfMatcher(),
+  matchers: [fzfMatcher()],
   coordinator: modernLayout({
     widthRatio: 0.4,
     heightRatio: 0.4,
@@ -27,17 +27,17 @@ export function getActionPickerParams(): Readonly<
 }
 
 export const refineActionPicker: RefineActionPicker = (params) => {
-  if (params.matcher) {
-    actionPickerParams.matcher = derive(params.matcher);
+  if (params.matchers) {
+    actionPickerParams.matchers = deriveArray(params.matchers);
   }
-  if (params.sorter) {
-    actionPickerParams.sorter = derive(params.sorter);
+  if (params.sorters) {
+    actionPickerParams.sorters = deriveArray(params.sorters);
   }
-  if (params.renderer) {
-    actionPickerParams.renderer = derive(params.renderer);
+  if (params.renderers) {
+    actionPickerParams.renderers = deriveArray(params.renderers);
   }
-  if (params.previewer) {
-    actionPickerParams.previewer = derive(params.previewer);
+  if (params.previewers) {
+    actionPickerParams.previewers = deriveArray(params.previewers);
   }
   if (params.coordinator) {
     actionPickerParams.coordinator = derive(params.coordinator);

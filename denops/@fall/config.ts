@@ -9,7 +9,11 @@ import type { Sorter } from "./sorter.ts";
 import type { Renderer } from "./renderer.ts";
 import type { Previewer } from "./previewer.ts";
 import type { Action } from "./action.ts";
-import type { Derivable, DerivableMap } from "./util/derivable.ts";
+import type {
+  Derivable,
+  DerivableArray,
+  DerivableMap,
+} from "./util/derivable.ts";
 
 export type Actions<T, A extends string> =
   & Record<string, Action<T>>
@@ -18,21 +22,21 @@ export type Actions<T, A extends string> =
 export type ItemPickerParams<T, A extends string> = {
   name: string;
   source: Source<T>;
-  matcher: Matcher<NoInfer<T>>;
   actions: Actions<T, NoInfer<A>>;
   defaultAction: A;
-  sorter?: Sorter<NoInfer<T>>;
-  renderer?: Renderer<NoInfer<T>>;
-  previewer?: Previewer<NoInfer<T>>;
+  matchers: [Matcher<NoInfer<T>>, ...Matcher<NoInfer<T>>[]];
+  sorters?: Sorter<NoInfer<T>>[];
+  renderers?: Renderer<NoInfer<T>>[];
+  previewers?: Previewer<NoInfer<T>>[];
   coordinator?: Coordinator;
   theme?: Theme;
 };
 
 export type ActionPickerParams = {
-  matcher: Matcher<Action<unknown>>;
-  sorter?: Sorter<Action<unknown>>;
-  renderer?: Renderer<Action<unknown>>;
-  previewer?: Previewer<Action<unknown>>;
+  matchers: [Matcher<Action<unknown>>, ...Matcher<Action<unknown>>[]];
+  sorters?: Sorter<Action<unknown>>[];
+  renderers?: Renderer<Action<unknown>>[];
+  previewers?: Previewer<Action<unknown>>[];
   coordinator?: Coordinator;
   theme?: Theme;
 };
@@ -49,12 +53,12 @@ export type DefineItemPickerFromSource = <T, A extends string>(
   name: string,
   source: Derivable<Source<T>>,
   params: {
-    matcher: Derivable<Matcher<NoInfer<T>>>;
     actions: DerivableMap<Actions<NoInfer<T>, NoInfer<A>>>;
     defaultAction: A;
-    sorter?: Derivable<Sorter<NoInfer<T>>>;
-    renderer?: Derivable<Renderer<NoInfer<T>>>;
-    previewer?: Derivable<Previewer<NoInfer<T>>>;
+    matchers: DerivableArray<[Matcher<NoInfer<T>>, ...Matcher<NoInfer<T>>[]]>;
+    sorters?: DerivableArray<Sorter<NoInfer<T>>[]>;
+    renderers?: DerivableArray<Renderer<NoInfer<T>>[]>;
+    previewers?: DerivableArray<Previewer<NoInfer<T>>[]>;
     coordinator?: Derivable<Coordinator>;
     theme?: Derivable<Theme>;
   },
@@ -69,9 +73,9 @@ export type DefineItemPickerFromCurator = <T, A extends string>(
   params: {
     actions: DerivableMap<Actions<NoInfer<T>, NoInfer<A>>>;
     defaultAction: A;
-    sorter?: Derivable<Sorter<NoInfer<T>>>;
-    renderer?: Derivable<Renderer<NoInfer<T>>>;
-    previewer?: Derivable<Previewer<NoInfer<T>>>;
+    sorters?: DerivableArray<Sorter<NoInfer<T>>[]>;
+    renderers?: DerivableArray<Renderer<NoInfer<T>>[]>;
+    previewers?: DerivableArray<Previewer<NoInfer<T>>[]>;
     coordinator?: Derivable<Coordinator>;
     theme?: Derivable<Theme>;
   },
@@ -82,10 +86,12 @@ export type DefineItemPickerFromCurator = <T, A extends string>(
  */
 export type RefineActionPicker = (
   params: {
-    matcher?: Derivable<Matcher<Action<unknown>>>;
-    sorter?: Derivable<Sorter<Action<unknown>>>;
-    renderer?: Derivable<Renderer<Action<unknown>>>;
-    previewer?: Derivable<Previewer<Action<unknown>>>;
+    matchers: DerivableArray<
+      [Matcher<Action<unknown>>, ...Matcher<Action<unknown>>[]]
+    >;
+    sorters?: DerivableArray<Sorter<Action<unknown>>[]>;
+    renderers?: DerivableArray<Renderer<Action<unknown>>[]>;
+    previewers?: DerivableArray<Previewer<Action<unknown>>[]>;
     coordinator?: Derivable<Coordinator>;
     theme?: Derivable<Theme>;
   },

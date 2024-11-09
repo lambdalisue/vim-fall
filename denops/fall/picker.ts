@@ -33,10 +33,10 @@ export type PickerParams<T> = {
   theme: Theme;
   coordinator: Coordinator;
   source: Source<T>;
-  matcher: Matcher<T>;
-  sorter?: Sorter<T>;
-  renderer?: Renderer<T>;
-  previewer?: Previewer<T>;
+  matchers: [Matcher<T>, ...Matcher<T>[]];
+  sorters?: Sorter<T>[];
+  renderers?: Renderer<T>[];
+  previewers?: Previewer<T>[];
   zindex?: number;
 };
 
@@ -101,16 +101,19 @@ export class Picker<T> implements AsyncDisposable {
       new CollectProcessor(params.source),
     );
     this.#matchProcessor = this.#stack.use(
-      new MatchProcessor(params.matcher),
+      // TODO: Support multiple matchers
+      new MatchProcessor(params.matchers[0]),
     );
     this.#visualizeProcessor = this.#stack.use(
+      // TODO: Support multiple sorters/renderers
       new VisualizeProcessor(
-        params.sorter,
-        params.renderer,
+        params.sorters?.at(0),
+        params.renderers?.at(0),
       ),
     );
     this.#previewProcessor = this.#stack.use(
-      new PreviewProcessor(params.previewer),
+      // TODO: Support multiple previewers
+      new PreviewProcessor(params.previewers?.at(0)),
     );
   }
 

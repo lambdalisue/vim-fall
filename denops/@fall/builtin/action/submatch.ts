@@ -9,8 +9,10 @@ import { list } from "../source/list.ts";
 import { type Action, defineAction } from "../../action.ts";
 import {
   type Derivable,
+  type DerivableArray,
   type DerivableMap,
   derive,
+  deriveArray,
   deriveMap,
 } from "../../util/derivable.ts";
 import { fzf } from "../matcher/fzf.ts";
@@ -20,15 +22,15 @@ import { regexp } from "../matcher/regexp.ts";
 type Options<T, A extends string> = {
   actions?: DerivableMap<Actions<T, A>>;
   defaultAction?: A;
-  sorter?: Derivable<Sorter<T>> | null;
-  renderer?: Derivable<Renderer<T>> | null;
-  previewer?: Derivable<Previewer<T>> | null;
+  sorters?: DerivableArray<Sorter<T>[]> | null;
+  renderers?: DerivableArray<Renderer<T>[]> | null;
+  previewers?: DerivableArray<Previewer<T>[]> | null;
   coordinator?: Derivable<Coordinator> | null;
   theme?: Derivable<Theme> | null;
 };
 
 export function submatch<T, A extends string>(
-  matcher: Derivable<Matcher<T>>,
+  matchers: DerivableArray<[Matcher<T>, ...Matcher<T>[]]>,
   options: Options<T, A> = {},
 ): Action<T> {
   return defineAction<T>(
@@ -36,7 +38,7 @@ export function submatch<T, A extends string>(
       const params: ItemPickerParams<T, string> & GlobalConfig = {
         ...context.pickerParams,
         source: list(selectedItems ?? filteredItems),
-        matcher: derive(matcher),
+        matchers: deriveArray(matchers),
       };
       if (options.actions) {
         params.actions = deriveMap(params.actions);
@@ -44,14 +46,20 @@ export function submatch<T, A extends string>(
       if (options.defaultAction) {
         params.defaultAction = options.defaultAction;
       }
-      if (options.sorter !== undefined) {
-        params.sorter = derive(options.sorter) ?? undefined;
+      if (options.sorters !== undefined) {
+        params.sorters = options.sorters
+          ? deriveArray(options.sorters)
+          : undefined;
       }
-      if (options.renderer !== undefined) {
-        params.renderer = derive(options.renderer) ?? undefined;
+      if (options.renderers !== undefined) {
+        params.renderers = options.renderers
+          ? deriveArray(options.renderers)
+          : undefined;
       }
-      if (options.previewer !== undefined) {
-        params.previewer = derive(options.previewer) ?? undefined;
+      if (options.previewers !== undefined) {
+        params.previewers = options.previewers
+          ? deriveArray(options.previewers)
+          : undefined;
       }
       if (options.coordinator !== undefined) {
         params.coordinator = derive(options.coordinator) ??
@@ -80,7 +88,7 @@ export const defaultSubmatchActions: {
   "sub:substring": Action<unknown>;
   "sub:regexp": Action<unknown>;
 } = {
-  "sub:fzf": submatch(fzf),
-  "sub:substring": submatch(substring),
-  "sub:regexp": submatch(regexp),
+  "sub:fzf": submatch([fzf]),
+  "sub:substring": submatch([substring]),
+  "sub:regexp": submatch([regexp]),
 };

@@ -181,12 +181,12 @@ const isScreen = is.ObjectOf({
 const isParams = is.ObjectOf({
   name: is.String,
   source: is.Any,
-  matcher: is.Any,
   actions: is.Any,
   defaultAction: is.String,
-  sorter: as.Optional(is.Any),
-  renderer: as.Optional(is.Any),
-  previewer: as.Optional(is.Any),
+  matchers: is.Any,
+  sorters: as.Optional(is.Any),
+  renderers: as.Optional(is.Any),
+  previewers: as.Optional(is.Any),
   coordinator: is.Any,
   theme: is.Any,
 }) satisfies Predicate<ItemPickerParams<unknown, string> & GlobalConfig>;

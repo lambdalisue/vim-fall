@@ -28,7 +28,7 @@ export const main: Entrypoint = (
       builtin.modifier.relativePath,
     ),
     {
-      previewer: builtin.previewer.file,
+      previewers: [builtin.previewer.file],
       actions: {
         ...quickfixActions,
         ...builtin.action.defaultOpenActions,
@@ -48,7 +48,7 @@ export const main: Entrypoint = (
       builtin.modifier.relativePath,
     ),
     {
-      previewer: builtin.previewer.file,
+      previewers: [builtin.previewer.file],
       actions: {
         ...quickfixActions,
         ...builtin.action.defaultOpenActions,
@@ -68,7 +68,7 @@ export const main: Entrypoint = (
       builtin.modifier.relativePath,
     ),
     {
-      previewer: builtin.previewer.file,
+      previewers: [builtin.previewer.file],
       actions: {
         ...quickfixActions,
         ...builtin.action.defaultOpenActions,
@@ -99,12 +99,12 @@ export const main: Entrypoint = (
       builtin.modifier.relativePath,
     ),
     {
-      matcher: builtin.matcher.fzf,
-      renderer: composeRenderer(
+      matchers: [builtin.matcher.fzf],
+      renderers: [composeRenderer(
         builtin.renderer.smartPath,
         builtin.renderer.nerdfont,
-      ),
-      previewer: builtin.previewer.file,
+      )],
+      previewers: [builtin.previewer.file],
       actions: {
         ...quickfixActions,
         ...builtin.action.defaultOpenActions,
@@ -118,8 +118,8 @@ export const main: Entrypoint = (
   );
 
   defineItemPickerFromSource("line", builtin.source.line, {
-    matcher: builtin.matcher.fzf,
-    previewer: builtin.previewer.buffer,
+    matchers: [builtin.matcher.fzf],
+    previewers: [builtin.previewer.buffer],
     actions: {
       ...quickfixActions,
       ...builtin.action.defaultOpenActions,
@@ -135,8 +135,8 @@ export const main: Entrypoint = (
     "buffer",
     builtin.source.buffer({ filter: "bufloaded" }),
     {
-      matcher: builtin.matcher.fzf,
-      previewer: builtin.previewer.buffer,
+      matchers: [builtin.matcher.fzf],
+      previewers: [builtin.previewer.buffer],
       actions: {
         ...quickfixActions,
         ...builtin.action.defaultOpenActions,
@@ -150,8 +150,8 @@ export const main: Entrypoint = (
   );
 
   defineItemPickerFromSource("help", builtin.source.helptag, {
-    matcher: builtin.matcher.fzf,
-    previewer: builtin.previewer.helptag,
+    matchers: [builtin.matcher.fzf],
+    previewers: [builtin.previewer.helptag],
     actions: {
       ...builtin.action.defaultHelpActions,
       ...builtin.action.defaultEchoActions,
