@@ -24,7 +24,7 @@ import {
 } from "../config.ts";
 import { Picker } from "../picker.ts";
 
-let initialized: Promise<void>;
+let initialized: Promise<void> | undefined;
 let zindex = 50;
 
 export const main: Entrypoint = (denops) => {
@@ -68,15 +68,19 @@ export const main: Entrypoint = (denops) => {
       assert(options, isOptions);
       return await startPicker(denops, args, screen, params, options);
     },
+    "picker:reload": async () => {
+      initialized = undefined;
+      await init(denops, `#${performance.now()}`);
+    },
   };
 };
 
-async function init(denops: Denops): Promise<void> {
+async function init(denops: Denops, suffix?: string): Promise<void> {
   if (initialized) {
     return initialized;
   }
   const path = await denops.eval("expand(g:fall_config_path)") as string;
-  return (initialized = loadUserConfig(denops, path));
+  return (initialized = loadUserConfig(denops, path, { suffix }));
 }
 
 async function startPicker(

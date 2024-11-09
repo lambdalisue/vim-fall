@@ -14,4 +14,12 @@ function! fall#command#FallConfig#call() abort
     call writefile(readfile(s:fall_config_template), l:path)
   endif
   execute 'vsplit' fnameescape(l:path)
+  augroup fall_config
+    autocmd!
+    autocmd BufWritePost <buffer> call s:reload()
+  augroup END
+endfunction
+
+function! s:reload() abort
+  call denops#request('fall', 'picker:reload', [])
 endfunction

@@ -1,10 +1,17 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 
-import { refineActionPicker } from "./config/action_picker.ts";
-import { refineGlobalConfig } from "./config/global_config.ts";
+import {
+  refineActionPicker,
+  resetActionPickerParams,
+} from "./config/action_picker.ts";
+import {
+  refineGlobalConfig,
+  resetGlobalConfig,
+} from "./config/global_config.ts";
 import {
   defineItemPickerFromCurator,
   defineItemPickerFromSource,
+  resetItemPickerParams,
 } from "./config/item_picker.ts";
 
 export { getGlobalConfig } from "./config/global_config.ts";
@@ -17,6 +24,7 @@ export {
 export async function loadUserConfig(
   denops: Denops,
   path: string,
+  { suffix }: { suffix?: string } = {},
 ): Promise<void> {
   const ctx = {
     denops,
@@ -26,7 +34,10 @@ export async function loadUserConfig(
     refineGlobalConfig,
   };
   try {
-    const { main } = await import(path);
+    const { main } = await import(`${path}${suffix ?? ""}`);
+    resetGlobalConfig();
+    resetActionPickerParams();
+    resetItemPickerParams();
     await main(ctx);
   } catch (e) {
     console.warn(

@@ -28,6 +28,10 @@ export function listItemPickerNames(): readonly string[] {
   return Array.from(itemPickerParamsMap.keys());
 }
 
+export function resetItemPickerParams(): void {
+  itemPickerParamsMap.clear();
+}
+
 export function getItemPickerParams(
   name: string,
 ): Readonly<ItemPickerParams<unknown, string> & GlobalConfig> | undefined {

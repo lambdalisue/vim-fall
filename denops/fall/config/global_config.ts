@@ -11,6 +11,11 @@ const globalConfig: GlobalConfig = {
   theme: MODERN_THEME,
 };
 
+export function resetGlobalConfig(): void {
+  globalConfig.coordinator = modernLayout();
+  globalConfig.theme = MODERN_THEME;
+}
+
 export function getGlobalConfig(): Readonly<GlobalConfig> {
   return globalConfig;
 }

@@ -18,6 +18,15 @@ const actionPickerParams: ActionPickerParams = {
   }),
 };
 
+export function resetActionPickerParams(): void {
+  actionPickerParams.matchers = [fzfMatcher()];
+  actionPickerParams.coordinator = modernCoordinator({
+    hidePreview: true,
+    widthRatio: 0.4,
+    heightRatio: 0.4,
+  });
+}
+
 export function getActionPickerParams(): Readonly<
   ActionPickerParams & GlobalConfig
 > {
