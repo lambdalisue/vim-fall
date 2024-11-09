@@ -2,7 +2,7 @@ import type { Denops } from "jsr:@denops/std@^7.3.0";
 
 import type { Promish } from "./_typeutil.ts";
 import type { IdItem } from "./item.ts";
-import type { Size } from "./layout.ts";
+import type { Size } from "./coordinator.ts";
 import type { GlobalConfig, ItemPickerParams } from "./config.ts";
 
 export type Context<T, A extends string> = {

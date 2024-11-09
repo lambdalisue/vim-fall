@@ -18,7 +18,7 @@ export const main: Entrypoint = (
   },
 ) => {
   refineGlobalConfig({
-    layout: builtin.layout.modern,
+    coordinator: builtin.coordinator.compact,
   });
 
   defineItemPickerFromCurator(

@@ -2,7 +2,7 @@ export * from "./action.ts";
 export * from "./config.ts";
 export * from "./curator.ts";
 export * from "./item.ts";
-export * from "./layout.ts";
+export * from "./coordinator.ts";
 export * from "./matcher.ts";
 export * from "./previewer.ts";
 export * from "./projector.ts";

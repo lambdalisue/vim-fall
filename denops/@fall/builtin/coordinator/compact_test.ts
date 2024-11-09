@@ -1,0 +1,81 @@
+import { assertEquals } from "jsr:@std/assert@^1.0.6";
+
+import { MODERN_THEME } from "../theme/modern.ts";
+import { buildCanvas, renderCanvas } from "../../util/testutil.ts";
+import { compact } from "./compact.ts";
+
+const WIDTH_RATIO = 0.8;
+const HEIGHT_RATIO = 0.8;
+const SCREEN = {
+  width: 40,
+  height: 15,
+} as const;
+
+Deno.test("compact", async (t) => {
+  await t.step("hidePreview=false", () => {
+    const coordinator = compact({
+      hidePreview: false,
+      widthRatio: WIDTH_RATIO,
+      heightRatio: HEIGHT_RATIO,
+    });
+    const borders = coordinator.style(MODERN_THEME);
+    const dimensions = coordinator.layout(SCREEN);
+
+    const canvas = buildCanvas(SCREEN);
+    renderCanvas(canvas, borders.input, dimensions.input);
+    renderCanvas(canvas, borders.list, dimensions.list);
+    renderCanvas(canvas, borders.preview!, dimensions.preview!);
+
+    const content = canvas.map((row) => row.join(""));
+    assertEquals(content, [
+      "                                        ",
+      "    ╭────────────┬─────────────────╮    ",
+      "    │            ╎                 │    ",
+      "    ├╌╌╌╌╌╌╌╌╌╌╌╌┤                 │    ",
+      "    │            ╎                 │    ",
+      "    │            ╎                 │    ",
+      "    │            ╎                 │    ",
+      "    │            ╎                 │    ",
+      "    │            ╎                 │    ",
+      "    │            ╎                 │    ",
+      "    │            ╎                 │    ",
+      "    │            ╎                 │    ",
+      "    ╰────────────┴─────────────────╯    ",
+      "                                        ",
+      "                                        ",
+    ]);
+  });
+
+  await t.step("hidePreview=true", () => {
+    const coordinator = compact({
+      hidePreview: true,
+      widthRatio: WIDTH_RATIO,
+      heightRatio: HEIGHT_RATIO,
+    });
+    const borders = coordinator.style(MODERN_THEME);
+    const dimensions = coordinator.layout(SCREEN);
+
+    const canvas = buildCanvas(SCREEN);
+    renderCanvas(canvas, borders.input, dimensions.input);
+    renderCanvas(canvas, borders.list, dimensions.list);
+
+    const content = canvas.map((row) => row.join(""));
+    assertEquals(content, [
+      "                                        ",
+      "    ╭──────────────────────────────╮    ",
+      "    │                              │    ",
+      "    ├╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌╌┤    ",
+      "    │                              │    ",
+      "    │                              │    ",
+      "    │                              │    ",
+      "    │                              │    ",
+      "    │                              │    ",
+      "    │                              │    ",
+      "    │                              │    ",
+      "    │                              │    ",
+      "    ╰──────────────────────────────╯    ",
+      "                                        ",
+      "                                        ",
+    ]);
+  });
+});

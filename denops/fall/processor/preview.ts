@@ -5,13 +5,13 @@ import type { Previewer, PreviewParams } from "../../@fall/previewer.ts";
 import { dispatch } from "../event.ts";
 
 export class PreviewProcessor<T> {
-  #previewer: Previewer<T>;
+  #previewer?: Previewer<T>;
   #controller: AbortController = new AbortController();
   #processing?: Promise<void>;
   #reserved?: () => void;
   #item: PreviewItem | undefined = undefined;
 
-  constructor(previewer: Previewer<T>) {
+  constructor(previewer: Previewer<T> | undefined) {
     this.#previewer = previewer;
   }
 
@@ -33,7 +33,7 @@ export class PreviewProcessor<T> {
         return;
       }
 
-      const previewItem = await this.#previewer.preview(
+      const previewItem = await this.#previewer?.preview(
         denops,
         { item },
         { signal },

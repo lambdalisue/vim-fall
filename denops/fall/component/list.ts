@@ -4,7 +4,7 @@ import { batch } from "jsr:@denops/std@^7.3.0/batch";
 import * as fn from "jsr:@denops/std@^7.3.0/function";
 import * as buffer from "jsr:@denops/std@^7.3.0/buffer";
 
-import type { Dimension } from "../../@fall/layout.ts";
+import type { Dimension } from "../../@fall/coordinator.ts";
 import type { DisplayItem } from "../../@fall/item.ts";
 import { BaseComponent } from "./_component.ts";
 

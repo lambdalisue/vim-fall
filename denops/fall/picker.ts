@@ -6,13 +6,13 @@ import { collect } from "jsr:@denops/std@^7.3.0/batch";
 import { unreachable } from "jsr:@core/errorutil@^1.2.0/unreachable";
 
 import type { IdItem } from "../@fall/item.ts";
-import type { Dimension, Layout, Size } from "../@fall/layout.ts";
+import type { Coordinator, Size } from "../@fall/coordinator.ts";
 import type { Source } from "../@fall/source.ts";
 import type { Matcher } from "../@fall/matcher.ts";
 import type { Sorter } from "../@fall/sorter.ts";
 import type { Renderer } from "../@fall/renderer.ts";
 import type { Previewer } from "../@fall/previewer.ts";
-import type { Border, Theme } from "../@fall/theme.ts";
+import type { Theme } from "../@fall/theme.ts";
 import { Scheduler } from "./lib/scheduler.ts";
 import { Cmdliner } from "./util/cmdliner.ts";
 import { emitPickerEnter, emitPickerLeave } from "./util/emitter.ts";
@@ -31,7 +31,7 @@ export type PickerParams<T> = {
   name: string;
   screen: Size;
   theme: Theme;
-  layout: Layout;
+  coordinator: Coordinator;
   source: Source<T>;
   matcher: Matcher<T>;
   sorter?: Sorter<T>;
@@ -56,7 +56,7 @@ export class Picker<T> implements AsyncDisposable {
   readonly #stack = new AsyncDisposableStack();
   readonly #schedulerInterval: number;
   readonly #name: string;
-  readonly #layout: Layout;
+  readonly #coordinator: Coordinator;
   readonly #collectProcessor: CollectProcessor<T>;
   readonly #matchProcessor: MatchProcessor<T>;
   readonly #visualizeProcessor: VisualizeProcessor<T>;
@@ -69,44 +69,29 @@ export class Picker<T> implements AsyncDisposable {
   constructor(params: PickerParams<T>, options: PickerOptions = {}) {
     this.#schedulerInterval = options.schedulerInterval ?? SCHEDULER_INTERVAL;
     this.#name = params.name;
-    this.#layout = params.layout;
+    this.#coordinator = params.coordinator;
 
     // Components
     const { theme, zindex = 50 } = params;
-    if (params.previewer) {
-      const borders = this.#layout.style3(theme);
-      this.#inputComponent = this.#stack.use(
-        new InputComponent({
-          border: borders.input,
-          title: this.#name,
-          zindex,
-        }),
-      );
-      this.#listComponent = this.#stack.use(
-        new ListComponent({
-          border: borders.list,
-          zindex: zindex + 1,
-        }),
-      );
+    const style = this.#coordinator.style(theme);
+    this.#inputComponent = this.#stack.use(
+      new InputComponent({
+        border: style.input,
+        title: this.#name,
+        zindex,
+      }),
+    );
+    this.#listComponent = this.#stack.use(
+      new ListComponent({
+        border: style.list,
+        zindex: zindex + 1,
+      }),
+    );
+    if (style.preview) {
       this.#previewComponent = this.#stack.use(
         new PreviewComponent({
-          border: borders.preview as Border,
+          border: style.preview,
           zindex: zindex + 2,
-        }),
-      );
-    } else {
-      const borders = this.#layout.style2(theme);
-      this.#inputComponent = this.#stack.use(
-        new InputComponent({
-          border: borders.input,
-          title: this.#name,
-          zindex,
-        }),
-      );
-      this.#listComponent = this.#stack.use(
-        new ListComponent({
-          border: borders.list,
-          zindex: zindex + 1,
         }),
       );
     }
@@ -124,11 +109,9 @@ export class Picker<T> implements AsyncDisposable {
         params.renderer,
       ),
     );
-    if (params.previewer) {
-      this.#previewProcessor = this.#stack.use(
-        new PreviewProcessor(params.previewer),
-      );
-    }
+    this.#previewProcessor = this.#stack.use(
+      new PreviewProcessor(params.previewer),
+    );
   }
 
   async open(
@@ -139,53 +122,57 @@ export class Picker<T> implements AsyncDisposable {
 
     // Calculate dimensions
     const screen = await getScreenSize(denops);
-    const dimensions = this.#dimensions(screen);
+    const layout = this.#coordinator.layout(screen);
     stack.use(
       await this.#inputComponent.open(
         denops,
-        dimensions.input,
+        layout.input,
         { signal },
       ),
     );
     stack.use(
       await this.#listComponent.open(
         denops,
-        dimensions.list,
+        layout.list,
         { signal },
       ),
     );
-    stack.use(
-      await this.#previewComponent?.open(
-        denops,
-        dimensions.preview!,
-        { signal },
-      ),
-    );
-    this.#visualizeProcessor.height = dimensions.list.height;
+    if (this.#previewComponent && layout.preview) {
+      stack.use(
+        await this.#previewComponent.open(
+          denops,
+          layout.preview,
+          { signal },
+        ),
+      );
+    }
+    this.#visualizeProcessor.height = layout.list.height;
 
     // Register autocmd to resize components
     const resizeComponents = stack.use(lambda.add(denops, async () => {
       const screen = await getScreenSize(denops);
-      const dimensions = this.#dimensions(screen);
+      const layout = this.#coordinator.layout(screen);
       await this.#inputComponent.move(
         denops,
-        dimensions.input,
+        layout.input,
         { signal },
       );
       await this.#listComponent.move(
         denops,
-        dimensions.list,
+        layout.list,
         { signal },
       );
-      await this.#previewComponent?.move(
-        denops,
-        dimensions.preview!,
-        { signal },
-      );
+      if (this.#previewComponent && layout.preview) {
+        await this.#previewComponent?.move(
+          denops,
+          layout.preview,
+          { signal },
+        );
+      }
       this.#inputComponent.forceRender();
       this.#listComponent.forceRender();
       this.#previewComponent?.forceRender();
-      this.#visualizeProcessor.height = dimensions.list.height;
+      this.#visualizeProcessor.height = layout.list.height;
     }));
     const autocmdGroupName = `fall-picker-${this.#name}-${resizeComponents.id}`;
     stack.defer(async () => {
@@ -270,14 +257,6 @@ export class Picker<T> implements AsyncDisposable {
       selectedItems,
       filteredItems: this.#matchProcessor.items,
     };
-  }
-
-  #dimensions(
-    screen: Size,
-  ): { input: Dimension; list: Dimension; preview?: Dimension } {
-    return this.#previewComponent
-      ? this.#layout.layout3(screen)
-      : this.#layout.layout2(screen);
   }
 
   #select(

@@ -2,7 +2,7 @@ import type { Denops } from "jsr:@denops/std@^7.3.0";
 import * as popup from "jsr:@denops/std@^7.3.0/popup";
 
 import type { Border } from "../../@fall/theme.ts";
-import type { Dimension } from "../../@fall/layout.ts";
+import type { Dimension } from "../../@fall/coordinator.ts";
 
 export type ComponentProperties = {
   title?: string;

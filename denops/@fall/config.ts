@@ -1,6 +1,6 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 
-import type { Layout } from "./layout.ts";
+import type { Coordinator } from "./coordinator.ts";
 import type { Theme } from "./theme.ts";
 import type { Curator } from "./curator.ts";
 import type { Source } from "./source.ts";
@@ -24,7 +24,7 @@ export type ItemPickerParams<T, A extends string> = {
   sorter?: Sorter<NoInfer<T>>;
   renderer?: Renderer<NoInfer<T>>;
   previewer?: Previewer<NoInfer<T>>;
-  layout?: Layout;
+  coordinator?: Coordinator;
   theme?: Theme;
 };
 
@@ -33,12 +33,12 @@ export type ActionPickerParams = {
   sorter?: Sorter<Action<unknown>>;
   renderer?: Renderer<Action<unknown>>;
   previewer?: Previewer<Action<unknown>>;
-  layout?: Layout;
+  coordinator?: Coordinator;
   theme?: Theme;
 };
 
 export type GlobalConfig = {
-  layout: Layout;
+  coordinator: Coordinator;
   theme: Theme;
 };
 
@@ -55,7 +55,7 @@ export type DefineItemPickerFromSource = <T, A extends string>(
     sorter?: Derivable<Sorter<NoInfer<T>>>;
     renderer?: Derivable<Renderer<NoInfer<T>>>;
     previewer?: Derivable<Previewer<NoInfer<T>>>;
-    layout?: Derivable<Layout>;
+    coordinator?: Derivable<Coordinator>;
     theme?: Derivable<Theme>;
   },
 ) => void;
@@ -72,7 +72,7 @@ export type DefineItemPickerFromCurator = <T, A extends string>(
     sorter?: Derivable<Sorter<NoInfer<T>>>;
     renderer?: Derivable<Renderer<NoInfer<T>>>;
     previewer?: Derivable<Previewer<NoInfer<T>>>;
-    layout?: Derivable<Layout>;
+    coordinator?: Derivable<Coordinator>;
     theme?: Derivable<Theme>;
   },
 ) => void;
@@ -86,7 +86,7 @@ export type RefineActionPicker = (
     sorter?: Derivable<Sorter<Action<unknown>>>;
     renderer?: Derivable<Renderer<Action<unknown>>>;
     previewer?: Derivable<Previewer<Action<unknown>>>;
-    layout?: Derivable<Layout>;
+    coordinator?: Derivable<Coordinator>;
     theme?: Derivable<Theme>;
   },
 ) => void;
@@ -96,7 +96,7 @@ export type RefineActionPicker = (
  */
 export type RefineGlobalConfig = (
   params: {
-    layout?: Derivable<Layout>;
+    coordinator?: Derivable<Coordinator>;
     theme?: Derivable<Theme>;
   },
 ) => void;

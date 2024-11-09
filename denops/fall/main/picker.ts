@@ -10,7 +10,7 @@ import {
   type Predicate,
 } from "jsr:@core/unknownutil@^4.3.0";
 
-import type { Size } from "../../@fall/layout.ts";
+import type { Size } from "../../@fall/coordinator.ts";
 import type { GlobalConfig, ItemPickerParams } from "../../@fall/config.ts";
 import {
   getActionPickerParams,
@@ -187,7 +187,7 @@ const isParams = is.ObjectOf({
   sorter: as.Optional(is.Any),
   renderer: as.Optional(is.Any),
   previewer: as.Optional(is.Any),
-  layout: is.Any,
+  coordinator: is.Any,
   theme: is.Any,
 }) satisfies Predicate<ItemPickerParams<unknown, string> & GlobalConfig>;
 

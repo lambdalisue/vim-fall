@@ -3,7 +3,7 @@ import type { Renderer } from "../../renderer.ts";
 import type { Theme } from "../../theme.ts";
 import type { Sorter } from "../../sorter.ts";
 import type { Previewer } from "../../previewer.ts";
-import type { Layout } from "../../layout.ts";
+import type { Coordinator } from "../../coordinator.ts";
 import type { Actions, GlobalConfig, ItemPickerParams } from "../../config.ts";
 import { list } from "../source/list.ts";
 import { type Action, defineAction } from "../../action.ts";
@@ -23,7 +23,7 @@ type Options<T, A extends string> = {
   sorter?: Derivable<Sorter<T>> | null;
   renderer?: Derivable<Renderer<T>> | null;
   previewer?: Derivable<Previewer<T>> | null;
-  layout?: Derivable<Layout> | null;
+  coordinator?: Derivable<Coordinator> | null;
   theme?: Derivable<Theme> | null;
 };
 
@@ -53,8 +53,9 @@ export function submatch<T, A extends string>(
       if (options.previewer !== undefined) {
         params.previewer = derive(options.previewer) ?? undefined;
       }
-      if (options.layout !== undefined) {
-        params.layout = derive(options.layout) ?? context.globalConfig.layout;
+      if (options.coordinator !== undefined) {
+        params.coordinator = derive(options.coordinator) ??
+          context.globalConfig.coordinator;
       }
       if (options.theme !== undefined) {
         params.theme = derive(options.theme) ?? context.globalConfig.theme;

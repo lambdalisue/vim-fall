@@ -1,5 +1,5 @@
 import { type Border, BorderIndex as BI } from "../theme.ts";
-import type { Dimension, Size } from "../layout.ts";
+import type { Dimension, Size } from "../coordinator.ts";
 
 /**
  * Build a canvas with the given size.
