@@ -12,6 +12,7 @@ import { getGlobalConfig } from "./global_config.ts";
 const actionPickerParams: ActionPickerParams = {
   matchers: [fzfMatcher()],
   coordinator: modernCoordinator({
+    hidePreview: true,
     widthRatio: 0.4,
     heightRatio: 0.4,
   }),
