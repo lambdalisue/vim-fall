@@ -2,23 +2,6 @@ import type { Denops } from "jsr:@denops/std@^7.3.0";
 
 import type { Promish } from "./_typeutil.ts";
 import type { IdItem } from "./item.ts";
-import type { Size } from "./coordinator.ts";
-import type { GlobalConfig, ItemPickerParams } from "./config.ts";
-
-export type Context<T, A extends string> = {
-  /**
-   * The screen size.
-   */
-  readonly screen: Size;
-  /**
-   * The global configuration.
-   */
-  readonly globalConfig: GlobalConfig;
-  /**
-   * The picker parameters.
-   */
-  readonly pickerParams: ItemPickerParams<T, A> & GlobalConfig;
-};
 
 export type InvokeParams<T> = {
   /**
@@ -33,10 +16,6 @@ export type InvokeParams<T> = {
    * The filtered items.
    */
   readonly filteredItems: readonly IdItem<T>[];
-  /**
-   * The picker context.
-   */
-  readonly context: Context<T, string>;
 };
 
 export type Action<T> = {

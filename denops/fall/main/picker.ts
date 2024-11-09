@@ -155,7 +155,8 @@ async function startPicker(
       throw new Error(`Action "${actionName}" is not found`);
     }
     const actionParams = {
-      context: {
+      // for 'submatch' action
+      _submatchContext: {
         screen,
         globalConfig: getGlobalConfig(),
         pickerParams: params,
