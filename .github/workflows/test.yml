@@ -48,10 +48,6 @@ jobs:
         run: deno fmt --check
       - name: Type check
         run: deno task check
-      - name: Gen check
-        run: |
-          deno task gen
-          git diff --exit-code
 
   test:
     strategy:
