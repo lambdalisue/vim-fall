@@ -1,5 +1,6 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 import type { Curator } from "jsr:@vim-fall/std@^0.1.0/curator";
+import type { Action } from "jsr:@vim-fall/std@^0.1.0/action";
 import type { CollectParams, Source } from "jsr:@vim-fall/std@^0.1.0/source";
 import type { Matcher, MatchParams } from "jsr:@vim-fall/std@^0.1.0/matcher";
 import type {
@@ -45,6 +46,7 @@ export const defineItemPickerFromSource: DefineItemPickerFromSource = (
   if (itemPickerParamsMap.has(name)) {
     throw new Error(`Item picker "${name}" is already defined.`);
   }
+  validatePickerName(name);
   const derivedParams = omitUndefinedAttributes({
     actions: deriveMap(params.actions) as Actions,
     defaultAction: params.defaultAction,
@@ -55,6 +57,7 @@ export const defineItemPickerFromSource: DefineItemPickerFromSource = (
     coordinator: derive(params.coordinator),
     theme: derive(params.theme),
   });
+  validateActions(derivedParams.actions);
   itemPickerParamsMap.set(name, {
     ...derivedParams,
     name,
@@ -67,9 +70,7 @@ export const defineItemPickerFromCurator: DefineItemPickerFromCurator = (
   curator,
   params,
 ) => {
-  if (itemPickerParamsMap.has(name)) {
-    throw new Error(`Item picker "${name}" is already defined.`);
-  }
+  validatePickerName(name);
   const source = new CuratorSourceMatcher(derive(curator));
   const derivedParams = omitUndefinedAttributes({
     actions: deriveMap(params.actions) as Actions,
@@ -80,6 +81,7 @@ export const defineItemPickerFromCurator: DefineItemPickerFromCurator = (
     coordinator: derive(params.coordinator),
     theme: derive(params.theme),
   });
+  validateActions(derivedParams.actions);
   itemPickerParamsMap.set(name, {
     ...derivedParams,
     name,
@@ -130,4 +132,21 @@ function omitUndefinedAttributes<
   return Object.fromEntries(
     Object.entries(map).filter(([, v]) => v !== undefined),
   ) as R;
+}
+
+function validatePickerName(name: string): void {
+  if (itemPickerParamsMap.has(name)) {
+    throw new Error(`Item picker "${name}" is already defined.`);
+  }
+  if (name.startsWith("@")) {
+    throw new Error(`Name "${name}" must not start with "@".`);
+  }
+}
+
+function validateActions(actions: Record<string, Action<unknown>>): void {
+  Object.entries(actions).forEach(([name, _action]) => {
+    if (name.startsWith("@")) {
+      throw new Error(`Action name "${name}" must not start with "@".`);
+    }
+  });
 }
