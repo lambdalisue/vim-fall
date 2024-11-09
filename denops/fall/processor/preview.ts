@@ -1,9 +1,9 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
-import type { PreviewItem } from "jsr:@vim-fall/std@^0.1.0-pre.0/item";
+import type { PreviewItem } from "jsr:@vim-fall/std@^0.1.0/item";
 import type {
   Previewer,
   PreviewParams,
-} from "jsr:@vim-fall/std@^0.1.0-pre.0/previewer";
+} from "jsr:@vim-fall/std@^0.1.0/previewer";
 
 import { dispatch } from "../event.ts";
 

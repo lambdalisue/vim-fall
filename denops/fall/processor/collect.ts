@@ -1,11 +1,8 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 import { chunked } from "jsr:@core/iterutil@^0.9.0/async/chunked";
 import { take } from "jsr:@core/iterutil@^0.9.0/async/take";
-import type { IdItem } from "jsr:@vim-fall/std@^0.1.0-pre.0/item";
-import type {
-  CollectParams,
-  Source,
-} from "jsr:@vim-fall/std@^0.1.0-pre.0/source";
+import type { IdItem } from "jsr:@vim-fall/std@^0.1.0/item";
+import type { CollectParams, Source } from "jsr:@vim-fall/std@^0.1.0/source";
 
 import { dispatch } from "../event.ts";
 
