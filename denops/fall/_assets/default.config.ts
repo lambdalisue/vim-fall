@@ -1,13 +1,28 @@
-import type { Entrypoint } from "jsr:@vim-fall/std@^0.1.0-pre.0/config";
-import { pipeProjectors } from "jsr:@vim-fall/std@^0.1.0-pre.0/projector";
-import { composeRenderer } from "jsr:@vim-fall/std@^0.1.0-pre.0/renderer";
-import * as builtin from "jsr:@vim-fall/std@^0.1.0-pre.0/builtin";
+import {
+  composeRenderers,
+  type Entrypoint,
+  pipeProjectors,
+} from "jsr:@vim-fall/std@^0.1.0";
+import * as builtin from "jsr:@vim-fall/std@^0.1.0/builtin";
 
-const quickfixActions = {
+const myPathActions = {
+  ...builtin.action.defaultOpenActions,
+  ...builtin.action.defaultSystemopenActions,
+  ...builtin.action.defaultCdActions,
+};
+
+const myQuickfixActions = {
   ...builtin.action.defaultQuickfixActions,
+  // Install https://github.com/thinca/vim-qfreplace to use this action
   "quickfix:qfreplace": builtin.action.quickfix({
     after: "Qfreplace",
   }),
+};
+
+const myMiscActions = {
+  ...builtin.action.defaultEchoActions,
+  ...builtin.action.defaultYankActions,
+  ...builtin.action.defaultSubmatchActions,
 };
 
 export const main: Entrypoint = (
@@ -19,27 +34,8 @@ export const main: Entrypoint = (
 ) => {
   refineGlobalConfig({
     coordinator: builtin.coordinator.modern,
+    theme: builtin.theme.MODERN_THEME,
   });
-
-  defineItemPickerFromCurator(
-    "grep",
-    pipeProjectors(
-      builtin.curator.grep,
-      builtin.modifier.relativePath,
-    ),
-    {
-      previewers: [builtin.previewer.file],
-      actions: {
-        ...quickfixActions,
-        ...builtin.action.defaultOpenActions,
-        ...builtin.action.defaultCdActions,
-        ...builtin.action.defaultEchoActions,
-        ...builtin.action.defaultSystemopenActions,
-        ...builtin.action.defaultSubmatchActions,
-      },
-      defaultAction: "open",
-    },
-  );
 
   defineItemPickerFromCurator(
     "git-grep",
@@ -50,17 +46,15 @@ export const main: Entrypoint = (
     {
       previewers: [builtin.previewer.file],
       actions: {
-        ...quickfixActions,
-        ...builtin.action.defaultOpenActions,
-        ...builtin.action.defaultCdActions,
-        ...builtin.action.defaultEchoActions,
-        ...builtin.action.defaultSystemopenActions,
-        ...builtin.action.defaultSubmatchActions,
+        ...myPathActions,
+        ...myQuickfixActions,
+        ...myMiscActions,
       },
       defaultAction: "open",
     },
   );
 
+  // Install https://github.com/BurntSushi/ripgrep to use this curator
   defineItemPickerFromCurator(
     "rg",
     pipeProjectors(
@@ -70,12 +64,9 @@ export const main: Entrypoint = (
     {
       previewers: [builtin.previewer.file],
       actions: {
-        ...quickfixActions,
-        ...builtin.action.defaultOpenActions,
-        ...builtin.action.defaultCdActions,
-        ...builtin.action.defaultEchoActions,
-        ...builtin.action.defaultSystemopenActions,
-        ...builtin.action.defaultSubmatchActions,
+        ...myPathActions,
+        ...myQuickfixActions,
+        ...myMiscActions,
       },
       defaultAction: "open",
     },
@@ -87,31 +78,50 @@ export const main: Entrypoint = (
       builtin.source.file({
         excludes: [
           /.*\/node_modules\/.*/,
-          /.*\/target\/.*/,
-          /.*\/dist\/.*/,
           /.*\/.git\/.*/,
           /.*\/.svn\/.*/,
           /.*\/.hg\/.*/,
+          /.*\/.ssh\/.*/,
           /.*\/.DS_Store$/,
-          /.*\/.coverage\//,
         ],
       }),
       builtin.modifier.relativePath,
     ),
     {
       matchers: [builtin.matcher.fzf],
-      renderers: [composeRenderer(
+      renderers: [composeRenderers(
         builtin.renderer.smartPath,
+        // Install https://www.nerdfonts.com/ to use this renderer
         builtin.renderer.nerdfont,
       )],
       previewers: [builtin.previewer.file],
       actions: {
-        ...quickfixActions,
-        ...builtin.action.defaultOpenActions,
-        ...builtin.action.defaultCdActions,
-        ...builtin.action.defaultEchoActions,
-        ...builtin.action.defaultSystemopenActions,
-        ...builtin.action.defaultSubmatchActions,
+        ...myPathActions,
+        ...myQuickfixActions,
+        ...myMiscActions,
+      },
+      defaultAction: "open",
+    },
+  );
+
+  defineItemPickerFromSource(
+    "file:all",
+    pipeProjectors(
+      builtin.source.file,
+      builtin.modifier.relativePath,
+    ),
+    {
+      matchers: [builtin.matcher.fzf],
+      renderers: [composeRenderers(
+        builtin.renderer.smartPath,
+        // Install https://www.nerdfonts.com/ to use this renderer
+        builtin.renderer.nerdfont,
+      )],
+      previewers: [builtin.previewer.file],
+      actions: {
+        ...myPathActions,
+        ...myQuickfixActions,
+        ...myMiscActions,
       },
       defaultAction: "open",
     },
@@ -121,12 +131,10 @@ export const main: Entrypoint = (
     matchers: [builtin.matcher.fzf],
     previewers: [builtin.previewer.buffer],
     actions: {
-      ...quickfixActions,
+      ...myQuickfixActions,
+      ...myMiscActions,
       ...builtin.action.defaultOpenActions,
       ...builtin.action.defaultBufferActions,
-      ...builtin.action.defaultCdActions,
-      ...builtin.action.defaultEchoActions,
-      ...builtin.action.defaultSubmatchActions,
     },
     defaultAction: "open",
   });
@@ -138,12 +146,10 @@ export const main: Entrypoint = (
       matchers: [builtin.matcher.fzf],
       previewers: [builtin.previewer.buffer],
       actions: {
-        ...quickfixActions,
+        ...myQuickfixActions,
+        ...myMiscActions,
         ...builtin.action.defaultOpenActions,
         ...builtin.action.defaultBufferActions,
-        ...builtin.action.defaultCdActions,
-        ...builtin.action.defaultEchoActions,
-        ...builtin.action.defaultSubmatchActions,
       },
       defaultAction: "open",
     },
@@ -153,9 +159,8 @@ export const main: Entrypoint = (
     matchers: [builtin.matcher.fzf],
     previewers: [builtin.previewer.helptag],
     actions: {
+      ...myMiscActions,
       ...builtin.action.defaultHelpActions,
-      ...builtin.action.defaultEchoActions,
-      ...builtin.action.defaultSubmatchActions,
     },
     defaultAction: "help",
   });
