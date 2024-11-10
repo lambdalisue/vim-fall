@@ -1,6 +1,7 @@
 # 🍂 fall
 
 [![Test](https://github.com/vim-fall/fall/actions/workflows/test.yml/badge.svg)](https://github.com/vim-fall/fall/actions/workflows/test.yml)
+[![Deno](https://img.shields.io/badge/Deno%202.x-333?logo=deno&logoColor=fff)](#)
 [![codecov](https://codecov.io/gh/vim-fall/fall/graph/badge.svg?token=k2ZTes7Kln)](https://codecov.io/gh/vim-fall/fall)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![vim help](https://img.shields.io/badge/vim-%3Ah%20fall-orange.svg)](doc/fall.txt)
