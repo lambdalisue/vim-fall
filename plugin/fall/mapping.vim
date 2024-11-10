@@ -24,6 +24,14 @@ cnoremap <silent> <Plug>(fall-switch-matcher-first) <Cmd>call fall#internal#disp
 cnoremap <silent> <Plug>(fall-switch-matcher-last) <Cmd>call fall#internal#dispatch(#{type: 'switch-matcher-at', index: '$'})<CR>
 cnoremap <silent> <Plug>(fall-switch-matcher-prev) <Cmd>call fall#internal#dispatch(#{type: 'switch-matcher', amount: -1, cycle: v:true})<CR>
 cnoremap <silent> <Plug>(fall-switch-matcher-next) <Cmd>call fall#internal#dispatch(#{type: 'switch-matcher', amount: 1, cycle: v:true})<CR>
+cnoremap <silent> <Plug>(fall-switch-sorter-first) <Cmd>call fall#internal#dispatch(#{type: 'switch-sorter-at', index: 0})<CR>
+cnoremap <silent> <Plug>(fall-switch-sorter-last) <Cmd>call fall#internal#dispatch(#{type: 'switch-sorter-at', index: '$'})<CR>
+cnoremap <silent> <Plug>(fall-switch-sorter-prev) <Cmd>call fall#internal#dispatch(#{type: 'switch-sorter', amount: -1, cycle: v:true})<CR>
+cnoremap <silent> <Plug>(fall-switch-sorter-next) <Cmd>call fall#internal#dispatch(#{type: 'switch-sorter', amount: 1, cycle: v:true})<CR>
+cnoremap <silent> <Plug>(fall-switch-renderer-first) <Cmd>call fall#internal#dispatch(#{type: 'switch-renderer-at', index: 0})<CR>
+cnoremap <silent> <Plug>(fall-switch-renderer-last) <Cmd>call fall#internal#dispatch(#{type: 'switch-renderer-at', index: '$'})<CR>
+cnoremap <silent> <Plug>(fall-switch-renderer-prev) <Cmd>call fall#internal#dispatch(#{type: 'switch-renderer', amount: -1, cycle: v:true})<CR>
+cnoremap <silent> <Plug>(fall-switch-renderer-next) <Cmd>call fall#internal#dispatch(#{type: 'switch-renderer', amount: 1, cycle: v:true})<CR>
 
 " Preview
 cnoremap <silent> <Plug>(fall-preview-first) <Cmd>call fall#internal#dispatch(#{type: 'preview-component-execute', command: 'silent! normal! gg'})<CR>
@@ -72,6 +80,8 @@ if !get(g:, 'fall_disable_default_mapping')
     cnoremap <nowait> <Tab> <Plug>(fall-action-select)
     " Switch
     cnoremap <nowait> <F2> <Plug>(fall-switch-matcher-next)
+    cnoremap <nowait> <F3> <Plug>(fall-switch-sorter-next)
+    cnoremap <nowait> <F4> <Plug>(fall-switch-renderer-next)
   endfunction
 
   augroup fall_mapping_plugin

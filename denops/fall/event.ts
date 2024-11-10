@@ -23,6 +23,10 @@ export type Event =
   | { type: "select-all-items"; method?: SelectMethod }
   | { type: "switch-matcher"; amount: number; cycle?: boolean }
   | { type: "switch-matcher-at"; index: number | "$" }
+  | { type: "switch-sorter"; amount: number; cycle?: boolean }
+  | { type: "switch-sorter-at"; index: number | "$" }
+  | { type: "switch-renderer"; amount: number; cycle?: boolean }
+  | { type: "switch-renderer-at"; index: number | "$" }
   | { type: "action-invoke"; name: string }
   | { type: "list-component-execute"; command: string }
   | { type: "preview-component-execute"; command: string }

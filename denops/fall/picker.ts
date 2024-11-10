@@ -104,10 +104,9 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       new MatchProcessor(params.matchers),
     );
     this.#visualizeProcessor = this.#stack.use(
-      // TODO: Support multiple sorters/renderers
       new VisualizeProcessor(
-        params.sorters?.at(0),
-        params.renderers?.at(0),
+        params.sorters ?? [],
+        params.renderers ?? [],
       ),
     );
     this.#previewProcessor = this.#stack.use(
@@ -383,6 +382,48 @@ export class Picker<T extends Detail> implements AsyncDisposable {
           query: this.#inputComponent.cmdline,
         }, {
           restart: true,
+        });
+        break;
+      case "switch-sorter": {
+        let index = this.#visualizeProcessor.sorterIndex + event.amount;
+        if (event.cycle) {
+          if (index < 0) {
+            index = this.#visualizeProcessor.sorterCount - 1;
+          } else if (index >= this.#visualizeProcessor.sorterCount) {
+            index = 0;
+          }
+        }
+        this.#visualizeProcessor.sorterIndex = index;
+        this.#visualizeProcessor.start(denops, {
+          items: this.#matchProcessor.items,
+        });
+        break;
+      }
+      case "switch-sorter-at":
+        this.#visualizeProcessor.sorterIndex = event.index;
+        this.#visualizeProcessor.start(denops, {
+          items: this.#matchProcessor.items,
+        });
+        break;
+      case "switch-renderer": {
+        let index = this.#visualizeProcessor.rendererIndex + event.amount;
+        if (event.cycle) {
+          if (index < 0) {
+            index = this.#visualizeProcessor.rendererCount - 1;
+          } else if (index >= this.#visualizeProcessor.rendererCount) {
+            index = 0;
+          }
+        }
+        this.#visualizeProcessor.rendererIndex = index;
+        this.#visualizeProcessor.start(denops, {
+          items: this.#matchProcessor.items,
+        });
+        break;
+      }
+      case "switch-renderer-at":
+        this.#visualizeProcessor.rendererIndex = event.index;
+        this.#visualizeProcessor.start(denops, {
+          items: this.#matchProcessor.items,
         });
         break;
       case "action-invoke":

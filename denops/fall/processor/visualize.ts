@@ -19,8 +19,8 @@ export type VisualizeProcessorOptions = {
 };
 
 export class VisualizeProcessor<T extends Detail> {
-  #sorter?: Sorter<T>;
-  #renderer?: Renderer<T>;
+  #sorters: Sorter<T>[];
+  #renderers: Renderer<T>[];
   #height: number;
   #scrollOffset: number;
   #controller: AbortController = new AbortController();
@@ -30,16 +30,60 @@ export class VisualizeProcessor<T extends Detail> {
   #itemCount: number = 0;
   #cursor: number = 0;
   #offset: number = 0;
+  #sorterIndex: number = 0;
+  #rendererIndex: number = 0;
 
   constructor(
-    sorter: Sorter<T> | undefined,
-    renderer: Renderer<T> | undefined,
+    sorters: Sorter<T>[],
+    renderers: Renderer<T>[],
     options: VisualizeProcessorOptions = {},
   ) {
-    this.#sorter = sorter;
-    this.#renderer = renderer;
+    this.#sorters = sorters;
+    this.#renderers = renderers;
     this.#height = options.height ?? HEIGHT;
     this.#scrollOffset = options.scrollOffset ?? SCROLL_OFFSET;
+  }
+
+  get #sorter(): Sorter<T> | undefined {
+    return this.#sorters.at(this.#sorterIndex);
+  }
+
+  get #renderer(): Renderer<T> | undefined {
+    return this.#renderers.at(this.#rendererIndex);
+  }
+
+  get sorterCount(): number {
+    return this.#sorters.length;
+  }
+
+  get rendererCount(): number {
+    return this.#renderers.length;
+  }
+
+  get sorterIndex(): number {
+    return this.#sorterIndex;
+  }
+
+  set sorterIndex(index: number | "$") {
+    if (index === "$" || index >= this.sorterCount) {
+      index = this.sorterCount - 1;
+    } else if (index < 0) {
+      index = 0;
+    }
+    this.#sorterIndex = index;
+  }
+
+  get rendererIndex(): number {
+    return this.#rendererIndex;
+  }
+
+  set rendererIndex(index: number | "$") {
+    if (index === "$" || index >= this.rendererCount) {
+      index = this.rendererCount - 1;
+    } else if (index < 0) {
+      index = 0;
+    }
+    this.#rendererIndex = index;
   }
 
   get items() {
