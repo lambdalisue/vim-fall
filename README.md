@@ -15,16 +15,26 @@
 Fall is an abbreviation for "Filter All," another fuzzy finder designed for Vim
 and Neovim and implemented in [Denops].
 
-**Alpha version. Please note that any changes, including those that may be
-backward incompatible, will be implemented without prior announcements.**
+> [!WARNING]
+>
+> **Alpha version. Please note that any changes, including those that may be
+> backward incompatible, will be implemented without prior announcements.**
 
 [Denops]: https://github.com/vim-denops/denops.vim
 
 ## Requirements
 
-Users must install [Deno].
+Users must install [Deno] version 2.x. Additionally, the `nerdfont` renderer is
+enabled by default so configure your terminal to use a [NerdFont] or disable it
+by removing `builtin.renderer.nerdfont` renderer from the configuration
+(`:FallConfig`).
 
 [Deno]: https://deno.land
+[NerdFont]: https://www.nerdfonts.com
+
+> [!NOTE]
+>
+> Deno version 1.x. is not tested and supported.
 
 ## Installation
 
@@ -58,6 +68,85 @@ Or `line` source with `README.md` as an argument
 ```
 Fall line README.md
 ```
+
+## Configuration
+
+Use `:FallConfig` command to open the configuration file. The configuration file
+is written in TypeScript. The configuration is reloaded automatically when the
+file is saved.
+
+```
+FallConfig
+```
+
+The following is a minimum configuration example. It only defines several
+fundamental pickers as default configurations.
+
+```typescript
+import { type Entrypoint } from "jsr:@vim-fall/std@^0.2.0";
+import * as builtin from "jsr:@vim-fall/std@^0.2.0/builtin";
+
+export const main: Entrypoint = ({
+  defineItemPickerFromSource,
+  defineItemPickerFromCurator,
+}) => {
+  defineItemPickerFromCurator("git-grep", builtin.curator.gitGrep, {
+    previewers: [builtin.previewer.file],
+    actions: {
+      ...builtin.action.defaultOpenActions,
+      ...builtin.action.defaultSystemopenActions,
+      ...builtin.action.defaultQuickfixActions,
+    },
+    defaultAction: "open",
+  });
+
+  defineItemPickerFromSource("file", builtin.source.file, {
+    matchers: [builtin.matcher.fzf],
+    previewers: [builtin.previewer.file],
+    actions: {
+      ...builtin.action.defaultOpenActions,
+      ...builtin.action.defaultSystemopenActions,
+      ...builtin.action.defaultQuickfixActions,
+    },
+    defaultAction: "open",
+  });
+
+  defineItemPickerFromSource("line", builtin.source.line, {
+    matchers: [builtin.matcher.fzf],
+    previewers: [builtin.previewer.buffer],
+    actions: {
+      ...builtin.action.defaultOpenActions,
+      ...builtin.action.defaultBufferActions,
+      ...builtin.action.defaultQuickfixActions,
+    },
+    defaultAction: "open",
+  });
+
+  defineItemPickerFromSource("buffer", builtin.source.buffer, {
+    matchers: [builtin.matcher.fzf],
+    previewers: [builtin.previewer.buffer],
+    actions: {
+      ...builtin.action.defaultOpenActions,
+      ...builtin.action.defaultBufferActions,
+      ...builtin.action.defaultQuickfixActions,
+    },
+    defaultAction: "open",
+  });
+
+  defineItemPickerFromSource("help", builtin.source.helptag, {
+    matchers: [builtin.matcher.fzf],
+    previewers: [builtin.previewer.helptag],
+    actions: {
+      ...builtin.action.defaultHelpActions,
+    },
+    defaultAction: "help",
+  });
+};
+```
+
+See
+[`./denops/fall/_assets/default.config.ts`](./denops/fall/_assets/default.config.ts)
+for the full code of the default configuration.
 
 ## Related Projects
 
