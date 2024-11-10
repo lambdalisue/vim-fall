@@ -21,6 +21,8 @@ export type Event =
   | { type: "move-cursor-at"; cursor: number | "$" }
   | { type: "select-item"; cursor?: number | "$"; method?: SelectMethod }
   | { type: "select-all-items"; method?: SelectMethod }
+  | { type: "switch-matcher"; amount: number; cycle?: boolean }
+  | { type: "switch-matcher-at"; index: number | "$" }
   | { type: "action-invoke"; name: string }
   | { type: "list-component-execute"; command: string }
   | { type: "preview-component-execute"; command: string }

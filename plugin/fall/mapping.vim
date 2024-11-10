@@ -15,8 +15,15 @@ cnoremap <silent> <Plug>(fall-right) <Cmd>call fall#internal#dispatch(#{type: 'l
 cnoremap <silent> <Plug>(fall-left:scroll) <Cmd>call fall#internal#dispatch(#{type: 'list-component-execute', command: 'silent! normal! zH'})<CR>
 cnoremap <silent> <Plug>(fall-right:scroll) <Cmd>call fall#internal#dispatch(#{type: 'list-component-execute', command: 'silent! normal! zL'})<CR>
 
+" Select
 cnoremap <silent> <Plug>(fall-select) <Cmd>call fall#internal#dispatch(#{type: 'select-item'})<CR>
 cnoremap <silent> <Plug>(fall-select-all) <Cmd>call fall#internal#dispatch(#{type: 'select-all-items'})<CR>
+
+" Switch
+cnoremap <silent> <Plug>(fall-switch-matcher-first) <Cmd>call fall#internal#dispatch(#{type: 'switch-matcher-at', index: 0})<CR>
+cnoremap <silent> <Plug>(fall-switch-matcher-last) <Cmd>call fall#internal#dispatch(#{type: 'switch-matcher-at', index: '$'})<CR>
+cnoremap <silent> <Plug>(fall-switch-matcher-prev) <Cmd>call fall#internal#dispatch(#{type: 'switch-matcher', amount: -1, cycle: v:true})<CR>
+cnoremap <silent> <Plug>(fall-switch-matcher-next) <Cmd>call fall#internal#dispatch(#{type: 'switch-matcher', amount: 1, cycle: v:true})<CR>
 
 " Preview
 cnoremap <silent> <Plug>(fall-preview-first) <Cmd>call fall#internal#dispatch(#{type: 'preview-component-execute', command: 'silent! normal! gg'})<CR>
@@ -63,6 +70,8 @@ if !get(g:, 'fall_disable_default_mapping')
     cnoremap <nowait> <S-Right> <Plug>(fall-preview-right:scroll)
     " Action
     cnoremap <nowait> <Tab> <Plug>(fall-action-select)
+    " Switch
+    cnoremap <nowait> <F2> <Plug>(fall-switch-matcher-next)
   endfunction
 
   augroup fall_mapping_plugin

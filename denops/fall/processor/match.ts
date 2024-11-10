@@ -19,7 +19,7 @@ export type MatchProcessorOptions = {
 };
 
 export class MatchProcessor<T extends Detail> {
-  #filter: Matcher<T>;
+  #matchers: Matcher<T>[];
   #interval: number;
   #threshold: number;
   #chunkSize: number;
@@ -28,19 +28,41 @@ export class MatchProcessor<T extends Detail> {
   #reserved?: () => void;
   #paused?: PromiseWithResolvers<void>;
   #items: IdItem<T>[] = [];
+  #matcherIndex = 0;
 
   constructor(
-    filter: Matcher<T>,
+    filters: Matcher<T>[],
     options: MatchProcessorOptions = {},
   ) {
-    this.#filter = filter;
+    this.#matchers = filters;
     this.#interval = options.interval ?? INTERVAL;
     this.#threshold = options.threshold ?? THRESHOLD;
     this.#chunkSize = options.chunkSize ?? CHUNK_SIZE;
   }
 
+  get #matcher(): Matcher<T> {
+    return this.#matchers[this.#matcherIndex];
+  }
+
   get items(): IdItem<T>[] {
     return this.#items;
+  }
+
+  get matcherCount(): number {
+    return this.#matchers.length;
+  }
+
+  get matcherIndex(): number {
+    return this.#matcherIndex;
+  }
+
+  set matcherIndex(index: number | "$") {
+    if (index === "$" || index >= this.#matchers.length) {
+      index = this.#matchers.length - 1;
+    } else if (index < 0) {
+      index = 0;
+    }
+    this.#matcherIndex = index;
   }
 
   start(
@@ -64,7 +86,7 @@ export class MatchProcessor<T extends Detail> {
       const iter = take(
         query === ""
           ? toAsyncIterable(items)
-          : this.#filter.match(denops, { items, query }, { signal }),
+          : this.#matcher.match(denops, { items, query }, { signal }),
         this.#threshold,
       );
       // Gradually update items when `items` is empty to improve latency

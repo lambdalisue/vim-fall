@@ -41,6 +41,16 @@ const isEventComplement = is.UnionOf([
     type: is.LiteralOf("select-all-items"),
     method: as.Optional(is.LiteralOneOf(["on", "off", "toggle"] as const)),
   }),
+  // Switch
+  is.ObjectOf({
+    type: is.LiteralOf("switch-matcher"),
+    amount: is.Number,
+    cycle: as.Optional(is.Boolean),
+  }),
+  is.ObjectOf({
+    type: is.LiteralOf("switch-matcher-at"),
+    index: is.UnionOf([is.Number, is.LiteralOf("$")]),
+  }),
   // Action
   is.ObjectOf({
     type: is.LiteralOf("action-invoke"),

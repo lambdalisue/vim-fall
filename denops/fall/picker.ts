@@ -101,8 +101,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       new CollectProcessor(params.source),
     );
     this.#matchProcessor = this.#stack.use(
-      // TODO: Support multiple matchers
-      new MatchProcessor(params.matchers[0]),
+      new MatchProcessor(params.matchers),
     );
     this.#visualizeProcessor = this.#stack.use(
       // TODO: Support multiple sorters/renderers
@@ -358,6 +357,33 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       case "select-all-items":
         this.#selectAll(event.method);
         this.#listComponent.selection = this.#selection;
+        break;
+      case "switch-matcher": {
+        let index = this.#matchProcessor.matcherIndex + event.amount;
+        if (event.cycle) {
+          if (index < 0) {
+            index = this.#matchProcessor.matcherCount - 1;
+          } else if (index >= this.#matchProcessor.matcherCount) {
+            index = 0;
+          }
+        }
+        this.#matchProcessor.matcherIndex = index;
+        this.#matchProcessor.start(denops, {
+          items: this.#collectProcessor.items,
+          query: this.#inputComponent.cmdline,
+        }, {
+          restart: true,
+        });
+        break;
+      }
+      case "switch-matcher-at":
+        this.#matchProcessor.matcherIndex = event.index;
+        this.#matchProcessor.start(denops, {
+          items: this.#collectProcessor.items,
+          query: this.#inputComponent.cmdline,
+        }, {
+          restart: true,
+        });
         break;
       case "action-invoke":
         accept(event.name);
