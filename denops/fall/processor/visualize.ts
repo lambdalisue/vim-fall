@@ -1,7 +1,11 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
-import type { DisplayItem, IdItem } from "jsr:@vim-fall/std@^0.1.0/item";
-import type { Renderer } from "jsr:@vim-fall/std@^0.1.0/renderer";
-import type { Sorter } from "jsr:@vim-fall/std@^0.1.0/sorter";
+import type {
+  Detail,
+  DisplayItem,
+  IdItem,
+} from "jsr:@vim-fall/std@^0.2.0/item";
+import type { Renderer } from "jsr:@vim-fall/std@^0.2.0/renderer";
+import type { Sorter } from "jsr:@vim-fall/std@^0.2.0/sorter";
 
 import { dispatch } from "../event.ts";
 import { adjustOffset } from "../lib/adjust_offset.ts";
@@ -14,7 +18,7 @@ export type VisualizeProcessorOptions = {
   scrollOffset?: number;
 };
 
-export class VisualizeProcessor<T> {
+export class VisualizeProcessor<T extends Detail> {
   #sorter?: Sorter<T>;
   #renderer?: Renderer<T>;
   #height: number;

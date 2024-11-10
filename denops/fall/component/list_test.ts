@@ -170,7 +170,7 @@ function buildItems(count: number) {
     id: i,
     value: `Item ${i + 1}`,
     label: `Item ${i + 1}`,
-    detail: undefined,
+    detail: {},
     decorations: [
       { column: 2, length: 2 },
     ],

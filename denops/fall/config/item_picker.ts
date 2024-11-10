@@ -1,27 +1,28 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
-import type { Curator } from "jsr:@vim-fall/std@^0.1.0/curator";
-import type { Action } from "jsr:@vim-fall/std@^0.1.0/action";
-import type { CollectParams, Source } from "jsr:@vim-fall/std@^0.1.0/source";
-import type { Matcher, MatchParams } from "jsr:@vim-fall/std@^0.1.0/matcher";
+import type { Detail, DetailUnit, IdItem } from "jsr:@vim-fall/std@^0.2.0/item";
+import type { Curator } from "jsr:@vim-fall/std@^0.2.0/curator";
+import type { Action } from "jsr:@vim-fall/std@^0.2.0/action";
+import type { CollectParams, Source } from "jsr:@vim-fall/std@^0.2.0/source";
+import type { Matcher, MatchParams } from "jsr:@vim-fall/std@^0.2.0/matcher";
 import type {
   DefineItemPickerFromCurator,
   DefineItemPickerFromSource,
   GlobalConfig,
   ItemPickerParams,
-} from "jsr:@vim-fall/std@^0.1.0/config";
+} from "jsr:@vim-fall/std@^0.2.0/config";
 import {
   derive,
   deriveArray,
   deriveMap,
-} from "jsr:@vim-fall/std@^0.1.0/util/derivable";
+} from "jsr:@vim-fall/std@^0.2.0/util/derivable";
 
 import { getGlobalConfig } from "./global_config.ts";
 
-type Actions = ItemPickerParams<unknown, string>["actions"];
+type Actions = ItemPickerParams<DetailUnit, string>["actions"];
 
 const itemPickerParamsMap = new Map<
   string,
-  ItemPickerParams<unknown, string>
+  ItemPickerParams<Detail, string>
 >();
 
 export function listItemPickerNames(): readonly string[] {
@@ -34,7 +35,7 @@ export function resetItemPickerParams(): void {
 
 export function getItemPickerParams(
   name: string,
-): Readonly<ItemPickerParams<unknown, string> & GlobalConfig> | undefined {
+): Readonly<ItemPickerParams<DetailUnit, string> & GlobalConfig> | undefined {
   const params = itemPickerParamsMap.get(name);
   if (params) {
     return { ...getGlobalConfig(), ...params };
@@ -66,7 +67,7 @@ export const defineItemPickerFromSource: DefineItemPickerFromSource = (
     ...derivedParams,
     name,
     source: derive(source),
-  });
+  } as ItemPickerParams<Detail, string>);
 };
 
 export const defineItemPickerFromCurator: DefineItemPickerFromCurator = (
@@ -90,11 +91,11 @@ export const defineItemPickerFromCurator: DefineItemPickerFromCurator = (
     ...derivedParams,
     name,
     source,
-    matchers: [source],
+    matchers: [source as Matcher<DetailUnit>],
   });
 };
 
-class CuratorSourceMatcher<T> implements Source<T>, Matcher<T> {
+class CuratorSourceMatcher<T extends Detail> implements Source<T>, Matcher<T> {
   #curator: Curator<T>;
   #args?: readonly string[];
 
@@ -111,11 +112,11 @@ class CuratorSourceMatcher<T> implements Source<T>, Matcher<T> {
     yield* [];
   }
 
-  async *match(
+  async *match<V extends T>(
     denops: Denops,
-    params: MatchParams<T>,
+    params: MatchParams<V>,
     options: { signal?: AbortSignal },
-  ) {
+  ): AsyncIterableIterator<IdItem<V>> {
     if (!this.#args) {
       throw new Error("Collect is not called before match.");
     }
@@ -123,7 +124,11 @@ class CuratorSourceMatcher<T> implements Source<T>, Matcher<T> {
       ...params,
       args: this.#args,
     };
-    yield* this.#curator.curate(denops, curatorParams, options);
+    yield* this.#curator.curate(
+      denops,
+      curatorParams,
+      options,
+    ) as AsyncIterableIterator<IdItem<V>>;
   }
 }
 
@@ -147,7 +152,7 @@ function validatePickerName(name: string): void {
   }
 }
 
-function validateActions(actions: Record<string, Action<unknown>>): void {
+function validateActions(actions: Record<string, Action>): void {
   Object.entries(actions).forEach(([name, _action]) => {
     if (name.startsWith("@")) {
       throw new Error(`Action name "${name}" must not start with "@".`);

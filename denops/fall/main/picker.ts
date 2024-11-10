@@ -9,11 +9,12 @@ import {
   is,
   type Predicate,
 } from "jsr:@core/unknownutil@^4.3.0";
-import type { Size } from "jsr:@vim-fall/std@^0.1.0/coordinator";
+import type { Size } from "jsr:@vim-fall/std@^0.2.0/coordinator";
+import type { DetailUnit } from "jsr:@vim-fall/std@^0.2.0/item";
 import type {
   GlobalConfig,
   ItemPickerParams,
-} from "jsr:@vim-fall/std@^0.1.0/config";
+} from "jsr:@vim-fall/std@^0.2.0/config";
 
 import {
   getActionPickerParams,
@@ -87,7 +88,7 @@ async function startPicker(
   denops: Denops,
   args: string[],
   screen: Size,
-  params: ItemPickerParams<unknown, string> & GlobalConfig,
+  params: ItemPickerParams<DetailUnit, string> & GlobalConfig,
   { signal }: { signal?: AbortSignal } = {},
 ): Promise<void | true> {
   await using stack = new AsyncDisposableStack();
@@ -197,7 +198,7 @@ const isParams = is.ObjectOf({
   previewers: as.Optional(is.Any),
   coordinator: is.Any,
   theme: is.Any,
-}) satisfies Predicate<ItemPickerParams<unknown, string> & GlobalConfig>;
+}) satisfies Predicate<ItemPickerParams<DetailUnit, string> & GlobalConfig>;
 
 const isOptions = is.ObjectOf({
   signal: as.Optional(is.InstanceOf(AbortSignal)),

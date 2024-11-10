@@ -3,8 +3,8 @@ import type { Decoration } from "jsr:@denops/std@^7.3.0/buffer";
 import { batch } from "jsr:@denops/std@^7.3.0/batch";
 import * as fn from "jsr:@denops/std@^7.3.0/function";
 import * as buffer from "jsr:@denops/std@^7.3.0/buffer";
-import type { DisplayItem } from "jsr:@vim-fall/core@^0.1.0-pre.0/item";
-import type { Dimension } from "jsr:@vim-fall/core@^0.1.0-pre.0/coordinator";
+import type { DetailUnit, DisplayItem } from "jsr:@vim-fall/std@^0.2.0/item";
+import type { Dimension } from "jsr:@vim-fall/std@^0.2.0/coordinator";
 
 import { BaseComponent } from "./_component.ts";
 
@@ -14,7 +14,7 @@ export const SIGN_SELECTED = "FallListSelected";
 
 export class ListComponent extends BaseComponent {
   #scroll = 1;
-  #items: readonly DisplayItem<unknown>[] = [];
+  #items: readonly DisplayItem<DetailUnit>[] = [];
   #selection = new Set<unknown>();
   #modifiedContent = true;
   #modifiedSigns = true;
@@ -24,11 +24,11 @@ export class ListComponent extends BaseComponent {
     return this.#scroll;
   }
 
-  get items(): readonly DisplayItem<unknown>[] {
+  get items(): readonly DisplayItem<DetailUnit>[] {
     return this.#items;
   }
 
-  set items(items: DisplayItem<unknown>[]) {
+  set items(items: DisplayItem<DetailUnit>[]) {
     this.#items = items;
     this.#modifiedContent = true;
     this.#modifiedSigns = true;

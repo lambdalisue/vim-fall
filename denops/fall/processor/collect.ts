@@ -1,8 +1,8 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 import { chunked } from "jsr:@core/iterutil@^0.9.0/async/chunked";
 import { take } from "jsr:@core/iterutil@^0.9.0/async/take";
-import type { IdItem } from "jsr:@vim-fall/std@^0.1.0/item";
-import type { CollectParams, Source } from "jsr:@vim-fall/std@^0.1.0/source";
+import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.2.0/item";
+import type { CollectParams, Source } from "jsr:@vim-fall/std@^0.2.0/source";
 
 import { dispatch } from "../event.ts";
 
@@ -14,7 +14,7 @@ export type CollectProcessorOptions = {
   chunkSize?: number;
 };
 
-export class CollectProcessor<T> implements Disposable {
+export class CollectProcessor<T extends Detail> implements Disposable {
   readonly #source: Source<T>;
   readonly #threshold: number;
   readonly #chunkSize: number;

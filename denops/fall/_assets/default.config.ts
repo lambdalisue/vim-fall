@@ -1,9 +1,10 @@
 import {
   composeRenderers,
   type Entrypoint,
-  pipeProjectors,
-} from "jsr:@vim-fall/std@^0.1.0";
-import * as builtin from "jsr:@vim-fall/std@^0.1.0/builtin";
+  refineCurator,
+  refineSource,
+} from "jsr:@vim-fall/std@^0.2.0";
+import * as builtin from "jsr:@vim-fall/std@^0.2.0/builtin";
 
 const myPathActions = {
   ...builtin.action.defaultOpenActions,
@@ -39,9 +40,9 @@ export const main: Entrypoint = (
 
   defineItemPickerFromCurator(
     "git-grep",
-    pipeProjectors(
+    refineCurator(
       builtin.curator.gitGrep,
-      builtin.modifier.relativePath,
+      builtin.refiner.relativePath,
     ),
     {
       previewers: [builtin.previewer.file],
@@ -57,9 +58,9 @@ export const main: Entrypoint = (
   // Install https://github.com/BurntSushi/ripgrep to use this curator
   defineItemPickerFromCurator(
     "rg",
-    pipeProjectors(
+    refineCurator(
       builtin.curator.rg,
-      builtin.modifier.relativePath,
+      builtin.refiner.relativePath,
     ),
     {
       previewers: [builtin.previewer.file],
@@ -74,7 +75,7 @@ export const main: Entrypoint = (
 
   defineItemPickerFromSource(
     "file",
-    pipeProjectors(
+    refineSource(
       builtin.source.file({
         excludes: [
           /.*\/node_modules\/.*/,
@@ -85,7 +86,7 @@ export const main: Entrypoint = (
           /.*\/.DS_Store$/,
         ],
       }),
-      builtin.modifier.relativePath,
+      builtin.refiner.relativePath,
     ),
     {
       matchers: [builtin.matcher.fzf],
@@ -106,9 +107,9 @@ export const main: Entrypoint = (
 
   defineItemPickerFromSource(
     "file:all",
-    pipeProjectors(
+    refineSource(
       builtin.source.file,
-      builtin.modifier.relativePath,
+      builtin.refiner.relativePath,
     ),
     {
       matchers: [builtin.matcher.fzf],

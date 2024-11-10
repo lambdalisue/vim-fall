@@ -3,8 +3,8 @@ import { delay } from "jsr:@std/async@^1.0.0/delay";
 import { chunked } from "jsr:@core/iterutil@^0.9.0/async/chunked";
 import { take } from "jsr:@core/iterutil@^0.9.0/async/take";
 import { toAsyncIterable } from "jsr:@core/iterutil@^0.9.0/async/to-async-iterable";
-import type { IdItem } from "jsr:@vim-fall/std@^0.1.0/item";
-import type { Matcher, MatchParams } from "jsr:@vim-fall/std@^0.1.0/matcher";
+import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.2.0/item";
+import type { Matcher, MatchParams } from "jsr:@vim-fall/std@^0.2.0/matcher";
 
 import { dispatch } from "../event.ts";
 
@@ -18,7 +18,7 @@ export type MatchProcessorOptions = {
   chunkSize?: number;
 };
 
-export class MatchProcessor<T> {
+export class MatchProcessor<T extends Detail> {
   #filter: Matcher<T>;
   #interval: number;
   #threshold: number;

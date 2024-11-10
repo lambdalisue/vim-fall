@@ -1,13 +1,13 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
-import type { PreviewItem } from "jsr:@vim-fall/std@^0.1.0/item";
+import type { Detail, PreviewItem } from "jsr:@vim-fall/std@^0.2.0/item";
 import type {
   Previewer,
   PreviewParams,
-} from "jsr:@vim-fall/std@^0.1.0/previewer";
+} from "jsr:@vim-fall/std@^0.2.0/previewer";
 
 import { dispatch } from "../event.ts";
 
-export class PreviewProcessor<T> {
+export class PreviewProcessor<T extends Detail> {
   #previewer?: Previewer<T>;
   #controller: AbortController = new AbortController();
   #processing?: Promise<void>;

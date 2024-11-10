@@ -4,14 +4,14 @@ import * as autocmd from "jsr:@denops/std@^7.3.0/autocmd";
 import * as lambda from "jsr:@denops/std@^7.3.0/lambda";
 import { collect } from "jsr:@denops/std@^7.3.0/batch";
 import { unreachable } from "jsr:@core/errorutil@^1.2.0/unreachable";
-import type { IdItem } from "jsr:@vim-fall/std@^0.1.0/item";
-import type { Coordinator, Size } from "jsr:@vim-fall/std@^0.1.0/coordinator";
-import type { Source } from "jsr:@vim-fall/std@^0.1.0/source";
-import type { Matcher } from "jsr:@vim-fall/std@^0.1.0/matcher";
-import type { Sorter } from "jsr:@vim-fall/std@^0.1.0/sorter";
-import type { Renderer } from "jsr:@vim-fall/std@^0.1.0/renderer";
-import type { Previewer } from "jsr:@vim-fall/std@^0.1.0/previewer";
-import type { Theme } from "jsr:@vim-fall/std@^0.1.0/theme";
+import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.2.0/item";
+import type { Coordinator, Size } from "jsr:@vim-fall/std@^0.2.0/coordinator";
+import type { Source } from "jsr:@vim-fall/std@^0.2.0/source";
+import type { Matcher } from "jsr:@vim-fall/std@^0.2.0/matcher";
+import type { Sorter } from "jsr:@vim-fall/std@^0.2.0/sorter";
+import type { Renderer } from "jsr:@vim-fall/std@^0.2.0/renderer";
+import type { Previewer } from "jsr:@vim-fall/std@^0.2.0/previewer";
+import type { Theme } from "jsr:@vim-fall/std@^0.2.0/theme";
 
 import { Scheduler } from "./lib/scheduler.ts";
 import { Cmdliner } from "./util/cmdliner.ts";
@@ -27,7 +27,7 @@ import { consume, type Event } from "./event.ts";
 
 const SCHEDULER_INTERVAL = 10;
 
-export type PickerParams<T> = {
+export type PickerParams<T extends Detail> = {
   name: string;
   screen: Size;
   theme: Theme;
@@ -40,7 +40,7 @@ export type PickerParams<T> = {
   zindex?: number;
 };
 
-export type PickerResult<T> = {
+export type PickerResult<T extends Detail> = {
   readonly action?: string;
   readonly query: string;
   readonly item: Readonly<IdItem<T>> | undefined;
@@ -52,7 +52,7 @@ export type PickerOptions = {
   schedulerInterval?: number;
 };
 
-export class Picker<T> implements AsyncDisposable {
+export class Picker<T extends Detail> implements AsyncDisposable {
   readonly #stack = new AsyncDisposableStack();
   readonly #schedulerInterval: number;
   readonly #name: string;
