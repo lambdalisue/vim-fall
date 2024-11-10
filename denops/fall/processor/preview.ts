@@ -8,14 +8,36 @@ import type {
 import { dispatch } from "../event.ts";
 
 export class PreviewProcessor<T extends Detail> {
-  #previewer?: Previewer<T>;
+  #previewers: Previewer<T>[];
   #controller: AbortController = new AbortController();
   #processing?: Promise<void>;
   #reserved?: () => void;
   #item: PreviewItem | undefined = undefined;
+  #previewerIndex = 0;
 
-  constructor(previewer: Previewer<T> | undefined) {
-    this.#previewer = previewer;
+  constructor(previewers: Previewer<T>[]) {
+    this.#previewers = previewers;
+  }
+
+  get #previewer(): Previewer<T> | undefined {
+    return this.#previewers[this.#previewerIndex];
+  }
+
+  get previewerCount(): number {
+    return this.#previewers.length;
+  }
+
+  get previewerIndex(): number {
+    return this.#previewerIndex;
+  }
+
+  set previewerIndex(index: number | "$") {
+    if (index === "$" || index >= this.#previewers.length) {
+      index = this.#previewers.length - 1;
+    } else if (index < 0) {
+      index = 0;
+    }
+    this.#previewerIndex = index;
   }
 
   get item(): PreviewItem | undefined {

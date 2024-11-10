@@ -32,6 +32,10 @@ cnoremap <silent> <Plug>(fall-switch-renderer-first) <Cmd>call fall#internal#dis
 cnoremap <silent> <Plug>(fall-switch-renderer-last) <Cmd>call fall#internal#dispatch(#{type: 'switch-renderer-at', index: '$'})<CR>
 cnoremap <silent> <Plug>(fall-switch-renderer-prev) <Cmd>call fall#internal#dispatch(#{type: 'switch-renderer', amount: -1, cycle: v:true})<CR>
 cnoremap <silent> <Plug>(fall-switch-renderer-next) <Cmd>call fall#internal#dispatch(#{type: 'switch-renderer', amount: 1, cycle: v:true})<CR>
+cnoremap <silent> <Plug>(fall-switch-previewer-first) <Cmd>call fall#internal#dispatch(#{type: 'switch-previewer-at', index: 0})<CR>
+cnoremap <silent> <Plug>(fall-switch-previewer-last) <Cmd>call fall#internal#dispatch(#{type: 'switch-previewer-at', index: '$'})<CR>
+cnoremap <silent> <Plug>(fall-switch-previewer-prev) <Cmd>call fall#internal#dispatch(#{type: 'switch-previewer', amount: -1, cycle: v:true})<CR>
+cnoremap <silent> <Plug>(fall-switch-previewer-next) <Cmd>call fall#internal#dispatch(#{type: 'switch-previewer', amount: 1, cycle: v:true})<CR>
 
 " Preview
 cnoremap <silent> <Plug>(fall-preview-first) <Cmd>call fall#internal#dispatch(#{type: 'preview-component-execute', command: 'silent! normal! gg'})<CR>
@@ -82,6 +86,7 @@ if !get(g:, 'fall_disable_default_mapping')
     cnoremap <nowait> <F2> <Plug>(fall-switch-matcher-next)
     cnoremap <nowait> <F3> <Plug>(fall-switch-sorter-next)
     cnoremap <nowait> <F4> <Plug>(fall-switch-renderer-next)
+    cnoremap <nowait> <F5> <Plug>(fall-switch-previewer-next)
   endfunction
 
   augroup fall_mapping_plugin

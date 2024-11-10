@@ -27,6 +27,8 @@ export type Event =
   | { type: "switch-sorter-at"; index: number | "$" }
   | { type: "switch-renderer"; amount: number; cycle?: boolean }
   | { type: "switch-renderer-at"; index: number | "$" }
+  | { type: "switch-previewer"; amount: number; cycle?: boolean }
+  | { type: "switch-previewer-at"; index: number | "$" }
   | { type: "action-invoke"; name: string }
   | { type: "list-component-execute"; command: string }
   | { type: "preview-component-execute"; command: string }

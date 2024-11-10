@@ -110,8 +110,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       ),
     );
     this.#previewProcessor = this.#stack.use(
-      // TODO: Support multiple previewers
-      new PreviewProcessor(params.previewers?.at(0)),
+      new PreviewProcessor(params.previewers ?? []),
     );
   }
 
@@ -424,6 +423,29 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         this.#visualizeProcessor.rendererIndex = event.index;
         this.#visualizeProcessor.start(denops, {
           items: this.#matchProcessor.items,
+        });
+        break;
+      case "switch-previewer": {
+        if (!this.#previewProcessor) break;
+        let index = this.#previewProcessor.previewerIndex + event.amount;
+        if (event.cycle) {
+          if (index < 0) {
+            index = this.#previewProcessor.previewerCount - 1;
+          } else if (index >= this.#previewProcessor.previewerCount) {
+            index = 0;
+          }
+        }
+        this.#previewProcessor.previewerIndex = index;
+        this.#previewProcessor.start(denops, {
+          item: this.#matchProcessor.items[this.#visualizeProcessor.cursor],
+        });
+        break;
+      }
+      case "switch-previewer-at":
+        if (!this.#previewProcessor) break;
+        this.#previewProcessor.previewerIndex = event.index;
+        this.#previewProcessor.start(denops, {
+          item: this.#matchProcessor.items[this.#visualizeProcessor.cursor],
         });
         break;
       case "action-invoke":

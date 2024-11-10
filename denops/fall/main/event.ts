@@ -69,6 +69,15 @@ const isEventComplement = is.UnionOf([
     type: is.LiteralOf("switch-renderer-at"),
     index: is.UnionOf([is.Number, is.LiteralOf("$")]),
   }),
+  is.ObjectOf({
+    type: is.LiteralOf("switch-previewer"),
+    amount: is.Number,
+    cycle: as.Optional(is.Boolean),
+  }),
+  is.ObjectOf({
+    type: is.LiteralOf("switch-previewer-at"),
+    index: is.UnionOf([is.Number, is.LiteralOf("$")]),
+  }),
   // Action
   is.ObjectOf({
     type: is.LiteralOf("action-invoke"),
