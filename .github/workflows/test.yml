@@ -26,14 +26,13 @@ jobs:
         runner:
           - ubuntu-latest
         deno_version:
-          - "1.x"
           - "2.x"
     runs-on: ${{ matrix.runner }}
     steps:
       - run: git config --global core.autocrlf false
         if: runner.os == 'Windows'
       - uses: actions/checkout@v4
-      - uses: denoland/setup-deno@v1.1.4
+      - uses: denoland/setup-deno@v2
         with:
           deno-version: "${{ matrix.deno_version }}"
       - uses: actions/cache@v4
@@ -57,7 +56,6 @@ jobs:
           - macos-latest
           - ubuntu-latest
         deno_version:
-          - "1.x"
           - "2.x"
         host_version:
           - vim: "v9.1.0448"
@@ -70,7 +68,7 @@ jobs:
 
       - uses: actions/checkout@v4
 
-      - uses: denoland/setup-deno@v1.1.4
+      - uses: denoland/setup-deno@v2
         with:
           deno-version: "${{ matrix.deno_version }}"
 
