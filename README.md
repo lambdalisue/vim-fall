@@ -12,13 +12,13 @@
 
 </div>
 
-Fall is an abbreviation for "Filter All," another fuzzy finder designed for Vim
-and Neovim and implemented in [Denops].
+Fall is a fuzzy finder for Vim and Neovim, implemented in [Denops], and stands
+for "Filter All."
 
-> [!WARNING]
+> [!NOTE]
 >
-> **Alpha version. Please note that any changes, including those that may be
-> backward incompatible, will be implemented without prior announcements.**
+> Beta version. Please be aware that there might be backward incompatible
+> changes.
 
 [Denops]: https://github.com/vim-denops/denops.vim
 
@@ -32,9 +32,7 @@ by removing `builtin.renderer.nerdfont` renderer from the configuration
 [Deno]: https://deno.land
 [NerdFont]: https://www.nerdfonts.com
 
-> [!NOTE]
->
-> Deno version 1.x. is not tested and supported.
+Note that Deno version 1.x. is not tested and supported.
 
 ## Installation
 
