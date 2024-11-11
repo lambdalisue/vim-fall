@@ -69,18 +69,39 @@ export const main: Entrypoint = (denops) => {
       assert(options, isOptions);
       return await startPicker(denops, args, screen, params, options);
     },
-    "picker:reload": async () => {
+    "picker:reload": async (recache) => {
       initialized = undefined;
-      await init(denops, `#${performance.now()}`);
+      assert(recache, as.Optional(is.Boolean));
+      await init(denops, true, recache);
     },
   };
 };
 
-async function init(denops: Denops, suffix?: string): Promise<void> {
+async function init(
+  denops: Denops,
+  reload?: boolean,
+  recache?: boolean,
+): Promise<void> {
   if (initialized) {
     return initialized;
   }
   const path = await denops.eval("expand(g:fall_config_path)") as string;
+  if (recache) {
+    const cmd = new Deno.Command(Deno.execPath(), {
+      args: ["cache", "--reload", "--allow-import", path],
+      stdin: "null",
+      stdout: "piped",
+      stderr: "piped",
+    });
+    const { success, stderr, stdout } = await cmd.output();
+    const decoder = new TextDecoder();
+    if (success) {
+      console.log(`Cache reload succeeded: ${path}\n${decoder.decode(stdout)}`);
+    } else {
+      console.error(`Cache reload failed: ${path}\n${decoder.decode(stderr)}`);
+    }
+  }
+  const suffix = reload ? `#${performance.now()}` : undefined;
   return (initialized = loadUserConfig(denops, path, { suffix }));
 }
 
