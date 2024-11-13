@@ -23,3 +23,16 @@ export async function dispose(resource: unknown): Promise<void> {
     await resource[Symbol.asyncDispose]();
   }
 }
+
+/**
+ * Ensure the resource is async disposable.
+ */
+export function ensureAsyncDisposable<T>(resource: T): T & AsyncDisposable {
+  if (isAsyncDisposable(resource)) {
+    return resource as T & AsyncDisposable;
+  }
+  return {
+    ...resource,
+    [Symbol.asyncDispose]: () => Promise.resolve(),
+  };
+}
