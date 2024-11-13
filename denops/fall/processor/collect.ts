@@ -20,7 +20,7 @@ export class CollectProcessor<T extends Detail> implements AsyncDisposable {
   readonly #source: Source<T>;
   readonly #threshold: number;
   readonly #chunkSize: number;
-  #controller: AbortController = new AbortController();
+  readonly #controller: AbortController = new AbortController();
   #processing?: Promise<void>;
   #paused?: PromiseWithResolvers<void>;
   readonly #items: IdItem<T>[] = [];
