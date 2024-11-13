@@ -93,11 +93,6 @@ export class MatchProcessor<T extends Detail> {
     }
     this.#processing = (async () => {
       dispatch({ type: "match-processor-started" });
-      if (query === "") {
-        this.#items = items.slice();
-        dispatch({ type: "match-processor-succeeded" });
-        return;
-      }
       const signal = this.#controller.signal;
       const iter = take(
         this.#matcher.match(denops, { items, query }, { signal }),
