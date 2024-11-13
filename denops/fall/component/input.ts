@@ -212,7 +212,7 @@ export class InputComponent extends BaseComponent {
       this.#offset,
       this.#cmdpos,
       this.#cmdline.length,
-      cmdwidth,
+      cmdwidth - 1,
       2,
     );
 
