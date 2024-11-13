@@ -1,8 +1,6 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 import { delay } from "jsr:@std/async@^1.0.0/delay";
-import { chunked } from "jsr:@core/iterutil@^0.9.0/async/chunked";
 import { take } from "jsr:@core/iterutil@^0.9.0/async/take";
-import { toAsyncIterable } from "jsr:@core/iterutil@^0.9.0/async/to-async-iterable";
 import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.2.0/item";
 import type { Matcher, MatchParams } from "jsr:@vim-fall/std@^0.2.0/matcher";
 
@@ -16,28 +14,30 @@ export type MatchProcessorOptions = {
   interval?: number;
   threshold?: number;
   chunkSize?: number;
+  incremental?: boolean;
 };
 
 export class MatchProcessor<T extends Detail> {
-  #matchers: Matcher<T>[];
+  #matchers: readonly [Matcher<T>, ...Matcher<T>[]];
   #interval: number;
   #threshold: number;
   #chunkSize: number;
+  #incremental: boolean;
   #controller: AbortController = new AbortController();
   #processing?: Promise<void>;
   #reserved?: () => void;
-  #paused?: PromiseWithResolvers<void>;
   #items: IdItem<T>[] = [];
   #matcherIndex = 0;
 
   constructor(
-    filters: Matcher<T>[],
+    filters: readonly [Matcher<T>, ...Matcher<T>[]],
     options: MatchProcessorOptions = {},
   ) {
     this.#matchers = filters;
     this.#interval = options.interval ?? INTERVAL;
     this.#threshold = options.threshold ?? THRESHOLD;
     this.#chunkSize = options.chunkSize ?? CHUNK_SIZE;
+    this.#incremental = options.incremental ?? false;
   }
 
   get #matcher(): Matcher<T> {
@@ -65,13 +65,24 @@ export class MatchProcessor<T extends Detail> {
     this.#matcherIndex = index;
   }
 
+  #validateAvailability(): void {
+    try {
+      this.#controller.signal.throwIfAborted();
+    } catch (err) {
+      if (err === null) {
+        throw new Error("The processor is already disposed");
+      }
+      throw err;
+    }
+  }
+
   start(
     denops: Denops,
     { items, query }: MatchParams<T>,
     options?: { restart?: boolean },
   ): void {
+    this.#validateAvailability();
     if (this.#processing) {
-      this.#resume();
       // Keep most recent start request for later.
       this.#reserved = () => this.start(denops, { items, query }, options);
       if (options?.restart) {
@@ -82,24 +93,37 @@ export class MatchProcessor<T extends Detail> {
     }
     this.#processing = (async () => {
       dispatch({ type: "match-processor-started" });
+      if (query === "") {
+        this.#items = items.slice();
+        dispatch({ type: "match-processor-succeeded" });
+        return;
+      }
       const signal = this.#controller.signal;
       const iter = take(
-        query === ""
-          ? toAsyncIterable(items)
-          : this.#matcher.match(denops, { items, query }, { signal }),
+        this.#matcher.match(denops, { items, query }, { signal }),
         this.#threshold,
       );
-      // Gradually update items when `items` is empty to improve latency
-      // of Curator.
-      const matchedItems = items.length === 0
-        ? (this.#items = [], this.#items)
-        : [];
-      for await (const chunk of chunked(iter, this.#chunkSize)) {
-        if (this.#paused) await this.#paused.promise;
-        signal.throwIfAborted();
+      const matchedItems: IdItem<T>[] = [];
+      const update = (chunk: IdItem<T>[]) => {
         matchedItems.push(...chunk);
-        dispatch({ type: "match-processor-updated" });
-        await delay(this.#interval, { signal });
+        // In immediate mode, we need to update items gradually to improve latency.
+        if (this.#incremental) {
+          this.#items = matchedItems;
+          dispatch({ type: "match-processor-updated" });
+        }
+      };
+      let chunk: IdItem<T>[] = [];
+      for await (const item of iter) {
+        signal.throwIfAborted();
+        chunk.push(item);
+        if (chunk.length >= this.#chunkSize) {
+          update(chunk);
+          chunk = [];
+          await delay(this.#interval, { signal });
+        }
+      }
+      if (chunk.length > 0) {
+        update(chunk);
       }
       this.#items = matchedItems;
       dispatch({ type: "match-processor-succeeded" });
@@ -115,24 +139,6 @@ export class MatchProcessor<T extends Detail> {
         this.#reserved?.();
         this.#reserved = undefined;
       });
-  }
-
-  pause(): void {
-    if (!this.#processing) {
-      return;
-    }
-    this.#paused = Promise.withResolvers<void>();
-    this.#controller.signal.addEventListener("abort", () => {
-      this.#paused?.resolve();
-    });
-  }
-
-  #resume(): void {
-    if (!this.#paused) {
-      return;
-    }
-    this.#paused.resolve();
-    this.#paused = undefined;
   }
 
   [Symbol.dispose]() {
