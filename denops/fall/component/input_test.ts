@@ -44,7 +44,7 @@ test({
         ]);
 
         // Hello, world!
-        // |||||
+        // ||||-
         // ^
         component.cmdline = "Hello, world!";
         await component.render(denops);
@@ -74,7 +74,7 @@ test({
         ]);
 
         // Hello, world!
-        // |||||
+        // ||||-
         //  ^
         component.cmdpos = 1;
         await component.render(denops);
@@ -104,7 +104,7 @@ test({
         ]);
 
         // Hello, world!
-        // |||||
+        // ||||-
         //   ^
         component.cmdpos = 2;
         await component.render(denops);
@@ -134,39 +134,9 @@ test({
         ]);
 
         // Hello, world!
-        // |||||
+        //  ||||-
         //    ^
         component.cmdpos = 3;
-        await component.render(denops);
-        await denops.cmd("redraw");
-        assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
-          "> Hello 0/0",
-        ]);
-        assertEquals(await listDecorations(denops, info.bufnr), [
-          {
-            column: 1,
-            highlight: HIGHLIGHT_HEADER,
-            length: 2,
-            line: 1,
-          },
-          {
-            column: 5,
-            highlight: HIGHLIGHT_CURSOR,
-            length: 1,
-            line: 1,
-          },
-          {
-            column: 8,
-            highlight: HIGHLIGHT_COUNTER,
-            length: 4,
-            line: 1,
-          },
-        ]);
-
-        // Hello, world!
-        //  |||||
-        //     ^
-        component.cmdpos = 4;
         await component.render(denops);
         await denops.cmd("redraw");
         assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
@@ -180,7 +150,7 @@ test({
             line: 1,
           },
           {
-            column: 5,
+            column: 4,
             highlight: HIGHLIGHT_CURSOR,
             length: 1,
             line: 1,
@@ -194,9 +164,9 @@ test({
         ]);
 
         // Hello, world!
-        //   |||||
-        //      ^
-        component.cmdpos = 5;
+        //   ||||-
+        //     ^
+        component.cmdpos = 4;
         await component.render(denops);
         await denops.cmd("redraw");
         assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
@@ -210,7 +180,7 @@ test({
             line: 1,
           },
           {
-            column: 5,
+            column: 4,
             highlight: HIGHLIGHT_CURSOR,
             length: 1,
             line: 1,
@@ -224,9 +194,9 @@ test({
         ]);
 
         // Hello, world!
-        //    |||||
-        //       ^
-        component.cmdpos = 6;
+        //    ||||-
+        //      ^
+        component.cmdpos = 5;
         await component.render(denops);
         await denops.cmd("redraw");
         assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
@@ -240,7 +210,7 @@ test({
             line: 1,
           },
           {
-            column: 5,
+            column: 4,
             highlight: HIGHLIGHT_CURSOR,
             length: 1,
             line: 1,
@@ -254,9 +224,9 @@ test({
         ]);
 
         // Hello, world!
-        //     |||||
-        //        ^
-        component.cmdpos = 7;
+        //     ||||-
+        //       ^
+        component.cmdpos = 6;
         await component.render(denops);
         await denops.cmd("redraw");
         assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
@@ -270,7 +240,7 @@ test({
             line: 1,
           },
           {
-            column: 5,
+            column: 4,
             highlight: HIGHLIGHT_CURSOR,
             length: 1,
             line: 1,
@@ -284,9 +254,9 @@ test({
         ]);
 
         // Hello, world!
-        //      |||||
-        //         ^
-        component.cmdpos = 8;
+        //      ||||-
+        //        ^
+        component.cmdpos = 7;
         await component.render(denops);
         await denops.cmd("redraw");
         assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
@@ -300,7 +270,7 @@ test({
             line: 1,
           },
           {
-            column: 5,
+            column: 4,
             highlight: HIGHLIGHT_CURSOR,
             length: 1,
             line: 1,
@@ -314,9 +284,9 @@ test({
         ]);
 
         // Hello, world!
-        //       |||||
-        //          ^
-        component.cmdpos = 9;
+        //       ||||-
+        //         ^
+        component.cmdpos = 8;
         await component.render(denops);
         await denops.cmd("redraw");
         assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
@@ -330,7 +300,7 @@ test({
             line: 1,
           },
           {
-            column: 5,
+            column: 4,
             highlight: HIGHLIGHT_CURSOR,
             length: 1,
             line: 1,
@@ -344,9 +314,9 @@ test({
         ]);
 
         // Hello, world!
-        //        |||||
-        //           ^
-        component.cmdpos = 10;
+        //        ||||-
+        //          ^
+        component.cmdpos = 9;
         await component.render(denops);
         await denops.cmd("redraw");
         assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
@@ -360,7 +330,7 @@ test({
             line: 1,
           },
           {
-            column: 5,
+            column: 4,
             highlight: HIGHLIGHT_CURSOR,
             length: 1,
             line: 1,
@@ -374,13 +344,73 @@ test({
         ]);
 
         // Hello, world!
-        //         |||||
+        //         ||||-
+        //           ^
+        component.cmdpos = 10;
+        await component.render(denops);
+        await denops.cmd("redraw");
+        assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
+          "> orld! 0/0",
+        ]);
+        assertEquals(await listDecorations(denops, info.bufnr), [
+          {
+            column: 1,
+            highlight: HIGHLIGHT_HEADER,
+            length: 2,
+            line: 1,
+          },
+          {
+            column: 4,
+            highlight: HIGHLIGHT_CURSOR,
+            length: 1,
+            line: 1,
+          },
+          {
+            column: 8,
+            highlight: HIGHLIGHT_COUNTER,
+            length: 4,
+            line: 1,
+          },
+        ]);
+
+        // Hello, world!
+        //          ||||-
         //            ^
         component.cmdpos = 11;
         await component.render(denops);
         await denops.cmd("redraw");
         assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
-          "> orld! 0/0",
+          "> rld!  0/0",
+        ]);
+        assertEquals(await listDecorations(denops, info.bufnr), [
+          {
+            column: 1,
+            highlight: HIGHLIGHT_HEADER,
+            length: 2,
+            line: 1,
+          },
+          {
+            column: 4,
+            highlight: HIGHLIGHT_CURSOR,
+            length: 1,
+            line: 1,
+          },
+          {
+            column: 8,
+            highlight: HIGHLIGHT_COUNTER,
+            length: 4,
+            line: 1,
+          },
+        ]);
+
+        // Hello, world!
+        //          ||||-
+        //             ^
+        component.cmdpos = 12;
+        await component.render(denops);
+        await denops.cmd("redraw");
+        assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
+          "> rld!  0/0",
         ]);
         assertEquals(await listDecorations(denops, info.bufnr), [
           {
@@ -404,13 +434,13 @@ test({
         ]);
 
         // Hello, world!
-        //         |||||
-        //             ^
-        component.cmdpos = 12;
+        //          ||||-
+        //              ^
+        component.cmdpos = 13;
         await component.render(denops);
         await denops.cmd("redraw");
         assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
-          "> orld! 0/0",
+          "> rld!  0/0",
         ]);
         assertEquals(await listDecorations(denops, info.bufnr), [
           {
@@ -421,36 +451,6 @@ test({
           },
           {
             column: 6,
-            highlight: HIGHLIGHT_CURSOR,
-            length: 1,
-            line: 1,
-          },
-          {
-            column: 8,
-            highlight: HIGHLIGHT_COUNTER,
-            length: 4,
-            line: 1,
-          },
-        ]);
-
-        // Hello, world!
-        //         |||||
-        //              ^
-        component.cmdpos = 13;
-        await component.render(denops);
-        await denops.cmd("redraw");
-        assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
-          "> orld! 0/0",
-        ]);
-        assertEquals(await listDecorations(denops, info.bufnr), [
-          {
-            column: 1,
-            highlight: HIGHLIGHT_HEADER,
-            length: 2,
-            line: 1,
-          },
-          {
-            column: 7,
             highlight: HIGHLIGHT_CURSOR,
             length: 1,
             line: 1,
@@ -551,7 +551,7 @@ test({
         await component.render(denops);
         await denops.cmd("redraw");
         assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
-          "> He 1/2+ X",
+          "> el 1/2+ X",
         ]);
       });
     });
