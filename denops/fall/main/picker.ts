@@ -9,12 +9,12 @@ import {
   is,
   type Predicate,
 } from "jsr:@core/unknownutil@^4.3.0";
-import type { Size } from "jsr:@vim-fall/std@^0.2.0/coordinator";
-import type { DetailUnit } from "jsr:@vim-fall/std@^0.2.0/item";
+import type { Size } from "jsr:@vim-fall/std@^0.4.0/coordinator";
+import type { DetailUnit } from "jsr:@vim-fall/std@^0.4.0/item";
 import type {
   GlobalConfig,
   ItemPickerParams,
-} from "jsr:@vim-fall/std@^0.2.0/config";
+} from "jsr:@vim-fall/std@^0.4.0/config";
 
 import { ensureAsyncDisposable } from "../lib/dispose.ts";
 import {

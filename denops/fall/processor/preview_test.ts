@@ -9,7 +9,7 @@ import {
   type DetailUnit,
   type IdItem,
   type Previewer,
-} from "jsr:@vim-fall/std@^0.3.1";
+} from "jsr:@vim-fall/std@^0.4.0";
 
 import { dispose } from "../lib/dispose.ts";
 import { PreviewProcessor } from "./preview.ts";

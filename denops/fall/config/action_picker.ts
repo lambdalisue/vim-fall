@@ -2,10 +2,10 @@ import type {
   ActionPickerParams,
   GlobalConfig,
   RefineActionPicker,
-} from "jsr:@vim-fall/std@^0.2.0/config";
-import { modern as modernCoordinator } from "jsr:@vim-fall/std@^0.2.0/builtin/coordinator/modern";
-import { fzf as fzfMatcher } from "jsr:@vim-fall/std@^0.2.0/builtin/matcher/fzf";
-import { derive, deriveArray } from "jsr:@vim-fall/std@^0.2.0/util/derivable";
+} from "jsr:@vim-fall/std@^0.4.0/config";
+import { modern as modernCoordinator } from "jsr:@vim-fall/std@^0.4.0/builtin/coordinator/modern";
+import { fzf as fzfMatcher } from "jsr:@vim-fall/std@^0.4.0/builtin/matcher/fzf";
+import { derive, deriveArray } from "jsr:@vim-fall/std@^0.4.0/util/derivable";
 
 import { getGlobalConfig } from "./global_config.ts";
 
