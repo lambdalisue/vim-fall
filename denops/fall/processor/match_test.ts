@@ -10,6 +10,8 @@ import {
   type IdItem,
   type Matcher,
 } from "jsr:@vim-fall/std@^0.3.1";
+
+import { dispose } from "../lib/dispose.ts";
 import { MatchProcessor } from "./match.ts";
 import { getDispatchedEvents } from "./_testutil.ts";
 
@@ -376,7 +378,7 @@ Deno.test("MatchProcessor", async (t) => {
   );
 
   await t.step(
-    "[Symbol.dispose] stops filtering items",
+    "dispose stops filtering items",
     async () => {
       await using stack = new AsyncDisposableStack();
       stack.defer(async () => {
@@ -407,7 +409,7 @@ Deno.test("MatchProcessor", async (t) => {
       }
 
       // Dispose the processor
-      processor[Symbol.dispose]();
+      await dispose(processor);
 
       // Notify two times here
       for (let i = 0; i < 2; i++) {
@@ -422,7 +424,7 @@ Deno.test("MatchProcessor", async (t) => {
   );
 
   await t.step(
-    "[Symbol.dispose] stops filtering items (incremental)",
+    "dispose stops filtering items (incremental)",
     async () => {
       await using stack = new AsyncDisposableStack();
       stack.defer(async () => {
@@ -454,7 +456,7 @@ Deno.test("MatchProcessor", async (t) => {
       }
 
       // Dispose the processor
-      processor[Symbol.dispose]();
+      await dispose(processor);
 
       // Notify two times here
       for (let i = 0; i < 2; i++) {
@@ -469,7 +471,7 @@ Deno.test("MatchProcessor", async (t) => {
   );
 
   await t.step(
-    "start after [Symbol.dispose] throws an error",
+    "start after dispose throws an error",
     async () => {
       await using stack = new AsyncDisposableStack();
       stack.defer(async () => {
@@ -504,7 +506,7 @@ Deno.test("MatchProcessor", async (t) => {
       await flushPromises();
 
       // Dispose the processor
-      processor[Symbol.dispose]();
+      await dispose(processor);
 
       // Notify once more
       notify.notify();

@@ -5,6 +5,8 @@ import { DenopsStub } from "jsr:@denops/test@^3.0.4";
 import { Notify } from "jsr:@core/asyncutil@^1.2.0";
 import { flushPromises } from "jsr:@core/asyncutil@^1.2.0";
 import { defineSource, type Source } from "jsr:@vim-fall/std@^0.3.1";
+
+import { dispose } from "../lib/dispose.ts";
 import { CollectProcessor } from "./collect.ts";
 import { getDispatchedEvents } from "./_testutil.ts";
 
@@ -316,7 +318,7 @@ Deno.test("CollectProcessor", async (t) => {
   );
 
   await t.step(
-    "[Symbol.dispose] stops collecting items",
+    "dispose stops collecting items",
     async () => {
       await using stack = new AsyncDisposableStack();
       stack.defer(async () => {
@@ -351,7 +353,7 @@ Deno.test("CollectProcessor", async (t) => {
       await flushPromises();
 
       // Dispose the processor
-      processor[Symbol.dispose]();
+      await dispose(processor);
 
       // Notify once more
       notify.notify();
@@ -364,7 +366,7 @@ Deno.test("CollectProcessor", async (t) => {
   );
 
   await t.step(
-    "start after [Symbol.dispose] throws an error",
+    "start after dispose throws an error",
     async () => {
       await using stack = new AsyncDisposableStack();
       stack.defer(async () => {
@@ -399,7 +401,7 @@ Deno.test("CollectProcessor", async (t) => {
       await flushPromises();
 
       // Dispose the processor
-      processor[Symbol.dispose]();
+      await dispose(processor);
 
       // Notify once more
       notify.notify();
@@ -418,7 +420,7 @@ Deno.test("CollectProcessor", async (t) => {
   );
 
   await t.step(
-    "pause after [Symbol.dispose] throws an error",
+    "pause after dispose throws an error",
     async () => {
       await using stack = new AsyncDisposableStack();
       stack.defer(async () => {
@@ -453,7 +455,7 @@ Deno.test("CollectProcessor", async (t) => {
       await flushPromises();
 
       // Dispose the processor
-      processor[Symbol.dispose]();
+      await dispose(processor);
 
       // Notify once more
       notify.notify();
