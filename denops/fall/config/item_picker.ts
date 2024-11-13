@@ -101,7 +101,7 @@ class CuratorSourceMatcher<T extends Detail> implements Source<T>, Matcher<T> {
 
   // This attribute is referred in Picker to determine if MatchProcessor
   // should be 'incremental'
-  readonly isCurator = true;
+  readonly incremental = true;
 
   constructor(curator: Curator<T>) {
     this.#curator = curator;

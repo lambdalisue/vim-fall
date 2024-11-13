@@ -105,7 +105,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
     this.#matchProcessor = this.#stack.use(
       new MatchProcessor(params.matchers, {
         // Use incremental mode for Curator matcher
-        incremental: isCuratorMatcher(params.matchers[0]),
+        incremental: isIncrementalMatcher(params.matchers[0]),
       }),
     );
     this.#sortProcessor = this.#stack.use(
@@ -582,6 +582,6 @@ async function getScreenSize(denops: Denops): Promise<Size> {
   return { width, height };
 }
 
-function isCuratorMatcher<T extends Detail>(m: Matcher<T>): boolean {
-  return (m as { isCurator?: boolean }).isCurator ?? false;
+function isIncrementalMatcher<T extends Detail>(m: Matcher<T>): boolean {
+  return (m as { incremental?: boolean }).incremental ?? false;
 }
