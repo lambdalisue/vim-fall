@@ -7,6 +7,9 @@ import { collect } from "jsr:@denops/std@^7.3.2/batch";
 
 import { dispatch } from "../event.ts";
 
+// deno-lint-ignore no-control-regex
+const CONTROL_CHARACTERS = /[\x00-\x1f\x7f]/g;
+
 export class Cmdliner {
   #cmdline: string;
   #cmdpos: number;
@@ -70,6 +73,14 @@ export class Cmdliner {
     ]);
     if (!mode.startsWith("c")) {
       // Not in command-line mode
+      return;
+    }
+    // Check control characters in cmdline
+    if (CONTROL_CHARACTERS.test(cmdline)) {
+      // remove control characters
+      await fn.setcmdline(denops, cmdline.replace(CONTROL_CHARACTERS, ""));
+      // retry check
+      await this.check(denops);
       return;
     }
     if (cmdline !== this.#cmdline) {

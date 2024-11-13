@@ -216,10 +216,6 @@ export class InputComponent extends BaseComponent {
       2,
     );
 
-    // TODO:
-    // When 'cmdline' includes control characters that is displayed like '^Y', the display width
-    // is not equal to the length of the string. So we need to slice 'middle' to fit in the cmdwidth
-    // properly.
     const spacer = " ".repeat(cmdwidth);
     const middle = `${this.#cmdline}${spacer}`.slice(
       this.#offset,
