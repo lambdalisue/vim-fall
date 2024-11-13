@@ -1,8 +1,10 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
 import { take } from "jsr:@core/iterutil@^0.9.0/async/take";
+import { map } from "jsr:@core/iterutil@^0.9.0/map";
 import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.2.0/item";
 import type { CollectParams, Source } from "jsr:@vim-fall/std@^0.2.0/source";
 
+import { Chunker } from "../lib/chunker.ts";
 import { dispatch } from "../event.ts";
 
 const THRESHOLD = 100000;
@@ -20,7 +22,7 @@ export class CollectProcessor<T extends Detail> implements Disposable {
   #controller: AbortController = new AbortController();
   #processing?: Promise<void>;
   #paused?: PromiseWithResolvers<void>;
-  #items: IdItem<T>[] = [];
+  readonly #items: IdItem<T>[] = [];
 
   constructor(
     source: Source<T>,
@@ -62,25 +64,23 @@ export class CollectProcessor<T extends Detail> implements Disposable {
         this.#source.collect(denops, params, { signal }),
         this.#threshold,
       );
-      const update = (chunk: IdItem<T>[]) => {
+      const update = (chunk: Iterable<IdItem<T>>) => {
         const offset = this.#items.length;
         this.#items.push(
-          ...chunk.map((item, i) => ({ ...item, id: i + offset })),
+          ...map(chunk, (item, i) => ({ ...item, id: i + offset })),
         );
         dispatch({ type: "collect-processor-updated" });
       };
-      let chunk = [];
+      const chunker = new Chunker<IdItem<T>>(this.#chunkSize);
       for await (const item of iter) {
         if (this.#paused) await this.#paused.promise;
         signal.throwIfAborted();
-        chunk.push(item);
-        if (chunk.length >= this.#chunkSize) {
-          update(chunk);
-          chunk = [];
+        if (chunker.put(item)) {
+          update(chunker.consume());
         }
       }
-      if (chunk.length > 0) {
-        update(chunk);
+      if (chunker.count > 0) {
+        update(chunker.consume());
       }
       dispatch({ type: "collect-processor-succeeded" });
     })();

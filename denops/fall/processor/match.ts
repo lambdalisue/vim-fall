@@ -4,6 +4,7 @@ import { take } from "jsr:@core/iterutil@^0.9.0/async/take";
 import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.2.0/item";
 import type { Matcher, MatchParams } from "jsr:@vim-fall/std@^0.2.0/matcher";
 
+import { Chunker } from "../lib/chunker.ts";
 import { dispatch } from "../event.ts";
 
 const INTERVAL = 0;
@@ -99,7 +100,7 @@ export class MatchProcessor<T extends Detail> {
         this.#threshold,
       );
       const matchedItems: IdItem<T>[] = [];
-      const update = (chunk: IdItem<T>[]) => {
+      const update = (chunk: Iterable<IdItem<T>>) => {
         matchedItems.push(...chunk);
         // In immediate mode, we need to update items gradually to improve latency.
         if (this.#incremental) {
@@ -107,18 +108,16 @@ export class MatchProcessor<T extends Detail> {
           dispatch({ type: "match-processor-updated" });
         }
       };
-      let chunk: IdItem<T>[] = [];
+      const chunker = new Chunker<IdItem<T>>(this.#chunkSize);
       for await (const item of iter) {
         signal.throwIfAborted();
-        chunk.push(item);
-        if (chunk.length >= this.#chunkSize) {
-          update(chunk);
-          chunk = [];
+        if (chunker.put(item)) {
+          update(chunker.consume());
           await delay(this.#interval, { signal });
         }
       }
-      if (chunk.length > 0) {
-        update(chunk);
+      if (chunker.count > 0) {
+        update(chunker.consume());
       }
       this.#items = matchedItems;
       dispatch({ type: "match-processor-succeeded" });
