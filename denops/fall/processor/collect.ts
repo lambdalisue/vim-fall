@@ -1,5 +1,4 @@
 import type { Denops } from "jsr:@denops/std@^7.3.0";
-import { chunked } from "jsr:@core/iterutil@^0.9.0/async/chunked";
 import { take } from "jsr:@core/iterutil@^0.9.0/async/take";
 import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.2.0/item";
 import type { CollectParams, Source } from "jsr:@vim-fall/std@^0.2.0/source";
@@ -36,10 +35,22 @@ export class CollectProcessor<T extends Detail> implements Disposable {
     return this.#items;
   }
 
+  #validateAvailability(): void {
+    try {
+      this.#controller.signal.throwIfAborted();
+    } catch (err) {
+      if (err === null) {
+        throw new Error("The processor is already disposed");
+      }
+      throw err;
+    }
+  }
+
   start(
     denops: Denops,
     params: CollectParams,
   ): void | Promise<void> {
+    this.#validateAvailability();
     if (this.#processing) {
       this.#resume();
       return;
@@ -51,14 +62,25 @@ export class CollectProcessor<T extends Detail> implements Disposable {
         this.#source.collect(denops, params, { signal }),
         this.#threshold,
       );
-      for await (const chunk of chunked(iter, this.#chunkSize)) {
-        if (this.#paused) await this.#paused.promise;
-        signal.throwIfAborted();
+      const update = (chunk: IdItem<T>[]) => {
         const offset = this.#items.length;
         this.#items.push(
           ...chunk.map((item, i) => ({ ...item, id: i + offset })),
         );
         dispatch({ type: "collect-processor-updated" });
+      };
+      let chunk = [];
+      for await (const item of iter) {
+        if (this.#paused) await this.#paused.promise;
+        signal.throwIfAborted();
+        chunk.push(item);
+        if (chunk.length >= this.#chunkSize) {
+          update(chunk);
+          chunk = [];
+        }
+      }
+      if (chunk.length > 0) {
+        update(chunk);
       }
       dispatch({ type: "collect-processor-succeeded" });
     })();
@@ -69,6 +91,7 @@ export class CollectProcessor<T extends Detail> implements Disposable {
   }
 
   pause(): void {
+    this.#validateAvailability();
     if (!this.#processing) {
       return;
     }
