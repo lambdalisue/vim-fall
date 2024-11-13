@@ -3,8 +3,9 @@ import {
   type Entrypoint,
   refineCurator,
   refineSource,
-} from "jsr:@vim-fall/std@^0.3.2";
-import * as builtin from "jsr:@vim-fall/std@^0.3.2/builtin";
+} from "jsr:@vim-fall/std@^0.4.0";
+import * as builtin from "jsr:@vim-fall/std@^0.4.0/builtin";
+import { SEPARATOR } from "jsr:@std/path@^1.0.8/constants";
 
 const myPathActions = {
   ...builtin.action.defaultOpenActions,
@@ -24,6 +25,88 @@ const myMiscActions = {
   ...builtin.action.defaultEchoActions,
   ...builtin.action.defaultYankActions,
   ...builtin.action.defaultSubmatchActions,
+};
+
+const myFilterFile = (path: string) => {
+  const excludes = [
+    ".7z",
+    ".DS_Store",
+    ".avi",
+    ".avi",
+    ".bmp",
+    ".class",
+    ".dll",
+    ".dmg",
+    ".doc",
+    ".docx",
+    ".dylib",
+    ".ear",
+    ".exe",
+    ".fla",
+    ".flac",
+    ".flv",
+    ".gif",
+    ".ico",
+    ".id_ed25519",
+    ".id_rsa",
+    ".iso",
+    ".jar",
+    ".jpeg",
+    ".jpg",
+    ".key",
+    ".mkv",
+    ".mov",
+    ".mp3",
+    ".mp4",
+    ".mpeg",
+    ".mpg",
+    ".o",
+    ".obj",
+    ".ogg",
+    ".pdf",
+    ".png",
+    ".ppt",
+    ".pptx",
+    ".rar",
+    ".so",
+    ".swf",
+    ".tar.gz",
+    ".war",
+    ".wav",
+    ".webm",
+    ".wma",
+    ".wmv",
+    ".xls",
+    ".xlsx",
+    ".zip",
+  ];
+  for (const exclude of excludes) {
+    if (path.endsWith(exclude)) {
+      return false;
+    }
+  }
+  return true;
+};
+
+const myFilterDirectory = (path: string) => {
+  const excludes = [
+    "$RECYVLE.BIN",
+    ".cache",
+    ".git",
+    ".hg",
+    ".ssh",
+    ".svn",
+    "__pycache__", // Python
+    "build", // C/C++
+    "node_modules", // Node.js
+    "target", // Rust
+  ];
+  for (const exclude of excludes) {
+    if (path.includes(`${SEPARATOR}${exclude}${SEPARATOR}`)) {
+      return false;
+    }
+  }
+  return true;
 };
 
 export const main: Entrypoint = (
@@ -77,14 +160,8 @@ export const main: Entrypoint = (
     "file",
     refineSource(
       builtin.source.file({
-        excludes: [
-          /.*\/node_modules\/.*/,
-          /.*\/.git\/.*/,
-          /.*\/.svn\/.*/,
-          /.*\/.hg\/.*/,
-          /.*\/.ssh\/.*/,
-          /.*\/.DS_Store$/,
-        ],
+        filterFile: myFilterFile,
+        filterDirectory: myFilterDirectory,
       }),
       builtin.refiner.relativePath,
     ),
