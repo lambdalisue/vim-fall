@@ -378,6 +378,108 @@ Deno.test("MatchProcessor", async (t) => {
   );
 
   await t.step(
+    "start will invoke latest call if it is in progress",
+    async () => {
+      await using stack = new AsyncDisposableStack();
+      stack.defer(async () => {
+        // Clear dispatched events
+        await flushPromises();
+        getDispatchedEvents();
+      });
+      const notify = new Notify();
+      const called: unknown[] = [];
+      const matcher = defineDummyMatcher(
+        () => notify.notified(),
+        ({ id }) => called.push(id),
+      );
+      const processor = stack.use(
+        new MatchProcessor([matcher], {
+          chunkSize: 3,
+        }),
+      );
+      processor.start(denops, {
+        items: [{ id: 0, value: "0", detail: {} }],
+        query: "",
+      });
+      processor.start(denops, {
+        items: [{ id: 1, value: "1", detail: {} }],
+        query: "",
+      });
+      processor.start(denops, {
+        items: [{ id: 2, value: "2", detail: {} }],
+        query: "",
+      });
+      processor.start(denops, {
+        items: [{ id: 3, value: "3", detail: {} }],
+        query: "",
+      });
+
+      assertEquals(called, []);
+
+      notify.notify();
+      await flushPromises();
+
+      assertEquals(called, [0]);
+
+      notify.notify();
+      await flushPromises();
+
+      assertEquals(called, [0, 3]);
+    },
+  );
+
+  await t.step(
+    "start will abort the in-progress call and invoke the latest call if 'restart' is specified and it is in progress",
+    async () => {
+      await using stack = new AsyncDisposableStack();
+      stack.defer(async () => {
+        // Clear dispatched events
+        await flushPromises();
+        getDispatchedEvents();
+      });
+      const notify = new Notify();
+      const called: unknown[] = [];
+      const matcher = defineDummyMatcher(
+        () => notify.notified(),
+        ({ id }) => called.push(id),
+      );
+      const processor = stack.use(
+        new MatchProcessor([matcher], {
+          chunkSize: 3,
+        }),
+      );
+      processor.start(denops, {
+        items: [{ id: 0, value: "0", detail: {} }],
+        query: "",
+      }, { restart: true });
+      processor.start(denops, {
+        items: [{ id: 1, value: "1", detail: {} }],
+        query: "",
+      }, { restart: true });
+      processor.start(denops, {
+        items: [{ id: 2, value: "2", detail: {} }],
+        query: "",
+      }, { restart: true });
+      processor.start(denops, {
+        items: [{ id: 3, value: "3", detail: {} }],
+        query: "",
+      }, { restart: true });
+
+      assertEquals(called, []);
+
+      notify.notify();
+      await flushPromises();
+
+      assertEquals(called, []);
+
+      notify.notify();
+      await flushPromises();
+
+      assertEquals(called, [3]);
+    },
+  );
+
+  await t.step(
     "dispose stops filtering items",
     async () => {
       await using stack = new AsyncDisposableStack();
