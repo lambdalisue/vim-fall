@@ -40,9 +40,12 @@ export type Event =
   | { type: "match-processor-updated" }
   | { type: "match-processor-succeeded" }
   | { type: "match-processor-failed"; err: unknown }
-  | { type: "visualize-processor-started" }
-  | { type: "visualize-processor-succeeded" }
-  | { type: "visualize-processor-failed"; err: unknown }
+  | { type: "sort-processor-started" }
+  | { type: "sort-processor-succeeded" }
+  | { type: "sort-processor-failed"; err: unknown }
+  | { type: "render-processor-started" }
+  | { type: "render-processor-succeeded" }
+  | { type: "render-processor-failed"; err: unknown }
   | { type: "preview-processor-started" }
   | { type: "preview-processor-succeeded" }
   | { type: "preview-processor-failed"; err: unknown };

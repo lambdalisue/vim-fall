@@ -5,7 +5,6 @@ import type {
   IdItem,
 } from "jsr:@vim-fall/std@^0.2.0/item";
 import type { Renderer } from "jsr:@vim-fall/std@^0.2.0/renderer";
-import type { Sorter } from "jsr:@vim-fall/std@^0.2.0/sorter";
 
 import { adjustOffset } from "../lib/adjust_offset.ts";
 import { dispose } from "../lib/dispose.ts";
@@ -14,64 +13,39 @@ import { dispatch } from "../event.ts";
 const HEIGHT = 10;
 const SCROLL_OFFSET = 2;
 
-export type VisualizeProcessorOptions = {
+export type RenderProcessorOptions = {
   height?: number;
   scrollOffset?: number;
 };
 
-export class VisualizeProcessor<T extends Detail> implements AsyncDisposable {
-  #sorters: Sorter<T>[];
-  #renderers: Renderer<T>[];
+export class RenderProcessor<T extends Detail> implements AsyncDisposable {
+  readonly #renderers: Renderer<T>[];
   #height: number;
   #scrollOffset: number;
-  #controller: AbortController = new AbortController();
+  readonly #controller: AbortController = new AbortController();
   #processing?: Promise<void>;
   #reserved?: () => void;
   #items: DisplayItem<T>[] = [];
   #itemCount: number = 0;
   #cursor: number = 0;
   #offset: number = 0;
-  #sorterIndex: number = 0;
   #rendererIndex: number = 0;
 
   constructor(
-    sorters: Sorter<T>[],
     renderers: Renderer<T>[],
-    options: VisualizeProcessorOptions = {},
+    options: RenderProcessorOptions = {},
   ) {
-    this.#sorters = sorters;
     this.#renderers = renderers;
     this.#height = options.height ?? HEIGHT;
     this.#scrollOffset = options.scrollOffset ?? SCROLL_OFFSET;
-  }
-
-  get #sorter(): Sorter<T> | undefined {
-    return this.#sorters.at(this.#sorterIndex);
   }
 
   get #renderer(): Renderer<T> | undefined {
     return this.#renderers.at(this.#rendererIndex);
   }
 
-  get sorterCount(): number {
-    return this.#sorters.length;
-  }
-
   get rendererCount(): number {
     return this.#renderers.length;
-  }
-
-  get sorterIndex(): number {
-    return this.#sorterIndex;
-  }
-
-  set sorterIndex(index: number | "$") {
-    if (index === "$" || index >= this.sorterCount) {
-      index = this.sorterCount - 1;
-    } else if (index < 0) {
-      index = 0;
-    }
-    this.#sorterIndex = index;
   }
 
   get rendererIndex(): number {
@@ -149,26 +123,34 @@ export class VisualizeProcessor<T extends Detail> implements AsyncDisposable {
     this.#adjustOffset();
   }
 
-  start(denops: Denops, { items }: { items: IdItem<T>[] }): void {
+  #validateAvailability(): void {
+    try {
+      this.#controller.signal.throwIfAborted();
+    } catch (err) {
+      if (err === null) {
+        throw new Error("The processor is already disposed");
+      }
+      throw err;
+    }
+  }
+
+  start(
+    denops: Denops,
+    { items }: { items: readonly Readonly<IdItem<T>>[] },
+  ): void {
+    this.#validateAvailability();
     if (this.#processing) {
       // Keep most recent start request for later.
       this.#reserved = () => this.start(denops, { items });
       return;
     }
     this.#processing = (async () => {
-      dispatch({ type: "visualize-processor-started" });
+      dispatch({ type: "render-processor-started" });
       const signal = this.#controller.signal;
 
       this.#itemCount = items.length;
       this.#adjustCursor();
       this.#adjustOffset();
-
-      await this.#sorter?.sort(
-        denops,
-        { items },
-        { signal },
-      );
-      signal.throwIfAborted();
 
       const displayItems = items
         .slice(this.offset, this.offset + this.height)
@@ -186,11 +168,11 @@ export class VisualizeProcessor<T extends Detail> implements AsyncDisposable {
       signal.throwIfAborted();
 
       this.#items = displayItems;
-      dispatch({ type: "visualize-processor-succeeded" });
+      dispatch({ type: "render-processor-succeeded" });
     })();
     this.#processing
       .catch((err) => {
-        dispatch({ type: "visualize-processor-failed", err });
+        dispatch({ type: "render-processor-failed", err });
       })
       .finally(() => {
         this.#processing = undefined;
@@ -207,9 +189,6 @@ export class VisualizeProcessor<T extends Detail> implements AsyncDisposable {
     } catch {
       // Ignore
     }
-    await Promise.all([
-      ...this.#sorters.map((v) => dispose(v)),
-      ...this.#renderers.map((v) => dispose(v)),
-    ]);
+    await Promise.all(this.#renderers.map((v) => dispose(v)));
   }
 }

@@ -18,7 +18,8 @@ import { Cmdliner } from "./util/cmdliner.ts";
 import { emitPickerEnter, emitPickerLeave } from "./util/emitter.ts";
 import { CollectProcessor } from "./processor/collect.ts";
 import { MatchProcessor } from "./processor/match.ts";
-import { VisualizeProcessor } from "./processor/visualize.ts";
+import { SortProcessor } from "./processor/sort.ts";
+import { RenderProcessor } from "./processor/render.ts";
 import { PreviewProcessor } from "./processor/preview.ts";
 import { InputComponent } from "./component/input.ts";
 import { ListComponent } from "./component/list.ts";
@@ -59,7 +60,8 @@ export class Picker<T extends Detail> implements AsyncDisposable {
   readonly #coordinator: Coordinator;
   readonly #collectProcessor: CollectProcessor<T>;
   readonly #matchProcessor: MatchProcessor<T>;
-  readonly #visualizeProcessor: VisualizeProcessor<T>;
+  readonly #sortProcessor: SortProcessor<T>;
+  readonly #renderProcessor: RenderProcessor<T>;
   readonly #previewProcessor?: PreviewProcessor<T>;
   readonly #inputComponent: InputComponent;
   readonly #listComponent: ListComponent;
@@ -106,9 +108,11 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         incremental: isCuratorMatcher(params.matchers[0]),
       }),
     );
-    this.#visualizeProcessor = this.#stack.use(
-      new VisualizeProcessor(
-        params.sorters ?? [],
+    this.#sortProcessor = this.#stack.use(
+      new SortProcessor(params.sorters ?? []),
+    );
+    this.#renderProcessor = this.#stack.use(
+      new RenderProcessor(
         params.renderers ?? [],
       ),
     );
@@ -149,7 +153,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         ),
       );
     }
-    this.#visualizeProcessor.height = layout.list.height;
+    this.#renderProcessor.height = layout.list.height;
 
     // Register autocmd to resize components
     const resizeComponents = stack.use(lambda.add(denops, async () => {
@@ -175,7 +179,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       this.#inputComponent.forceRender();
       this.#listComponent.forceRender();
       this.#previewComponent?.forceRender();
-      this.#visualizeProcessor.height = layout.list.height;
+      this.#renderProcessor.height = layout.list.height;
     }));
     const autocmdGroupName = `fall-picker-${this.#name}-${resizeComponents.id}`;
     stack.defer(async () => {
@@ -249,7 +253,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       return;
     }
 
-    const item = this.#matchProcessor.items[this.#visualizeProcessor.cursor];
+    const item = this.#matchProcessor.items[this.#renderProcessor.cursor];
     const selectedItems = this.#selection.size > 0
       ? this.#matchProcessor.items.filter((v) => this.#selection.has(v.id))
       : undefined;
@@ -270,7 +274,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       cursor = this.#matchProcessor.items.length - 1;
     }
     if (cursor === undefined) {
-      cursor = this.#visualizeProcessor.cursor;
+      cursor = this.#renderProcessor.cursor;
     }
     const item = this.#matchProcessor.items.at(cursor);
     if (!item) {
@@ -339,15 +343,15 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         break;
       case "move-cursor": {
         const amplifier = event.scroll ? this.#listComponent.scroll : 1;
-        this.#visualizeProcessor.cursor += event.amount * amplifier;
-        this.#visualizeProcessor.start(denops, {
+        this.#renderProcessor.cursor += event.amount * amplifier;
+        this.#renderProcessor.start(denops, {
           items: this.#matchProcessor.items,
         });
         break;
       }
       case "move-cursor-at":
-        this.#visualizeProcessor.cursor = event.cursor;
-        this.#visualizeProcessor.start(denops, {
+        this.#renderProcessor.cursor = event.cursor;
+        this.#renderProcessor.start(denops, {
           items: this.#matchProcessor.items,
         });
         break;
@@ -387,44 +391,44 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         });
         break;
       case "switch-sorter": {
-        let index = this.#visualizeProcessor.sorterIndex + event.amount;
+        let index = this.#sortProcessor.sorterIndex + event.amount;
         if (event.cycle) {
           if (index < 0) {
-            index = this.#visualizeProcessor.sorterCount - 1;
-          } else if (index >= this.#visualizeProcessor.sorterCount) {
+            index = this.#sortProcessor.sorterCount - 1;
+          } else if (index >= this.#sortProcessor.sorterCount) {
             index = 0;
           }
         }
-        this.#visualizeProcessor.sorterIndex = index;
-        this.#visualizeProcessor.start(denops, {
+        this.#sortProcessor.sorterIndex = index;
+        this.#sortProcessor.start(denops, {
           items: this.#matchProcessor.items,
         });
         break;
       }
       case "switch-sorter-at":
-        this.#visualizeProcessor.sorterIndex = event.index;
-        this.#visualizeProcessor.start(denops, {
+        this.#sortProcessor.sorterIndex = event.index;
+        this.#sortProcessor.start(denops, {
           items: this.#matchProcessor.items,
         });
         break;
       case "switch-renderer": {
-        let index = this.#visualizeProcessor.rendererIndex + event.amount;
+        let index = this.#renderProcessor.rendererIndex + event.amount;
         if (event.cycle) {
           if (index < 0) {
-            index = this.#visualizeProcessor.rendererCount - 1;
-          } else if (index >= this.#visualizeProcessor.rendererCount) {
+            index = this.#renderProcessor.rendererCount - 1;
+          } else if (index >= this.#renderProcessor.rendererCount) {
             index = 0;
           }
         }
-        this.#visualizeProcessor.rendererIndex = index;
-        this.#visualizeProcessor.start(denops, {
+        this.#renderProcessor.rendererIndex = index;
+        this.#renderProcessor.start(denops, {
           items: this.#matchProcessor.items,
         });
         break;
       }
       case "switch-renderer-at":
-        this.#visualizeProcessor.rendererIndex = event.index;
-        this.#visualizeProcessor.start(denops, {
+        this.#renderProcessor.rendererIndex = event.index;
+        this.#renderProcessor.start(denops, {
           items: this.#matchProcessor.items,
         });
         break;
@@ -440,7 +444,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         }
         this.#previewProcessor.previewerIndex = index;
         this.#previewProcessor.start(denops, {
-          item: this.#matchProcessor.items[this.#visualizeProcessor.cursor],
+          item: this.#matchProcessor.items[this.#renderProcessor.cursor],
         });
         break;
       }
@@ -448,7 +452,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         if (!this.#previewProcessor) break;
         this.#previewProcessor.previewerIndex = event.index;
         this.#previewProcessor.start(denops, {
-          item: this.#matchProcessor.items[this.#visualizeProcessor.cursor],
+          item: this.#matchProcessor.items[this.#renderProcessor.cursor],
         });
         break;
       case "action-invoke":
@@ -487,14 +491,14 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         break;
       case "match-processor-updated":
         this.#inputComponent.processed = this.#matchProcessor.items.length;
-        this.#visualizeProcessor.start(denops, {
+        this.#sortProcessor.start(denops, {
           items: this.#matchProcessor.items,
         });
         break;
       case "match-processor-succeeded":
         this.#inputComponent.processing = false;
         this.#inputComponent.processed = this.#matchProcessor.items.length;
-        this.#visualizeProcessor.start(denops, {
+        this.#sortProcessor.start(denops, {
           items: this.#matchProcessor.items,
         });
         break;
@@ -506,23 +510,43 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         console.warn(`[fall] Failed to filter items:`, event.err);
         break;
       }
-      case "visualize-processor-started":
+      case "sort-processor-started":
         break;
-      case "visualize-processor-succeeded": {
-        const line = this.#visualizeProcessor.line;
-        this.#listComponent.items = this.#visualizeProcessor.items;
-        this.#listComponent.execute(`silent! normal! ${line}G`);
-        this.#previewProcessor?.start(denops, {
-          item: this.#matchProcessor.items[this.#visualizeProcessor.cursor],
+      case "sort-processor-succeeded": {
+        this.#renderProcessor.start(denops, {
+          items: this.#sortProcessor.items,
         });
         break;
       }
-      case "visualize-processor-failed": {
+      case "sort-processor-failed": {
         this.#inputComponent.processing = "failed";
         if (event.err === null) {
           break;
         }
-        console.warn(`[fall] Failed to select items:`, event.err);
+        console.warn(`[fall] Failed to sort items:`, event.err);
+        // Even if sorting failed, try to render items
+        this.#renderProcessor.start(denops, {
+          items: this.#matchProcessor.items,
+        });
+        break;
+      }
+      case "render-processor-started":
+        break;
+      case "render-processor-succeeded": {
+        const line = this.#renderProcessor.line;
+        this.#listComponent.items = this.#renderProcessor.items;
+        this.#listComponent.execute(`silent! normal! ${line}G`);
+        this.#previewProcessor?.start(denops, {
+          item: this.#matchProcessor.items[this.#renderProcessor.cursor],
+        });
+        break;
+      }
+      case "render-processor-failed": {
+        this.#inputComponent.processing = "failed";
+        if (event.err === null) {
+          break;
+        }
+        console.warn(`[fall] Failed to render items:`, event.err);
         break;
       }
       case "preview-processor-started":
