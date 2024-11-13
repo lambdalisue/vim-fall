@@ -1,5 +1,5 @@
 import { test } from "jsr:@denops/test@^3.0.4";
-import * as fn from "jsr:@denops/std@^7.3.0/function";
+import * as fn from "jsr:@denops/std@^7.3.2/function";
 import { assertEquals, assertNotEquals } from "jsr:@std/assert@^1.0.7";
 
 import { screentext } from "./_testutil.ts";

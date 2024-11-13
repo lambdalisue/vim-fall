@@ -1,6 +1,6 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
-import * as fn from "jsr:@denops/std@^7.3.0/function";
-import * as buffer from "jsr:@denops/std@^7.3.0/buffer";
+import type { Denops } from "jsr:@denops/std@^7.3.2";
+import * as fn from "jsr:@denops/std@^7.3.2/function";
+import * as buffer from "jsr:@denops/std@^7.3.2/buffer";
 import type { Dimension } from "jsr:@vim-fall/std@^0.2.0/coordinator";
 
 import { Spinner } from "../lib/spinner.ts";

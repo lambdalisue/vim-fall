@@ -1,8 +1,8 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
-import * as opt from "jsr:@denops/std@^7.3.0/option";
-import * as autocmd from "jsr:@denops/std@^7.3.0/autocmd";
-import * as lambda from "jsr:@denops/std@^7.3.0/lambda";
-import { collect } from "jsr:@denops/std@^7.3.0/batch";
+import type { Denops } from "jsr:@denops/std@^7.3.2";
+import * as opt from "jsr:@denops/std@^7.3.2/option";
+import * as autocmd from "jsr:@denops/std@^7.3.2/autocmd";
+import * as lambda from "jsr:@denops/std@^7.3.2/lambda";
+import { collect } from "jsr:@denops/std@^7.3.2/batch";
 import { unreachable } from "jsr:@core/errorutil@^1.2.0/unreachable";
 import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.2.0/item";
 import type { Coordinator, Size } from "jsr:@vim-fall/std@^0.2.0/coordinator";

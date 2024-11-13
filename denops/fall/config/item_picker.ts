@@ -1,4 +1,4 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
+import type { Denops } from "jsr:@denops/std@^7.3.2";
 import type { Detail, DetailUnit, IdItem } from "jsr:@vim-fall/std@^0.2.0/item";
 import type { Curator } from "jsr:@vim-fall/std@^0.2.0/curator";
 import type { Action } from "jsr:@vim-fall/std@^0.2.0/action";

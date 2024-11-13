@@ -1,7 +1,7 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
-import * as fn from "jsr:@denops/std@^7.3.0/function";
-import * as buffer from "jsr:@denops/std@^7.3.0/buffer";
-import { batch } from "jsr:@denops/std@^7.3.0/batch";
+import type { Denops } from "jsr:@denops/std@^7.3.2";
+import * as fn from "jsr:@denops/std@^7.3.2/function";
+import * as buffer from "jsr:@denops/std@^7.3.2/buffer";
+import { batch } from "jsr:@denops/std@^7.3.2/batch";
 import type { PreviewItem } from "jsr:@vim-fall/std@^0.2.0/item";
 import type { Dimension } from "jsr:@vim-fall/std@^0.2.0/coordinator";
 

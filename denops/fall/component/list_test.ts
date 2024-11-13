@@ -1,9 +1,9 @@
 import "../lib/polyfill.ts";
 
-import type { Denops } from "jsr:@denops/std@^7.3.0";
+import type { Denops } from "jsr:@denops/std@^7.3.2";
 import { test } from "jsr:@denops/test@^3.0.4";
-import * as fn from "jsr:@denops/std@^7.3.0/function";
-import { listDecorations } from "jsr:@denops/std@^7.3.0/buffer";
+import * as fn from "jsr:@denops/std@^7.3.2/function";
+import { listDecorations } from "jsr:@denops/std@^7.3.2/buffer";
 import { assertEquals } from "jsr:@std/assert@^1.0.6";
 import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
 import { omit } from "jsr:@std/collections@^1.0.9/omit";
