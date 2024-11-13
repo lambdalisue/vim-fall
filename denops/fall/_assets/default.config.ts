@@ -3,8 +3,8 @@ import {
   type Entrypoint,
   refineCurator,
   refineSource,
-} from "jsr:@vim-fall/std@^0.2.0";
-import * as builtin from "jsr:@vim-fall/std@^0.2.0/builtin";
+} from "jsr:@vim-fall/std@^0.3.2";
+import * as builtin from "jsr:@vim-fall/std@^0.3.2/builtin";
 
 const myPathActions = {
   ...builtin.action.defaultOpenActions,
