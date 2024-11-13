@@ -1,8 +1,8 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
-import * as opt from "jsr:@denops/std@^7.3.0/option";
-import * as autocmd from "jsr:@denops/std@^7.3.0/autocmd";
-import * as lambda from "jsr:@denops/std@^7.3.0/lambda";
-import { collect } from "jsr:@denops/std@^7.3.0/batch";
+import type { Denops } from "jsr:@denops/std@^7.3.2";
+import * as opt from "jsr:@denops/std@^7.3.2/option";
+import * as autocmd from "jsr:@denops/std@^7.3.2/autocmd";
+import * as lambda from "jsr:@denops/std@^7.3.2/lambda";
+import { collect } from "jsr:@denops/std@^7.3.2/batch";
 import { unreachable } from "jsr:@core/errorutil@^1.2.0/unreachable";
 import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.2.0/item";
 import type { Coordinator, Size } from "jsr:@vim-fall/std@^0.2.0/coordinator";
@@ -101,7 +101,10 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       new CollectProcessor(params.source),
     );
     this.#matchProcessor = this.#stack.use(
-      new MatchProcessor(params.matchers),
+      new MatchProcessor(params.matchers, {
+        // Use incremental mode for Curator matcher
+        incremental: isCuratorMatcher(params.matchers[0]),
+      }),
     );
     this.#visualizeProcessor = this.#stack.use(
       new VisualizeProcessor(
@@ -553,4 +556,8 @@ async function getScreenSize(denops: Denops): Promise<Size> {
     opt.lines.get(denops),
   ]);
   return { width, height };
+}
+
+function isCuratorMatcher<T extends Detail>(m: Matcher<T>): boolean {
+  return (m as { isCurator?: boolean }).isCurator ?? false;
 }

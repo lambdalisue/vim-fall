@@ -1,5 +1,5 @@
 import { test } from "jsr:@denops/test@^3.0.4";
-import * as fn from "jsr:@denops/std@^7.3.0/function";
+import * as fn from "jsr:@denops/std@^7.3.2/function";
 import { assertEquals, assertNotEquals } from "jsr:@std/assert@^1.0.7";
 
 import { screentext } from "./_testutil.ts";
@@ -83,8 +83,8 @@ test("nvim", "Component", async (denops, t) => {
       width + 2,
       height + 2,
     );
-    assertEquals(winrow, 2); // +1 for border
-    assertEquals(wincol, 2); // +1 for border
+    assertEquals(winrow, 1);
+    assertEquals(wincol, 1);
     assertEquals(width, 5);
     assertEquals(height, 5);
     assertEquals(content, [
@@ -155,8 +155,8 @@ test("nvim", "Component", async (denops, t) => {
         width + 2,
         height + 2,
       );
-      assertEquals(winrow, 11); // +1 for border
-      assertEquals(wincol, 11); // +1 for border
+      assertEquals(winrow, 10);
+      assertEquals(wincol, 10);
       assertEquals(width, 10);
       assertEquals(height, 10);
       assertEquals(content, [
@@ -225,8 +225,8 @@ test("nvim", "Component", async (denops, t) => {
         width + 2,
         height + 2,
       );
-      assertEquals(winrow, 2); // +1 for border
-      assertEquals(wincol, 2); // +1 for border
+      assertEquals(winrow, 1);
+      assertEquals(wincol, 1);
       assertEquals(width, 5);
       assertEquals(height, 5);
       assertEquals(content, [
@@ -284,18 +284,18 @@ test("nvim", "Component", async (denops, t) => {
       width + 2,
       height + 2,
     );
-    assertEquals(winrow, 2); // +1 for border
-    assertEquals(wincol, 2); // +1 for border
+    assertEquals(winrow, 1);
+    assertEquals(wincol, 1);
     assertEquals(width, 5);
     assertEquals(height, 5);
     assertEquals(content, [
       "       ",
-      "       ",
-      "       ",
-      "       ",
-      "       ",
-      "       ",
-      "       ",
+      "~      ",
+      "~      ",
+      "~      ",
+      "~      ",
+      "~      ",
+      "~      ",
     ]);
   });
 });

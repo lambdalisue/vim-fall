@@ -4,8 +4,8 @@ import { assertEquals } from "jsr:@std/assert@^1.0.6";
 import { delay } from "jsr:@std/async@^1.0.7";
 import { test } from "jsr:@denops/test@^3.0.4";
 import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
-import { listDecorations } from "jsr:@denops/std@^7.3.0/buffer";
-import * as fn from "jsr:@denops/std@^7.3.0/function";
+import { listDecorations } from "jsr:@denops/std@^7.3.2/buffer";
+import * as fn from "jsr:@denops/std@^7.3.2/function";
 
 import {
   HIGHLIGHT_COUNTER,

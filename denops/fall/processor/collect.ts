@@ -1,9 +1,10 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
-import { chunked } from "jsr:@core/iterutil@^0.9.0/async/chunked";
+import type { Denops } from "jsr:@denops/std@^7.3.2";
 import { take } from "jsr:@core/iterutil@^0.9.0/async/take";
+import { map } from "jsr:@core/iterutil@^0.9.0/map";
 import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.2.0/item";
 import type { CollectParams, Source } from "jsr:@vim-fall/std@^0.2.0/source";
 
+import { Chunker } from "../lib/chunker.ts";
 import { dispatch } from "../event.ts";
 
 const THRESHOLD = 100000;
@@ -21,7 +22,7 @@ export class CollectProcessor<T extends Detail> implements Disposable {
   #controller: AbortController = new AbortController();
   #processing?: Promise<void>;
   #paused?: PromiseWithResolvers<void>;
-  #items: IdItem<T>[] = [];
+  readonly #items: IdItem<T>[] = [];
 
   constructor(
     source: Source<T>,
@@ -36,10 +37,22 @@ export class CollectProcessor<T extends Detail> implements Disposable {
     return this.#items;
   }
 
+  #validateAvailability(): void {
+    try {
+      this.#controller.signal.throwIfAborted();
+    } catch (err) {
+      if (err === null) {
+        throw new Error("The processor is already disposed");
+      }
+      throw err;
+    }
+  }
+
   start(
     denops: Denops,
     params: CollectParams,
   ): void | Promise<void> {
+    this.#validateAvailability();
     if (this.#processing) {
       this.#resume();
       return;
@@ -51,14 +64,23 @@ export class CollectProcessor<T extends Detail> implements Disposable {
         this.#source.collect(denops, params, { signal }),
         this.#threshold,
       );
-      for await (const chunk of chunked(iter, this.#chunkSize)) {
-        if (this.#paused) await this.#paused.promise;
-        signal.throwIfAborted();
+      const update = (chunk: Iterable<IdItem<T>>) => {
         const offset = this.#items.length;
         this.#items.push(
-          ...chunk.map((item, i) => ({ ...item, id: i + offset })),
+          ...map(chunk, (item, i) => ({ ...item, id: i + offset })),
         );
         dispatch({ type: "collect-processor-updated" });
+      };
+      const chunker = new Chunker<IdItem<T>>(this.#chunkSize);
+      for await (const item of iter) {
+        if (this.#paused) await this.#paused.promise;
+        signal.throwIfAborted();
+        if (chunker.put(item)) {
+          update(chunker.consume());
+        }
+      }
+      if (chunker.count > 0) {
+        update(chunker.consume());
       }
       dispatch({ type: "collect-processor-succeeded" });
     })();
@@ -69,6 +91,7 @@ export class CollectProcessor<T extends Detail> implements Disposable {
   }
 
   pause(): void {
+    this.#validateAvailability();
     if (!this.#processing) {
       return;
     }

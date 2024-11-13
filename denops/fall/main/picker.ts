@@ -1,6 +1,6 @@
-import type { Denops, Entrypoint } from "jsr:@denops/std@^7.3.0";
-import * as opt from "jsr:@denops/std@^7.3.0/option";
-import { collect } from "jsr:@denops/std@^7.3.0/batch";
+import type { Denops, Entrypoint } from "jsr:@denops/std@^7.3.2";
+import * as opt from "jsr:@denops/std@^7.3.2/option";
+import { collect } from "jsr:@denops/std@^7.3.2/batch";
 import { ensurePromise } from "jsr:@core/asyncutil@^1.2.0/ensure-promise";
 import {
   as,

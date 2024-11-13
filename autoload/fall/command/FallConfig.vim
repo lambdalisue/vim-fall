@@ -13,7 +13,7 @@ function! fall#command#FallConfig#call() abort
     call mkdir(fnamemodify(l:path, ':h'), 'p')
     call writefile(readfile(s:fall_config_template), l:path)
   endif
-  execute 'vsplit' fnameescape(l:path)
+  execute 'edit' fnameescape(l:path)
   augroup fall_config
     autocmd!
     autocmd BufWritePost <buffer> call s:reload()

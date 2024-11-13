@@ -1,4 +1,4 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
+import type { Denops } from "jsr:@denops/std@^7.3.2";
 import type { Detail, DetailUnit, IdItem } from "jsr:@vim-fall/std@^0.2.0/item";
 import type { Curator } from "jsr:@vim-fall/std@^0.2.0/curator";
 import type { Action } from "jsr:@vim-fall/std@^0.2.0/action";
@@ -98,6 +98,10 @@ export const defineItemPickerFromCurator: DefineItemPickerFromCurator = (
 class CuratorSourceMatcher<T extends Detail> implements Source<T>, Matcher<T> {
   #curator: Curator<T>;
   #args?: readonly string[];
+
+  // This attribute is referred in Picker to determine if MatchProcessor
+  // should be 'incremental'
+  readonly isCurator = true;
 
   constructor(curator: Curator<T>) {
     this.#curator = curator;

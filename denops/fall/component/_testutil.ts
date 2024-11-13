@@ -1,6 +1,6 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
-import * as fn from "jsr:@denops/std@^7.3.0/function";
-import { collect } from "jsr:@denops/std@^7.3.0/batch";
+import type { Denops } from "jsr:@denops/std@^7.3.2";
+import * as fn from "jsr:@denops/std@^7.3.2/function";
+import { collect } from "jsr:@denops/std@^7.3.2/batch";
 import * as iterutil from "jsr:@core/iterutil@^0.9/pipe";
 import { range } from "jsr:@core/iterutil@^0.9.0";
 import { pipe } from "jsr:@core/pipe@^0.4.0";

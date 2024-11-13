@@ -1,9 +1,9 @@
-import type { Denops } from "jsr:@denops/std@^7.3.0";
-import * as fn from "jsr:@denops/std@^7.3.0/function";
-import * as autocmd from "jsr:@denops/std@^7.3.0/autocmd";
-import { input } from "jsr:@denops/std@^7.3.0/helper/input";
-import { rawString, useEval } from "jsr:@denops/std@^7.3.0/eval";
-import { collect } from "jsr:@denops/std@^7.3.0/batch";
+import type { Denops } from "jsr:@denops/std@^7.3.2";
+import * as fn from "jsr:@denops/std@^7.3.2/function";
+import * as autocmd from "jsr:@denops/std@^7.3.2/autocmd";
+import { input } from "jsr:@denops/std@^7.3.2/helper/input";
+import { rawString, useEval } from "jsr:@denops/std@^7.3.2/eval";
+import { collect } from "jsr:@denops/std@^7.3.2/batch";
 
 import { dispatch } from "../event.ts";
 
