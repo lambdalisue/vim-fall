@@ -20,11 +20,11 @@ export type MatchProcessorOptions = {
 };
 
 export class MatchProcessor<T extends Detail> implements AsyncDisposable {
-  #matchers: readonly [Matcher<T>, ...Matcher<T>[]];
-  #interval: number;
-  #threshold: number;
-  #chunkSize: number;
-  #incremental: boolean;
+  readonly #matchers: readonly [Matcher<T>, ...Matcher<T>[]];
+  readonly #interval: number;
+  readonly #threshold: number;
+  readonly #chunkSize: number;
+  readonly #incremental: boolean;
   #controller: AbortController = new AbortController();
   #processing?: Promise<void>;
   #reserved?: () => void;
@@ -87,7 +87,9 @@ export class MatchProcessor<T extends Detail> implements AsyncDisposable {
     if (this.#processing) {
       // Keep most recent start request for later.
       this.#reserved = () => this.start(denops, { items, query }, options);
+      // If restart is requested, we need to abort the current processing.
       if (options?.restart) {
+        // This abort will invoke function in `#reserved`.
         this.#controller.abort(null);
         this.#controller = new AbortController();
       }
