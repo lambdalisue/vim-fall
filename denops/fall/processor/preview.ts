@@ -9,8 +9,8 @@ import { dispose } from "../lib/dispose.ts";
 import { dispatch } from "../event.ts";
 
 export class PreviewProcessor<T extends Detail> implements AsyncDisposable {
-  #previewers: Previewer<T>[];
-  #controller: AbortController = new AbortController();
+  readonly #previewers: Previewer<T>[];
+  readonly #controller: AbortController = new AbortController();
   #processing?: Promise<void>;
   #reserved?: () => void;
   #item: PreviewItem | undefined = undefined;
@@ -45,7 +45,19 @@ export class PreviewProcessor<T extends Detail> implements AsyncDisposable {
     return this.#item;
   }
 
+  #validateAvailability(): void {
+    try {
+      this.#controller.signal.throwIfAborted();
+    } catch (err) {
+      if (err === null) {
+        throw new Error("The processor is already disposed");
+      }
+      throw err;
+    }
+  }
+
   start(denops: Denops, { item }: PreviewParams<T>): void {
+    this.#validateAvailability();
     if (this.#processing) {
       // Keep most recent start request for later.
       this.#reserved = () => this.start(denops, { item });
