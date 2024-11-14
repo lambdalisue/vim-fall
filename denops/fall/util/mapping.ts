@@ -42,7 +42,7 @@ function formatMappingHelpPage(
   const columnCount = Math.floor(width / columnWidth);
   const recordWidth = columnWidth - spacer.length;
   const records = mappings
-    .toSorted((a, b) => `${a.lhs}${a.rhs}`.localeCompare(`${b.lhs}${b.rhs}`))
+    .toSorted((a, b) => `${a.rhs}${a.lhs}`.localeCompare(`${b.rhs}${b.lhs}`))
     .map(({ lhs, rhs }) => {
       const r = `${lhs.padStart(lhsWidth)}${operator}${rhs}`;
       if (r.length < recordWidth) {
