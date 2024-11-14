@@ -1,8 +1,8 @@
 # 🍂 fall
 
-[![Test](https://github.com/vim-fall/fall/actions/workflows/test.yml/badge.svg)](https://github.com/vim-fall/fall/actions/workflows/test.yml)
+[![Test](https://github.com/vim-fall/fall.vim/actions/workflows/test.yml/badge.svg)](https://github.com/vim-fall/fall.vim/actions/workflows/test.yml)
 [![Deno](https://img.shields.io/badge/Deno%202.x-333?logo=deno&logoColor=fff)](#)
-[![codecov](https://codecov.io/gh/vim-fall/fall/graph/badge.svg?token=k2ZTes7Kln)](https://codecov.io/gh/vim-fall/fall)
+[![codecov](https://codecov.io/gh/vim-fall/fall.vim/graph/badge.svg?token=k2ZTes7Kln)](https://codecov.io/gh/vim-fall/fall.vim)
 [![MIT License](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
 [![vim help](https://img.shields.io/badge/vim-%3Ah%20fall-orange.svg)](doc/fall.txt)
 
@@ -41,7 +41,7 @@ To install [Denops] and this plugin using your preferred plugin manager, such as
 
 ```vim
 Plug 'vim-denops/denops.vim'
-Plug 'vim-fall/fall'
+Plug 'vim-fall/fall.vim'
 ```
 
 [vim-plug]: https://github.com/junegunn/vim-plug
@@ -148,11 +148,11 @@ for the full code of the default configuration.
 
 ## Related Projects
 
-| Repository                                                    | Package                                             | Description                                      |
-| ------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------ |
-| [vim-fall/fall-core](https://github.com/vim-fall/fall-core)   | [`@vim-fall/core`](https://jsr.io/@vim-fall/core)   | Core types for Fall. Not meant for external use. |
-| [vim-fall/fall-std](https://github.com/vim-fall/fall-std)     | [`@vim-fall/std`](https://jsr.io/@vim-fall/std)     | Standard library for using Fall.                 |
-| [vim-fall/fall-extra](https://github.com/vim-fall/fall-extra) | [`@vim-fall/extra`](https://jsr.io/@vim-fall/extra) | Extra library for using Fall.                    |
+| Repository                                                              | Package                                             | Description                                      |
+| ----------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------ |
+| [vim-fall/deno-fall-core](https://github.com/vim-fall/deno-fall-core)   | [`@vim-fall/core`](https://jsr.io/@vim-fall/core)   | Core types for Fall. Not meant for external use. |
+| [vim-fall/deno-fall-std](https://github.com/vim-fall/deno-fall-std)     | [`@vim-fall/std`](https://jsr.io/@vim-fall/std)     | Standard library for using Fall.                 |
+| [vim-fall/deno-fall-extra](https://github.com/vim-fall/deno-fall-extra) | [`@vim-fall/extra`](https://jsr.io/@vim-fall/extra) | Extra library for using Fall.                    |
 
 ## Similar Projects
 
