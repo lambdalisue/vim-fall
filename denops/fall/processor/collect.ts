@@ -16,13 +16,13 @@ export type CollectProcessorOptions = {
 };
 
 export class CollectProcessor<T extends Detail> implements Disposable {
+  readonly #controller: AbortController = new AbortController();
+  readonly #items: IdItem<T>[] = [];
   readonly #source: Source<T>;
   readonly #threshold: number;
   readonly #chunkSize: number;
-  readonly #controller: AbortController = new AbortController();
   #processing?: Promise<void>;
   #paused?: PromiseWithResolvers<void>;
-  readonly #items: IdItem<T>[] = [];
 
   constructor(
     source: Source<T>,

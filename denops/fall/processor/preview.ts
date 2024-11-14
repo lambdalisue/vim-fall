@@ -5,39 +5,37 @@ import type {
   PreviewParams,
 } from "jsr:@vim-fall/std@^0.4.0/previewer";
 
+import { ItemBelt } from "../lib/item_belt.ts";
 import { dispatch } from "../event.ts";
 
 export class PreviewProcessor<T extends Detail> implements Disposable {
-  readonly #previewers: Previewer<T>[];
   readonly #controller: AbortController = new AbortController();
+  readonly #previewers: ItemBelt<Previewer<T>>;
   #processing?: Promise<void>;
   #reserved?: () => void;
   #item: PreviewItem | undefined = undefined;
-  #previewerIndex = 0;
 
-  constructor(previewers: Previewer<T>[]) {
-    this.#previewers = previewers;
+  constructor(previewers: readonly Previewer<T>[]) {
+    this.#previewers = new ItemBelt(previewers);
   }
 
   get #previewer(): Previewer<T> | undefined {
-    return this.#previewers[this.#previewerIndex];
+    return this.#previewers.current;
   }
 
   get previewerCount(): number {
-    return this.#previewers.length;
+    return this.#previewers.count;
   }
 
   get previewerIndex(): number {
-    return this.#previewerIndex;
+    return this.#previewers.index;
   }
 
   set previewerIndex(index: number | "$") {
-    if (index === "$" || index >= this.#previewers.length) {
-      index = this.#previewers.length - 1;
-    } else if (index < 0) {
-      index = 0;
+    if (index === "$") {
+      index = this.#previewers.count;
     }
-    this.#previewerIndex = index;
+    this.#previewers.index = index;
   }
 
   get item(): PreviewItem | undefined {

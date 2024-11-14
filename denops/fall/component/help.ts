@@ -6,6 +6,7 @@ import * as buffer from "jsr:@denops/std@^7.3.2/buffer";
 import type { Dimension } from "jsr:@vim-fall/std@^0.4.0/coordinator";
 
 import { BaseComponent } from "./_component.ts";
+import { ItemBelt } from "../lib/item_belt.ts";
 
 export type Page = {
   readonly title?: string;
@@ -14,31 +15,27 @@ export type Page = {
 };
 
 export class HelpComponent extends BaseComponent {
-  #page = 1;
-  #pages: readonly Page[] = [];
+  readonly #pages = new ItemBelt<Page>([]);
   #modifiedContent = true;
 
   get page(): number {
-    return this.#page;
+    return this.#pages.index + 1;
   }
 
   set page(page: number | "$") {
-    if (page === "$" || page >= this.#pages.length) {
-      page = this.#pages.length;
-    } else if (page < 1) {
-      page = 1;
+    if (page === "$") {
+      page = this.#pages.count;
     }
-    this.#page = page;
+    this.#pages.index = page - 1;
     this.#modifiedContent = true;
   }
 
   get pages(): readonly Page[] {
-    return this.#pages;
+    return this.#pages.items;
   }
 
   set pages(pages: readonly Page[]) {
-    this.#pages = pages;
-    this.page = this.#page;
+    this.#pages.items = pages;
     this.#modifiedContent = true;
   }
 
@@ -91,7 +88,7 @@ export class HelpComponent extends BaseComponent {
 
     const { bufnr, dimension: { width } } = this.info;
 
-    const page = this.#pages.at(this.#page - 1);
+    const page = this.#pages.current;
     const content = [
       await this.#buildNavigationHeader(denops, width, { signal }),
       ...(page?.content ?? []),
@@ -129,7 +126,7 @@ export class HelpComponent extends BaseComponent {
     const prev = mappings.find((m) => m.rhs === "<Plug>(fall-help-prev)");
     const next = mappings.find((m) => m.rhs === "<Plug>(fall-help-next)");
     const navigator = [prev?.lhs, next?.lhs].filter((v) => !!v).join(" / ");
-    const pager = `Page ${this.#page}/${this.#pages.length}`;
+    const pager = `Page ${this.page}/${this.#pages.count}`;
     const spacer = " ".repeat(width - pager.length - navigator.length);
     return `${pager}${spacer}${navigator}`;
   }

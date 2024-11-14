@@ -5,6 +5,7 @@ import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.4.0/item";
 import type { Matcher, MatchParams } from "jsr:@vim-fall/std@^0.4.0/matcher";
 
 import { Chunker } from "../lib/chunker.ts";
+import { ItemBelt } from "../lib/item_belt.ts";
 import { dispatch } from "../event.ts";
 
 const INTERVAL = 0;
@@ -19,7 +20,7 @@ export type MatchProcessorOptions = {
 };
 
 export class MatchProcessor<T extends Detail> implements Disposable {
-  readonly #matchers: readonly [Matcher<T>, ...Matcher<T>[]];
+  readonly #matchers: ItemBelt<Matcher<T>>;
   readonly #interval: number;
   readonly #threshold: number;
   readonly #chunkSize: number;
@@ -28,13 +29,12 @@ export class MatchProcessor<T extends Detail> implements Disposable {
   #processing?: Promise<void>;
   #reserved?: () => void;
   #items: IdItem<T>[] = [];
-  #matcherIndex = 0;
 
   constructor(
-    filters: readonly [Matcher<T>, ...Matcher<T>[]],
+    matchers: readonly [Matcher<T>, ...Matcher<T>[]],
     options: MatchProcessorOptions = {},
   ) {
-    this.#matchers = filters;
+    this.#matchers = new ItemBelt(matchers);
     this.#interval = options.interval ?? INTERVAL;
     this.#threshold = options.threshold ?? THRESHOLD;
     this.#chunkSize = options.chunkSize ?? CHUNK_SIZE;
@@ -42,7 +42,7 @@ export class MatchProcessor<T extends Detail> implements Disposable {
   }
 
   get #matcher(): Matcher<T> {
-    return this.#matchers[this.#matcherIndex];
+    return this.#matchers.current!;
   }
 
   get items(): IdItem<T>[] {
@@ -50,20 +50,18 @@ export class MatchProcessor<T extends Detail> implements Disposable {
   }
 
   get matcherCount(): number {
-    return this.#matchers.length;
+    return this.#matchers.count;
   }
 
   get matcherIndex(): number {
-    return this.#matcherIndex;
+    return this.#matchers.index;
   }
 
   set matcherIndex(index: number | "$") {
-    if (index === "$" || index >= this.#matchers.length) {
-      index = this.#matchers.length - 1;
-    } else if (index < 0) {
-      index = 0;
+    if (index === "$") {
+      index = this.#matchers.count;
     }
-    this.#matcherIndex = index;
+    this.#matchers.index = index;
   }
 
   #validateAvailability(): void {

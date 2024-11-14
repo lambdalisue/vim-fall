@@ -7,6 +7,7 @@ import type {
 import type { Renderer } from "jsr:@vim-fall/std@^0.4.0/renderer";
 
 import { adjustOffset } from "../lib/adjust_offset.ts";
+import { ItemBelt } from "../lib/item_belt.ts";
 import { dispatch } from "../event.ts";
 
 const HEIGHT = 10;
@@ -18,46 +19,43 @@ export type RenderProcessorOptions = {
 };
 
 export class RenderProcessor<T extends Detail> implements Disposable {
-  readonly #renderers: Renderer<T>[];
+  readonly #controller: AbortController = new AbortController();
+  readonly #renderers: ItemBelt<Renderer<T>>;
   #height: number;
   #scrollOffset: number;
-  readonly #controller: AbortController = new AbortController();
   #processing?: Promise<void>;
   #reserved?: () => void;
   #items: DisplayItem<T>[] = [];
   #itemCount: number = 0;
   #cursor: number = 0;
   #offset: number = 0;
-  #rendererIndex: number = 0;
 
   constructor(
-    renderers: Renderer<T>[],
+    renderers: readonly Renderer<T>[],
     options: RenderProcessorOptions = {},
   ) {
-    this.#renderers = renderers;
+    this.#renderers = new ItemBelt(renderers);
     this.#height = options.height ?? HEIGHT;
     this.#scrollOffset = options.scrollOffset ?? SCROLL_OFFSET;
   }
 
   get #renderer(): Renderer<T> | undefined {
-    return this.#renderers.at(this.#rendererIndex);
+    return this.#renderers.current;
   }
 
   get rendererCount(): number {
-    return this.#renderers.length;
+    return this.#renderers.count;
   }
 
   get rendererIndex(): number {
-    return this.#rendererIndex;
+    return this.#renderers.index;
   }
 
   set rendererIndex(index: number | "$") {
-    if (index === "$" || index >= this.rendererCount) {
-      index = this.rendererCount - 1;
-    } else if (index < 0) {
-      index = 0;
+    if (index === "$") {
+      index = this.#renderers.count;
     }
-    this.#rendererIndex = index;
+    this.#renderers.index = index;
   }
 
   get items() {

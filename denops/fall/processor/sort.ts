@@ -2,39 +2,37 @@ import type { Denops } from "jsr:@denops/std@^7.3.2";
 import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.4.0/item";
 import type { Sorter } from "jsr:@vim-fall/std@^0.4.0/sorter";
 
+import { ItemBelt } from "../lib/item_belt.ts";
 import { dispatch } from "../event.ts";
 
 export class SortProcessor<T extends Detail> implements Disposable {
-  readonly #sorters: Sorter<T>[];
   readonly #controller: AbortController = new AbortController();
+  readonly #sorters: ItemBelt<Sorter<T>>;
   #processing?: Promise<void>;
   #reserved?: () => void;
   #items: IdItem<T>[] = [];
-  #sorterIndex: number = 0;
 
-  constructor(sorters: Sorter<T>[]) {
-    this.#sorters = sorters;
+  constructor(sorters: readonly Sorter<T>[]) {
+    this.#sorters = new ItemBelt(sorters);
   }
 
   get #sorter(): Sorter<T> | undefined {
-    return this.#sorters.at(this.#sorterIndex);
+    return this.#sorters.current;
   }
 
   get sorterCount(): number {
-    return this.#sorters.length;
+    return this.#sorters.count;
   }
 
   get sorterIndex(): number {
-    return this.#sorterIndex;
+    return this.#sorters.index;
   }
 
   set sorterIndex(index: number | "$") {
-    if (index === "$" || index >= this.sorterCount) {
-      index = this.sorterCount - 1;
-    } else if (index < 0) {
-      index = 0;
+    if (index === "$") {
+      index = this.#sorters.count;
     }
-    this.#sorterIndex = index;
+    this.#sorters.index = index;
   }
 
   get items() {
