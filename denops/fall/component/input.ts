@@ -11,13 +11,49 @@ export const HIGHLIGHT_HEADER = "FallInputHeader";
 export const HIGHLIGHT_CURSOR = "FallInputCursor";
 export const HIGHLIGHT_COUNTER = "FallInputCounter";
 
+/**
+ * Parameters for the InputComponent, extending ComponentProperties.
+ * Includes properties specific to the input component like title, spinner, and symbols.
+ */
 export type InputComponentParams = ComponentProperties & {
-  title?: string;
-  spinner?: readonly string[];
-  headSymbol?: string;
-  failSymbol?: string;
+  /** The title of the input component */
+  readonly title?: string;
+
+  /** Optional spinner sequence to show during processing */
+  readonly spinner?: readonly string[];
+
+  /** Symbol to display at the start of the input line */
+  readonly headSymbol?: string;
+
+  /** Symbol to display when a failure occurs during input */
+  readonly failSymbol?: string;
 };
 
+/**
+ * The InputComponent class represents an interactive input component in the picker UI used for user input.
+ *
+ * It displays the current input state, including the input text, cursor position, and processing status.
+ *
+ * ```
+ *    ┌ cmdline
+ *    ┊  ┌ cmdpos
+ * ╭──┊──┊───────────────────────────╮
+ * │> QUE█Y                       0/0│
+ * ╰┊─────────────────────────────┊─┊╯
+ *  └ headSymbol                  ┊ └ collecting
+ *                                └ processing
+ *
+ * ╭─────────────────────────────────╮
+ * │⣾ QUE█Y                      0/0+│
+ * ╰┊───────────────────────────────┊╯
+ *  └ spinner                       └ truncated
+ *
+ * ╭─────────────────────────────────╮
+ * │> QUE█Y                      0/0X│
+ * ╰────────────────────────────────┊╯
+ *                                  └ failSymbol
+ * ```
+ */
 export class InputComponent extends BaseComponent {
   readonly #spinner: Spinner;
   readonly #headSymbol: string;
@@ -46,77 +82,89 @@ export class InputComponent extends BaseComponent {
     this.#failSymbol = failSymbol ?? "X";
   }
 
+  /** The title of the input component */
   get title(): string {
     return this.#title;
   }
 
+  /** Sets the title of the input component */
   set title(value: string) {
     this.#title = value;
     this.#modifiedWindow = true;
   }
 
+  /** The current command line input */
   get cmdline(): string {
     return this.#cmdline;
   }
 
+  /** Sets the command line input and marks the content as modified */
   set cmdline(value: string) {
     this.#cmdline = value;
-    this.cmdpos = this.#cmdpos;
     this.#modifiedContent = true;
   }
 
+  /** The current cursor position in the command line */
   get cmdpos(): number {
     return this.#cmdpos;
   }
 
+  /** Sets the cursor position in the command line */
   set cmdpos(value: number) {
-    // NOTE:
-    // We should NOT check if 'cmdpos' is out of range here because it might be updated before the
-    // 'cmdline' is updated.
     this.#cmdpos = value;
     this.#modifiedContent = true;
   }
 
+  /** The number of items collected */
   get collected(): number {
     return this.#collected;
   }
 
+  /** Sets the number of items collected and marks the content as modified */
   set collected(value: number) {
     this.#collected = value;
     this.#modifiedContent = true;
   }
 
+  /** The number of items processed */
   get processed(): number {
     return this.#processed;
   }
 
+  /** Sets the number of items processed and marks the content as modified */
   set processed(value: number) {
     this.#processed = value;
     this.#modifiedContent = true;
   }
 
+  /** Indicates if the content is truncated */
   get truncated(): boolean {
     return this.#truncated;
   }
 
+  /** Sets the truncated flag and marks the content as modified */
   set truncated(value: boolean) {
     this.#truncated = value;
     this.#modifiedContent = true;
   }
 
+  /** The current collecting status, which can be a boolean or "failed" status */
   get collecting(): boolean | "failed" {
     return this.#collecting;
   }
 
+  /** Sets the collecting status and marks the content as modified */
   set collecting(value: boolean | "failed") {
     this.#collecting = value;
     this.#modifiedContent = true;
   }
 
+  /** The current processing status, which can be a boolean or "failed" status */
   get processing(): boolean | "failed" {
     return this.#processing;
   }
 
+  /** Sets the processing status and marks the content as modified */
   set processing(value: boolean | "failed") {
     this.#processing = value;
     this.#modifiedContent = true;
@@ -141,6 +189,9 @@ export class InputComponent extends BaseComponent {
     return (this.collecting || this.processing) && !this.#spinner.locked;
   }
 
+  /**
+   * Forces the component to re-render by marking both the window and content as modified
+   */
   forceRender(): void {
     this.#modifiedWindow = true;
     this.#modifiedContent = true;

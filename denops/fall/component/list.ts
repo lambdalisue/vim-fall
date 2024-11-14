@@ -3,7 +3,6 @@ import type { Decoration } from "jsr:@denops/std@^7.3.2/buffer";
 import { batch } from "jsr:@denops/std@^7.3.2/batch";
 import * as fn from "jsr:@denops/std@^7.3.2/function";
 import * as buffer from "jsr:@denops/std@^7.3.2/buffer";
-import type { DetailUnit, DisplayItem } from "jsr:@vim-fall/std@^0.4.0/item";
 import type { Dimension } from "jsr:@vim-fall/std@^0.4.0/coordinator";
 
 import { BaseComponent } from "./_component.ts";
@@ -12,41 +11,90 @@ export const HIGHLIGHT_MATCH = "FallListMatch";
 export const SIGN_GROUP_SELECTED = "PopUpFallListSelected";
 export const SIGN_SELECTED = "FallListSelected";
 
+/**
+ * Type representing the decoration properties of an item,
+ * allowing customization of specific visual aspects.
+ * `highlight` is optional and can be used to specify
+ * a highlight group for a portion of the item's display.
+ */
+export type ItemDecoration =
+  & Omit<Decoration, "line" | "highlight">
+  & Partial<Pick<Decoration, "highlight">>;
+
+/**
+ * Type representing an item to be displayed in a list.
+ * Each item has a unique identifier, a label for display,
+ * and optional decorations for customizing its appearance.
+ */
+export type DisplayItem = {
+  readonly id: unknown; // Unique identifier for the item.
+  readonly label: string; // Text label to display for the item.
+  readonly decorations: readonly ItemDecoration[]; // Array of decorations to apply to the item.
+};
+
+/**
+ * ListComponent is a component for managing and rendering a list of display items.
+ * It handles item selection, scrolling, and rendering of highlights and signs.
+ */
 export class ListComponent extends BaseComponent {
   #scroll = 1;
-  #items: readonly DisplayItem<DetailUnit>[] = [];
+  #items: readonly DisplayItem[] = [];
   #selection = new Set<unknown>();
   #modifiedContent = true;
   #modifiedSigns = true;
   #reservedCommands: string[] = [];
 
+  /**
+   * Gets the scroll setting of the list.
+   */
   get scroll(): number {
     return this.#scroll;
   }
 
-  get items(): readonly DisplayItem<DetailUnit>[] {
+  /**
+   * Gets the current list of display items.
+   */
+  get items(): readonly DisplayItem[] {
     return this.#items;
   }
 
-  set items(items: DisplayItem<DetailUnit>[]) {
+  /**
+   * Sets the display items for the list and marks content as modified.
+   * @param items - The new list of display items.
+   */
+  set items(items: readonly DisplayItem[]) {
     this.#items = items;
     this.#modifiedContent = true;
     this.#modifiedSigns = true;
   }
 
+  /**
+   * Gets the set of selected items.
+   */
   get selection(): Set<unknown> {
     return this.#selection;
   }
 
+  /**
+   * Sets the selected items and marks signs as modified.
+   * @param selection - A set of selected item identifiers.
+   */
   set selection(selection: Set<unknown>) {
     this.#selection = selection;
     this.#modifiedSigns = true;
   }
 
+  /**
+   * Adds a command to be executed in the list's context.
+   * @param command - The command to queue for execution.
+   */
   execute(command: string): void {
     this.#reservedCommands.push(command);
   }
 
+  /**
+   * Forces the component to render its content and signs in the next render cycle.
+   */
   forceRender(): void {
     this.#modifiedContent = true;
     this.#modifiedSigns = true;

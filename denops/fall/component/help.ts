@@ -8,20 +8,36 @@ import type { Dimension } from "jsr:@vim-fall/std@^0.4.0/coordinator";
 import { BaseComponent } from "./_component.ts";
 import { ItemBelt } from "../lib/item_belt.ts";
 
+/**
+ * Represents a page in the HelpComponent.
+ * Contains content and optional decorations for the page.
+ */
 export type Page = {
-  readonly title?: string;
+  /** The content to be displayed on the page */
   readonly content: readonly string[];
+
+  /** The decorations to be applied on the page (optional) */
   readonly decorations?: readonly Decoration[];
 };
 
+/**
+ * A component to display help content, extendable for navigation, rendering, and updating pages.
+ */
 export class HelpComponent extends BaseComponent {
   readonly #pages = new ItemBelt<Page>([]);
   #modifiedContent = true;
 
+  /**
+   * Returns the current page number (1-based).
+   */
   get page(): number {
     return this.#pages.index + 1;
   }
 
+  /**
+   * Sets the page number or sets it to the last page ("$").
+   * @param page - The page number to set or "$" to set to the last page.
+   */
   set page(page: number | "$") {
     if (page === "$") {
       page = this.#pages.count;
@@ -30,15 +46,25 @@ export class HelpComponent extends BaseComponent {
     this.#modifiedContent = true;
   }
 
+  /**
+   * Returns the list of all pages.
+   */
   get pages(): readonly Page[] {
     return this.#pages.items;
   }
 
+  /**
+   * Sets the list of pages and marks the content as modified.
+   * @param pages - An array of pages to set.
+   */
   set pages(pages: readonly Page[]) {
     this.#pages.items = pages;
     this.#modifiedContent = true;
   }
 
+  /**
+   * Forces the component to re-render by marking the content as modified.
+   */
   forceRender(): void {
     this.#modifiedContent = true;
   }

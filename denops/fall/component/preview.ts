@@ -2,17 +2,40 @@ import type { Denops } from "jsr:@denops/std@^7.3.2";
 import * as fn from "jsr:@denops/std@^7.3.2/function";
 import * as buffer from "jsr:@denops/std@^7.3.2/buffer";
 import { batch } from "jsr:@denops/std@^7.3.2/batch";
-import type { PreviewItem } from "jsr:@vim-fall/std@^0.4.0/item";
 import type { Dimension } from "jsr:@vim-fall/std@^0.4.0/coordinator";
 
 import { BaseComponent, type ComponentProperties } from "./_component.ts";
 
+/**
+ * Parameters for configuring a PreviewComponent
+ */
 export type PreviewComponentParams = ComponentProperties & {
-  realHighlight?: boolean;
+  /** If true, enables real syntax highlighting within the preview */
+  readonly realHighlight?: boolean;
 };
 
+/**
+ * Defines the structure of an item to be previewed
+ */
+export type PreviewItem = {
+  /** Content to display in the preview as an array of strings */
+  readonly content: readonly string[];
+  /** Optional filename associated with the previewed content */
+  readonly filename?: string;
+  /** Optional filetype for applying syntax highlighting */
+  readonly filetype?: string;
+  /** Optional line number to position the cursor */
+  readonly line?: number;
+  /** Optional column number to position the cursor */
+  readonly column?: number;
+};
+
+/**
+ * Represents a preview component that displays content with optional
+ * syntax highlighting and cursor positioning.
+ */
 export class PreviewComponent extends BaseComponent {
-  #realHighlight: boolean;
+  readonly #realHighlight: boolean;
   #item?: PreviewItem;
   #modifiedContent = true;
   #reservedCommands: string[] = [];
@@ -22,19 +45,27 @@ export class PreviewComponent extends BaseComponent {
     this.#realHighlight = realHighlight ?? false;
   }
 
+  /** Gets the current preview item */
   get item(): PreviewItem | undefined {
     return this.#item;
   }
 
+  /** Sets a new preview item, marking the content as modified */
   set item(value: PreviewItem | undefined) {
     this.#item = value;
     this.#modifiedContent = true;
   }
 
+  /**
+   * Adds a command to be executed in the preview window context.
+   *
+   * @param command - The Vim command to be executed
+   */
   execute(command: string): void {
     this.#reservedCommands.push(command);
   }
 
+  /** Forces a re-render of the preview content */
   forceRender(): void {
     this.#modifiedContent = true;
   }
@@ -81,15 +112,15 @@ export class PreviewComponent extends BaseComponent {
     const { winid, bufnr } = this.info;
 
     const {
-      content,
+      content = ["No preview"],
       filename = "noname",
       filetype = "",
       line = 1,
       column = 1,
-    } = this.#item ?? { content: ["No preview"] };
+    } = this.#item ?? {};
 
     signal?.throwIfAborted();
-    await buffer.replace(denops, bufnr, content);
+    await buffer.replace(denops, bufnr, content as string[]);
 
     signal?.throwIfAborted();
     await batch(denops, async (denops) => {
