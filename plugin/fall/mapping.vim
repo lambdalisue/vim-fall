@@ -4,16 +4,16 @@ endif
 let g:loaded_fall_mapping = 1
 
 " List
-cnoremap <silent> <Plug>(fall-first) <Cmd>call fall#internal#dispatch(#{type: 'move-cursor-at', cursor: 0})<CR>
-cnoremap <silent> <Plug>(fall-last) <Cmd>call fall#internal#dispatch(#{type: 'move-cursor-at', cursor: '$'})<CR>
-cnoremap <silent> <Plug>(fall-prev) <Cmd>call fall#internal#dispatch(#{type: 'move-cursor', amount: -1})<CR>
-cnoremap <silent> <Plug>(fall-next) <Cmd>call fall#internal#dispatch(#{type: 'move-cursor', amount: 1})<CR>
-cnoremap <silent> <Plug>(fall-prev:scroll) <Cmd>call fall#internal#dispatch(#{type: 'move-cursor', amount: -1, scroll: v:true})<CR>
-cnoremap <silent> <Plug>(fall-next:scroll) <Cmd>call fall#internal#dispatch(#{type: 'move-cursor', amount: 1, scroll: v:true})<CR>
-cnoremap <silent> <Plug>(fall-left) <Cmd>call fall#internal#dispatch(#{type: 'list-component-execute', command: 'silent! normal! zh'})<CR>
-cnoremap <silent> <Plug>(fall-right) <Cmd>call fall#internal#dispatch(#{type: 'list-component-execute', command: 'silent! normal! zl'})<CR>
-cnoremap <silent> <Plug>(fall-left:scroll) <Cmd>call fall#internal#dispatch(#{type: 'list-component-execute', command: 'silent! normal! zH'})<CR>
-cnoremap <silent> <Plug>(fall-right:scroll) <Cmd>call fall#internal#dispatch(#{type: 'list-component-execute', command: 'silent! normal! zL'})<CR>
+cnoremap <silent> <Plug>(fall-list-first) <Cmd>call fall#internal#dispatch(#{type: 'move-cursor-at', cursor: 0})<CR>
+cnoremap <silent> <Plug>(fall-list-last) <Cmd>call fall#internal#dispatch(#{type: 'move-cursor-at', cursor: '$'})<CR>
+cnoremap <silent> <Plug>(fall-list-prev) <Cmd>call fall#internal#dispatch(#{type: 'move-cursor', amount: -1})<CR>
+cnoremap <silent> <Plug>(fall-list-next) <Cmd>call fall#internal#dispatch(#{type: 'move-cursor', amount: 1})<CR>
+cnoremap <silent> <Plug>(fall-list-prev:scroll) <Cmd>call fall#internal#dispatch(#{type: 'move-cursor', amount: -1, scroll: v:true})<CR>
+cnoremap <silent> <Plug>(fall-list-next:scroll) <Cmd>call fall#internal#dispatch(#{type: 'move-cursor', amount: 1, scroll: v:true})<CR>
+cnoremap <silent> <Plug>(fall-list-left) <Cmd>call fall#internal#dispatch(#{type: 'list-component-execute', command: 'silent! normal! zh'})<CR>
+cnoremap <silent> <Plug>(fall-list-right) <Cmd>call fall#internal#dispatch(#{type: 'list-component-execute', command: 'silent! normal! zl'})<CR>
+cnoremap <silent> <Plug>(fall-list-left:scroll) <Cmd>call fall#internal#dispatch(#{type: 'list-component-execute', command: 'silent! normal! zH'})<CR>
+cnoremap <silent> <Plug>(fall-list-right:scroll) <Cmd>call fall#internal#dispatch(#{type: 'list-component-execute', command: 'silent! normal! zL'})<CR>
 
 " Select
 cnoremap <silent> <Plug>(fall-select) <Cmd>call fall#internal#dispatch(#{type: 'select-item'})<CR>
@@ -60,20 +60,20 @@ cnoremap <silent> <Plug>(fall-action-select) <Cmd>call fall#action('@select')<CR
 if !get(g:, 'fall_disable_default_mapping')
   function! s:map_picker() abort
     " List
-    cnoremap <nowait> <C-t> <Plug>(fall-first)
-    cnoremap <nowait> <C-g> <Plug>(fall-last)
-    cnoremap <nowait> <C-p> <Plug>(fall-prev)
-    cnoremap <nowait> <C-n> <Plug>(fall-next)
-    cnoremap <nowait> <C-u> <Plug>(fall-prev:scroll)
-    cnoremap <nowait> <C-d> <Plug>(fall-next:scroll)
-    cnoremap <nowait> <PageUp> <Plug>(fall-left)
-    cnoremap <nowait> <PageDown> <Plug>(fall-right)
-    cnoremap <nowait> <S-PageUp> <Plug>(fall-left:scroll)
-    cnoremap <nowait> <S-PageDown> <Plug>(fall-right:scroll)
+    cnoremap <nowait> <C-t> <Plug>(fall-list-first)
+    cnoremap <nowait> <C-g> <Plug>(fall-list-last)
+    cnoremap <nowait> <C-p> <Plug>(fall-list-prev)
+    cnoremap <nowait> <C-n> <Plug>(fall-list-next)
+    cnoremap <nowait> <C-u> <Plug>(fall-list-prev:scroll)
+    cnoremap <nowait> <C-d> <Plug>(fall-list-next:scroll)
+    cnoremap <nowait> <PageUp> <Plug>(fall-list-left)
+    cnoremap <nowait> <PageDown> <Plug>(fall-list-right)
+    cnoremap <nowait> <S-PageUp> <Plug>(fall-list-left:scroll)
+    cnoremap <nowait> <S-PageDown> <Plug>(fall-list-right:scroll)
     cnoremap <nowait> <C-,> <Plug>(fall-select)
     cnoremap <nowait> <C-.> <Plug>(fall-select-all)
-    cnoremap <nowait> <C-j> <Plug>(fall-select)<Plug>(fall-next)
-    cnoremap <nowait> <C-k> <Plug>(fall-prev)<Plug>(fall-select)
+    cnoremap <nowait> <C-j> <Plug>(fall-select)<Plug>(fall-list-next)
+    cnoremap <nowait> <C-k> <Plug>(fall-list-prev)<Plug>(fall-select)
     " Preview
     cnoremap <nowait> <M-Home> <Plug>(fall-preview-first)
     cnoremap <nowait> <M-End> <Plug>(fall-preview-last)
