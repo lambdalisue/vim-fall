@@ -178,7 +178,7 @@ async function startPicker(
       actionName = params.defaultAction;
     }
 
-    // Execute the action AFTER the picker is closed
+    // Execute the action
     const action = params.actions[actionName];
     if (!action) {
       throw new Error(`Action "${actionName}" is not found`);
