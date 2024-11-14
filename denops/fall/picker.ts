@@ -29,6 +29,11 @@ import { consume, type Event } from "./event.ts";
 
 const SCHEDULER_INTERVAL = 10;
 
+type ReservedCallback = (
+  denops: Denops,
+  options: { signal?: AbortSignal },
+) => void | Promise<void>;
+
 export type PickerParams<T extends Detail> = {
   name: string;
   screen: Size;
@@ -222,6 +227,10 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       await Cmdliner.accept(denops);
       action = name;
     };
+    let reservedCallbacks: ReservedCallback[] = [];
+    const reserve = (callback: ReservedCallback) => {
+      reservedCallbacks.push(callback);
+    };
     const cmdliner = new Cmdliner({
       cmdline: this.#inputComponent.cmdline,
       cmdpos: this.#inputComponent.cmdpos,
@@ -231,8 +240,14 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       // Check cmdline/cmdpos
       await cmdliner.check(denops);
 
-      // Handle events
-      consume((event) => this.#handleEvent(denops, event, { accept }));
+      // Handle events synchronously
+      consume((event) => this.#handleEvent(event, { accept, reserve }));
+
+      // Handle reserved callbacks asynchronously
+      for (const callback of reservedCallbacks) {
+        await callback(denops, { signal });
+      }
+      reservedCallbacks = [];
 
       // Render components
       const renderResults = [
@@ -326,17 +341,20 @@ export class Picker<T extends Detail> implements AsyncDisposable {
     }
   }
 
-  #handleEvent(denops: Denops, event: Event, { accept }: {
+  #handleEvent(event: Event, { accept, reserve }: {
     accept: (name: string) => Promise<void>;
+    reserve: (callback: ReservedCallback) => void;
   }): void {
     switch (event.type) {
       case "vim-cmdline-changed":
         this.#inputComponent.cmdline = event.cmdline;
-        this.#matchProcessor.start(denops, {
-          items: this.#collectProcessor.items,
-          query: event.cmdline,
-        }, {
-          restart: true,
+        reserve((denops) => {
+          this.#matchProcessor.start(denops, {
+            items: this.#collectProcessor.items,
+            query: event.cmdline,
+          }, {
+            restart: true,
+          });
         });
         break;
       case "vim-cmdpos-changed":
@@ -345,15 +363,19 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       case "move-cursor": {
         const amplifier = event.scroll ? this.#listComponent.scroll : 1;
         this.#renderProcessor.cursor += event.amount * amplifier;
-        this.#renderProcessor.start(denops, {
-          items: this.#matchProcessor.items,
+        reserve((denops) => {
+          this.#renderProcessor.start(denops, {
+            items: this.#matchProcessor.items,
+          });
         });
         break;
       }
       case "move-cursor-at":
         this.#renderProcessor.cursor = event.cursor;
-        this.#renderProcessor.start(denops, {
-          items: this.#matchProcessor.items,
+        reserve((denops) => {
+          this.#renderProcessor.start(denops, {
+            items: this.#matchProcessor.items,
+          });
         });
         break;
       case "select-item":
@@ -374,21 +396,25 @@ export class Picker<T extends Detail> implements AsyncDisposable {
           }
         }
         this.#matchProcessor.matcherIndex = index;
-        this.#matchProcessor.start(denops, {
-          items: this.#collectProcessor.items,
-          query: this.#inputComponent.cmdline,
-        }, {
-          restart: true,
+        reserve((denops) => {
+          this.#matchProcessor.start(denops, {
+            items: this.#collectProcessor.items,
+            query: this.#inputComponent.cmdline,
+          }, {
+            restart: true,
+          });
         });
         break;
       }
       case "switch-matcher-at":
         this.#matchProcessor.matcherIndex = event.index;
-        this.#matchProcessor.start(denops, {
-          items: this.#collectProcessor.items,
-          query: this.#inputComponent.cmdline,
-        }, {
-          restart: true,
+        reserve((denops) => {
+          this.#matchProcessor.start(denops, {
+            items: this.#collectProcessor.items,
+            query: this.#inputComponent.cmdline,
+          }, {
+            restart: true,
+          });
         });
         break;
       case "switch-sorter": {
@@ -401,15 +427,19 @@ export class Picker<T extends Detail> implements AsyncDisposable {
           }
         }
         this.#sortProcessor.sorterIndex = index;
-        this.#sortProcessor.start(denops, {
-          items: this.#matchProcessor.items,
+        reserve((denops) => {
+          this.#sortProcessor.start(denops, {
+            items: this.#matchProcessor.items,
+          });
         });
         break;
       }
       case "switch-sorter-at":
         this.#sortProcessor.sorterIndex = event.index;
-        this.#sortProcessor.start(denops, {
-          items: this.#matchProcessor.items,
+        reserve((denops) => {
+          this.#sortProcessor.start(denops, {
+            items: this.#matchProcessor.items,
+          });
         });
         break;
       case "switch-renderer": {
@@ -422,15 +452,19 @@ export class Picker<T extends Detail> implements AsyncDisposable {
           }
         }
         this.#renderProcessor.rendererIndex = index;
-        this.#renderProcessor.start(denops, {
-          items: this.#matchProcessor.items,
+        reserve((denops) => {
+          this.#renderProcessor.start(denops, {
+            items: this.#matchProcessor.items,
+          });
         });
         break;
       }
       case "switch-renderer-at":
         this.#renderProcessor.rendererIndex = event.index;
-        this.#renderProcessor.start(denops, {
-          items: this.#matchProcessor.items,
+        reserve((denops) => {
+          this.#renderProcessor.start(denops, {
+            items: this.#matchProcessor.items,
+          });
         });
         break;
       case "switch-previewer": {
@@ -444,16 +478,20 @@ export class Picker<T extends Detail> implements AsyncDisposable {
           }
         }
         this.#previewProcessor.previewerIndex = index;
-        this.#previewProcessor.start(denops, {
-          item: this.#matchProcessor.items[this.#renderProcessor.cursor],
+        reserve((denops) => {
+          this.#previewProcessor?.start(denops, {
+            item: this.#matchProcessor.items[this.#renderProcessor.cursor],
+          });
         });
         break;
       }
       case "switch-previewer-at":
         if (!this.#previewProcessor) break;
         this.#previewProcessor.previewerIndex = event.index;
-        this.#previewProcessor.start(denops, {
-          item: this.#matchProcessor.items[this.#renderProcessor.cursor],
+        reserve((denops) => {
+          this.#previewProcessor?.start(denops, {
+            item: this.#matchProcessor.items[this.#renderProcessor.cursor],
+          });
         });
         break;
       case "action-invoke":
@@ -463,17 +501,18 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         this.#listComponent.execute(event.command);
         break;
       case "preview-component-execute":
-        if (!this.#previewComponent) break;
-        this.#previewComponent.execute(event.command);
+        this.#previewComponent?.execute(event.command);
         break;
       case "collect-processor-started":
         this.#inputComponent.collecting = true;
         break;
       case "collect-processor-updated":
         this.#inputComponent.collected = this.#collectProcessor.items.length;
-        this.#matchProcessor.start(denops, {
-          items: this.#collectProcessor.items,
-          query: this.#inputComponent.cmdline,
+        reserve((denops) => {
+          this.#matchProcessor.start(denops, {
+            items: this.#collectProcessor.items,
+            query: this.#inputComponent.cmdline,
+          });
         });
         break;
       case "collect-processor-succeeded":
@@ -492,15 +531,19 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         break;
       case "match-processor-updated":
         this.#inputComponent.processed = this.#matchProcessor.items.length;
-        this.#sortProcessor.start(denops, {
-          items: this.#matchProcessor.items,
+        reserve((denops) => {
+          this.#sortProcessor.start(denops, {
+            items: this.#matchProcessor.items,
+          });
         });
         break;
       case "match-processor-succeeded":
         this.#inputComponent.processing = false;
         this.#inputComponent.processed = this.#matchProcessor.items.length;
-        this.#sortProcessor.start(denops, {
-          items: this.#matchProcessor.items,
+        reserve((denops) => {
+          this.#sortProcessor.start(denops, {
+            items: this.#matchProcessor.items,
+          });
         });
         break;
       case "match-processor-failed": {
@@ -514,8 +557,10 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       case "sort-processor-started":
         break;
       case "sort-processor-succeeded": {
-        this.#renderProcessor.start(denops, {
-          items: this.#sortProcessor.items,
+        reserve((denops) => {
+          this.#renderProcessor.start(denops, {
+            items: this.#sortProcessor.items,
+          });
         });
         break;
       }
@@ -526,8 +571,10 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         }
         console.warn(`[fall] Failed to sort items:`, event.err);
         // Even if sorting failed, try to render items
-        this.#renderProcessor.start(denops, {
-          items: this.#matchProcessor.items,
+        reserve((denops) => {
+          this.#renderProcessor.start(denops, {
+            items: this.#matchProcessor.items,
+          });
         });
         break;
       }
@@ -537,8 +584,10 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         const line = this.#renderProcessor.line;
         this.#listComponent.items = this.#renderProcessor.items;
         this.#listComponent.execute(`silent! normal! ${line}G`);
-        this.#previewProcessor?.start(denops, {
-          item: this.#matchProcessor.items[this.#renderProcessor.cursor],
+        reserve((denops) => {
+          this.#previewProcessor?.start(denops, {
+            item: this.#matchProcessor.items[this.#renderProcessor.cursor],
+          });
         });
         break;
       }
