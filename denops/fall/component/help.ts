@@ -82,7 +82,7 @@ export class HelpComponent extends BaseComponent {
     await fn.win_execute(
       denops,
       winid,
-      "setlocal nocursorline signcolumn=no nowrap nofoldenable nonumber norelativenumber filetype=fall-document",
+      "setlocal nocursorline signcolumn=no nowrap nofoldenable nonumber norelativenumber filetype=fall-help",
     );
 
     this.forceRender();
