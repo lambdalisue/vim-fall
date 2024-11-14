@@ -2,13 +2,7 @@ import type { Denops, Entrypoint } from "jsr:@denops/std@^7.3.2";
 import * as opt from "jsr:@denops/std@^7.3.2/option";
 import { collect } from "jsr:@denops/std@^7.3.2/batch";
 import { ensurePromise } from "jsr:@core/asyncutil@^1.2.0/ensure-promise";
-import {
-  as,
-  assert,
-  ensure,
-  is,
-  type Predicate,
-} from "jsr:@core/unknownutil@^4.3.0";
+import { as, assert, ensure, is } from "jsr:@core/unknownutil@^4.3.0";
 import type { Size } from "jsr:@vim-fall/std@^0.4.0/coordinator";
 import type { DetailUnit } from "jsr:@vim-fall/std@^0.4.0/item";
 import type {
@@ -23,6 +17,12 @@ import {
   listItemPickerNames,
   loadUserConfig,
 } from "../config.ts";
+import {
+  isOptions,
+  isParams,
+  isScreen,
+  isStringArray,
+} from "../util/predicate.ts";
 import { Picker } from "../picker.ts";
 
 let initialized: Promise<void> | undefined;
@@ -34,7 +34,7 @@ export const main: Entrypoint = (denops) => {
     "picker:command": async (args) => {
       await init(denops);
       // Split the command arguments
-      const [name, ...sourceArgs] = ensure(args, isArgs);
+      const [name, ...sourceArgs] = ensure(args, isStringArray);
       // Load user config
       const itemPickerParams = getItemPickerParams(name);
       if (!itemPickerParams) {
@@ -63,7 +63,7 @@ export const main: Entrypoint = (denops) => {
     },
     "picker:start": async (args, screen, params, options) => {
       await init(denops);
-      assert(args, isArgs);
+      assert(args, isStringArray);
       assert(screen, isScreen);
       assert(params, isParams);
       assert(options, isOptions);
@@ -200,27 +200,3 @@ async function startPicker(
     return;
   }
 }
-
-const isArgs = is.ArrayOf(is.String);
-
-const isScreen = is.ObjectOf({
-  width: is.Number,
-  height: is.Number,
-}) satisfies Predicate<Size>;
-
-const isParams = is.ObjectOf({
-  name: is.String,
-  source: is.Any,
-  actions: is.Any,
-  defaultAction: is.String,
-  matchers: is.Any,
-  sorters: as.Optional(is.Any),
-  renderers: as.Optional(is.Any),
-  previewers: as.Optional(is.Any),
-  coordinator: is.Any,
-  theme: is.Any,
-}) satisfies Predicate<ItemPickerParams<DetailUnit, string> & GlobalConfig>;
-
-const isOptions = is.ObjectOf({
-  signal: as.Optional(is.InstanceOf(AbortSignal)),
-});

@@ -15,6 +15,7 @@ import type { Theme } from "jsr:@vim-fall/std@^0.4.0/theme";
 
 import { Scheduler } from "./lib/scheduler.ts";
 import { Cmdliner } from "./util/cmdliner.ts";
+import { isIncrementalMatcher } from "./util/predicate.ts";
 import { emitPickerEnter, emitPickerLeave } from "./util/emitter.ts";
 import { CollectProcessor } from "./processor/collect.ts";
 import { MatchProcessor } from "./processor/match.ts";
@@ -580,8 +581,4 @@ async function getScreenSize(denops: Denops): Promise<Size> {
     opt.lines.get(denops),
   ]);
   return { width, height };
-}
-
-function isIncrementalMatcher<T extends Detail>(m: Matcher<T>): boolean {
-  return (m as { incremental?: boolean }).incremental ?? false;
 }
