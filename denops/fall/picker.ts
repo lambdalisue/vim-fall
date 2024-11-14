@@ -20,6 +20,7 @@ import type { Theme } from "jsr:@vim-fall/std@^0.4.0/theme";
 import { Scheduler } from "./lib/scheduler.ts";
 import { Cmdliner } from "./util/cmdliner.ts";
 import { isIncrementalMatcher } from "./util/predicate.ts";
+import { buildMappingHelpPages } from "./util/mapping.ts";
 import { emitPickerEnter, emitPickerLeave } from "./util/emitter.ts";
 import { CollectProcessor } from "./processor/collect.ts";
 import { MatchProcessor } from "./processor/match.ts";
@@ -189,6 +190,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
     const resizeComponents = stack.use(lambda.add(denops, async () => {
       const screen = await getScreenSize(denops);
       const layout = this.#coordinator.layout(screen);
+      const helpDimension = this.#getHelpDimension(screen);
       await this.#inputComponent.move(
         denops,
         layout.input,
@@ -208,9 +210,17 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       }
       await this.#helpComponent.move(
         denops,
-        this.#getHelpDimension(screen),
+        helpDimension,
         { signal },
       );
+      if (this.#helpComponent.info) {
+        // Regenerate help pages
+        this.#helpComponent.pages = await buildMappingHelpPages(
+          denops,
+          helpDimension.width,
+          helpDimension.height - 1,
+        );
+      }
       this.#inputComponent.forceRender();
       this.#listComponent.forceRender();
       this.#previewComponent?.forceRender();
@@ -540,10 +550,15 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         } else {
           reserve(async (denops, { signal }) => {
             const screen = await getScreenSize(denops);
-            const dimension = this.#getHelpDimension(screen);
+            const helpDimension = this.#getHelpDimension(screen);
+            this.#helpComponent.pages = await buildMappingHelpPages(
+              denops,
+              helpDimension.width,
+              helpDimension.height - 1,
+            );
             this.#helpComponent.open(
               denops,
-              dimension,
+              helpDimension,
               { signal },
             );
           });

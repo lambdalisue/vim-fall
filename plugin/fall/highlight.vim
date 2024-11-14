@@ -24,6 +24,9 @@ function! s:init() abort
 
   " Help
   highlight default link FallHelpHeader Conceal
+  highlight default link FallHelpMappingLhs Special
+  highlight default link FallHelpMappingRhs Title
+  highlight default link FallHelpMappingOperator Operator
 endfunction
 
 augroup fall_plugin_highlight
