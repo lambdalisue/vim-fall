@@ -5,7 +5,11 @@ import * as lambda from "jsr:@denops/std@^7.3.2/lambda";
 import { collect } from "jsr:@denops/std@^7.3.2/batch";
 import { unreachable } from "jsr:@core/errorutil@^1.2.0/unreachable";
 import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.4.0/item";
-import type { Coordinator, Size } from "jsr:@vim-fall/std@^0.4.0/coordinator";
+import type {
+  Coordinator,
+  Dimension,
+  Size,
+} from "jsr:@vim-fall/std@^0.4.0/coordinator";
 import type { Source } from "jsr:@vim-fall/std@^0.4.0/source";
 import type { Matcher } from "jsr:@vim-fall/std@^0.4.0/matcher";
 import type { Sorter } from "jsr:@vim-fall/std@^0.4.0/sorter";
@@ -25,6 +29,7 @@ import { PreviewProcessor } from "./processor/preview.ts";
 import { InputComponent } from "./component/input.ts";
 import { ListComponent } from "./component/list.ts";
 import { PreviewComponent } from "./component/preview.ts";
+import { HelpComponent } from "./component/help.ts";
 import { consume, type Event } from "./event.ts";
 
 const SCHEDULER_INTERVAL = 10;
@@ -60,6 +65,7 @@ export type PickerOptions = {
 };
 
 export class Picker<T extends Detail> implements AsyncDisposable {
+  static readonly ZINDEX_ALLOCATION = 4;
   readonly #stack = new AsyncDisposableStack();
   readonly #schedulerInterval: number;
   readonly #name: string;
@@ -72,6 +78,9 @@ export class Picker<T extends Detail> implements AsyncDisposable {
   readonly #inputComponent: InputComponent;
   readonly #listComponent: ListComponent;
   readonly #previewComponent?: PreviewComponent;
+  readonly #helpComponent: HelpComponent;
+  readonly #helpWidthRatio = 0.98;
+  readonly #helpHeightRatio = 0.3;
   #selection: Set<unknown> = new Set();
 
   constructor(params: PickerParams<T>, options: PickerOptions = {}) {
@@ -103,6 +112,13 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         }),
       );
     }
+    this.#helpComponent = this.#stack.use(
+      new HelpComponent({
+        title: " Help ",
+        border: theme.border,
+        zindex: zindex + 3,
+      }),
+    );
 
     // Processor
     this.#collectProcessor = this.#stack.use(
@@ -125,6 +141,14 @@ export class Picker<T extends Detail> implements AsyncDisposable {
     this.#previewProcessor = this.#stack.use(
       new PreviewProcessor(params.previewers ?? []),
     );
+  }
+
+  #getHelpDimension(screen: Size): Dimension {
+    const width = Math.floor(screen.width * this.#helpWidthRatio);
+    const height = Math.floor(screen.height * this.#helpHeightRatio);
+    const row = Math.floor(screen.height - height - 2);
+    const col = Math.floor((screen.width - width) / 2);
+    return { row, col, width, height };
   }
 
   async open(
@@ -182,9 +206,15 @@ export class Picker<T extends Detail> implements AsyncDisposable {
           { signal },
         );
       }
+      await this.#helpComponent.move(
+        denops,
+        this.#getHelpDimension(screen),
+        { signal },
+      );
       this.#inputComponent.forceRender();
       this.#listComponent.forceRender();
       this.#previewComponent?.forceRender();
+      this.#helpComponent.forceRender();
       this.#renderProcessor.height = layout.list.height;
     }));
     const autocmdGroupName = `fall-picker-${this.#name}-${resizeComponents.id}`;
@@ -254,6 +284,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         await this.#inputComponent.render(denops, { signal }),
         await this.#listComponent.render(denops, { signal }),
         await this.#previewComponent?.render(denops, { signal }),
+        await this.#helpComponent.render(denops, { signal }),
       ];
       if (renderResults.some((result) => result === true)) {
         await denops.cmd("redraw");
@@ -502,6 +533,24 @@ export class Picker<T extends Detail> implements AsyncDisposable {
         break;
       case "preview-component-execute":
         this.#previewComponent?.execute(event.command);
+        break;
+      case "help-component-toggle":
+        if (this.#helpComponent.info) {
+          this.#helpComponent.close();
+        } else {
+          reserve(async (denops, { signal }) => {
+            const screen = await getScreenSize(denops);
+            const dimension = this.#getHelpDimension(screen);
+            this.#helpComponent.open(
+              denops,
+              dimension,
+              { signal },
+            );
+          });
+        }
+        break;
+      case "help-component-page":
+        this.#helpComponent.page += event.amount;
         break;
       case "collect-processor-started":
         this.#inputComponent.collecting = true;

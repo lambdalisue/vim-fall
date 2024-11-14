@@ -185,4 +185,12 @@ export const isEventComplement = is.UnionOf([
     type: is.LiteralOf("preview-component-execute"),
     command: is.String,
   }),
+  // Help
+  is.ObjectOf({
+    type: is.LiteralOf("help-component-toggle"),
+  }),
+  is.ObjectOf({
+    type: is.LiteralOf("help-component-page"),
+    amount: is.Number,
+  }),
 ]) satisfies Predicate<Event>;

@@ -32,6 +32,8 @@ export type Event =
   | { type: "action-invoke"; name: string }
   | { type: "list-component-execute"; command: string }
   | { type: "preview-component-execute"; command: string }
+  | { type: "help-component-toggle" }
+  | { type: "help-component-page"; amount: number }
   | { type: "collect-processor-started" }
   | { type: "collect-processor-updated" }
   | { type: "collect-processor-succeeded" }

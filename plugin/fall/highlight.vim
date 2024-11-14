@@ -21,6 +21,9 @@ function! s:init() abort
   highlight default link FallListMatch Search
   highlight default link FallListSelected CurSearch
   sign define FallListSelected text=≫
+
+  " Help
+  highlight default link FallHelpHeader Conceal
 endfunction
 
 augroup fall_plugin_highlight

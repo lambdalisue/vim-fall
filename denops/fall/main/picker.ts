@@ -115,6 +115,10 @@ async function startPicker(
   await using stack = new AsyncDisposableStack();
   const pickerParams = { screen, ...params };
   const itemPicker = stack.use(new Picker({ ...pickerParams, zindex }));
+  zindex += Picker.ZINDEX_ALLOCATION;
+  stack.defer(() => {
+    zindex -= Picker.ZINDEX_ALLOCATION;
+  });
   const actionPicker = stack.use(
     new Picker({
       name: "@action",
@@ -129,14 +133,14 @@ async function startPicker(
         },
       },
       ...getActionPickerParams(),
-      zindex: zindex + 3,
+      zindex,
     }),
   );
-
-  zindex += 6;
+  zindex += Picker.ZINDEX_ALLOCATION;
   stack.defer(() => {
-    zindex -= 6;
+    zindex -= Picker.ZINDEX_ALLOCATION;
   });
+
   stack.use(await itemPicker.open(denops, { signal }));
   while (true) {
     // Select items

@@ -49,6 +49,11 @@ cnoremap <silent> <Plug>(fall-preview-right) <Cmd>call fall#internal#dispatch(#{
 cnoremap <silent> <Plug>(fall-preview-left:scroll) <Cmd>call fall#internal#dispatch(#{type: 'preview-component-execute', command: 'silent! normal! zH'})<CR>
 cnoremap <silent> <Plug>(fall-preview-right:scroll) <Cmd>call fall#internal#dispatch(#{type: 'preview-component-execute', command: 'silent! normal! zL'})<CR>
 
+" Help
+cnoremap <silent> <Plug>(fall-help) <Cmd>call fall#internal#dispatch(#{type: 'help-component-toggle'})<CR>
+cnoremap <silent> <Plug>(fall-help-prev) <Cmd>call fall#internal#dispatch(#{type: 'help-component-page', amount: -1})<CR>
+cnoremap <silent> <Plug>(fall-help-next) <Cmd>call fall#internal#dispatch(#{type: 'help-component-page', amount: 1})<CR>
+
 " Action
 cnoremap <silent> <Plug>(fall-action-select) <Cmd>call fall#action('@select')<CR>
 
@@ -82,6 +87,10 @@ if !get(g:, 'fall_disable_default_mapping')
     cnoremap <nowait> <S-Right> <Plug>(fall-preview-right:scroll)
     " Action
     cnoremap <nowait> <Tab> <Plug>(fall-action-select)
+    " Help
+    cnoremap <nowait> <F1> <Plug>(fall-help)
+    cnoremap <nowait> <S-Home> <Plug>(fall-help-prev)
+    cnoremap <nowait> <S-End> <Plug>(fall-help-next)
     " Switch
     cnoremap <nowait> <F2> <Plug>(fall-switch-matcher-next)
     cnoremap <nowait> <F3> <Plug>(fall-switch-sorter-next)
