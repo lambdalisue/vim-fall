@@ -5,7 +5,6 @@ import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.4.0/item";
 import type { Matcher, MatchParams } from "jsr:@vim-fall/std@^0.4.0/matcher";
 
 import { Chunker } from "../lib/chunker.ts";
-import { dispose } from "../lib/dispose.ts";
 import { dispatch } from "../event.ts";
 
 const INTERVAL = 0;
@@ -19,7 +18,7 @@ export type MatchProcessorOptions = {
   incremental?: boolean;
 };
 
-export class MatchProcessor<T extends Detail> implements AsyncDisposable {
+export class MatchProcessor<T extends Detail> implements Disposable {
   readonly #matchers: readonly [Matcher<T>, ...Matcher<T>[]];
   readonly #interval: number;
   readonly #threshold: number;
@@ -138,12 +137,11 @@ export class MatchProcessor<T extends Detail> implements AsyncDisposable {
       });
   }
 
-  async [Symbol.asyncDispose]() {
+  [Symbol.dispose](): void {
     try {
       this.#controller.abort(null);
     } catch {
       // Ignore
     }
-    await Promise.all(this.#matchers.map((v) => dispose(v)));
   }
 }

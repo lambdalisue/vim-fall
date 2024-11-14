@@ -5,10 +5,9 @@ import type {
   PreviewParams,
 } from "jsr:@vim-fall/std@^0.4.0/previewer";
 
-import { dispose } from "../lib/dispose.ts";
 import { dispatch } from "../event.ts";
 
-export class PreviewProcessor<T extends Detail> implements AsyncDisposable {
+export class PreviewProcessor<T extends Detail> implements Disposable {
   readonly #previewers: Previewer<T>[];
   readonly #controller: AbortController = new AbortController();
   #processing?: Promise<void>;
@@ -94,12 +93,11 @@ export class PreviewProcessor<T extends Detail> implements AsyncDisposable {
       });
   }
 
-  async [Symbol.asyncDispose]() {
+  [Symbol.dispose](): void {
     try {
       this.#controller.abort(null);
     } catch {
       // Ignore
     }
-    await Promise.all(this.#previewers.map((v) => dispose(v)));
   }
 }

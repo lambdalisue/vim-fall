@@ -16,7 +16,6 @@ import type {
   ItemPickerParams,
 } from "jsr:@vim-fall/std@^0.4.0/config";
 
-import { ensureAsyncDisposable } from "../lib/dispose.ts";
 import {
   getActionPickerParams,
   getGlobalConfig,
@@ -184,7 +183,6 @@ async function startPicker(
     if (!action) {
       throw new Error(`Action "${actionName}" is not found`);
     }
-    await using _guardAction = ensureAsyncDisposable(action);
     const actionParams = {
       // for 'submatch' action
       _submatchContext: {

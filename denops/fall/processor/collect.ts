@@ -5,7 +5,6 @@ import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.4.0/item";
 import type { CollectParams, Source } from "jsr:@vim-fall/std@^0.4.0/source";
 
 import { Chunker } from "../lib/chunker.ts";
-import { dispose } from "../lib/dispose.ts";
 import { dispatch } from "../event.ts";
 
 const THRESHOLD = 100000;
@@ -16,7 +15,7 @@ export type CollectProcessorOptions = {
   chunkSize?: number;
 };
 
-export class CollectProcessor<T extends Detail> implements AsyncDisposable {
+export class CollectProcessor<T extends Detail> implements Disposable {
   readonly #source: Source<T>;
   readonly #threshold: number;
   readonly #chunkSize: number;
@@ -110,12 +109,11 @@ export class CollectProcessor<T extends Detail> implements AsyncDisposable {
     this.#paused = undefined;
   }
 
-  async [Symbol.asyncDispose](): Promise<void> {
+  [Symbol.dispose](): void {
     try {
       this.#controller.abort(null);
     } catch {
       // Ignore
     }
-    await dispose(this.#source);
   }
 }

@@ -2,10 +2,9 @@ import type { Denops } from "jsr:@denops/std@^7.3.2";
 import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.4.0/item";
 import type { Sorter } from "jsr:@vim-fall/std@^0.4.0/sorter";
 
-import { dispose } from "../lib/dispose.ts";
 import { dispatch } from "../event.ts";
 
-export class SortProcessor<T extends Detail> implements AsyncDisposable {
+export class SortProcessor<T extends Detail> implements Disposable {
   readonly #sorters: Sorter<T>[];
   readonly #controller: AbortController = new AbortController();
   #processing?: Promise<void>;
@@ -87,12 +86,11 @@ export class SortProcessor<T extends Detail> implements AsyncDisposable {
       });
   }
 
-  async [Symbol.asyncDispose]() {
+  [Symbol.dispose](): void {
     try {
       this.#controller.abort(null);
     } catch {
       // Ignore
     }
-    await Promise.all(this.#sorters.map((v) => dispose(v)));
   }
 }

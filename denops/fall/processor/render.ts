@@ -7,7 +7,6 @@ import type {
 import type { Renderer } from "jsr:@vim-fall/std@^0.4.0/renderer";
 
 import { adjustOffset } from "../lib/adjust_offset.ts";
-import { dispose } from "../lib/dispose.ts";
 import { dispatch } from "../event.ts";
 
 const HEIGHT = 10;
@@ -18,7 +17,7 @@ export type RenderProcessorOptions = {
   scrollOffset?: number;
 };
 
-export class RenderProcessor<T extends Detail> implements AsyncDisposable {
+export class RenderProcessor<T extends Detail> implements Disposable {
   readonly #renderers: Renderer<T>[];
   #height: number;
   #scrollOffset: number;
@@ -183,12 +182,11 @@ export class RenderProcessor<T extends Detail> implements AsyncDisposable {
       });
   }
 
-  async [Symbol.asyncDispose]() {
+  [Symbol.dispose](): void {
     try {
       this.#controller.abort(null);
     } catch {
       // Ignore
     }
-    await Promise.all(this.#renderers.map((v) => dispose(v)));
   }
 }
