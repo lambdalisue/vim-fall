@@ -547,6 +547,9 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       case "help-component-toggle":
         if (this.#helpComponent.info) {
           this.#helpComponent.close();
+          reserve(async (denops) => {
+            await denops.cmd("redraw");
+          });
         } else {
           reserve(async (denops, { signal }) => {
             const screen = await getScreenSize(denops);
