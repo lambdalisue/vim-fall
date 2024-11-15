@@ -9,7 +9,7 @@ import {
   type IdItem,
   type Previewer,
 } from "jsr:@vim-fall/core@^0.2.1";
-import { definePreviewer } from "jsr:@vim-fall/std@^0.4.0";
+import { definePreviewer } from "jsr:@vim-fall/std@^0.5.0";
 
 import { dispose } from "../lib/dispose.ts";
 import { PreviewProcessor } from "./preview.ts";

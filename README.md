@@ -82,7 +82,7 @@ fundamental pickers as default configurations.
 
 ```typescript
 import { type Entrypoint } from "jsr:@vim-fall/config@^0.17.3";
-import * as builtin from "jsr:@vim-fall/std@^0.4.0/builtin";
+import * as builtin from "jsr:@vim-fall/std@^0.5.0/builtin";
 
 export const main: Entrypoint = ({
   defineItemPickerFromSource,
