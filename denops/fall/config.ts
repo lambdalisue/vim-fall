@@ -1,18 +1,53 @@
 import type { Denops } from "jsr:@denops/std@^7.3.2";
+import {
+  buildRefineGlobalConfig,
+  type GlobalConfig,
+} from "jsr:@vim-fall/config@^0.17.3/global-config";
+import {
+  type ActionPickerParams,
+  buildRefineActionPicker,
+} from "jsr:@vim-fall/config@^0.17.3/action-picker";
+import {
+  buildDefineItemPickerFromCurator,
+  buildDefineItemPickerFromSource,
+  type ItemPickerParams,
+} from "jsr:@vim-fall/config@^0.17.3/item-picker";
 
-import {
-  refineActionPicker,
-  resetActionPickerParams,
-} from "./config/action_picker.ts";
-import {
-  refineGlobalConfig,
-  resetGlobalConfig,
-} from "./config/global_config.ts";
-import {
-  defineItemPickerFromCurator,
-  defineItemPickerFromSource,
-  resetItemPickerParams,
-} from "./config/item_picker.ts";
+import { modern } from "jsr:@vim-fall/std@^0.4.0/builtin/coordinator/modern";
+import { MODERN_THEME } from "jsr:@vim-fall/std@^0.4.0/builtin/theme/modern";
+import { fzf } from "jsr:@vim-fall/std@^0.4.0/builtin/matcher/fzf";
+
+const defaultGlobalConfig: GlobalConfig = {
+  coordinator: modern(),
+  theme: MODERN_THEME,
+};
+let globalConfig = { ...defaultGlobalConfig };
+
+const defaultActionPickerParams: ActionPickerParams = {
+  matchers: [fzf()],
+  coordinator: modern({
+    widthRatio: 0.4,
+    heightRatio: 0.4,
+  }),
+};
+let actionPickerParams = { ...defaultActionPickerParams };
+
+const itemPickerParamsMap = new Map<string, ItemPickerParams>();
+
+const refineGlobalConfig = buildRefineGlobalConfig(globalConfig);
+const refineActionPicker = buildRefineActionPicker(actionPickerParams);
+const defineItemPickerFromSource = buildDefineItemPickerFromSource(
+  itemPickerParamsMap,
+);
+const defineItemPickerFromCurator = buildDefineItemPickerFromCurator(
+  itemPickerParamsMap,
+);
+
+function reset(): void {
+  globalConfig = { ...defaultGlobalConfig };
+  actionPickerParams = { ...defaultActionPickerParams };
+  itemPickerParamsMap.clear();
+}
 
 export async function loadUserConfig(
   denops: Denops,
@@ -28,9 +63,7 @@ export async function loadUserConfig(
   };
   try {
     const { main } = await import(`${path}${suffix ?? ""}`);
-    resetGlobalConfig();
-    resetActionPickerParams();
-    resetItemPickerParams();
+    reset();
     await main(ctx);
   } catch (e) {
     console.warn(
@@ -43,9 +76,29 @@ export async function loadUserConfig(
   }
 }
 
-export { getGlobalConfig } from "./config/global_config.ts";
-export { getActionPickerParams } from "./config/action_picker.ts";
-export {
-  getItemPickerParams,
-  listItemPickerNames,
-} from "./config/item_picker.ts";
+export function getGlobalConfig(): Readonly<GlobalConfig> {
+  return globalConfig;
+}
+
+export function getActionPickerParams(): Readonly<
+  ActionPickerParams & GlobalConfig
+> {
+  return {
+    ...getGlobalConfig(),
+    ...actionPickerParams,
+  };
+}
+
+export function listItemPickerNames(): readonly string[] {
+  return Array.from(itemPickerParamsMap.keys());
+}
+
+export function getItemPickerParams(
+  name: string,
+): Readonly<ItemPickerParams & GlobalConfig> | undefined {
+  const params = itemPickerParamsMap.get(name);
+  if (params) {
+    return { ...getGlobalConfig(), ...params };
+  }
+  return undefined;
+}
