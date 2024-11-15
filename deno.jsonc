@@ -1,4 +1,24 @@
 {
+  "name": "@vim-fall/config",
+  "version": "0.0.0",
+  "exports": {
+    ".": "./denops/@fall-config/mod.ts",
+    "./config": "./denops/@fall-config/config.ts",
+    "./derivable": "./denops/@fall-config/derivable.ts"
+  },
+  "publish": {
+    "include": [
+      "**/*.ts",
+      "./denops/@fall-config/README.md",
+      "LICENSE"
+    ],
+    "exclude": [
+      ".script/**",
+      "*_test.ts",
+      "*_bench.ts",
+      "./denops/fall/**"
+    ]
+  },
   "exclude": [
     "docs/**",
     ".coverage/**"

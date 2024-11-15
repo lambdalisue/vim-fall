@@ -121,3 +121,14 @@ jobs:
           os: ${{ runner.os }}
           files: ./coverage.lcov
           token: ${{ secrets.CODECOV_TOKEN }}
+
+  jsr-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: denoland/setup-deno@v2
+        with:
+          deno-version: "2.x"
+      - name: Publish (dry-run)
+        run: |
+          deno publish --dry-run

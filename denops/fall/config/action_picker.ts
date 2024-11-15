@@ -1,17 +1,17 @@
+import { modern } from "jsr:@vim-fall/std@^0.4.0/builtin/coordinator/modern";
+import { fzf as fzfMatcher } from "jsr:@vim-fall/std@^0.4.0/builtin/matcher/fzf";
+
 import type {
   ActionPickerParams,
   GlobalConfig,
   RefineActionPicker,
-} from "jsr:@vim-fall/std@^0.4.0/config";
-import { modern as modernCoordinator } from "jsr:@vim-fall/std@^0.4.0/builtin/coordinator/modern";
-import { fzf as fzfMatcher } from "jsr:@vim-fall/std@^0.4.0/builtin/matcher/fzf";
-import { derive, deriveArray } from "jsr:@vim-fall/std@^0.4.0/util/derivable";
-
+} from "../../@fall-config/config.ts";
+import { derive, deriveArray } from "../../@fall-config/derivable.ts";
 import { getGlobalConfig } from "./global_config.ts";
 
 const actionPickerParams: ActionPickerParams = {
   matchers: [fzfMatcher()],
-  coordinator: modernCoordinator({
+  coordinator: modern({
     hidePreview: true,
     widthRatio: 0.4,
     heightRatio: 0.4,
@@ -20,7 +20,7 @@ const actionPickerParams: ActionPickerParams = {
 
 export function resetActionPickerParams(): void {
   actionPickerParams.matchers = [fzfMatcher()];
-  actionPickerParams.coordinator = modernCoordinator({
+  actionPickerParams.coordinator = modern({
     hidePreview: true,
     widthRatio: 0.4,
     heightRatio: 0.4,

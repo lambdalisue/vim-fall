@@ -4,18 +4,18 @@ import type { Curator } from "jsr:@vim-fall/std@^0.4.0/curator";
 import type { Action } from "jsr:@vim-fall/std@^0.4.0/action";
 import type { CollectParams, Source } from "jsr:@vim-fall/std@^0.4.0/source";
 import type { Matcher, MatchParams } from "jsr:@vim-fall/std@^0.4.0/matcher";
+
 import type {
   DefineItemPickerFromCurator,
   DefineItemPickerFromSource,
   GlobalConfig,
   ItemPickerParams,
-} from "jsr:@vim-fall/std@^0.4.0/config";
+} from "../../@fall-config/config.ts";
 import {
   derive,
   deriveArray,
   deriveMap,
-} from "jsr:@vim-fall/std@^0.4.0/util/derivable";
-
+} from "../../@fall-config/derivable.ts";
 import { getGlobalConfig } from "./global_config.ts";
 
 type Actions = ItemPickerParams<DetailUnit, string>["actions"];

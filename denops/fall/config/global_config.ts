@@ -1,18 +1,19 @@
+import { modern as modern } from "jsr:@vim-fall/std@^0.4.0/builtin/coordinator/modern";
+import { MODERN_THEME } from "jsr:@vim-fall/std@^0.4.0/builtin/theme/modern";
+
 import type {
   GlobalConfig,
   RefineGlobalConfig,
-} from "jsr:@vim-fall/std@^0.4.0/config";
-import { modern as modernLayout } from "jsr:@vim-fall/std@^0.4.0/builtin/coordinator/modern";
-import { MODERN_THEME } from "jsr:@vim-fall/std@^0.4.0/builtin/theme/modern";
-import { derive } from "jsr:@vim-fall/std@^0.4.0/util/derivable";
+} from "../../@fall-config/config.ts";
+import { derive } from "../../@fall-config/derivable.ts";
 
 const globalConfig: GlobalConfig = {
-  coordinator: modernLayout(),
+  coordinator: modern(),
   theme: MODERN_THEME,
 };
 
 export function resetGlobalConfig(): void {
-  globalConfig.coordinator = modernLayout();
+  globalConfig.coordinator = modern();
   globalConfig.theme = MODERN_THEME;
 }
 

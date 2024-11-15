@@ -14,13 +14,6 @@ import {
   resetItemPickerParams,
 } from "./config/item_picker.ts";
 
-export { getGlobalConfig } from "./config/global_config.ts";
-export { getActionPickerParams } from "./config/action_picker.ts";
-export {
-  getItemPickerParams,
-  listItemPickerNames,
-} from "./config/item_picker.ts";
-
 export async function loadUserConfig(
   denops: Denops,
   path: string,
@@ -49,3 +42,10 @@ export async function loadUserConfig(
     await main(ctx);
   }
 }
+
+export { getGlobalConfig } from "./config/global_config.ts";
+export { getActionPickerParams } from "./config/action_picker.ts";
+export {
+  getItemPickerParams,
+  listItemPickerNames,
+} from "./config/item_picker.ts";
