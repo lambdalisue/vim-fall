@@ -140,6 +140,9 @@ async function startPicker(
 
   stack.use(await itemPicker.open(denops, { signal }));
   while (true) {
+    // Redraw the screen to clean up the closed action picker
+    await denops.cmd("redraw");
+
     // Select items
     const resultItem = await itemPicker.start(
       denops,
