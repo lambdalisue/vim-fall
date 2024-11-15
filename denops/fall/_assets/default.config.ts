@@ -1,6 +1,6 @@
+import type { Entrypoint } from "jsr:@vim-fall/config@^0.17.3";
 import {
   composeRenderers,
-  type Entrypoint,
   refineCurator,
   refineSource,
 } from "jsr:@vim-fall/std@^0.4.0";

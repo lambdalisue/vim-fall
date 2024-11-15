@@ -5,11 +5,11 @@ import { DenopsStub } from "jsr:@denops/test@^3.0.4";
 import { Notify } from "jsr:@core/asyncutil@^1.2.0";
 import { flushPromises } from "jsr:@core/asyncutil@^1.2.0";
 import {
-  definePreviewer,
   type DetailUnit,
   type IdItem,
   type Previewer,
-} from "jsr:@vim-fall/std@^0.4.0";
+} from "jsr:@vim-fall/core@^0.2.1";
+import { definePreviewer } from "jsr:@vim-fall/std@^0.4.0";
 
 import { dispose } from "../lib/dispose.ts";
 import { PreviewProcessor } from "./preview.ts";

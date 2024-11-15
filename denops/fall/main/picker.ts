@@ -3,13 +3,10 @@ import * as opt from "jsr:@denops/std@^7.3.2/option";
 import { collect } from "jsr:@denops/std@^7.3.2/batch";
 import { ensurePromise } from "jsr:@core/asyncutil@^1.2.0/ensure-promise";
 import { as, assert, ensure, is } from "jsr:@core/unknownutil@^4.3.0";
-import type { Size } from "jsr:@vim-fall/std@^0.4.0/coordinator";
-import type { DetailUnit } from "jsr:@vim-fall/std@^0.4.0/item";
-import type {
-  GlobalConfig,
-  ItemPickerParams,
-} from "jsr:@vim-fall/std@^0.4.0/config";
+import type { Size } from "jsr:@vim-fall/core@^0.2.1/coordinator";
+import type { DetailUnit } from "jsr:@vim-fall/core@^0.2.1/item";
 
+import type { GlobalConfig, ItemPickerParams } from "../config.ts";
 import {
   getActionPickerParams,
   getGlobalConfig,

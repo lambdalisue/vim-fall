@@ -2,7 +2,7 @@ import type { Denops } from "jsr:@denops/std@^7.3.2";
 import * as fn from "jsr:@denops/std@^7.3.2/function";
 import * as buffer from "jsr:@denops/std@^7.3.2/buffer";
 import { batch } from "jsr:@denops/std@^7.3.2/batch";
-import type { Dimension } from "jsr:@vim-fall/std@^0.4.0/coordinator";
+import type { Dimension } from "jsr:@vim-fall/core@^0.2.1/coordinator";
 
 import { BaseComponent, type ComponentProperties } from "./_component.ts";
 

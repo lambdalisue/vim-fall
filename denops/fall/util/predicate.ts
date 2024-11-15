@@ -4,8 +4,6 @@ import type {
   Coordinator,
   Curator,
   Detail,
-  GlobalConfig,
-  ItemPickerParams,
   Matcher,
   Previewer,
   Renderer,
@@ -13,7 +11,9 @@ import type {
   Sorter,
   Source,
   Theme,
-} from "jsr:@vim-fall/std@^0.4.0";
+} from "jsr:@vim-fall/core@^0.2.1";
+
+import type { GlobalConfig, ItemPickerParams } from "../config.ts";
 import type { Event } from "../event.ts";
 
 export const isStringArray = is.ArrayOf(is.String);

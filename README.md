@@ -81,7 +81,7 @@ The following is a minimum configuration example. It only defines several
 fundamental pickers as default configurations.
 
 ```typescript
-import { type Entrypoint } from "jsr:@vim-fall/std@^0.4.0";
+import { type Entrypoint } from "jsr:@vim-fall/config@^0.17.3";
 import * as builtin from "jsr:@vim-fall/std@^0.4.0/builtin";
 
 export const main: Entrypoint = ({
@@ -148,11 +148,12 @@ for the full code of the default configuration.
 
 ## Related Projects
 
-| Repository                                                              | Package                                             | Description                                      |
-| ----------------------------------------------------------------------- | --------------------------------------------------- | ------------------------------------------------ |
-| [vim-fall/deno-fall-core](https://github.com/vim-fall/deno-fall-core)   | [`@vim-fall/core`](https://jsr.io/@vim-fall/core)   | Core types for Fall. Not meant for external use. |
-| [vim-fall/deno-fall-std](https://github.com/vim-fall/deno-fall-std)     | [`@vim-fall/std`](https://jsr.io/@vim-fall/std)     | Standard library for using Fall.                 |
-| [vim-fall/deno-fall-extra](https://github.com/vim-fall/deno-fall-extra) | [`@vim-fall/extra`](https://jsr.io/@vim-fall/extra) | Extra library for using Fall.                    |
+| Repository                                                                | Package                                               | Description                                      |
+| ------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------ |
+| [vim-fall/deno-fall-core](https://github.com/vim-fall/deno-fall-core)     | [`@vim-fall/core`](https://jsr.io/@vim-fall/core)     | Core types for Fall. Not meant for external use. |
+| [vim-fall/deno-fall-config](https://github.com/vim-fall/deno-fall-config) | [`@vim-fall/config`](https://jsr.io/@vim-fall/config) | Module to configure Fall.                        |
+| [vim-fall/deno-fall-std](https://github.com/vim-fall/deno-fall-std)       | [`@vim-fall/std`](https://jsr.io/@vim-fall/std)       | Standard library for using Fall.                 |
+| [vim-fall/deno-fall-extra](https://github.com/vim-fall/deno-fall-extra)   | [`@vim-fall/extra`](https://jsr.io/@vim-fall/extra)   | Extra library for using Fall.                    |
 
 ## Similar Projects
 

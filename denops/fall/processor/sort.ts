@@ -1,6 +1,6 @@
 import type { Denops } from "jsr:@denops/std@^7.3.2";
-import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.4.0/item";
-import type { Sorter } from "jsr:@vim-fall/std@^0.4.0/sorter";
+import type { Detail, IdItem } from "jsr:@vim-fall/core@^0.2.1/item";
+import type { Sorter } from "jsr:@vim-fall/core@^0.2.1/sorter";
 
 import { ItemBelt } from "../lib/item_belt.ts";
 import { dispatch } from "../event.ts";

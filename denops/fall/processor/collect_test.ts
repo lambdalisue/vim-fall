@@ -4,7 +4,8 @@ import { assertEquals, assertThrows } from "jsr:@std/assert@^1.0.7";
 import { DenopsStub } from "jsr:@denops/test@^3.0.4";
 import { Notify } from "jsr:@core/asyncutil@^1.2.0";
 import { flushPromises } from "jsr:@core/asyncutil@^1.2.0";
-import { defineSource, type Source } from "jsr:@vim-fall/std@^0.4.0";
+import type { Source } from "jsr:@vim-fall/core@^0.2.1";
+import { defineSource } from "jsr:@vim-fall/std@^0.4.0";
 
 import { dispose } from "../lib/dispose.ts";
 import { CollectProcessor } from "./collect.ts";

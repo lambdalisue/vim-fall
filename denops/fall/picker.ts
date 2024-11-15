@@ -4,18 +4,18 @@ import * as autocmd from "jsr:@denops/std@^7.3.2/autocmd";
 import * as lambda from "jsr:@denops/std@^7.3.2/lambda";
 import { collect } from "jsr:@denops/std@^7.3.2/batch";
 import { unreachable } from "jsr:@core/errorutil@^1.2.0/unreachable";
-import type { Detail, IdItem } from "jsr:@vim-fall/std@^0.4.0/item";
+import type { Detail, IdItem } from "jsr:@vim-fall/core@^0.2.1/item";
 import type {
   Coordinator,
   Dimension,
   Size,
-} from "jsr:@vim-fall/std@^0.4.0/coordinator";
-import type { Source } from "jsr:@vim-fall/std@^0.4.0/source";
-import type { Matcher } from "jsr:@vim-fall/std@^0.4.0/matcher";
-import type { Sorter } from "jsr:@vim-fall/std@^0.4.0/sorter";
-import type { Renderer } from "jsr:@vim-fall/std@^0.4.0/renderer";
-import type { Previewer } from "jsr:@vim-fall/std@^0.4.0/previewer";
-import type { Theme } from "jsr:@vim-fall/std@^0.4.0/theme";
+} from "jsr:@vim-fall/core@^0.2.1/coordinator";
+import type { Source } from "jsr:@vim-fall/core@^0.2.1/source";
+import type { Matcher } from "jsr:@vim-fall/core@^0.2.1/matcher";
+import type { Sorter } from "jsr:@vim-fall/core@^0.2.1/sorter";
+import type { Renderer } from "jsr:@vim-fall/core@^0.2.1/renderer";
+import type { Previewer } from "jsr:@vim-fall/core@^0.2.1/previewer";
+import type { Theme } from "jsr:@vim-fall/core@^0.2.1/theme";
 
 import { Scheduler } from "./lib/scheduler.ts";
 import { Cmdliner } from "./util/cmdliner.ts";
@@ -46,10 +46,10 @@ export type PickerParams<T extends Detail> = {
   theme: Theme;
   coordinator: Coordinator;
   source: Source<T>;
-  matchers: [Matcher<T>, ...Matcher<T>[]];
-  sorters?: Sorter<T>[];
-  renderers?: Renderer<T>[];
-  previewers?: Previewer<T>[];
+  matchers: readonly [Matcher<T>, ...Matcher<T>[]];
+  sorters?: readonly Sorter<T>[];
+  renderers?: readonly Renderer<T>[];
+  previewers?: readonly Previewer<T>[];
   zindex?: number;
 };
 
