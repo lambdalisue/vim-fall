@@ -3,19 +3,13 @@ function! fall#command#Fall#call(args) abort
     return
   endif
   let l:laststatus_saved = &laststatus
-  augroup fall_command_Fall
-    autocmd!
-    autocmd CmdlineEnter * call s:hide()
-    autocmd CmdlineLeave * call timer_start(0, { -> s:show() })
-  augroup END
   try
     set laststatus=0
+    call s:hide()
     call fall#internal#mapping#store()
     call denops#request('fall', 'picker:command', [a:args])
   finally
-    augroup fall_command_Fall
-      autocmd!
-    augroup END
+    call s:show()
     call fall#internal#tolerant#call({ -> fall#internal#mapping#restore() })
     call fall#internal#tolerant#call({ -> fall#internal#popup#closeall() })
     let &laststatus = l:laststatus_saved
