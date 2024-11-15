@@ -6,7 +6,7 @@ function! fall#command#Fall#call(args) abort
   augroup fall_command_Fall
     autocmd!
     autocmd CmdlineEnter * call s:hide()
-    autocmd CmdlineLeave * call s:show()
+    autocmd CmdlineLeave * call timer_start(0, { -> s:show() })
   augroup END
   try
     set laststatus=0
