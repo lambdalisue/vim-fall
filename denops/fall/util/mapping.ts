@@ -33,8 +33,8 @@ function formatMappingHelpPage(
 ): Page[] {
   const operator = " ➙ ";
   const spacer = "    ";
-  const lhsWidth = Math.max(...mappings.map(({ lhs }) => lhs.length));
-  const rhsWidth = Math.max(...mappings.map(({ rhs }) => rhs.length));
+  const lhsWidth = Math.max(...mappings.map(({ lhs }) => getByteLength(lhs)));
+  const rhsWidth = Math.max(...mappings.map(({ rhs }) => getByteLength(rhs)));
   const columnWidth = Math.min(
     width,
     lhsWidth + rhsWidth + operator.length + spacer.length,
@@ -58,7 +58,7 @@ function formatMappingHelpPage(
     const content = [...range(0, height)]
       .map((_, i) => {
         return columns
-          .map((column) => column[i] ?? "")
+          .map((column) => column[i] ?? " ".repeat(columnWidth))
           .join(spacer);
       })
       .filter((c) => c.trim() !== "");
