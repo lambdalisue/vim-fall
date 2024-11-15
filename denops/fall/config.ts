@@ -28,6 +28,7 @@ const defaultActionPickerParams: ActionPickerParams = {
   coordinator: modern({
     widthRatio: 0.4,
     heightRatio: 0.4,
+    hidePreview: true,
   }),
 };
 let actionPickerParams = { ...defaultActionPickerParams };
