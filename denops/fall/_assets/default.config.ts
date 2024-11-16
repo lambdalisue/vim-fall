@@ -3,8 +3,8 @@ import {
   composeRenderers,
   refineCurator,
   refineSource,
-} from "jsr:@vim-fall/std@^0.7.1";
-import * as builtin from "jsr:@vim-fall/std@^0.7.1/builtin";
+} from "jsr:@vim-fall/std@^0.7.4";
+import * as builtin from "jsr:@vim-fall/std@^0.7.4/builtin";
 import { SEPARATOR } from "jsr:@std/path@^1.0.8/constants";
 
 // NOTE:
@@ -22,7 +22,6 @@ const myPathActions = {
 
 const myQuickfixActions = {
   ...builtin.action.defaultQuickfixActions,
-  // Install https://github.com/thinca/vim-qfreplace to use this action
   "quickfix:qfreplace": builtin.action.quickfix({
     after: "Qfreplace",
   }),
@@ -127,6 +126,32 @@ export const main: Entrypoint = (
     coordinator: builtin.coordinator.modern,
     theme: builtin.theme.MODERN_THEME,
   });
+
+  defineItemPickerFromCurator(
+    "grep",
+    refineCurator(
+      builtin.curator.grep,
+      builtin.refiner.relativePath,
+    ),
+    {
+      sorters: [
+        builtin.sorter.noop,
+        builtin.sorter.lexical,
+        builtin.sorter.lexical({ reverse: true }),
+      ],
+      renderers: [
+        builtin.renderer.nerdfont,
+        builtin.renderer.noop,
+      ],
+      previewers: [builtin.previewer.file],
+      actions: {
+        ...myPathActions,
+        ...myQuickfixActions,
+        ...myMiscActions,
+      },
+      defaultAction: "open",
+    },
+  );
 
   defineItemPickerFromCurator(
     "git-grep",
@@ -291,5 +316,59 @@ export const main: Entrypoint = (
       ...builtin.action.defaultHelpActions,
     },
     defaultAction: "help",
+  });
+
+  defineItemPickerFromSource("quickfix", builtin.source.quickfix, {
+    matchers: [builtin.matcher.fzf],
+    sorters: [
+      builtin.sorter.noop,
+      builtin.sorter.lexical,
+      builtin.sorter.lexical({ reverse: true }),
+    ],
+    previewers: [builtin.previewer.buffer],
+    actions: {
+      ...builtin.action.defaultOpenActions,
+      ...myMiscActions,
+    },
+    defaultAction: "open",
+  });
+
+  defineItemPickerFromSource(
+    "oldfiles",
+    refineSource(
+      builtin.source.oldfiles,
+      builtin.refiner.cwd,
+      builtin.refiner.exists,
+      builtin.refiner.relativePath,
+    ),
+    {
+      matchers: [builtin.matcher.fzf],
+      sorters: [
+        builtin.sorter.noop,
+        builtin.sorter.lexical,
+        builtin.sorter.lexical({ reverse: true }),
+      ],
+      previewers: [builtin.previewer.file],
+      actions: {
+        ...myPathActions,
+        ...myQuickfixActions,
+        ...myMiscActions,
+      },
+      defaultAction: "open",
+    },
+  );
+
+  defineItemPickerFromSource("history", builtin.source.history, {
+    matchers: [builtin.matcher.fzf],
+    sorters: [
+      builtin.sorter.noop,
+      builtin.sorter.lexical,
+      builtin.sorter.lexical({ reverse: true }),
+    ],
+    actions: {
+      "cmd": builtin.action.cmd({ immediate: true }),
+      ...myMiscActions,
+    },
+    defaultAction: "cmd",
   });
 };
