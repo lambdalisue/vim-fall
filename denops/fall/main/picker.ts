@@ -3,6 +3,7 @@ import * as opt from "jsr:@denops/std@^7.3.2/option";
 import { collect } from "jsr:@denops/std@^7.3.2/batch";
 import { ensurePromise } from "jsr:@core/asyncutil@^1.2.0/ensure-promise";
 import { as, assert, ensure, is } from "jsr:@core/unknownutil@^4.3.0";
+import { toFileUrl } from "jsr:@std/path@^1.0.8/to-file-url";
 import type { Size } from "jsr:@vim-fall/core@^0.2.1/coordinator";
 import type { DetailUnit } from "jsr:@vim-fall/core@^0.2.1/item";
 
@@ -98,8 +99,7 @@ async function init(
       console.error(`Cache reload failed: ${path}\n${decoder.decode(stderr)}`);
     }
   }
-  const suffix = reload ? `#${performance.now()}` : undefined;
-  return (initialized = loadUserConfig(denops, path, { suffix }));
+  return (initialized = loadUserConfig(denops, toFileUrl(path), { reload }));
 }
 
 async function startPicker(

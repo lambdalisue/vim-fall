@@ -36,10 +36,13 @@ let actionPickerParams = { ...defaultActionPickerParams };
 const itemPickerParamsMap = new Map<string, ItemPickerParams>();
 
 const refineGlobalConfig = buildRefineGlobalConfig(globalConfig);
+
 const refineActionPicker = buildRefineActionPicker(actionPickerParams);
+
 const defineItemPickerFromSource = buildDefineItemPickerFromSource(
   itemPickerParamsMap,
 );
+
 const defineItemPickerFromCurator = buildDefineItemPickerFromCurator(
   itemPickerParamsMap,
 );
@@ -52,8 +55,8 @@ function reset(): void {
 
 export async function loadUserConfig(
   denops: Denops,
-  path: string,
-  { suffix }: { suffix?: string } = {},
+  path: URL,
+  { reload = false }: { reload?: boolean } = {},
 ): Promise<void> {
   const ctx = {
     denops,
@@ -62,8 +65,9 @@ export async function loadUserConfig(
     refineActionPicker,
     refineGlobalConfig,
   };
+  const suffix = reload ? `#${performance.now()}` : "";
   try {
-    const { main } = await import(`${path}${suffix ?? ""}`);
+    const { main } = await import(`${path.href}${suffix}`);
     reset();
     await main(ctx);
   } catch (err) {
