@@ -12,6 +12,7 @@ import {
   loadUserConfig,
 } from "../config.ts";
 import { isOptions, isParams, isStringArray } from "../util/predicate.ts";
+import { action as buildActionSource } from "../extension/source/action.ts";
 import { Picker } from "../picker.ts";
 
 let zindex = 50;
@@ -68,15 +69,7 @@ async function startPicker(
   const actionPicker = stack.use(
     new Picker({
       name: "@action",
-      source: {
-        collect: async function* () {
-          yield* Object.entries(params.actions).map(([name, action], id) => ({
-            id,
-            value: name,
-            detail: action,
-          }));
-        },
-      },
+      source: buildActionSource(params.actions),
       ...getActionPickerParams(),
       zindex,
     }),
