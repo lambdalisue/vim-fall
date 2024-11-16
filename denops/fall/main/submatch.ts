@@ -60,9 +60,10 @@ async function submatchStart(
   params: SubmatchParams,
   options: { signal?: AbortSignal } = {},
 ): Promise<void | true> {
-  const itemPickerParams = {
+  const itemPickerParams: ItemPickerParams = {
     ...context._submatch.itemPickerParams,
     source: buildListSource(context.selectedItems ?? context.filteredItems),
+    matchers: params.matchers,
   };
   if (params.actions) {
     itemPickerParams.actions = params.actions;
