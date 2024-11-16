@@ -66,10 +66,16 @@ export async function loadUserConfig(
     const { main } = await import(`${path}${suffix ?? ""}`);
     reset();
     await main(ctx);
-  } catch (e) {
-    console.warn(
-      `Failed to load user config. Fallback to the default config: ${e}`,
-    );
+  } catch (err) {
+    if (err instanceof Deno.errors.NotFound) {
+      console.debug(
+        `User config not found: '${path}'. Fallback to the default config.`,
+      );
+    } else {
+      console.warn(
+        `Failed to load user config. Fallback to the default config: ${err}`,
+      );
+    }
     const { main } = await import(
       new URL("./_assets/default.config.ts", import.meta.url).href
     );
