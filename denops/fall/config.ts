@@ -96,23 +96,12 @@ export function loadUserConfig(
   // Avoid reloading when the user config is not yet loaded.
   reload = initialized ? reload : false;
   initialized = (async () => {
-    const ctx = {
-      denops,
-      refineGlobalConfig: buildRefineGlobalConfig(globalConfig),
-      refineActionPicker: buildRefineActionPicker(actionPickerParams),
-      defineItemPickerFromSource: buildDefineItemPickerFromSource(
-        itemPickerParamsMap,
-      ),
-      defineItemPickerFromCurator: buildDefineItemPickerFromCurator(
-        itemPickerParamsMap,
-      ),
-    };
     const configUrl = await getUserConfigUrl(denops);
     const suffix = reload ? `#${performance.now()}` : "";
     try {
       const { main } = await import(`${configUrl.href}${suffix}`);
       reset();
-      await main(ctx);
+      await main(buildContext(denops));
       if (verbose) {
         await denops.cmd(
           `echomsg "[fall] User config is loaded: ${configUrl}"`,
@@ -140,7 +129,7 @@ export function loadUserConfig(
       }
       const { main } = await import(defaultConfigUrl.href);
       reset();
-      await main(ctx);
+      await main(buildContext(denops));
       if (verbose) {
         await denops.cmd(
           `echomsg "[fall] Default config is loaded: ${defaultConfigUrl}"`,
@@ -240,6 +229,20 @@ function reset(): void {
   globalConfig = { ...defaultGlobalConfig };
   actionPickerParams = { ...defaultActionPickerParams };
   itemPickerParamsMap.clear();
+}
+
+function buildContext(denops: Denops) {
+  return {
+    denops,
+    refineGlobalConfig: buildRefineGlobalConfig(globalConfig),
+    refineActionPicker: buildRefineActionPicker(actionPickerParams),
+    defineItemPickerFromSource: buildDefineItemPickerFromSource(
+      itemPickerParamsMap,
+    ),
+    defineItemPickerFromCurator: buildDefineItemPickerFromCurator(
+      itemPickerParamsMap,
+    ),
+  };
 }
 
 async function getUserConfigUrl(denops: Denops): Promise<URL> {
