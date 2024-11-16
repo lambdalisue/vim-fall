@@ -19,6 +19,6 @@ augroup END
 
 if !exists('g:fall_config_path')
   let g:fall_config_path = has('nvim')
-        \ ? join([stdpath('config'), 'fall', 'config.ts'], s:sep)
-        \ : join([$HOME, '.vim', 'fall', 'config.ts'], s:sep)
+        \ ? expand(join([stdpath('config'), 'fall', 'config.ts'], s:sep))
+        \ : expand(join([$HOME, '.vim', 'fall', 'config.ts'], s:sep))
 endif

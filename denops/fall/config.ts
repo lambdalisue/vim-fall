@@ -1,5 +1,6 @@
 import type { Denops } from "jsr:@denops/std@^7.3.2";
 import * as buffer from "jsr:@denops/std@^7.3.2/buffer";
+import * as vars from "jsr:@denops/std@^7.3.2/variable";
 import * as autocmd from "jsr:@denops/std@^7.3.2/autocmd";
 import { TextLineStream } from "jsr:@std/streams@^1.0.8/text-line-stream";
 import { mergeReadableStreams } from "jsr:@std/streams@^1.0.8/merge-readable-streams";
@@ -243,7 +244,7 @@ function reset(): void {
 
 async function getUserConfigUrl(denops: Denops): Promise<URL> {
   try {
-    const path = await denops.eval("expand(g:fall_config_path)") as string;
+    const path = await vars.g.get(denops, "fall_config_path") as string;
     return toFileUrl(path);
   } catch (err) {
     throw new Error(
