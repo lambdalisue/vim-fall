@@ -4,6 +4,7 @@ import { as, assert, is } from "jsr:@core/unknownutil@^4.3.0";
 import {
   editUserConfig,
   loadUserConfig,
+  recacheUserConfig,
 } from "../config.ts";
 
 export const main: Entrypoint = (denops) => {
@@ -16,6 +17,9 @@ export const main: Entrypoint = (denops) => {
     "config:reload": (options = {}) => {
       assert(options, isReloadOptions);
       return loadUserConfig(denops, { verbose: options.verbose, reload: true });
+    },
+    "config:recache": () => {
+      return recacheUserConfig(denops, { signal: denops.interrupted });
     },
   };
 };

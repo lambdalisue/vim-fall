@@ -1,6 +1,8 @@
 import type { Denops } from "jsr:@denops/std@^7.3.2";
 import * as buffer from "jsr:@denops/std@^7.3.2/buffer";
 import * as autocmd from "jsr:@denops/std@^7.3.2/autocmd";
+import { TextLineStream } from "jsr:@std/streams@^1.0.8/text-line-stream";
+import { mergeReadableStreams } from "jsr:@std/streams@^1.0.8/merge-readable-streams";
 import { toFileUrl } from "jsr:@std/path@^1.0.8/to-file-url";
 import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
 import { dirname } from "jsr:@std/path@^1.0.8/dirname";
@@ -146,6 +148,55 @@ export function loadUserConfig(
     }
   })();
   return initialized;
+}
+
+/**
+ * Recache user config by running `deno cache --reload` command.
+ */
+export async function recacheUserConfig(
+  denops: Denops,
+  { signal }: { signal?: AbortSignal },
+): Promise<void> {
+  const configUrl = await getUserConfigUrl(denops);
+  const cmd = new Deno.Command(Deno.execPath(), {
+    args: ["cache", "--no-lock", "--reload", "--allow-import", configUrl.href],
+    stdin: "null",
+    stdout: "piped",
+    stderr: "piped",
+  });
+  await using proc = cmd.spawn();
+  signal?.addEventListener("abort", () => {
+    try {
+      proc.kill();
+    } catch {
+      // Do nothing
+    }
+  }, { once: true });
+  mergeReadableStreams(proc.stdout, proc.stderr)
+    .pipeThrough(new TextDecoderStream(), { signal })
+    .pipeThrough(new TextLineStream(), { signal })
+    .pipeTo(
+      new WritableStream({
+        async start() {
+          await denops.cmd(
+            `redraw | echomsg "[fall] Recaching user config: ${configUrl}"`,
+          );
+        },
+        async write(line) {
+          await denops.cmd(
+            `redraw | echohl Comment | echomsg "[fall] ${line}" | echohl NONE`,
+          );
+        },
+        async close() {
+          await denops.cmd(
+            `redraw | echomsg "[fall] Recaching user config is completed."`,
+          );
+        },
+      }),
+      { signal },
+    );
+  await proc.status;
+  await loadUserConfig(denops, { verbose: true, reload: true });
 }
 
 /**
