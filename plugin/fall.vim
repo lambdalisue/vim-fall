@@ -8,6 +8,7 @@ command! -nargs=+ -complete=customlist,fall#command#Fall#complete
       \ Fall call fall#command#Fall#call([<f-args>])
 
 command! -nargs=0 FallConfig call fall#command#FallConfig#call()
+command! -nargs=0 FallConfigReload call fall#command#FallConfigReload#call()
 
 augroup fall_plugin
   autocmd! *
