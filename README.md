@@ -32,7 +32,7 @@ by removing `builtin.renderer.nerdfont` renderer from the configuration
 [Deno]: https://deno.land
 [NerdFont]: https://www.nerdfonts.com
 
-Note that Deno version 1.x. is not tested and supported.
+Note that Deno version 1.x. is not tested and not supported.
 
 ## Installation
 
