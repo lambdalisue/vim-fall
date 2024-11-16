@@ -1,7 +1,18 @@
 import type { Entrypoint } from "jsr:@vim-fall/config@^0.17.3";
-import { composeRenderers } from "jsr:@vim-fall/std@^0.7.0";
-import * as builtin from "jsr:@vim-fall/std@^0.7.0/builtin";
+import {
+  composeRenderers,
+  refineCurator,
+  refineSource,
+} from "jsr:@vim-fall/std@^0.7.1";
+import * as builtin from "jsr:@vim-fall/std@^0.7.1/builtin";
 import { SEPARATOR } from "jsr:@std/path@^1.0.8/constants";
+
+// NOTE:
+//
+// Install https://github.com/BurntSushi/ripgrep to use 'builtin.curator.rg'
+// Install https://www.nerdfonts.com/ to use 'builtin.renderer.nerdfont'
+// Install https://github.com/thinca/vim-qfreplace to use 'Qfreplace'
+//
 
 const myPathActions = {
   ...builtin.action.defaultOpenActions,
@@ -119,14 +130,20 @@ export const main: Entrypoint = (
 
   defineItemPickerFromCurator(
     "git-grep",
-    builtin.curator.gitGrep,
+    refineCurator(
+      builtin.curator.gitGrep,
+      builtin.refiner.relativePath,
+    ),
     {
       sorters: [
         builtin.sorter.noop,
         builtin.sorter.lexical,
         builtin.sorter.lexical({ reverse: true }),
       ],
-      renderers: [builtin.renderer.relativePath],
+      renderers: [
+        builtin.renderer.nerdfont,
+        builtin.renderer.noop,
+      ],
       previewers: [builtin.previewer.file],
       actions: {
         ...myPathActions,
@@ -137,17 +154,22 @@ export const main: Entrypoint = (
     },
   );
 
-  // Install https://github.com/BurntSushi/ripgrep to use this curator
   defineItemPickerFromCurator(
     "rg",
-    builtin.curator.rg,
+    refineCurator(
+      builtin.curator.rg,
+      builtin.refiner.relativePath,
+    ),
     {
       sorters: [
         builtin.sorter.noop,
         builtin.sorter.lexical,
         builtin.sorter.lexical({ reverse: true }),
       ],
-      renderers: [builtin.renderer.relativePath],
+      renderers: [
+        builtin.renderer.nerdfont,
+        builtin.renderer.noop,
+      ],
       previewers: [builtin.previewer.file],
       actions: {
         ...myPathActions,
@@ -160,10 +182,13 @@ export const main: Entrypoint = (
 
   defineItemPickerFromSource(
     "file",
-    builtin.source.file({
-      filterFile: myFilterFile,
-      filterDirectory: myFilterDirectory,
-    }),
+    refineSource(
+      builtin.source.file({
+        filterFile: myFilterFile,
+        filterDirectory: myFilterDirectory,
+      }),
+      builtin.refiner.relativePath,
+    ),
     {
       matchers: [builtin.matcher.fzf],
       sorters: [
@@ -173,16 +198,10 @@ export const main: Entrypoint = (
       ],
       renderers: [
         composeRenderers(
-          builtin.renderer.relativePath,
           builtin.renderer.smartPath,
-          // Install https://www.nerdfonts.com/ to use this renderer
           builtin.renderer.nerdfont,
         ),
-        composeRenderers(
-          builtin.renderer.relativePath,
-          // Install https://www.nerdfonts.com/ to use this renderer
-          builtin.renderer.nerdfont,
-        ),
+        builtin.renderer.nerdfont,
         builtin.renderer.noop,
       ],
       previewers: [builtin.previewer.file],
@@ -197,7 +216,10 @@ export const main: Entrypoint = (
 
   defineItemPickerFromSource(
     "file:all",
-    builtin.source.file,
+    refineSource(
+      builtin.source.file,
+      builtin.refiner.relativePath,
+    ),
     {
       matchers: [builtin.matcher.fzf],
       sorters: [
@@ -207,16 +229,10 @@ export const main: Entrypoint = (
       ],
       renderers: [
         composeRenderers(
-          builtin.renderer.relativePath,
           builtin.renderer.smartPath,
-          // Install https://www.nerdfonts.com/ to use this renderer
           builtin.renderer.nerdfont,
         ),
-        composeRenderers(
-          builtin.renderer.relativePath,
-          // Install https://www.nerdfonts.com/ to use this renderer
-          builtin.renderer.nerdfont,
-        ),
+        builtin.renderer.nerdfont,
         builtin.renderer.noop,
       ],
       previewers: [builtin.previewer.file],
