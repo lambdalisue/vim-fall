@@ -2,8 +2,7 @@ import type { Denops, Entrypoint } from "jsr:@denops/std@^7.3.2";
 import * as opt from "jsr:@denops/std@^7.3.2/option";
 import { collect } from "jsr:@denops/std@^7.3.2/batch";
 import { ensurePromise } from "jsr:@core/asyncutil@^1.2.0/ensure-promise";
-import { as, assert, ensure, is } from "jsr:@core/unknownutil@^4.3.0";
-import { toFileUrl } from "jsr:@std/path@^1.0.8/to-file-url";
+import { assert, ensure, is } from "jsr:@core/unknownutil@^4.3.0";
 import type { Size } from "jsr:@vim-fall/core@^0.2.1/coordinator";
 import type { DetailUnit } from "jsr:@vim-fall/core@^0.2.1/item";
 
@@ -23,14 +22,13 @@ import {
 } from "../util/predicate.ts";
 import { Picker } from "../picker.ts";
 
-let initialized: Promise<void> | undefined;
 let zindex = 50;
 
 export const main: Entrypoint = (denops) => {
   denops.dispatcher = {
     ...denops.dispatcher,
     "picker:command": async (args) => {
-      await init(denops);
+      await loadUserConfig(denops);
       // Split the command arguments
       const [name, ...sourceArgs] = ensure(args, isStringArray);
       // Load user config
@@ -53,54 +51,22 @@ export const main: Entrypoint = (denops) => {
       );
     },
     "picker:command:complete": async (arglead, cmdline, cursorpos) => {
-      await init(denops);
+      await loadUserConfig(denops);
       assert(arglead, is.String);
       assert(cmdline, is.String);
       assert(cursorpos, is.Number);
       return listItemPickerNames().filter((name) => name.startsWith(arglead));
     },
     "picker:start": async (args, screen, params, options) => {
-      await init(denops);
+      await loadUserConfig(denops);
       assert(args, isStringArray);
       assert(screen, isScreen);
       assert(params, isParams);
       assert(options, isOptions);
       return await startPicker(denops, args, screen, params, options);
     },
-    "picker:reload": async (recache) => {
-      initialized = undefined;
-      assert(recache, as.Optional(is.Boolean));
-      await init(denops, true, recache);
-    },
   };
 };
-
-async function init(
-  denops: Denops,
-  reload?: boolean,
-  recache?: boolean,
-): Promise<void> {
-  if (initialized) {
-    return initialized;
-  }
-  const path = await denops.eval("expand(g:fall_config_path)") as string;
-  if (recache) {
-    const cmd = new Deno.Command(Deno.execPath(), {
-      args: ["cache", "--no-lock", "--reload", "--allow-import", path],
-      stdin: "null",
-      stdout: "piped",
-      stderr: "piped",
-    });
-    const { success, stderr, stdout } = await cmd.output();
-    const decoder = new TextDecoder();
-    if (success) {
-      console.log(`Cache reload succeeded: ${path}\n${decoder.decode(stdout)}`);
-    } else {
-      console.error(`Cache reload failed: ${path}\n${decoder.decode(stderr)}`);
-    }
-  }
-  return (initialized = loadUserConfig(denops, toFileUrl(path), { reload }));
-}
 
 async function startPicker(
   denops: Denops,

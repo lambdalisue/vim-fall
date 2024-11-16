@@ -1,4 +1,5 @@
 import type { Denops } from "jsr:@denops/std@^7.3.2";
+import { toFileUrl } from "jsr:@std/path@^1.0.8/to-file-url";
 import {
   buildRefineGlobalConfig,
   type GlobalConfig,
@@ -16,6 +17,12 @@ import {
 import { modern } from "jsr:@vim-fall/std@^0.5.0/builtin/coordinator/modern";
 import { MODERN_THEME } from "jsr:@vim-fall/std@^0.5.0/builtin/theme/modern";
 import { fzf } from "jsr:@vim-fall/std@^0.5.0/builtin/matcher/fzf";
+
+const defaultConfigUrl = new URL(
+  "./_assets/default.config.ts",
+  import.meta.url,
+);
+let initialized: undefined | Promise<void>;
 
 const defaultGlobalConfig: GlobalConfig = {
   coordinator: modern(),
@@ -35,62 +42,74 @@ let actionPickerParams = { ...defaultActionPickerParams };
 
 const itemPickerParamsMap = new Map<string, ItemPickerParams>();
 
-const refineGlobalConfig = buildRefineGlobalConfig(globalConfig);
-
-const refineActionPicker = buildRefineActionPicker(actionPickerParams);
-
-const defineItemPickerFromSource = buildDefineItemPickerFromSource(
-  itemPickerParamsMap,
-);
-
-const defineItemPickerFromCurator = buildDefineItemPickerFromCurator(
-  itemPickerParamsMap,
-);
-
-function reset(): void {
-  globalConfig = { ...defaultGlobalConfig };
-  actionPickerParams = { ...defaultActionPickerParams };
-  itemPickerParamsMap.clear();
-}
-
-export async function loadUserConfig(
+/**
+ * Load user config from the g:fall_config_path.
+ */
+export function loadUserConfig(
   denops: Denops,
-  path: URL,
   { reload = false }: { reload?: boolean } = {},
 ): Promise<void> {
-  const ctx = {
-    denops,
-    defineItemPickerFromSource,
-    defineItemPickerFromCurator,
-    refineActionPicker,
-    refineGlobalConfig,
-  };
-  const suffix = reload ? `#${performance.now()}` : "";
-  try {
-    const { main } = await import(`${path.href}${suffix}`);
-    reset();
-    await main(ctx);
-  } catch (err) {
-    if (err instanceof Deno.errors.NotFound) {
-      console.debug(
-        `User config not found: '${path}'. Fallback to the default config.`,
-      );
-    } else {
-      console.warn(
-        `Failed to load user config. Fallback to the default config: ${err}`,
-      );
-    }
-    const { main } = await import(
-      new URL("./_assets/default.config.ts", import.meta.url).href
-    );
-    await main(ctx);
+  if (initialized && !reload) {
+    return initialized;
   }
+  // Avoid reloading when the user config is not yet loaded.
+  reload = initialized ? reload : false;
+  initialized = (async () => {
+    const ctx = {
+      denops,
+      refineGlobalConfig: buildRefineGlobalConfig(globalConfig),
+      refineActionPicker: buildRefineActionPicker(actionPickerParams),
+      defineItemPickerFromSource: buildDefineItemPickerFromSource(
+        itemPickerParamsMap,
+      ),
+      defineItemPickerFromCurator: buildDefineItemPickerFromCurator(
+        itemPickerParamsMap,
+      ),
+    };
+    const configUrl = await getUserConfigUrl(denops);
+    const suffix = reload ? `#${performance.now()}` : "";
+    try {
+      const { main } = await import(`${configUrl.href}${suffix}`);
+      reset();
+      await main(ctx);
+    } catch (err) {
+      // Avoid loading default configration if reload is set to keep the previous configuration.
+      if (reload) {
+        if (err instanceof Deno.errors.NotFound) {
+          console.debug(`User config not found: '${configUrl}'. Skip.`);
+        } else {
+          console.warn(`Failed to load user config. Skip: ${err}`);
+        }
+        return;
+      }
+      // Fallback to the default configuration.
+      if (err instanceof Deno.errors.NotFound) {
+        console.debug(
+          `User config not found: '${configUrl}'. Fallback to the default config.`,
+        );
+      } else {
+        console.warn(
+          `Failed to load user config. Fallback to the default config: ${err}`,
+        );
+      }
+      const { main } = await import(defaultConfigUrl.href);
+      reset();
+      await main(ctx);
+    }
+  })();
+  return initialized;
 }
 
+/**
+ * Get global config.
+ */
 export function getGlobalConfig(): Readonly<GlobalConfig> {
   return globalConfig;
 }
 
+/**
+ * Get action picker params.
+ */
 export function getActionPickerParams(): Readonly<
   ActionPickerParams & GlobalConfig
 > {
@@ -100,10 +119,9 @@ export function getActionPickerParams(): Readonly<
   };
 }
 
-export function listItemPickerNames(): readonly string[] {
-  return Array.from(itemPickerParamsMap.keys());
-}
-
+/**
+ * Get item picker params.
+ */
 export function getItemPickerParams(
   name: string,
 ): Readonly<ItemPickerParams & GlobalConfig> | undefined {
@@ -112,6 +130,30 @@ export function getItemPickerParams(
     return { ...getGlobalConfig(), ...params };
   }
   return undefined;
+}
+
+/**
+ * List item picker names.
+ */
+export function listItemPickerNames(): readonly string[] {
+  return Array.from(itemPickerParamsMap.keys());
+}
+
+function reset(): void {
+  globalConfig = { ...defaultGlobalConfig };
+  actionPickerParams = { ...defaultActionPickerParams };
+  itemPickerParamsMap.clear();
+}
+
+async function getUserConfigUrl(denops: Denops): Promise<URL> {
+  try {
+    const path = await denops.eval("expand(g:fall_config_path)") as string;
+    return toFileUrl(path);
+  } catch (err) {
+    throw new Error(
+      `Failed to get user config path from 'g:fall_config_path': ${err}`,
+    );
+  }
 }
 
 export type { ActionPickerParams, GlobalConfig, ItemPickerParams };
