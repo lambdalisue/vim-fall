@@ -85,7 +85,7 @@ async function init(
   const path = await denops.eval("expand(g:fall_config_path)") as string;
   if (recache) {
     const cmd = new Deno.Command(Deno.execPath(), {
-      args: ["cache", "--reload", "--allow-import", path],
+      args: ["cache", "--no-lock", "--reload", "--allow-import", path],
       stdin: "null",
       stdout: "piped",
       stderr: "piped",
