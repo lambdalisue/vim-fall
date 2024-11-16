@@ -1,5 +1,10 @@
 import type { Denops } from "jsr:@denops/std@^7.3.2";
+import * as buffer from "jsr:@denops/std@^7.3.2/buffer";
+import * as autocmd from "jsr:@denops/std@^7.3.2/autocmd";
 import { toFileUrl } from "jsr:@std/path@^1.0.8/to-file-url";
+import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
+import { dirname } from "jsr:@std/path@^1.0.8/dirname";
+import { copy } from "jsr:@std/fs@^1.0.5/copy";
 import {
   buildRefineGlobalConfig,
   type GlobalConfig,
@@ -43,11 +48,44 @@ let actionPickerParams = { ...defaultActionPickerParams };
 const itemPickerParamsMap = new Map<string, ItemPickerParams>();
 
 /**
+ * Edit user config
+ */
+export async function editUserConfig(
+  denops: Denops,
+  options: buffer.OpenOptions,
+): Promise<void> {
+  const path = fromFileUrl(await getUserConfigUrl(denops));
+  // Try to copy the default config file if the user config file does not exist.
+  try {
+    const parent = dirname(path);
+    await Deno.mkdir(parent, { recursive: true });
+    await copy(defaultConfigUrl, path, { overwrite: false });
+  } catch (err) {
+    if (err instanceof Deno.errors.AlreadyExists) {
+      // Expected. Do nothing.
+    } else {
+      throw err;
+    }
+  }
+  // Open the user config file.
+  const info = await buffer.open(denops, path, options);
+  // Register autocmd to reload the user config when the buffer is written.
+  await autocmd.group(denops, "fall_config", (helper) => {
+    helper.remove("*");
+    helper.define(
+      "BufWritePost",
+      `<buffer=${info.bufnr}>`,
+      `call denops#notify("${denops.name}", "config:reload", [#{ verbose: v:true }])`,
+    );
+  });
+}
+
+/**
  * Load user config from the g:fall_config_path.
  */
 export function loadUserConfig(
   denops: Denops,
-  { reload = false }: { reload?: boolean } = {},
+  { reload = false, verbose = false } = {},
 ): Promise<void> {
   if (initialized && !reload) {
     return initialized;
@@ -72,6 +110,11 @@ export function loadUserConfig(
       const { main } = await import(`${configUrl.href}${suffix}`);
       reset();
       await main(ctx);
+      if (verbose) {
+        await denops.cmd(
+          `echomsg "[fall] User config is loaded: ${configUrl}"`,
+        );
+      }
     } catch (err) {
       // Avoid loading default configration if reload is set to keep the previous configuration.
       if (reload) {
@@ -95,6 +138,11 @@ export function loadUserConfig(
       const { main } = await import(defaultConfigUrl.href);
       reset();
       await main(ctx);
+      if (verbose) {
+        await denops.cmd(
+          `echomsg "[fall] Default config is loaded: ${defaultConfigUrl}"`,
+        );
+      }
     }
   })();
   return initialized;
