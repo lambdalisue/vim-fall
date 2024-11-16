@@ -72,7 +72,6 @@ Fall line README.md
 > [!NOTE]
 >
 > You can confirm your actual key mappings by opening the help window (`<F1>`).
->
 
 | Key Mapping    | Description                                                         | Plug Mapping                                |
 | :------------- | :------------------------------------------------------------------ | :------------------------------------------ |
@@ -108,7 +107,6 @@ Fall line README.md
 | `<F3>`         | Switch to the next sorter in the current picker                     | `<Plug>(fall-switch-sorter-next)`           |
 | `<F4>`         | Switch to the next renderer in the current picker                   | `<Plug>(fall-switch-renderer-next)`         |
 | `<F5>`         | Switch to the next previewer in the current picker                  | `<Plug>(fall-switch-previewer-next)`        |
-
 
 ### Customization
 
@@ -189,29 +187,29 @@ import { type Entrypoint } from "jsr:@vim-fall/config@^0.17.3";
 import * as builtin from "jsr:@vim-fall/std@^0.6.0/builtin";
 
 export const main: Entrypoint = ({
-    defineItemPickerFromSource,
-    defineItemPickerFromCurator,
+  defineItemPickerFromSource,
+  defineItemPickerFromCurator,
 }) => {
-    defineItemPickerFromCurator("git-grep", builtin.curator.gitGrep, {
-        previewers: [builtin.previewer.file],
-        actions: {
-            ...builtin.action.defaultOpenActions,
-            ...builtin.action.defaultSystemopenActions,
-            ...builtin.action.defaultQuickfixActions,
-        },
-        defaultAction: "open",
-    });
+  defineItemPickerFromCurator("git-grep", builtin.curator.gitGrep, {
+    previewers: [builtin.previewer.file],
+    actions: {
+      ...builtin.action.defaultOpenActions,
+      ...builtin.action.defaultSystemopenActions,
+      ...builtin.action.defaultQuickfixActions,
+    },
+    defaultAction: "open",
+  });
 
-    defineItemPickerFromSource("file", builtin.source.file, {
-        matchers: [builtin.matcher.fzf],
-        previewers: [builtin.previewer.file],
-        actions: {
-            ...builtin.action.defaultOpenActions,
-            ...builtin.action.defaultSystemopenActions,
-            ...builtin.action.defaultQuickfixActions,
-        },
-        defaultAction: "open",
-    });
+  defineItemPickerFromSource("file", builtin.source.file, {
+    matchers: [builtin.matcher.fzf],
+    previewers: [builtin.previewer.file],
+    actions: {
+      ...builtin.action.defaultOpenActions,
+      ...builtin.action.defaultSystemopenActions,
+      ...builtin.action.defaultQuickfixActions,
+    },
+    defaultAction: "open",
+  });
 };
 ```
 
