@@ -1,9 +1,6 @@
 import type { Denops, Entrypoint } from "jsr:@denops/std@^7.3.2";
-import * as opt from "jsr:@denops/std@^7.3.2/option";
-import { collect } from "jsr:@denops/std@^7.3.2/batch";
 import { ensurePromise } from "jsr:@core/asyncutil@^1.2.0/ensure-promise";
 import { assert, ensure, is } from "jsr:@core/unknownutil@^4.3.0";
-import type { Size } from "jsr:@vim-fall/core@^0.2.1/coordinator";
 import type { DetailUnit } from "jsr:@vim-fall/core@^0.2.1/item";
 
 import type { GlobalConfig, ItemPickerParams } from "../config.ts";
@@ -14,12 +11,7 @@ import {
   listItemPickerNames,
   loadUserConfig,
 } from "../config.ts";
-import {
-  isOptions,
-  isParams,
-  isScreen,
-  isStringArray,
-} from "../util/predicate.ts";
+import { isOptions, isParams, isStringArray } from "../util/predicate.ts";
 import { Picker } from "../picker.ts";
 
 let zindex = 50;
@@ -36,16 +28,9 @@ export const main: Entrypoint = (denops) => {
       if (!itemPickerParams) {
         throw new Error(`Config for picker "${name}" is not found`);
       }
-      // Collect options from Vim
-      const [width, height] = await collect(denops, (denops) => [
-        opt.columns.get(denops),
-        opt.lines.get(denops),
-      ]);
-      const screen = { width, height };
       await startPicker(
         denops,
         sourceArgs,
-        screen,
         itemPickerParams,
         { signal: denops.interrupted },
       );
@@ -57,13 +42,13 @@ export const main: Entrypoint = (denops) => {
       assert(cursorpos, is.Number);
       return listItemPickerNames().filter((name) => name.startsWith(arglead));
     },
-    "picker:start": async (args, screen, params, options) => {
+    // _screen is not used
+    "picker:start": async (args, _screen, params, options) => {
       await loadUserConfig(denops);
       assert(args, isStringArray);
-      assert(screen, isScreen);
       assert(params, isParams);
       assert(options, isOptions);
-      return await startPicker(denops, args, screen, params, options);
+      return await startPicker(denops, args, params, options);
     },
   };
 };
@@ -71,13 +56,11 @@ export const main: Entrypoint = (denops) => {
 async function startPicker(
   denops: Denops,
   args: string[],
-  screen: Size,
   params: ItemPickerParams<DetailUnit, string> & GlobalConfig,
   { signal }: { signal?: AbortSignal } = {},
 ): Promise<void | true> {
   await using stack = new AsyncDisposableStack();
-  const pickerParams = { screen, ...params };
-  const itemPicker = stack.use(new Picker({ ...pickerParams, zindex }));
+  const itemPicker = stack.use(new Picker({ ...params, zindex }));
   zindex += Picker.ZINDEX_ALLOCATION;
   stack.defer(() => {
     zindex -= Picker.ZINDEX_ALLOCATION;
@@ -85,7 +68,6 @@ async function startPicker(
   const actionPicker = stack.use(
     new Picker({
       name: "@action",
-      screen,
       source: {
         collect: async function* () {
           yield* Object.entries(params.actions).map(([name, action], id) => ({
@@ -156,9 +138,13 @@ async function startPicker(
     const actionParams = {
       // for 'submatch' action
       _submatchContext: {
-        screen,
         globalConfig: getGlobalConfig(),
         pickerParams: params,
+        // not used
+        screen: {
+          width: 0,
+          height: 0,
+        },
       },
       ...resultItem,
     };

@@ -42,7 +42,6 @@ type ReservedCallback = (
 
 export type PickerParams<T extends Detail> = {
   name: string;
-  screen: Size;
   theme: Theme;
   coordinator: Coordinator;
   source: Source<T>;
