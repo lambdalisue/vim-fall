@@ -59,11 +59,11 @@ function formatMappingHelpPage(
     const content = [...range(0, height)]
       .map((_, i) => {
         return columns
-          .map((column) => column[i] ?? " ".repeat(columnWidth))
+          .map((column) => column[i] ?? " ".repeat(recordWidth))
           .join(spacer);
       })
       .filter((c) => c.trim() !== "");
-    const decorations = [...range(1, height)]
+    const decorations = [...range(1, content.length)]
       .map((line) => {
         return [...range(0, columns.length - 1)]
           .map((x) => {
