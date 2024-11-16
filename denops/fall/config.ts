@@ -22,9 +22,9 @@ import {
   type ItemPickerParams,
 } from "jsr:@vim-fall/config@^0.17.3/item-picker";
 
-import { modern } from "jsr:@vim-fall/std@^0.6.0/builtin/coordinator/modern";
-import { MODERN_THEME } from "jsr:@vim-fall/std@^0.6.0/builtin/theme/modern";
-import { fzf } from "jsr:@vim-fall/std@^0.6.0/builtin/matcher/fzf";
+import { modern } from "jsr:@vim-fall/std@^0.7.0/builtin/coordinator/modern";
+import { MODERN_THEME } from "jsr:@vim-fall/std@^0.7.0/builtin/theme/modern";
+import { fzf } from "jsr:@vim-fall/std@^0.7.0/builtin/matcher/fzf";
 
 const defaultConfigUrl = new URL(
   "./_assets/default.config.ts",
