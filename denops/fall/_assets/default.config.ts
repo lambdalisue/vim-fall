@@ -1,9 +1,5 @@
 import type { Entrypoint } from "jsr:@vim-fall/config@^0.17.3";
-import {
-  composeRenderers,
-  refineCurator,
-  refineSource,
-} from "jsr:@vim-fall/std@^0.7.0";
+import { composeRenderers } from "jsr:@vim-fall/std@^0.7.0";
 import * as builtin from "jsr:@vim-fall/std@^0.7.0/builtin";
 import { SEPARATOR } from "jsr:@std/path@^1.0.8/constants";
 
@@ -123,11 +119,14 @@ export const main: Entrypoint = (
 
   defineItemPickerFromCurator(
     "git-grep",
-    refineCurator(
-      builtin.curator.gitGrep,
-      builtin.refiner.relativePath,
-    ),
+    builtin.curator.gitGrep,
     {
+      sorters: [
+        builtin.sorter.noop,
+        builtin.sorter.lexical,
+        builtin.sorter.lexical({ reverse: true }),
+      ],
+      renderers: [builtin.renderer.relativePath],
       previewers: [builtin.previewer.file],
       actions: {
         ...myPathActions,
@@ -141,11 +140,14 @@ export const main: Entrypoint = (
   // Install https://github.com/BurntSushi/ripgrep to use this curator
   defineItemPickerFromCurator(
     "rg",
-    refineCurator(
-      builtin.curator.rg,
-      builtin.refiner.relativePath,
-    ),
+    builtin.curator.rg,
     {
+      sorters: [
+        builtin.sorter.noop,
+        builtin.sorter.lexical,
+        builtin.sorter.lexical({ reverse: true }),
+      ],
+      renderers: [builtin.renderer.relativePath],
       previewers: [builtin.previewer.file],
       actions: {
         ...myPathActions,
@@ -158,20 +160,31 @@ export const main: Entrypoint = (
 
   defineItemPickerFromSource(
     "file",
-    refineSource(
-      builtin.source.file({
-        filterFile: myFilterFile,
-        filterDirectory: myFilterDirectory,
-      }),
-      builtin.refiner.relativePath,
-    ),
+    builtin.source.file({
+      filterFile: myFilterFile,
+      filterDirectory: myFilterDirectory,
+    }),
     {
       matchers: [builtin.matcher.fzf],
-      renderers: [composeRenderers(
-        builtin.renderer.smartPath,
-        // Install https://www.nerdfonts.com/ to use this renderer
-        builtin.renderer.nerdfont,
-      )],
+      sorters: [
+        builtin.sorter.noop,
+        builtin.sorter.lexical,
+        builtin.sorter.lexical({ reverse: true }),
+      ],
+      renderers: [
+        composeRenderers(
+          builtin.renderer.relativePath,
+          builtin.renderer.smartPath,
+          // Install https://www.nerdfonts.com/ to use this renderer
+          builtin.renderer.nerdfont,
+        ),
+        composeRenderers(
+          builtin.renderer.relativePath,
+          // Install https://www.nerdfonts.com/ to use this renderer
+          builtin.renderer.nerdfont,
+        ),
+        builtin.renderer.noop,
+      ],
       previewers: [builtin.previewer.file],
       actions: {
         ...myPathActions,
@@ -184,17 +197,28 @@ export const main: Entrypoint = (
 
   defineItemPickerFromSource(
     "file:all",
-    refineSource(
-      builtin.source.file,
-      builtin.refiner.relativePath,
-    ),
+    builtin.source.file,
     {
       matchers: [builtin.matcher.fzf],
-      renderers: [composeRenderers(
-        builtin.renderer.smartPath,
-        // Install https://www.nerdfonts.com/ to use this renderer
-        builtin.renderer.nerdfont,
-      )],
+      sorters: [
+        builtin.sorter.noop,
+        builtin.sorter.lexical,
+        builtin.sorter.lexical({ reverse: true }),
+      ],
+      renderers: [
+        composeRenderers(
+          builtin.renderer.relativePath,
+          builtin.renderer.smartPath,
+          // Install https://www.nerdfonts.com/ to use this renderer
+          builtin.renderer.nerdfont,
+        ),
+        composeRenderers(
+          builtin.renderer.relativePath,
+          // Install https://www.nerdfonts.com/ to use this renderer
+          builtin.renderer.nerdfont,
+        ),
+        builtin.renderer.noop,
+      ],
       previewers: [builtin.previewer.file],
       actions: {
         ...myPathActions,
@@ -222,6 +246,11 @@ export const main: Entrypoint = (
     builtin.source.buffer({ filter: "bufloaded" }),
     {
       matchers: [builtin.matcher.fzf],
+      sorters: [
+        builtin.sorter.noop,
+        builtin.sorter.lexical,
+        builtin.sorter.lexical({ reverse: true }),
+      ],
       previewers: [builtin.previewer.buffer],
       actions: {
         ...myQuickfixActions,
@@ -235,6 +264,11 @@ export const main: Entrypoint = (
 
   defineItemPickerFromSource("help", builtin.source.helptag, {
     matchers: [builtin.matcher.fzf],
+    sorters: [
+      builtin.sorter.noop,
+      builtin.sorter.lexical,
+      builtin.sorter.lexical({ reverse: true }),
+    ],
     previewers: [builtin.previewer.helptag],
     actions: {
       ...myMiscActions,
