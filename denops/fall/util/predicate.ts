@@ -7,7 +7,6 @@ import type {
   Matcher,
   Previewer,
   Renderer,
-  Size,
   Sorter,
   Source,
   Theme,
@@ -20,11 +19,6 @@ export const isStringArray = is.ArrayOf(is.String);
 export const isAbortSignal = is.InstanceOf(AbortSignal) as Predicate<
   AbortSignal
 >;
-
-export const isScreen = is.ObjectOf({
-  width: is.Number,
-  height: is.Number,
-}) satisfies Predicate<Size>;
 
 export const isTheme = is.ObjectOf({
   border: is.UniformTupleOf(8, is.String),
@@ -92,11 +86,6 @@ export const isItemPickerParams = is.ObjectOf({
   coordinator: as.Optional(isCoordinator),
   theme: as.Optional(isTheme),
 }) satisfies Predicate<ItemPickerParams<Detail, string>>;
-
-export const isParams = is.IntersectionOf([
-  isGlobalConfig,
-  isItemPickerParams,
-]);
 
 export const isOptions = is.ObjectOf({
   signal: as.Optional(isAbortSignal),

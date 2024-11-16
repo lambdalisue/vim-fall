@@ -3,7 +3,7 @@ import { ensurePromise } from "jsr:@core/asyncutil@^1.2.0/ensure-promise";
 import { assert, ensure, is } from "jsr:@core/unknownutil@^4.3.0";
 import type { DetailUnit } from "jsr:@vim-fall/core@^0.2.1/item";
 
-import type { GlobalConfig, ItemPickerParams } from "../config.ts";
+import type { ItemPickerParams } from "../config.ts";
 import {
   getActionPickerParams,
   getGlobalConfig,
@@ -11,15 +11,27 @@ import {
   listItemPickerNames,
   loadUserConfig,
 } from "../config.ts";
-import { isOptions, isParams, isStringArray } from "../util/predicate.ts";
+import {
+  isGlobalConfig,
+  isItemPickerParams,
+  isOptions,
+  isStringArray,
+} from "../util/predicate.ts";
 import { action as buildActionSource } from "../extension/source/action.ts";
 import { Picker } from "../picker.ts";
+import type { SubmatchContext } from "./submatch.ts";
 
 let zindex = 50;
 
 export const main: Entrypoint = (denops) => {
   denops.dispatcher = {
     ...denops.dispatcher,
+    "picker": (args, itemPickerParams, options) => {
+      assert(args, isStringArray);
+      assert(itemPickerParams, isItemPickerParams);
+      assert(options, isOptions);
+      return startPicker(denops, args, itemPickerParams, options);
+    },
     "picker:command": async (args) => {
       await loadUserConfig(denops);
       // Split the command arguments
@@ -43,13 +55,22 @@ export const main: Entrypoint = (denops) => {
       assert(cursorpos, is.Number);
       return listItemPickerNames().filter((name) => name.startsWith(arglead));
     },
-    // _screen is not used
-    "picker:start": async (args, _screen, params, options) => {
-      await loadUserConfig(denops);
-      assert(args, isStringArray);
-      assert(params, isParams);
+    // TODO: Remove this API prior to release v1.0.0
+    // DEPRECATED: Use "submatch:start" instead
+    "picker:start": async (_args, _screen, params, options) => {
+      console.warn(
+        "The 'picker:start' is deprecated. Use 'submatch:start' instead.",
+        "It is probably caused by '@vim-fall/std/builtin/action/submatch' action.",
+      );
+      assert(
+        params,
+        is.IntersectionOf([
+          isGlobalConfig,
+          isItemPickerParams,
+        ]),
+      );
       assert(options, isOptions);
-      return await startPicker(denops, args, params, options);
+      return await startPicker(denops, [], params, options);
     },
   };
 };
@@ -57,11 +78,18 @@ export const main: Entrypoint = (denops) => {
 async function startPicker(
   denops: Denops,
   args: string[],
-  params: ItemPickerParams<DetailUnit, string> & GlobalConfig,
+  itemPickerParams: ItemPickerParams<DetailUnit, string>,
   { signal }: { signal?: AbortSignal } = {},
 ): Promise<void | true> {
   await using stack = new AsyncDisposableStack();
-  const itemPicker = stack.use(new Picker({ ...params, zindex }));
+  const globalConfig = getGlobalConfig();
+  const itemPicker = stack.use(
+    new Picker({
+      ...globalConfig,
+      ...itemPickerParams,
+      zindex,
+    }),
+  );
   zindex += Picker.ZINDEX_ALLOCATION;
   stack.defer(() => {
     zindex -= Picker.ZINDEX_ALLOCATION;
@@ -69,7 +97,8 @@ async function startPicker(
   const actionPicker = stack.use(
     new Picker({
       name: "@action",
-      source: buildActionSource(params.actions),
+      source: buildActionSource(itemPickerParams.actions),
+      ...globalConfig,
       ...getActionPickerParams(),
       zindex,
     }),
@@ -120,27 +149,31 @@ async function startPicker(
       actionName = resultItem.action;
     } else {
       // Default action
-      actionName = params.defaultAction;
+      actionName = itemPickerParams.defaultAction;
     }
 
     // Execute the action
-    const action = params.actions[actionName];
+    const action = itemPickerParams.actions[actionName];
     if (!action) {
       throw new Error(`Action "${actionName}" is not found`);
     }
     const actionParams = {
-      // for 'submatch' action
+      // TODO: Drop the following attributes prior to release v1.0.0
+      // Attributes used before @vim-fall/std@0.6.0
       _submatchContext: {
-        globalConfig: getGlobalConfig(),
-        pickerParams: params,
-        // not used
-        screen: {
-          width: 0,
-          height: 0,
+        globalConfig,
+        pickerParams: {
+          ...globalConfig,
+          ...itemPickerParams,
         },
+        screen: { width: 0, height: 0 },
+      },
+      // Secret attribute for @vim-fall/std/builtin/action/submatch
+      _submatch: {
+        itemPickerParams,
       },
       ...resultItem,
-    };
+    } as const satisfies SubmatchContext & { _submatchContext: unknown };
     if (await ensurePromise(action.invoke(denops, actionParams, { signal }))) {
       // Picker should not be closed
       continue;

@@ -210,12 +210,9 @@ export function getGlobalConfig(): Readonly<GlobalConfig> {
  * Get action picker params.
  */
 export function getActionPickerParams(): Readonly<
-  ActionPickerParams & GlobalConfig
+  ActionPickerParams
 > {
-  return {
-    ...getGlobalConfig(),
-    ...actionPickerParams,
-  };
+  return actionPickerParams;
 }
 
 /**
@@ -223,10 +220,10 @@ export function getActionPickerParams(): Readonly<
  */
 export function getItemPickerParams(
   name: string,
-): Readonly<ItemPickerParams & GlobalConfig> | undefined {
+): Readonly<ItemPickerParams> | undefined {
   const params = itemPickerParamsMap.get(name);
   if (params) {
-    return { ...getGlobalConfig(), ...params };
+    return params;
   }
   return undefined;
 }
