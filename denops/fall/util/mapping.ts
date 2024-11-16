@@ -4,6 +4,7 @@ import { chunked } from "jsr:@core/iterutil@^0.9.0/chunked";
 import { range } from "jsr:@core/iterutil@^0.9.0/range";
 
 import type { Page } from "../component/help.ts";
+import { getByteLength } from "../lib/stringutil.ts";
 
 const HIGHLIGHT_LHS = "FallHelpMappingLhs";
 const HIGHLIGHT_RHS = "FallHelpMappingRhs";
@@ -93,10 +94,4 @@ function formatMappingHelpPage(
       .flat();
     return { content, decorations };
   });
-}
-
-const encoder = new TextEncoder();
-
-function getByteLength(str: string): number {
-  return encoder.encode(str).length;
 }

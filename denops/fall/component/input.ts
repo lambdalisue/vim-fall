@@ -5,6 +5,7 @@ import type { Dimension } from "jsr:@vim-fall/core@^0.2.1/coordinator";
 
 import { Spinner } from "../lib/spinner.ts";
 import { adjustOffset } from "../lib/adjust_offset.ts";
+import { getByteLength } from "../lib/stringutil.ts";
 import { BaseComponent, type ComponentProperties } from "./_component.ts";
 
 export const HIGHLIGHT_HEADER = "FallInputHeader";
@@ -313,9 +314,4 @@ export class InputComponent extends BaseComponent {
     await super[Symbol.asyncDispose]();
     this.#spinner[Symbol.dispose]();
   }
-}
-
-const encoder = new TextEncoder();
-function getByteLength(str: string): number {
-  return encoder.encode(str).length;
 }
