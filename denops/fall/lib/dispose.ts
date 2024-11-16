@@ -1,13 +1,12 @@
 import { isObjectOf } from "jsr:@core/unknownutil@^4.3.0/is/object-of";
-import { isSyncFunction } from "jsr:@core/unknownutil@^4.3.0/is/sync-function";
-import { isAsyncFunction } from "jsr:@core/unknownutil@^4.3.0/is/async-function";
+import { isFunction } from "jsr:@core/unknownutil@^4.3.0/is/function";
 
 const isDisposable = isObjectOf({
-  [Symbol.dispose]: isSyncFunction,
+  [Symbol.dispose]: isFunction,
 });
 
 const isAsyncDisposable = isObjectOf({
-  [Symbol.asyncDispose]: isAsyncFunction,
+  [Symbol.asyncDispose]: isFunction,
 });
 
 /**
@@ -19,7 +18,8 @@ const isAsyncDisposable = isObjectOf({
 export async function dispose(resource: unknown): Promise<void> {
   if (isDisposable(resource)) {
     resource[Symbol.dispose]();
-  } else if (isAsyncDisposable(resource)) {
+  }
+  if (isAsyncDisposable(resource)) {
     await resource[Symbol.asyncDispose]();
   }
 }
