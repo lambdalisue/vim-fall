@@ -6,21 +6,22 @@ import {
   loadUserConfig,
   recacheUserConfig,
 } from "../config.ts";
+import { withHandleError } from "../error.ts";
 
 export const main: Entrypoint = (denops) => {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "config:edit": (options = {}) => {
+    "config:edit": withHandleError(denops, (options = {}) => {
       assert(options, isEditOptions);
       return editUserConfig(denops, options);
-    },
-    "config:reload": (options = {}) => {
+    }),
+    "config:reload": withHandleError(denops, (options = {}) => {
       assert(options, isReloadOptions);
       return loadUserConfig(denops, { verbose: options.verbose, reload: true });
-    },
-    "config:recache": () => {
+    }),
+    "config:recache": withHandleError(denops, () => {
       return recacheUserConfig(denops, { signal: denops.interrupted });
-    },
+    }),
   };
 };
 

@@ -24,6 +24,7 @@ import {
   isTheme,
 } from "../util/predicate.ts";
 import { list as buildListSource } from "../extension/source/list.ts";
+import { withHandleError } from "../error.ts";
 
 export type SubmatchContext = InvokeParams<Detail> & {
   readonly _submatch: {
@@ -45,12 +46,12 @@ type SubmatchParams = {
 export const main: Entrypoint = (denops) => {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "submatch": async (context, params, options) => {
+    "submatch": withHandleError(denops, async (context, params, options) => {
       assert(context, isSubmatchContext);
       assert(params, isSubmatchParams);
       assert(options, isOptions);
       return await submatchStart(denops, context, params, options);
-    },
+    }),
   };
 };
 

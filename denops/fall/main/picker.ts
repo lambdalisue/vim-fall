@@ -20,6 +20,7 @@ import {
 import { action as buildActionSource } from "../extension/source/action.ts";
 import { Picker } from "../picker.ts";
 import type { SubmatchContext } from "./submatch.ts";
+import { ExpectedError, withHandleError } from "../error.ts";
 
 let zindex = 50;
 
@@ -32,14 +33,18 @@ export const main: Entrypoint = (denops) => {
       assert(options, isOptions);
       return startPicker(denops, args, itemPickerParams, options);
     },
-    "picker:command": async (args) => {
+    "picker:command": withHandleError(denops, async (args) => {
       await loadUserConfig(denops);
       // Split the command arguments
       const [name, ...sourceArgs] = ensure(args, isStringArray);
       // Load user config
       const itemPickerParams = getItemPickerParams(name);
       if (!itemPickerParams) {
-        throw new Error(`Config for picker "${name}" is not found`);
+        throw new ExpectedError(
+          `No item picker "${name}" is found. Available item pickers are: ${
+            listItemPickerNames().join(", ")
+          }`,
+        );
       }
       await startPicker(
         denops,
@@ -47,14 +52,17 @@ export const main: Entrypoint = (denops) => {
         itemPickerParams,
         { signal: denops.interrupted },
       );
-    },
-    "picker:command:complete": async (arglead, cmdline, cursorpos) => {
-      await loadUserConfig(denops);
-      assert(arglead, is.String);
-      assert(cmdline, is.String);
-      assert(cursorpos, is.Number);
-      return listItemPickerNames().filter((name) => name.startsWith(arglead));
-    },
+    }),
+    "picker:command:complete": withHandleError(
+      denops,
+      async (arglead, cmdline, cursorpos) => {
+        await loadUserConfig(denops);
+        assert(arglead, is.String);
+        assert(cmdline, is.String);
+        assert(cursorpos, is.Number);
+        return listItemPickerNames().filter((name) => name.startsWith(arglead));
+      },
+    ),
     // TODO: Remove this API prior to release v1.0.0
     // DEPRECATED: Use "submatch:start" instead
     "picker:start": async (_args, _screen, params, options) => {
@@ -155,7 +163,13 @@ async function startPicker(
     // Execute the action
     const action = itemPickerParams.actions[actionName];
     if (!action) {
-      throw new Error(`Action "${actionName}" is not found`);
+      throw new ExpectedError(
+        `No action "${actionName}" is found. Available actions are: ${
+          Object.keys(itemPickerParams.actions).join(
+            ", ",
+          )
+        }`,
+      );
     }
     const actionParams = {
       // TODO: Drop the following attributes prior to release v1.0.0

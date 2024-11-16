@@ -2,13 +2,14 @@ import type { Entrypoint } from "jsr:@denops/std@^7.3.2";
 import { as, ensure, is, type Predicate } from "jsr:@core/unknownutil@^4.3.0";
 
 import { dispatch, type Event } from "../event.ts";
+import { withHandleError } from "../error.ts";
 
 export const main: Entrypoint = (denops) => {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "event:dispatch": (event) => {
+    "event:dispatch": withHandleError(denops, (event) => {
       dispatch(ensure(event, isEventComplement));
-    },
+    }),
   };
 };
 
