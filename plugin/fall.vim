@@ -15,6 +15,9 @@ augroup fall_plugin
   autocmd! *
   autocmd User FallPickerEnter:* :
   autocmd User FallPickerLeave:* :
+  autocmd User FallCustomLoaded :
+  autocmd User FallCustomRecached :
+  autocmd User FallPreviewRendered:* :
 augroup END
 
 if !exists('g:fall_custom_path')
@@ -22,3 +25,5 @@ if !exists('g:fall_custom_path')
         \ ? expand(join([stdpath('config'), 'fall', 'custom.ts'], s:sep))
         \ : expand(join([$HOME, '.vim', 'fall', 'custom.ts'], s:sep))
 endif
+
+
