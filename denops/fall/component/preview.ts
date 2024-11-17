@@ -172,6 +172,12 @@ export class PreviewComponent extends BaseComponent {
         winid,
         `silent! normal! ${line}G${column}|`,
       );
+      // Emit autocmd for customization
+      await fn.win_execute(
+        denops,
+        winid,
+        `silent! doautocmd <nomodeline> User FallPreviewRendered:${filename}`,
+      );
     });
 
     return true;
