@@ -260,6 +260,11 @@ export class Picker<T extends Detail> implements AsyncDisposable {
     this.#collectProcessor.start(denops, { args });
     stack.defer(() => this.#collectProcessor.pause());
 
+    // Change window title
+    if (args.length > 0) {
+      this.#inputComponent.title = `${this.#name}:${args.join(" ")}`;
+    }
+
     // Start mainloop
     let action: string | undefined;
     const accept = async (name: string) => {
