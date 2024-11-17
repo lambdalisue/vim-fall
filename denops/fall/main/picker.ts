@@ -11,12 +11,7 @@ import {
   listPickerNames,
   loadUserCustom,
 } from "../custom.ts";
-import {
-  isOptions,
-  isPickerParams,
-  isSetting,
-  isStringArray,
-} from "../util/predicate.ts";
+import { isOptions, isPickerParams, isStringArray } from "../util/predicate.ts";
 import { action as buildActionSource } from "../extension/source/action.ts";
 import { Picker } from "../picker.ts";
 import type { SubmatchContext } from "./submatch.ts";
@@ -63,23 +58,6 @@ export const main: Entrypoint = (denops) => {
         return listPickerNames().filter((name) => name.startsWith(arglead));
       },
     ),
-    // TODO: Remove this API prior to release v1.0.0
-    // DEPRECATED: Use "submatch:start" instead
-    "picker:start": async (_args, _screen, params, options) => {
-      console.warn(
-        "The 'picker:start' is deprecated. Use 'submatch:start' instead.",
-        "It is probably caused by '@vim-fall/std/builtin/action/submatch' action.",
-      );
-      assert(
-        params,
-        is.IntersectionOf([
-          isSetting,
-          isPickerParams,
-        ]),
-      );
-      assert(options, isOptions);
-      return await startPicker(denops, [], params, options);
-    },
   };
 };
 
@@ -172,22 +150,12 @@ async function startPicker(
       );
     }
     const actionParams = {
-      // TODO: Drop the following attributes prior to release v1.0.0
-      // Attributes used before @vim-fall/std@0.6.0
-      _submatchContext: {
-        setting,
-        pickerParams: {
-          ...setting,
-          ...pickerParams,
-        },
-        screen: { width: 0, height: 0 },
-      },
       // Secret attribute for @vim-fall/std/builtin/action/submatch
       _submatch: {
         pickerParams,
       },
       ...resultItem,
-    } as const satisfies SubmatchContext & { _submatchContext: unknown };
+    } as const satisfies SubmatchContext;
     if (await ensurePromise(action.invoke(denops, actionParams, { signal }))) {
       // Picker should not be closed
       continue;
