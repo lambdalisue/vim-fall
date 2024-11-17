@@ -17,12 +17,14 @@ export async function buildMappingHelpPages(
 ): Promise<Page[]> {
   // Collect mappings
   const mappings = await mapping.list(denops, "", { mode: "c" });
-  const pattern = /^<Plug>\(fall-([^)]+)\)$/;
+  const pattern1 = /^<Plug>\(fall-([^)]+)\)$/;
+  const pattern2 = /^<Cmd>call\s+fall#action\(['"](.*)['"]\)<CR>$/;
   const records = mappings
-    .filter((m) => pattern.test(m.rhs))
+    .filter((m) => pattern1.test(m.rhs) || pattern2.test(m.rhs))
+    .filter((m) => !pattern1.test(m.lhs))
     .map((m) => ({
       lhs: m.lhs,
-      rhs: m.rhs.replace(pattern, "$1"),
+      rhs: m.rhs.replace(pattern1, "$1").replace(pattern2, "action($1)"),
     }));
   return formatMappingHelpPage(width, height, records);
 }
