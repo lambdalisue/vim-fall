@@ -1,6 +1,6 @@
-import type { Detail } from "jsr:@vim-fall/core@^0.2.1/item";
-import type { Source } from "jsr:@vim-fall/core@^0.2.1/source";
-import type { Action } from "jsr:@vim-fall/core@^0.2.1/action";
+import type { Detail } from "jsr:@vim-fall/core@^0.3.0/item";
+import type { Source } from "jsr:@vim-fall/core@^0.3.0/source";
+import type { Action } from "jsr:@vim-fall/core@^0.3.0/action";
 
 /**
  * Create a source for actions.

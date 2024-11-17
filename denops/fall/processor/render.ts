@@ -3,8 +3,8 @@ import type {
   Detail,
   DisplayItem,
   IdItem,
-} from "jsr:@vim-fall/core@^0.2.1/item";
-import type { Renderer } from "jsr:@vim-fall/core@^0.2.1/renderer";
+} from "jsr:@vim-fall/core@^0.3.0/item";
+import type { Renderer } from "jsr:@vim-fall/core@^0.3.0/renderer";
 
 import { adjustOffset } from "../lib/adjust_offset.ts";
 import { ItemBelt } from "../lib/item_belt.ts";

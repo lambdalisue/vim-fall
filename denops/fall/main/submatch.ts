@@ -9,7 +9,7 @@ import type {
   Renderer,
   Sorter,
   Theme,
-} from "jsr:@vim-fall/core@^0.2.1";
+} from "jsr:@vim-fall/core@^0.3.0";
 
 import type { PickerParams } from "../custom.ts";
 import {

@@ -1,7 +1,7 @@
 import type { Denops, Entrypoint } from "jsr:@denops/std@^7.3.2";
 import { ensurePromise } from "jsr:@core/asyncutil@^1.2.0/ensure-promise";
 import { assert, ensure, is } from "jsr:@core/unknownutil@^4.3.0";
-import type { DetailUnit } from "jsr:@vim-fall/core@^0.2.1/item";
+import type { DetailUnit } from "jsr:@vim-fall/core@^0.3.0/item";
 
 import type { PickerParams } from "../custom.ts";
 import {

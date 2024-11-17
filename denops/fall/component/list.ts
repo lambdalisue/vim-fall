@@ -3,7 +3,7 @@ import type { Decoration } from "jsr:@denops/std@^7.3.2/buffer";
 import { batch } from "jsr:@denops/std@^7.3.2/batch";
 import * as fn from "jsr:@denops/std@^7.3.2/function";
 import * as buffer from "jsr:@denops/std@^7.3.2/buffer";
-import type { Dimension } from "jsr:@vim-fall/core@^0.2.1/coordinator";
+import type { Dimension } from "jsr:@vim-fall/core@^0.3.0/coordinator";
 
 import { BaseComponent, ComponentProperties } from "./_component.ts";
 

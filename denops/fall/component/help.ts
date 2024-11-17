@@ -3,7 +3,7 @@ import type { Decoration } from "jsr:@denops/std@^7.3.2/buffer";
 import * as mapping from "jsr:@denops/std@^7.3.2/mapping";
 import * as fn from "jsr:@denops/std@^7.3.2/function";
 import * as buffer from "jsr:@denops/std@^7.3.2/buffer";
-import type { Dimension } from "jsr:@vim-fall/core@^0.2.1/coordinator";
+import type { Dimension } from "jsr:@vim-fall/core@^0.3.0/coordinator";
 
 import { BaseComponent } from "./_component.ts";
 import { ItemBelt } from "../lib/item_belt.ts";

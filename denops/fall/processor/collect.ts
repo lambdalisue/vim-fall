@@ -1,8 +1,8 @@
 import type { Denops } from "jsr:@denops/std@^7.3.2";
 import { take } from "jsr:@core/iterutil@^0.9.0/async/take";
 import { map } from "jsr:@core/iterutil@^0.9.0/map";
-import type { Detail, IdItem } from "jsr:@vim-fall/core@^0.2.1/item";
-import type { CollectParams, Source } from "jsr:@vim-fall/core@^0.2.1/source";
+import type { Detail, IdItem } from "jsr:@vim-fall/core@^0.3.0/item";
+import type { CollectParams, Source } from "jsr:@vim-fall/core@^0.3.0/source";
 
 import { Chunker } from "../lib/chunker.ts";
 import { dispatch } from "../event.ts";

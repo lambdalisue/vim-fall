@@ -1,8 +1,8 @@
 import type { Denops } from "jsr:@denops/std@^7.3.2";
 import { delay } from "jsr:@std/async@^1.0.0/delay";
 import { take } from "jsr:@core/iterutil@^0.9.0/async/take";
-import type { Detail, IdItem } from "jsr:@vim-fall/core@^0.2.1/item";
-import type { Matcher, MatchParams } from "jsr:@vim-fall/core@^0.2.1/matcher";
+import type { Detail, IdItem } from "jsr:@vim-fall/core@^0.3.0/item";
+import type { Matcher, MatchParams } from "jsr:@vim-fall/core@^0.3.0/matcher";
 
 import { Chunker } from "../lib/chunker.ts";
 import { ItemBelt } from "../lib/item_belt.ts";
