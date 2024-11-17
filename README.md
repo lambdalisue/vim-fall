@@ -33,8 +33,8 @@ information about Fall's features.
 
 Users must install [Deno] version 2.x. Additionally, the `nerdfont` renderer is
 enabled by default, so configure your terminal to use a [NerdFont], or disable
-it by removing the `builtin.renderer.nerdfont` renderer from the custom file
-(`:FallCustom`).
+it by removing the `builtin.renderer.nerdfont` renderer from the custom file and
+use non `builtin.theme.modern.MODERN_THEME` theme (`:FallCustom`).
 
 [Deno]: https://deno.land
 [NerdFont]: https://www.nerdfonts.com
