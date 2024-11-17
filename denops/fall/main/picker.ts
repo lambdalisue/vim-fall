@@ -3,18 +3,18 @@ import { ensurePromise } from "jsr:@core/asyncutil@^1.2.0/ensure-promise";
 import { assert, ensure, is } from "jsr:@core/unknownutil@^4.3.0";
 import type { DetailUnit } from "jsr:@vim-fall/core@^0.2.1/item";
 
-import type { ItemPickerParams } from "../config.ts";
+import type { PickerParams } from "../config.ts";
 import {
   getActionPickerParams,
-  getGlobalConfig,
-  getItemPickerParams,
-  listItemPickerNames,
+  getPickerParams,
+  getSetting,
+  listPickerNames,
   loadUserConfig,
 } from "../config.ts";
 import {
-  isGlobalConfig,
-  isItemPickerParams,
   isOptions,
+  isPickerParams,
+  isSetting,
   isStringArray,
 } from "../util/predicate.ts";
 import { action as buildActionSource } from "../extension/source/action.ts";
@@ -29,7 +29,7 @@ export const main: Entrypoint = (denops) => {
     ...denops.dispatcher,
     "picker": (args, itemPickerParams, options) => {
       assert(args, isStringArray);
-      assert(itemPickerParams, isItemPickerParams);
+      assert(itemPickerParams, isPickerParams);
       assert(options, isOptions);
       return startPicker(denops, args, itemPickerParams, options);
     },
@@ -38,11 +38,11 @@ export const main: Entrypoint = (denops) => {
       // Split the command arguments
       const [name, ...sourceArgs] = ensure(args, isStringArray);
       // Load user config
-      const itemPickerParams = getItemPickerParams(name);
+      const itemPickerParams = getPickerParams(name);
       if (!itemPickerParams) {
         throw new ExpectedError(
           `No item picker "${name}" is found. Available item pickers are: ${
-            listItemPickerNames().join(", ")
+            listPickerNames().join(", ")
           }`,
         );
       }
@@ -60,7 +60,7 @@ export const main: Entrypoint = (denops) => {
         assert(arglead, is.String);
         assert(cmdline, is.String);
         assert(cursorpos, is.Number);
-        return listItemPickerNames().filter((name) => name.startsWith(arglead));
+        return listPickerNames().filter((name) => name.startsWith(arglead));
       },
     ),
     // TODO: Remove this API prior to release v1.0.0
@@ -73,8 +73,8 @@ export const main: Entrypoint = (denops) => {
       assert(
         params,
         is.IntersectionOf([
-          isGlobalConfig,
-          isItemPickerParams,
+          isSetting,
+          isPickerParams,
         ]),
       );
       assert(options, isOptions);
@@ -86,11 +86,11 @@ export const main: Entrypoint = (denops) => {
 async function startPicker(
   denops: Denops,
   args: string[],
-  itemPickerParams: ItemPickerParams<DetailUnit, string>,
+  itemPickerParams: PickerParams<DetailUnit, string>,
   { signal }: { signal?: AbortSignal } = {},
 ): Promise<void | true> {
   await using stack = new AsyncDisposableStack();
-  const globalConfig = getGlobalConfig();
+  const globalConfig = getSetting();
   const itemPicker = stack.use(
     new Picker({
       ...globalConfig,

@@ -12,7 +12,7 @@ import type {
   Theme,
 } from "jsr:@vim-fall/core@^0.2.1";
 
-import type { GlobalConfig, ItemPickerParams } from "../config.ts";
+import type { PickerParams, Setting } from "../config.ts";
 
 export const isStringArray = is.ArrayOf(is.String);
 
@@ -67,12 +67,12 @@ export const isAction = is.ObjectOf({
   invoke: is.Function as Predicate<any>,
 }) satisfies Predicate<Action<Detail>>;
 
-export const isGlobalConfig = is.ObjectOf({
+export const isSetting = is.ObjectOf({
   coordinator: isCoordinator,
   theme: isTheme,
-}) satisfies Predicate<GlobalConfig>;
+}) satisfies Predicate<Setting>;
 
-export const isItemPickerParams = is.ObjectOf({
+export const isPickerParams = is.ObjectOf({
   name: is.String,
   source: isSource,
   actions: is.RecordOf(isAction, is.String),
@@ -85,7 +85,7 @@ export const isItemPickerParams = is.ObjectOf({
   previewers: as.Optional(is.ArrayOf(isPreviewer)),
   coordinator: as.Optional(isCoordinator),
   theme: as.Optional(isTheme),
-}) satisfies Predicate<ItemPickerParams<Detail, string>>;
+}) satisfies Predicate<PickerParams<Detail, string>>;
 
 export const isOptions = is.ObjectOf({
   signal: as.Optional(isAbortSignal),

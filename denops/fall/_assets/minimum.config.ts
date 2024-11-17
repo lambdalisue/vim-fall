@@ -1,11 +1,11 @@
-import type { Entrypoint } from "jsr:@vim-fall/config@^0.17.3";
+import type { Entrypoint } from "jsr:@vim-fall/custom@^0.1.0";
 import * as builtin from "jsr:@vim-fall/std@^0.7.0/builtin";
 
 export const main: Entrypoint = ({
-  defineItemPickerFromSource,
-  defineItemPickerFromCurator,
+  definePickerFromSource,
+  definePickerFromCurator,
 }) => {
-  defineItemPickerFromCurator("git-grep", builtin.curator.gitGrep, {
+  definePickerFromCurator("git-grep", builtin.curator.gitGrep, {
     previewers: [builtin.previewer.file],
     actions: {
       ...builtin.action.defaultOpenActions,
@@ -15,7 +15,7 @@ export const main: Entrypoint = ({
     defaultAction: "open",
   });
 
-  defineItemPickerFromSource("file", builtin.source.file, {
+  definePickerFromSource("file", builtin.source.file, {
     matchers: [builtin.matcher.fzf],
     previewers: [builtin.previewer.file],
     actions: {
@@ -26,7 +26,7 @@ export const main: Entrypoint = ({
     defaultAction: "open",
   });
 
-  defineItemPickerFromSource("line", builtin.source.line, {
+  definePickerFromSource("line", builtin.source.line, {
     matchers: [builtin.matcher.fzf],
     previewers: [builtin.previewer.buffer],
     actions: {
@@ -37,7 +37,7 @@ export const main: Entrypoint = ({
     defaultAction: "open",
   });
 
-  defineItemPickerFromSource("buffer", builtin.source.buffer, {
+  definePickerFromSource("buffer", builtin.source.buffer, {
     matchers: [builtin.matcher.fzf],
     previewers: [builtin.previewer.buffer],
     actions: {
@@ -48,7 +48,7 @@ export const main: Entrypoint = ({
     defaultAction: "open",
   });
 
-  defineItemPickerFromSource("help", builtin.source.helptag, {
+  definePickerFromSource("help", builtin.source.helptag, {
     matchers: [builtin.matcher.fzf],
     previewers: [builtin.previewer.helptag],
     actions: {

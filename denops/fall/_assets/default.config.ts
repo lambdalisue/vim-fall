@@ -1,4 +1,4 @@
-import type { Entrypoint } from "jsr:@vim-fall/config@^0.17.3";
+import type { Entrypoint } from "jsr:@vim-fall/custom@^0.1.0";
 import {
   composeRenderers,
   refineCurator,
@@ -117,17 +117,17 @@ const myFilterDirectory = (path: string) => {
 
 export const main: Entrypoint = (
   {
-    defineItemPickerFromSource,
-    defineItemPickerFromCurator,
-    refineGlobalConfig,
+    definePickerFromSource,
+    definePickerFromCurator,
+    refineSetting,
   },
 ) => {
-  refineGlobalConfig({
+  refineSetting({
     coordinator: builtin.coordinator.modern,
     theme: builtin.theme.MODERN_THEME,
   });
 
-  defineItemPickerFromCurator(
+  definePickerFromCurator(
     "grep",
     refineCurator(
       builtin.curator.grep,
@@ -153,7 +153,7 @@ export const main: Entrypoint = (
     },
   );
 
-  defineItemPickerFromCurator(
+  definePickerFromCurator(
     "git-grep",
     refineCurator(
       builtin.curator.gitGrep,
@@ -179,7 +179,7 @@ export const main: Entrypoint = (
     },
   );
 
-  defineItemPickerFromCurator(
+  definePickerFromCurator(
     "rg",
     refineCurator(
       builtin.curator.rg,
@@ -205,7 +205,7 @@ export const main: Entrypoint = (
     },
   );
 
-  defineItemPickerFromSource(
+  definePickerFromSource(
     "file",
     refineSource(
       builtin.source.file({
@@ -239,7 +239,7 @@ export const main: Entrypoint = (
     },
   );
 
-  defineItemPickerFromSource(
+  definePickerFromSource(
     "file:all",
     refineSource(
       builtin.source.file,
@@ -270,7 +270,7 @@ export const main: Entrypoint = (
     },
   );
 
-  defineItemPickerFromSource("line", builtin.source.line, {
+  definePickerFromSource("line", builtin.source.line, {
     matchers: [builtin.matcher.fzf],
     previewers: [builtin.previewer.buffer],
     actions: {
@@ -282,7 +282,7 @@ export const main: Entrypoint = (
     defaultAction: "open",
   });
 
-  defineItemPickerFromSource(
+  definePickerFromSource(
     "buffer",
     builtin.source.buffer({ filter: "bufloaded" }),
     {
@@ -303,7 +303,7 @@ export const main: Entrypoint = (
     },
   );
 
-  defineItemPickerFromSource("help", builtin.source.helptag, {
+  definePickerFromSource("help", builtin.source.helptag, {
     matchers: [builtin.matcher.fzf],
     sorters: [
       builtin.sorter.noop,
@@ -318,7 +318,7 @@ export const main: Entrypoint = (
     defaultAction: "help",
   });
 
-  defineItemPickerFromSource("quickfix", builtin.source.quickfix, {
+  definePickerFromSource("quickfix", builtin.source.quickfix, {
     matchers: [builtin.matcher.fzf],
     sorters: [
       builtin.sorter.noop,
@@ -333,7 +333,7 @@ export const main: Entrypoint = (
     defaultAction: "open",
   });
 
-  defineItemPickerFromSource(
+  definePickerFromSource(
     "oldfiles",
     refineSource(
       builtin.source.oldfiles,
@@ -358,7 +358,7 @@ export const main: Entrypoint = (
     },
   );
 
-  defineItemPickerFromSource("history", builtin.source.history, {
+  definePickerFromSource("history", builtin.source.history, {
     matchers: [builtin.matcher.fzf],
     sorters: [
       builtin.sorter.noop,

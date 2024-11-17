@@ -9,18 +9,18 @@ import { fromFileUrl } from "jsr:@std/path@^1.0.8/from-file-url";
 import { dirname } from "jsr:@std/path@^1.0.8/dirname";
 import { copy } from "jsr:@std/fs@^1.0.5/copy";
 import {
-  buildRefineGlobalConfig,
-  type GlobalConfig,
-} from "jsr:@vim-fall/config@^0.17.3/global-config";
+  buildRefineSetting,
+  type Setting,
+} from "jsr:@vim-fall/custom@^0.1.0/setting";
 import {
   type ActionPickerParams,
   buildRefineActionPicker,
-} from "jsr:@vim-fall/config@^0.17.3/action-picker";
+} from "jsr:@vim-fall/custom@^0.1.0/action-picker";
 import {
-  buildDefineItemPickerFromCurator,
-  buildDefineItemPickerFromSource,
-  type ItemPickerParams,
-} from "jsr:@vim-fall/config@^0.17.3/item-picker";
+  buildDefinePickerFromCurator,
+  buildDefinePickerFromSource,
+  type PickerParams,
+} from "jsr:@vim-fall/custom@^0.1.0/picker";
 
 import { modern } from "jsr:@vim-fall/std@^0.7.0/builtin/coordinator/modern";
 import { MODERN_THEME } from "jsr:@vim-fall/std@^0.7.0/builtin/theme/modern";
@@ -32,11 +32,11 @@ const defaultConfigUrl = new URL(
 );
 let initialized: undefined | Promise<void>;
 
-const defaultGlobalConfig: GlobalConfig = {
+const defaultSetting: Setting = {
   coordinator: modern(),
   theme: MODERN_THEME,
 };
-let globalConfig = { ...defaultGlobalConfig };
+let globalConfig = { ...defaultSetting };
 
 const defaultActionPickerParams: ActionPickerParams = {
   matchers: [fzf()],
@@ -48,7 +48,7 @@ const defaultActionPickerParams: ActionPickerParams = {
 };
 let actionPickerParams = { ...defaultActionPickerParams };
 
-const itemPickerParamsMap = new Map<string, ItemPickerParams>();
+const itemPickerParamsMap = new Map<string, PickerParams>();
 
 /**
  * Edit user config
@@ -192,7 +192,7 @@ export async function recacheUserConfig(
 /**
  * Get global config.
  */
-export function getGlobalConfig(): Readonly<GlobalConfig> {
+export function getSetting(): Readonly<Setting> {
   return globalConfig;
 }
 
@@ -208,9 +208,9 @@ export function getActionPickerParams(): Readonly<
 /**
  * Get item picker params.
  */
-export function getItemPickerParams(
+export function getPickerParams(
   name: string,
-): Readonly<ItemPickerParams> | undefined {
+): Readonly<PickerParams> | undefined {
   const params = itemPickerParamsMap.get(name);
   if (params) {
     return params;
@@ -221,25 +221,26 @@ export function getItemPickerParams(
 /**
  * List item picker names.
  */
-export function listItemPickerNames(): readonly string[] {
+export function listPickerNames(): readonly string[] {
   return Array.from(itemPickerParamsMap.keys());
 }
 
 function reset(): void {
-  globalConfig = { ...defaultGlobalConfig };
+  globalConfig = { ...defaultSetting };
   actionPickerParams = { ...defaultActionPickerParams };
   itemPickerParamsMap.clear();
 }
 
 function buildContext(denops: Denops) {
+  // TODO: Validation must be provided in fall.vim itself
   return {
     denops,
-    refineGlobalConfig: buildRefineGlobalConfig(globalConfig),
+    refineSetting: buildRefineSetting(globalConfig),
     refineActionPicker: buildRefineActionPicker(actionPickerParams),
-    defineItemPickerFromSource: buildDefineItemPickerFromSource(
+    definePickerFromSource: buildDefinePickerFromSource(
       itemPickerParamsMap,
     ),
-    defineItemPickerFromCurator: buildDefineItemPickerFromCurator(
+    definePickerFromCurator: buildDefinePickerFromCurator(
       itemPickerParamsMap,
     ),
   };
@@ -256,4 +257,4 @@ async function getUserConfigUrl(denops: Denops): Promise<URL> {
   }
 }
 
-export type { ActionPickerParams, GlobalConfig, ItemPickerParams };
+export type { ActionPickerParams, PickerParams, Setting };
