@@ -280,6 +280,9 @@ export const main: Entrypoint = (
       ...builtin.action.defaultBufferActions,
     },
     defaultAction: "open",
+    coordinator: builtin.coordinator.modern({
+      hidePreview: true,
+    }),
   });
 
   definePickerFromSource(
