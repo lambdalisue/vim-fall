@@ -5,7 +5,7 @@ import * as fn from "jsr:@denops/std@^7.3.2/function";
 import * as buffer from "jsr:@denops/std@^7.3.2/buffer";
 import type { Dimension } from "jsr:@vim-fall/core@^0.2.1/coordinator";
 
-import { BaseComponent } from "./_component.ts";
+import { BaseComponent, ComponentProperties } from "./_component.ts";
 
 export const HIGHLIGHT_MATCH = "FallListMatch";
 export const SIGN_GROUP_SELECTED = "PopUpFallListSelected";
@@ -38,11 +38,31 @@ export type DisplayItem = {
  */
 export class ListComponent extends BaseComponent {
   #scroll = 1;
+  #title = "";
   #items: readonly DisplayItem[] = [];
   #selection = new Set<unknown>();
   #modifiedContent = true;
   #modifiedSigns = true;
+  #modifiedWindow = true;
   #reservedCommands: string[] = [];
+
+  constructor(
+    params: ComponentProperties = {},
+  ) {
+    super(params);
+    this.#title = params.title ?? "";
+  }
+
+  /** The title of the input component */
+  get title(): string {
+    return this.#title;
+  }
+
+  /** Sets the title of the input component */
+  set title(value: string) {
+    this.#title = value;
+    this.#modifiedWindow = true;
+  }
 
   /**
    * Gets the scroll setting of the list.
@@ -141,6 +161,7 @@ export class ListComponent extends BaseComponent {
   ): Promise<true | void> {
     try {
       const results = [
+        await this.#renderWindow(denops, { signal }),
         await this.#renderContent(denops, { signal }),
         await this.#placeSigns(denops, { signal }),
         await this.#executeCommands(denops, { signal }),
@@ -151,6 +172,20 @@ export class ListComponent extends BaseComponent {
       const m = err instanceof Error ? err.message : String(err);
       console.warn(`Failed to render content of the list component: ${m}`);
     }
+  }
+
+  async #renderWindow(
+    denops: Denops,
+    { signal }: { signal?: AbortSignal } = {},
+  ): Promise<true | void> {
+    if (!this.info) return;
+    if (!this.#modifiedWindow) return;
+    this.#modifiedWindow = false;
+
+    await this.update(denops, {
+      title: this.#title ? ` ${this.#title} ` : undefined,
+    });
+    signal?.throwIfAborted();
   }
 
   async #renderContent(
