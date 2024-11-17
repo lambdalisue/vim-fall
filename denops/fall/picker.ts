@@ -34,6 +34,10 @@ import { HelpComponent } from "./component/help.ts";
 import { consume, type Event } from "./event.ts";
 
 const SCHEDULER_INTERVAL = 10;
+const MATCHER_ICON = " ";
+const SORTER_ICON = " ";
+const RENDERER_ICON = " ";
+const PREVIEWER_ICON = "󰥷 ";
 
 type ReservedCallback = (
   denops: Denops,
@@ -62,6 +66,10 @@ export type PickerResult<T extends Detail> = {
 
 export type PickerOptions = {
   schedulerInterval?: number;
+  matcherIcon?: string;
+  sorterIcon?: string;
+  rendererIcon?: string;
+  previewerIcon?: string;
 };
 
 export class Picker<T extends Detail> implements AsyncDisposable {
@@ -81,12 +89,20 @@ export class Picker<T extends Detail> implements AsyncDisposable {
   readonly #helpComponent: HelpComponent;
   readonly #helpWidthRatio = 0.98;
   readonly #helpHeightRatio = 0.3;
+  readonly #matcherIcon: string;
+  readonly #sorterIcon: string;
+  readonly #rendererIcon: string;
+  readonly #previewerIcon: string;
   #selection: Set<unknown> = new Set();
 
   constructor(params: PickerParams<T>, options: PickerOptions = {}) {
     this.#schedulerInterval = options.schedulerInterval ?? SCHEDULER_INTERVAL;
     this.#name = params.name;
     this.#coordinator = params.coordinator;
+    this.#matcherIcon = options.matcherIcon ?? MATCHER_ICON;
+    this.#sorterIcon = options.sorterIcon ?? SORTER_ICON;
+    this.#rendererIcon = options.rendererIcon ?? RENDERER_ICON;
+    this.#previewerIcon = options.previewerIcon ?? PREVIEWER_ICON;
 
     // Components
     const { theme, zindex = 50 } = params;
@@ -149,6 +165,20 @@ export class Picker<T extends Detail> implements AsyncDisposable {
     const row = Math.floor(screen.height - height - 2);
     const col = Math.floor((screen.width - width) / 2);
     return { row, col, width, height };
+  }
+
+  #getExtensionIndicator(): string {
+    const { matcherIndex } = this.#matchProcessor;
+    const { sorterIndex } = this.#sortProcessor;
+    const { rendererIndex } = this.#renderProcessor;
+    const { previewerIndex } = this.#previewProcessor ?? {};
+    const matcherIndicator = `${this.#matcherIcon}${matcherIndex + 1}`;
+    const sorterIndicator = `${this.#sorterIcon}${sorterIndex + 1}`;
+    const rendererIndicator = `${this.#rendererIcon}${rendererIndex + 1}`;
+    const previewerIndicator = previewerIndex !== undefined
+      ? `${this.#previewerIcon}${previewerIndex + 1}`
+      : "";
+    return `${matcherIndicator} ${sorterIndicator} ${rendererIndicator} ${previewerIndicator}`;
   }
 
   async open(
@@ -264,6 +294,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
     if (args.length > 0) {
       this.#inputComponent.title = `${this.#name}:${args.join(" ")}`;
     }
+    this.#listComponent.title = this.#getExtensionIndicator();
 
     // Start mainloop
     let action: string | undefined;
@@ -441,6 +472,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
           }
         }
         this.#matchProcessor.matcherIndex = index;
+        this.#listComponent.title = this.#getExtensionIndicator();
         reserve((denops) => {
           this.#matchProcessor.start(denops, {
             items: this.#collectProcessor.items,
@@ -453,6 +485,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       }
       case "switch-matcher-at":
         this.#matchProcessor.matcherIndex = event.index;
+        this.#listComponent.title = this.#getExtensionIndicator();
         reserve((denops) => {
           this.#matchProcessor.start(denops, {
             items: this.#collectProcessor.items,
@@ -472,6 +505,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
           }
         }
         this.#sortProcessor.sorterIndex = index;
+        this.#listComponent.title = this.#getExtensionIndicator();
         reserve((denops) => {
           // NOTE:
           // We need to restart from the matcher processor because
@@ -486,6 +520,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       }
       case "switch-sorter-at":
         this.#sortProcessor.sorterIndex = event.index;
+        this.#listComponent.title = this.#getExtensionIndicator();
         reserve((denops) => {
           // NOTE:
           // We need to restart from the matcher processor because
@@ -507,6 +542,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
           }
         }
         this.#renderProcessor.rendererIndex = index;
+        this.#listComponent.title = this.#getExtensionIndicator();
         reserve((denops) => {
           // NOTE:
           // We need to restart from the matcher processor because
@@ -521,6 +557,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       }
       case "switch-renderer-at":
         this.#renderProcessor.rendererIndex = event.index;
+        this.#listComponent.title = this.#getExtensionIndicator();
         reserve((denops) => {
           // NOTE:
           // We need to restart from the matcher processor because
@@ -543,6 +580,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
           }
         }
         this.#previewProcessor.previewerIndex = index;
+        this.#listComponent.title = this.#getExtensionIndicator();
         reserve((denops) => {
           this.#previewProcessor?.start(denops, {
             item: this.#matchProcessor.items[this.#renderProcessor.cursor],
@@ -553,6 +591,7 @@ export class Picker<T extends Detail> implements AsyncDisposable {
       case "switch-previewer-at":
         if (!this.#previewProcessor) break;
         this.#previewProcessor.previewerIndex = event.index;
+        this.#listComponent.title = this.#getExtensionIndicator();
         reserve((denops) => {
           this.#previewProcessor?.start(denops, {
             item: this.#matchProcessor.items[this.#renderProcessor.cursor],
