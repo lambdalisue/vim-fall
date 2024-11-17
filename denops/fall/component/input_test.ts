@@ -501,7 +501,7 @@ test({
         await component.render(denops);
         await denops.cmd("redraw");
         assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
-          "X Hello 0/0",
+          "✕ Hello 0/0",
         ]);
       });
 
@@ -544,14 +544,14 @@ test({
         await component.render(denops);
         await denops.cmd("redraw");
         assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
-          "> Hel 1/2 X",
+          "> Hel 1/2 ✕",
         ]);
 
         component.truncated = true;
         await component.render(denops);
         await denops.cmd("redraw");
         assertEquals(await fn.getbufline(denops, info.bufnr, 1, "$"), [
-          "> el 1/2+ X",
+          "> el 1/2+ ✕",
         ]);
       });
     });

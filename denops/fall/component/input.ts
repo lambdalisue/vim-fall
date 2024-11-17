@@ -3,7 +3,7 @@ import * as fn from "jsr:@denops/std@^7.3.2/function";
 import * as buffer from "jsr:@denops/std@^7.3.2/buffer";
 import type { Dimension } from "jsr:@vim-fall/core@^0.3.0/coordinator";
 
-import { Spinner } from "../lib/spinner.ts";
+import { Spinner, UNICODE_SPINNER } from "../lib/spinner.ts";
 import { adjustOffset } from "../lib/adjust_offset.ts";
 import { getByteLength } from "../lib/stringutil.ts";
 import { BaseComponent, type ComponentProperties } from "./_component.ts";
@@ -11,6 +11,10 @@ import { BaseComponent, type ComponentProperties } from "./_component.ts";
 export const HIGHLIGHT_HEADER = "FallInputHeader";
 export const HIGHLIGHT_CURSOR = "FallInputCursor";
 export const HIGHLIGHT_COUNTER = "FallInputCounter";
+
+const HEAD_SYMBOL = ">";
+const FAIL_SYMBOL = "✕";
+const SPINNER = UNICODE_SPINNER;
 
 /**
  * Parameters for the InputComponent, extending ComponentProperties.
@@ -50,7 +54,7 @@ export type InputComponentParams = ComponentProperties & {
  *  └ spinner                       └ truncated
  *
  * ╭─────────────────────────────────╮
- * │> QUE█Y                      0/0X│
+ * │> QUE█Y                      0/0✕│
  * ╰────────────────────────────────┊╯
  *                                  └ failSymbol
  * ```
@@ -78,9 +82,9 @@ export class InputComponent extends BaseComponent {
   ) {
     super(params);
     this.#title = title ?? "";
-    this.#spinner = new Spinner(spinner);
-    this.#headSymbol = headSymbol ?? ">";
-    this.#failSymbol = failSymbol ?? "X";
+    this.#spinner = new Spinner(spinner ?? SPINNER);
+    this.#headSymbol = headSymbol ?? HEAD_SYMBOL;
+    this.#failSymbol = failSymbol ?? FAIL_SYMBOL;
   }
 
   /** The title of the input component */
