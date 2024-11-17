@@ -102,6 +102,7 @@ export function loadUserCustom(
       const { main } = await import(`${configUrl.href}${suffix}`);
       reset();
       await main(buildContext(denops));
+      await autocmd.emit(denops, "User", "FallCustomLoaded");
       if (verbose) {
         await denops.cmd(
           `echomsg "[fall] User custom is loaded: ${configUrl}"`,
