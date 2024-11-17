@@ -8,8 +8,8 @@
 
 <div align="center">
 
-![Screencast](https://github.com/lambdalisue/vim-fall/assets/546312/fca60054-73db-4bb1-82de-1262f1542862)
-
+![CleanShot 2024-11-17 at 15 17 46](https://github.com/user-attachments/assets/f19fe70e-1b6f-4493-90da-45fcfdd5cd57)<br>
+<sup>Fall with [vim-glyph-pallet](https://github.com/lambdalisue/vim-glyph-palette) (Colors on glyphs) on [NordFox](https://github.com/EdenEast/nightfox.nvim) (Vim's colorscheme)</sup>
 </div>
 
 Fall is a fuzzy finder for Vim and Neovim, implemented in [Denops], and stands
