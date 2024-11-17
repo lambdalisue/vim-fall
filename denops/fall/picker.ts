@@ -168,16 +168,24 @@ export class Picker<T extends Detail> implements AsyncDisposable {
   }
 
   #getExtensionIndicator(): string {
-    const { matcherIndex } = this.#matchProcessor;
-    const { sorterIndex } = this.#sortProcessor;
-    const { rendererIndex } = this.#renderProcessor;
-    const { previewerIndex } = this.#previewProcessor ?? {};
-    const matcherIndicator = `${this.#matcherIcon}${matcherIndex + 1}`;
-    const sorterIndicator = `${this.#sorterIcon}${sorterIndex + 1}`;
-    const rendererIndicator = `${this.#rendererIcon}${rendererIndex + 1}`;
-    const previewerIndicator = previewerIndex !== undefined
-      ? `${this.#previewerIcon}${previewerIndex + 1}`
+    const { matcherIndex, matcherCount } = this.#matchProcessor;
+    const { sorterIndex, sorterCount } = this.#sortProcessor;
+    const { rendererIndex, rendererCount } = this.#renderProcessor;
+    const { previewerIndex, previewerCount } = this.#previewProcessor ?? {};
+    const matcherIndicator = matcherCount > 1
+      ? `${this.#matcherIcon}${matcherIndex + 1}`
       : "";
+    const sorterIndicator = sorterCount > 1
+      ? `${this.#sorterIcon}${sorterIndex + 1}`
+      : "";
+    const rendererIndicator = rendererCount > 1
+      ? `${this.#rendererIcon}${rendererIndex + 1}`
+      : "";
+    const previewerIndicator =
+      previewerIndex !== undefined && previewerCount !== undefined &&
+        previewerCount > 1
+        ? `${this.#previewerIcon}${previewerIndex + 1}`
+        : "";
     return `${matcherIndicator} ${sorterIndicator} ${rendererIndicator} ${previewerIndicator}`;
   }
 
