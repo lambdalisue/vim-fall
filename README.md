@@ -19,7 +19,8 @@ colorscheme)</sup>
 Fall is a fuzzy finder for Vim and Neovim, implemented in [Denops], and stands
 for **"Filter All."**
 
-See [Features](https://github.com/vim-fall/fall.vim/wiki/Features) for more information about Fall's features.
+See [Features](https://github.com/vim-fall/fall.vim/wiki/Features) for more
+information about Fall's features.
 
 > [!WARNING]
 >
@@ -78,7 +79,8 @@ Fall line README.md
 ![Fall Vim README Image](https://github.com/user-attachments/assets/4eb4db30-ee1e-458c-b619-765cf307a74c)
 
 Users can view available mappings by pressing `<F1>` in the picker window. See
-the [Mappings](https://github.com/vim-fall/fall.vim/wiki/Mappings) page for more details.
+the [Mappings](https://github.com/vim-fall/fall.vim/wiki/Mappings) page for more
+details.
 
 ### Configuration
 
@@ -86,8 +88,9 @@ In Fall, settings that utilize Vim’s built-in functionality are categorized as
 “Configuration.” This includes key mappings, highlights, and buffer option
 modifications.
 
-Refer to the [Configuration](https://github.com/vim-fall/fall.vim/wiki/Configuration) page on the GitHub Wiki for
-more details.
+Refer to the
+[Configuration](https://github.com/vim-fall/fall.vim/wiki/Configuration) page on
+the GitHub Wiki for more details.
 
 ### Customization
 
@@ -96,8 +99,9 @@ categorized as “Customization.” These specifically refer to modifications ma
 to the user customization file, which can be accessed via the `FallCustom`
 command.
 
-Visit the [Customization](https://github.com/vim-fall/fall.vim/wiki/Customization) page on the GitHub Wiki for more
-information.
+Visit the
+[Customization](https://github.com/vim-fall/fall.vim/wiki/Customization) page on
+the GitHub Wiki for more information.
 
 ## Related Projects
 
