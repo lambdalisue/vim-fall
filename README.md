@@ -73,8 +73,11 @@ Fall line README.md
 
 ### Mappings
 
+![Fall Vim README Image](https://github.com/user-attachments/assets/4eb4db30-ee1e-458c-b619-765cf307a74c)
+
 Users can view available mappings by pressing `<F1>` in the picker window. See
 the [Mappings](./wiki/Mappings) page for more details.
+
 
 ### Configuration
 
