@@ -19,8 +19,12 @@ export const main: Entrypoint = (denops) => {
       assert(options, isReloadOptions);
       return loadUserCustom(denops, { verbose: options.verbose, reload: true });
     }),
-    "custom:recache": withHandleError(denops, () => {
-      return recacheUserCustom(denops, { signal: denops.interrupted });
+    "custom:recache": withHandleError(denops, (options = {}) => {
+      assert(options, isRecacheOptions);
+      return recacheUserCustom(denops, {
+        ...options,
+        signal: denops.interrupted,
+      });
     }),
   };
 };
@@ -33,5 +37,9 @@ const isEditOptions = is.ObjectOf({
 });
 
 const isReloadOptions = is.ObjectOf({
+  verbose: as.Optional(is.Boolean),
+});
+
+const isRecacheOptions = is.ObjectOf({
   verbose: as.Optional(is.Boolean),
 });

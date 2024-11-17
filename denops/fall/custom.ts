@@ -145,7 +145,7 @@ export function loadUserCustom(
  */
 export async function recacheUserCustom(
   denops: Denops,
-  { signal }: { signal?: AbortSignal },
+  { verbose, signal }: { verbose?: boolean; signal?: AbortSignal },
 ): Promise<void> {
   const configUrl = await getUserCustomUrl(denops);
   const cmd = new Deno.Command(Deno.execPath(), {
@@ -168,25 +168,31 @@ export async function recacheUserCustom(
     .pipeTo(
       new WritableStream({
         async start() {
-          await denops.cmd(
-            `redraw | echomsg "[fall] Recaching user custom: ${configUrl}"`,
-          );
+          if (verbose) {
+            await denops.cmd(
+              `redraw | echomsg "[fall] Recaching Deno modules referred in user custom: ${configUrl}"`,
+            );
+          }
         },
         async write(line) {
-          await denops.cmd(
-            `redraw | echohl Comment | echomsg "[fall] ${line}" | echohl NONE`,
-          );
+          if (verbose) {
+            await denops.cmd(
+              `redraw | echohl Comment | echomsg "[fall] ${line}" | echohl NONE`,
+            );
+          }
         },
         async close() {
-          await denops.cmd(
-            `redraw | echomsg "[fall] Recaching user custom is completed."`,
-          );
+          await autocmd.emit(denops, "User", "FallCustomRecached");
+          if (verbose) {
+            await denops.cmd(
+              `redraw | echomsg "[fall] The Deno modules referenced in user custom are re-cached. Restart Vim to apply the changes: ${configUrl}"`,
+            );
+          }
         },
       }),
       { signal },
     );
   await proc.status;
-  await loadUserCustom(denops, { verbose: true, reload: true });
 }
 
 /**
