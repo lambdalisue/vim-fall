@@ -11,7 +11,7 @@ import type {
   Theme,
 } from "jsr:@vim-fall/core@^0.2.1";
 
-import type { PickerParams } from "../config.ts";
+import type { PickerParams } from "../custom.ts";
 import {
   isAction,
   isCoordinator,
@@ -28,7 +28,7 @@ import { withHandleError } from "../error.ts";
 
 export type SubmatchContext = InvokeParams<Detail> & {
   readonly _submatch: {
-    readonly itemPickerParams: PickerParams<Detail, string>;
+    readonly pickerParams: PickerParams<Detail, string>;
   };
 };
 
@@ -62,7 +62,7 @@ async function submatchStart(
   options: { signal?: AbortSignal } = {},
 ): Promise<void | true> {
   const itemPickerParams: PickerParams = {
-    ...context._submatch.itemPickerParams,
+    ...context._submatch.pickerParams,
     source: buildListSource(context.selectedItems ?? context.filteredItems),
     matchers: params.matchers,
   };
@@ -104,7 +104,7 @@ const isSubmatchContext = is.ObjectOf({
   selectedItems: as.Optional(is.ArrayOf(is.Any)),
   filteredItems: is.ArrayOf(is.Any),
   _submatch: is.ObjectOf({
-    itemPickerParams: isPickerParams,
+    pickerParams: isPickerParams,
   }),
 }) satisfies Predicate<SubmatchContext>;
 

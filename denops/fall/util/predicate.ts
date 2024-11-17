@@ -12,7 +12,7 @@ import type {
   Theme,
 } from "jsr:@vim-fall/core@^0.2.1";
 
-import type { PickerParams, Setting } from "../config.ts";
+import type { PickerParams, Setting } from "../custom.ts";
 
 export const isStringArray = is.ArrayOf(is.String);
 

@@ -2,25 +2,25 @@ import type { Entrypoint } from "jsr:@denops/std@^7.3.2";
 import { as, assert, is } from "jsr:@core/unknownutil@^4.3.0";
 
 import {
-  editUserConfig,
-  loadUserConfig,
-  recacheUserConfig,
-} from "../config.ts";
+  editUserCustom,
+  loadUserCustom,
+  recacheUserCustom,
+} from "../custom.ts";
 import { withHandleError } from "../error.ts";
 
 export const main: Entrypoint = (denops) => {
   denops.dispatcher = {
     ...denops.dispatcher,
-    "config:edit": withHandleError(denops, (options = {}) => {
+    "custom:edit": withHandleError(denops, (options = {}) => {
       assert(options, isEditOptions);
-      return editUserConfig(denops, options);
+      return editUserCustom(denops, options);
     }),
-    "config:reload": withHandleError(denops, (options = {}) => {
+    "custom:reload": withHandleError(denops, (options = {}) => {
       assert(options, isReloadOptions);
-      return loadUserConfig(denops, { verbose: options.verbose, reload: true });
+      return loadUserCustom(denops, { verbose: options.verbose, reload: true });
     }),
-    "config:recache": withHandleError(denops, () => {
-      return recacheUserConfig(denops, { signal: denops.interrupted });
+    "custom:recache": withHandleError(denops, () => {
+      return recacheUserCustom(denops, { signal: denops.interrupted });
     }),
   };
 };

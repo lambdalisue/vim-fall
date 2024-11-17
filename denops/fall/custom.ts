@@ -26,8 +26,8 @@ import { modern } from "jsr:@vim-fall/std@^0.7.0/builtin/coordinator/modern";
 import { MODERN_THEME } from "jsr:@vim-fall/std@^0.7.0/builtin/theme/modern";
 import { fzf } from "jsr:@vim-fall/std@^0.7.0/builtin/matcher/fzf";
 
-const defaultConfigUrl = new URL(
-  "./_assets/default.config.ts",
+const defaultCustomUrl = new URL(
+  "./_assets/default.custom.ts",
   import.meta.url,
 );
 let initialized: undefined | Promise<void>;
@@ -36,7 +36,7 @@ const defaultSetting: Setting = {
   coordinator: modern(),
   theme: MODERN_THEME,
 };
-let globalConfig = { ...defaultSetting };
+let setting = { ...defaultSetting };
 
 const defaultActionPickerParams: ActionPickerParams = {
   matchers: [fzf()],
@@ -48,21 +48,21 @@ const defaultActionPickerParams: ActionPickerParams = {
 };
 let actionPickerParams = { ...defaultActionPickerParams };
 
-const itemPickerParamsMap = new Map<string, PickerParams>();
+const pickerParamsMap = new Map<string, PickerParams>();
 
 /**
- * Edit user config
+ * Edit user custom
  */
-export async function editUserConfig(
+export async function editUserCustom(
   denops: Denops,
   options: buffer.OpenOptions,
 ): Promise<void> {
-  const path = fromFileUrl(await getUserConfigUrl(denops));
-  // Try to copy the default config file if the user config file does not exist.
+  const path = fromFileUrl(await getUserCustomUrl(denops));
+  // Try to copy the default custom file if the user custom file does not exist.
   try {
     const parent = dirname(path);
     await Deno.mkdir(parent, { recursive: true });
-    await copy(defaultConfigUrl, path, { overwrite: false });
+    await copy(defaultCustomUrl, path, { overwrite: false });
   } catch (err) {
     if (err instanceof Deno.errors.AlreadyExists) {
       // Expected. Do nothing.
@@ -70,33 +70,33 @@ export async function editUserConfig(
       throw err;
     }
   }
-  // Open the user config file.
+  // Open the user custom file.
   const info = await buffer.open(denops, path, options);
-  // Register autocmd to reload the user config when the buffer is written.
+  // Register autocmd to reload the user custom when the buffer is written.
   await autocmd.group(denops, "fall_config", (helper) => {
     helper.remove("*");
     helper.define(
       "BufWritePost",
       `<buffer=${info.bufnr}>`,
-      `call denops#notify("${denops.name}", "config:reload", [#{ verbose: v:true }])`,
+      `call denops#notify("${denops.name}", "custom:reload", [#{ verbose: v:true }])`,
     );
   });
 }
 
 /**
- * Load user config from the g:fall_config_path.
+ * Load user custom from the g:fall_config_path.
  */
-export function loadUserConfig(
+export function loadUserCustom(
   denops: Denops,
   { reload = false, verbose = false } = {},
 ): Promise<void> {
   if (initialized && !reload) {
     return initialized;
   }
-  // Avoid reloading when the user config is not yet loaded.
+  // Avoid reloading when the user custom is not yet loaded.
   reload = initialized ? reload : false;
   initialized = (async () => {
-    const configUrl = await getUserConfigUrl(denops);
+    const configUrl = await getUserCustomUrl(denops);
     const suffix = reload ? `#${performance.now()}` : "";
     try {
       const { main } = await import(`${configUrl.href}${suffix}`);
@@ -104,35 +104,35 @@ export function loadUserConfig(
       await main(buildContext(denops));
       if (verbose) {
         await denops.cmd(
-          `echomsg "[fall] User config is loaded: ${configUrl}"`,
+          `echomsg "[fall] User custom is loaded: ${configUrl}"`,
         );
       }
     } catch (err) {
       // Avoid loading default configration if reload is set to keep the previous configuration.
       if (reload) {
         if (err instanceof Deno.errors.NotFound) {
-          console.debug(`User config not found: '${configUrl}'. Skip.`);
+          console.debug(`User custom not found: '${configUrl}'. Skip.`);
         } else {
-          console.warn(`Failed to load user config. Skip: ${err}`);
+          console.warn(`Failed to load user custom. Skip: ${err}`);
         }
         return;
       }
       // Fallback to the default configuration.
       if (err instanceof Deno.errors.NotFound) {
         console.debug(
-          `User config not found: '${configUrl}'. Fallback to the default config.`,
+          `User custom not found: '${configUrl}'. Fallback to the default custom.`,
         );
       } else {
         console.warn(
-          `Failed to load user config. Fallback to the default config: ${err}`,
+          `Failed to load user custom. Fallback to the default custom: ${err}`,
         );
       }
-      const { main } = await import(defaultConfigUrl.href);
+      const { main } = await import(defaultCustomUrl.href);
       reset();
       await main(buildContext(denops));
       if (verbose) {
         await denops.cmd(
-          `echomsg "[fall] Default config is loaded: ${defaultConfigUrl}"`,
+          `echomsg "[fall] Default custom is loaded: ${defaultCustomUrl}"`,
         );
       }
     }
@@ -141,13 +141,13 @@ export function loadUserConfig(
 }
 
 /**
- * Recache user config by running `deno cache --reload` command.
+ * Recache user custom by running `deno cache --reload` command.
  */
-export async function recacheUserConfig(
+export async function recacheUserCustom(
   denops: Denops,
   { signal }: { signal?: AbortSignal },
 ): Promise<void> {
-  const configUrl = await getUserConfigUrl(denops);
+  const configUrl = await getUserCustomUrl(denops);
   const cmd = new Deno.Command(Deno.execPath(), {
     args: ["cache", "--no-lock", "--reload", "--allow-import", configUrl.href],
     stdin: "null",
@@ -169,7 +169,7 @@ export async function recacheUserConfig(
       new WritableStream({
         async start() {
           await denops.cmd(
-            `redraw | echomsg "[fall] Recaching user config: ${configUrl}"`,
+            `redraw | echomsg "[fall] Recaching user custom: ${configUrl}"`,
           );
         },
         async write(line) {
@@ -179,21 +179,21 @@ export async function recacheUserConfig(
         },
         async close() {
           await denops.cmd(
-            `redraw | echomsg "[fall] Recaching user config is completed."`,
+            `redraw | echomsg "[fall] Recaching user custom is completed."`,
           );
         },
       }),
       { signal },
     );
   await proc.status;
-  await loadUserConfig(denops, { verbose: true, reload: true });
+  await loadUserCustom(denops, { verbose: true, reload: true });
 }
 
 /**
- * Get global config.
+ * Get global custom.
  */
 export function getSetting(): Readonly<Setting> {
-  return globalConfig;
+  return setting;
 }
 
 /**
@@ -211,7 +211,7 @@ export function getActionPickerParams(): Readonly<
 export function getPickerParams(
   name: string,
 ): Readonly<PickerParams> | undefined {
-  const params = itemPickerParamsMap.get(name);
+  const params = pickerParamsMap.get(name);
   if (params) {
     return params;
   }
@@ -222,37 +222,37 @@ export function getPickerParams(
  * List item picker names.
  */
 export function listPickerNames(): readonly string[] {
-  return Array.from(itemPickerParamsMap.keys());
+  return Array.from(pickerParamsMap.keys());
 }
 
 function reset(): void {
-  globalConfig = { ...defaultSetting };
+  setting = { ...defaultSetting };
   actionPickerParams = { ...defaultActionPickerParams };
-  itemPickerParamsMap.clear();
+  pickerParamsMap.clear();
 }
 
 function buildContext(denops: Denops) {
   // TODO: Validation must be provided in fall.vim itself
   return {
     denops,
-    refineSetting: buildRefineSetting(globalConfig),
+    refineSetting: buildRefineSetting(setting),
     refineActionPicker: buildRefineActionPicker(actionPickerParams),
     definePickerFromSource: buildDefinePickerFromSource(
-      itemPickerParamsMap,
+      pickerParamsMap,
     ),
     definePickerFromCurator: buildDefinePickerFromCurator(
-      itemPickerParamsMap,
+      pickerParamsMap,
     ),
   };
 }
 
-async function getUserConfigUrl(denops: Denops): Promise<URL> {
+async function getUserCustomUrl(denops: Denops): Promise<URL> {
   try {
-    const path = await vars.g.get(denops, "fall_config_path") as string;
+    const path = await vars.g.get(denops, "fall_custom_path") as string;
     return toFileUrl(path);
   } catch (err) {
     throw new Error(
-      `Failed to get user config path from 'g:fall_config_path': ${err}`,
+      `Failed to get user custom path from 'g:fall_custom_path': ${err}`,
     );
   }
 }

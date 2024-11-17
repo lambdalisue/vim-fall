@@ -3,14 +3,14 @@ import { ensurePromise } from "jsr:@core/asyncutil@^1.2.0/ensure-promise";
 import { assert, ensure, is } from "jsr:@core/unknownutil@^4.3.0";
 import type { DetailUnit } from "jsr:@vim-fall/core@^0.2.1/item";
 
-import type { PickerParams } from "../config.ts";
+import type { PickerParams } from "../custom.ts";
 import {
   getActionPickerParams,
   getPickerParams,
   getSetting,
   listPickerNames,
-  loadUserConfig,
-} from "../config.ts";
+  loadUserCustom,
+} from "../custom.ts";
 import {
   isOptions,
   isPickerParams,
@@ -34,10 +34,10 @@ export const main: Entrypoint = (denops) => {
       return startPicker(denops, args, itemPickerParams, options);
     },
     "picker:command": withHandleError(denops, async (args) => {
-      await loadUserConfig(denops);
+      await loadUserCustom(denops);
       // Split the command arguments
       const [name, ...sourceArgs] = ensure(args, isStringArray);
-      // Load user config
+      // Load user custom
       const itemPickerParams = getPickerParams(name);
       if (!itemPickerParams) {
         throw new ExpectedError(
@@ -56,7 +56,7 @@ export const main: Entrypoint = (denops) => {
     "picker:command:complete": withHandleError(
       denops,
       async (arglead, cmdline, cursorpos) => {
-        await loadUserConfig(denops);
+        await loadUserCustom(denops);
         assert(arglead, is.String);
         assert(cmdline, is.String);
         assert(cursorpos, is.Number);
@@ -86,15 +86,15 @@ export const main: Entrypoint = (denops) => {
 async function startPicker(
   denops: Denops,
   args: string[],
-  itemPickerParams: PickerParams<DetailUnit, string>,
+  pickerParams: PickerParams<DetailUnit, string>,
   { signal }: { signal?: AbortSignal } = {},
 ): Promise<void | true> {
   await using stack = new AsyncDisposableStack();
-  const globalConfig = getSetting();
+  const setting = getSetting();
   const itemPicker = stack.use(
     new Picker({
-      ...globalConfig,
-      ...itemPickerParams,
+      ...setting,
+      ...pickerParams,
       zindex,
     }),
   );
@@ -105,8 +105,8 @@ async function startPicker(
   const actionPicker = stack.use(
     new Picker({
       name: "@action",
-      source: buildActionSource(itemPickerParams.actions),
-      ...globalConfig,
+      source: buildActionSource(pickerParams.actions),
+      ...setting,
       ...getActionPickerParams(),
       zindex,
     }),
@@ -157,15 +157,15 @@ async function startPicker(
       actionName = resultItem.action;
     } else {
       // Default action
-      actionName = itemPickerParams.defaultAction;
+      actionName = pickerParams.defaultAction;
     }
 
     // Execute the action
-    const action = itemPickerParams.actions[actionName];
+    const action = pickerParams.actions[actionName];
     if (!action) {
       throw new ExpectedError(
         `No action "${actionName}" is found. Available actions are: ${
-          Object.keys(itemPickerParams.actions).join(
+          Object.keys(pickerParams.actions).join(
             ", ",
           )
         }`,
@@ -175,16 +175,16 @@ async function startPicker(
       // TODO: Drop the following attributes prior to release v1.0.0
       // Attributes used before @vim-fall/std@0.6.0
       _submatchContext: {
-        globalConfig,
+        setting,
         pickerParams: {
-          ...globalConfig,
-          ...itemPickerParams,
+          ...setting,
+          ...pickerParams,
         },
         screen: { width: 0, height: 0 },
       },
       // Secret attribute for @vim-fall/std/builtin/action/submatch
       _submatch: {
-        itemPickerParams,
+        pickerParams,
       },
       ...resultItem,
     } as const satisfies SubmatchContext & { _submatchContext: unknown };

@@ -30,8 +30,8 @@ for **"Filter All."**
 
 Users must install [Deno] version 2.x. Additionally, the `nerdfont` renderer is
 enabled by default, so configure your terminal to use a [NerdFont], or disable
-it by removing the `builtin.renderer.nerdfont` renderer from the configuration
-(`:FallConfig`).
+it by removing the `builtin.renderer.nerdfont` renderer from the custom file
+(`:FallCustom`).
 
 [Deno]: https://deno.land
 [NerdFont]: https://www.nerdfonts.com
@@ -76,7 +76,7 @@ Fall line README.md
 | Repository                                                                | Package                                               | Description                                      |
 | ------------------------------------------------------------------------- | ----------------------------------------------------- | ------------------------------------------------ |
 | [vim-fall/deno-fall-core](https://github.com/vim-fall/deno-fall-core)     | [`@vim-fall/core`](https://jsr.io/@vim-fall/core)     | Core types for Fall. Not meant for external use. |
-| [vim-fall/deno-fall-custom](https://github.com/vim-fall/deno-fall-custom) | [`@vim-fall/custom`](https://jsr.io/@vim-fall/custom) | Library to customize Fall.                        |
+| [vim-fall/deno-fall-custom](https://github.com/vim-fall/deno-fall-custom) | [`@vim-fall/custom`](https://jsr.io/@vim-fall/custom) | Library to customize Fall.                       |
 | [vim-fall/deno-fall-std](https://github.com/vim-fall/deno-fall-std)       | [`@vim-fall/std`](https://jsr.io/@vim-fall/std)       | Standard library for using Fall.                 |
 | [vim-fall/deno-fall-extra](https://github.com/vim-fall/deno-fall-extra)   | [`@vim-fall/extra`](https://jsr.io/@vim-fall/extra)   | Extra library for using Fall.                    |
 
