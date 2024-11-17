@@ -71,6 +71,30 @@ Or use the `line` source with `README.md` as an argument:
 Fall line README.md
 ```
 
+### Mappings
+
+Users can view available mappings by pressing `<F1>` in the picker window. See
+the [Mappings](./wiki/Mappings) page for more details.
+
+### Configuration
+
+In Fall, settings that utilize Vim’s built-in functionality are categorized as
+“Configuration.” This includes key mappings, highlights, and buffer option
+modifications.
+
+Refer to the [Configuration](./wiki/Configuration) page on the GitHub Wiki for
+more details.
+
+### Customization
+
+In Fall, settings written in TypeScript to enhance Fall’s functionality are
+categorized as “Customization.” These specifically refer to modifications made
+to the user customization file, which can be accessed via the `FallCustom`
+command.
+
+Visit the [Customization](./wiki/Customization) page on the GitHub Wiki for more
+information.
+
 ## Related Projects
 
 | Repository                                                                | Package                                               | Description                                      |
