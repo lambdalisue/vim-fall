@@ -19,6 +19,8 @@ colorscheme)</sup>
 Fall is a fuzzy finder for Vim and Neovim, implemented in [Denops], and stands
 for **"Filter All."**
 
+See [Features](./wiki/Features) for more information about Fall's features.
+
 > [!WARNING]
 >
 > This is a beta version. Please be aware that there might be
