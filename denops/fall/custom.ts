@@ -26,6 +26,8 @@ import { modern } from "jsr:@vim-fall/std@^0.8.0/builtin/coordinator/modern";
 import { MODERN_THEME } from "jsr:@vim-fall/std@^0.8.0/builtin/theme/modern";
 import { fzf } from "jsr:@vim-fall/std@^0.8.0/builtin/matcher/fzf";
 
+import { ExpectedError } from "./error.ts";
+
 const defaultCustomUrl = new URL(
   "./_assets/default.custom.ts",
   import.meta.url,
@@ -238,18 +240,29 @@ function reset(): void {
   pickerParamsMap.clear();
 }
 
-function buildContext(denops: Denops) {
-  // TODO: Validation must be provided in fall.vim itself
+function buildContext(denops: Denops): {
+  denops: Denops;
+  refineSetting: ReturnType<typeof buildRefineSetting>;
+  refineActionPicker: ReturnType<typeof buildRefineActionPicker>;
+  definePickerFromSource: ReturnType<typeof buildDefinePickerFromSource>;
+  definePickerFromCurator: ReturnType<typeof buildDefinePickerFromCurator>;
+} {
+  const definePickerFromSource = buildDefinePickerFromSource(pickerParamsMap);
+  const definePickerFromCurator = buildDefinePickerFromCurator(pickerParamsMap);
   return {
     denops,
     refineSetting: buildRefineSetting(setting),
     refineActionPicker: buildRefineActionPicker(actionPickerParams),
-    definePickerFromSource: buildDefinePickerFromSource(
-      pickerParamsMap,
-    ),
-    definePickerFromCurator: buildDefinePickerFromCurator(
-      pickerParamsMap,
-    ),
+    definePickerFromSource: (name, source, params) => {
+      validatePickerName(name);
+      validateActions(params.actions);
+      return definePickerFromSource(name, source, params);
+    },
+    definePickerFromCurator: (name, curator, params) => {
+      validatePickerName(name);
+      validateActions(params.actions);
+      return definePickerFromCurator(name, curator, params);
+    },
   };
 }
 
@@ -262,6 +275,23 @@ async function getUserCustomUrl(denops: Denops): Promise<URL> {
       `Failed to get user custom path from 'g:fall_custom_path': ${err}`,
     );
   }
+}
+
+function validatePickerName(name: string): void {
+  if (pickerParamsMap.has(name)) {
+    throw new ExpectedError(`Picker '${name}' is already defined.`);
+  }
+  if (name.startsWith("@")) {
+    throw new ExpectedError(`Picker name must not start with '@': ${name}`);
+  }
+}
+
+function validateActions(actions: Record<PropertyKey, unknown>): void {
+  Object.keys(actions).forEach((name) => {
+    if (name.startsWith("@")) {
+      throw new ExpectedError(`Action name must not start with '@': ${name}`);
+    }
+  });
 }
 
 export type { ActionPickerParams, PickerParams, Setting };
