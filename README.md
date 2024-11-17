@@ -78,7 +78,6 @@ Fall line README.md
 Users can view available mappings by pressing `<F1>` in the picker window. See
 the [Mappings](./wiki/Mappings) page for more details.
 
-
 ### Configuration
 
 In Fall, settings that utilize Vim’s built-in functionality are categorized as
