@@ -6,8 +6,6 @@ Deno.test("Scheduler", async (t) => {
   await t.step(
     "calls the given asynchronous callback function with the given interval without overlapping",
     async () => {
-      const controller = new AbortController();
-      const { signal } = controller;
       let count = 0;
       let locked = false;
       {
@@ -17,16 +15,15 @@ Deno.test("Scheduler", async (t) => {
             throw new Error("Overlapping");
           }
           locked = true;
-          await delay(100, { signal });
+          await delay(100);
           count++;
           locked = false;
         });
-        await delay(900);
+        await delay(950);
       }
-      controller.abort();
       // ```
       // Count             1                   2                   3                   4
-      // -------->=========|--------->=========|--------->=========|--------->=========|---------x
+      // -------->=========|--------->=========|--------->=========|--------->=========|--------->====x
       // Time    100       200       300       400       500       600       700       800       900
       // ```
       assertEquals(count, 4);
