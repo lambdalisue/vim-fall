@@ -9,7 +9,7 @@ import {
   type IdItem,
   type Matcher,
 } from "jsr:@vim-fall/core@^0.2.1";
-import { defineMatcher } from "jsr:@vim-fall/std@^0.7.0";
+import { defineMatcher } from "jsr:@vim-fall/std@^0.8.0";
 
 import { dispose } from "../lib/dispose.ts";
 import { MatchProcessor } from "./match.ts";

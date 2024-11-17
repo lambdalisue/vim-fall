@@ -9,7 +9,7 @@ import {
   type IdItem,
   type Sorter,
 } from "jsr:@vim-fall/core@^0.2.1";
-import { defineSorter } from "jsr:@vim-fall/std@^0.7.0";
+import { defineSorter } from "jsr:@vim-fall/std@^0.8.0";
 
 import { dispose } from "../lib/dispose.ts";
 import { SortProcessor } from "./sort.ts";

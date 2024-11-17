@@ -22,9 +22,9 @@ import {
   type PickerParams,
 } from "jsr:@vim-fall/custom@^0.1.0/picker";
 
-import { modern } from "jsr:@vim-fall/std@^0.7.0/builtin/coordinator/modern";
-import { MODERN_THEME } from "jsr:@vim-fall/std@^0.7.0/builtin/theme/modern";
-import { fzf } from "jsr:@vim-fall/std@^0.7.0/builtin/matcher/fzf";
+import { modern } from "jsr:@vim-fall/std@^0.8.0/builtin/coordinator/modern";
+import { MODERN_THEME } from "jsr:@vim-fall/std@^0.8.0/builtin/theme/modern";
+import { fzf } from "jsr:@vim-fall/std@^0.8.0/builtin/matcher/fzf";
 
 const defaultCustomUrl = new URL(
   "./_assets/default.custom.ts",
