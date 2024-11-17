@@ -34,10 +34,10 @@ import { HelpComponent } from "./component/help.ts";
 import { consume, type Event } from "./event.ts";
 
 const SCHEDULER_INTERVAL = 10;
-const MATCHER_ICON = " ";
-const SORTER_ICON = " ";
-const RENDERER_ICON = " ";
-const PREVIEWER_ICON = "󰥷 ";
+const MATCHER_ICON = "🅼 ";
+const SORTER_ICON = "🆂 ";
+const RENDERER_ICON = "🆁 ";
+const PREVIEWER_ICON = "🅿 ";
 
 type ReservedCallback = (
   denops: Denops,
@@ -66,10 +66,6 @@ export type PickerResult<T extends Detail> = {
 
 export type PickerOptions = {
   schedulerInterval?: number;
-  matcherIcon?: string;
-  sorterIcon?: string;
-  rendererIcon?: string;
-  previewerIcon?: string;
 };
 
 export class Picker<T extends Detail> implements AsyncDisposable {
@@ -99,16 +95,20 @@ export class Picker<T extends Detail> implements AsyncDisposable {
     this.#schedulerInterval = options.schedulerInterval ?? SCHEDULER_INTERVAL;
     this.#name = params.name;
     this.#coordinator = params.coordinator;
-    this.#matcherIcon = options.matcherIcon ?? MATCHER_ICON;
-    this.#sorterIcon = options.sorterIcon ?? SORTER_ICON;
-    this.#rendererIcon = options.rendererIcon ?? RENDERER_ICON;
-    this.#previewerIcon = options.previewerIcon ?? PREVIEWER_ICON;
 
     // Components
     const { theme, zindex = 50 } = params;
+    this.#matcherIcon = theme.matcherIcon ?? MATCHER_ICON;
+    this.#sorterIcon = theme.sorterIcon ?? SORTER_ICON;
+    this.#rendererIcon = theme.rendererIcon ?? RENDERER_ICON;
+    this.#previewerIcon = theme.previewerIcon ?? PREVIEWER_ICON;
+
     const style = this.#coordinator.style(theme);
     this.#inputComponent = this.#stack.use(
       new InputComponent({
+        spinner: theme.spinner,
+        headSymbol: theme.headSymbol,
+        failSymbol: theme.failSymbol,
         border: style.input,
         title: this.#name,
         zindex,
