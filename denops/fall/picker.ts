@@ -172,21 +172,18 @@ export class Picker<T extends Detail> implements AsyncDisposable {
     const { sorterIndex, sorterCount } = this.#sortProcessor;
     const { rendererIndex, rendererCount } = this.#renderProcessor;
     const { previewerIndex, previewerCount } = this.#previewProcessor ?? {};
-    const matcherIndicator = matcherCount > 1
+    const mi = matcherCount > 1
       ? `${this.#matcherIcon}${matcherIndex + 1}`
       : "";
-    const sorterIndicator = sorterCount > 1
-      ? `${this.#sorterIcon}${sorterIndex + 1}`
-      : "";
-    const rendererIndicator = rendererCount > 1
+    const si = sorterCount > 1 ? `${this.#sorterIcon}${sorterIndex + 1}` : "";
+    const ri = rendererCount > 1
       ? `${this.#rendererIcon}${rendererIndex + 1}`
       : "";
-    const previewerIndicator =
-      previewerIndex !== undefined && previewerCount !== undefined &&
+    const pi = previewerIndex !== undefined && previewerCount !== undefined &&
         previewerCount > 1
-        ? `${this.#previewerIcon}${previewerIndex + 1}`
-        : "";
-    return `${matcherIndicator} ${sorterIndicator} ${rendererIndicator} ${previewerIndicator}`;
+      ? `${this.#previewerIcon}${previewerIndex + 1}`
+      : "";
+    return `${mi} ${si} ${ri} ${pi}`.trim();
   }
 
   async open(
