@@ -63,7 +63,7 @@ cnoremap <silent> <Plug>(fall-action-select) <Cmd>call fall#action('@select')<CR
 
 if !get(g:, 'fall_disable_default_mapping')
   function! s:define(lhs, rhs) abort
-    if !empty(hasmapto(a:rhs, 'c')) && empty(maparg(a:lhs, 'c'))
+    if !hasmapto(a:rhs, 'c') && empty(maparg(a:lhs, 'c'))
       execute 'cnoremap <silent> <nowait> ' . a:lhs . ' ' . a:rhs
     endif
   endfunction
