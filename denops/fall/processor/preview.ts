@@ -65,17 +65,16 @@ export class PreviewProcessor<T extends Detail> implements Disposable {
       const signal = this.#controller.signal;
       if (!item) {
         this.#item = undefined;
-        return;
+      } else {
+        const previewItem = await this.#previewer?.preview(
+          denops,
+          { item },
+          { signal },
+        );
+        signal.throwIfAborted();
+
+        this.#item = previewItem ?? undefined;
       }
-
-      const previewItem = await this.#previewer?.preview(
-        denops,
-        { item },
-        { signal },
-      );
-      signal.throwIfAborted();
-
-      this.#item = previewItem ?? undefined;
       dispatch({ type: "preview-processor-succeeded" });
     })();
     this.#processing
