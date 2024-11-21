@@ -4,7 +4,6 @@ function! fall#command#Fall#call(args) abort
   endif
   let l:laststatus_saved = &laststatus
   try
-    set laststatus=0
     call s:hide()
     call fall#internal#mapping#store()
     call denops#request('fall', 'picker:command', [a:args])
@@ -12,7 +11,6 @@ function! fall#command#Fall#call(args) abort
     call s:show()
     call fall#internal#tolerant#call({ -> fall#internal#mapping#restore() })
     call fall#internal#tolerant#call({ -> fall#internal#popup#closeall() })
-    let &laststatus = l:laststatus_saved
   endtry
 endfunction
 
